@@ -1,12 +1,17 @@
 """Paper assembly coordinator.
 
-The view calls PaperAssembler().assemble(). All assembly logic lives inside
-this class. _build_plan() returns the PaperSpec; _select() runs the
-SelectionEngine; _persist() writes the Paper + PaperQuestion rows.
+The view calls PaperAssembler().assemble_bundle(), which persists a Paper
+and returns the PaperAssemblyBundleV1 dict. assemble() is the lower-level
+entry point used by tests and internal callers that only need the Paper.
+
+_build_plan() returns the PaperSpec; _select() runs the SelectionEngine;
+_persist() writes the Paper + PaperQuestion rows; BundleBuilder maps the
+domain objects to the contract JSON.
 """
 from django.db import transaction
 
 from .blueprint import BlueprintEngine, PaperSpec
+from .bundle import BundleBuilder
 from .models import Paper, PaperQuestion
 from .selection import DEFAULT_PROFILE, SelectionEngine, SelectionInput, SelectionResult
 
@@ -27,6 +32,27 @@ class PaperAssembler:
 
     def _build_plan(self, preset: str) -> PaperSpec:
         return BlueprintEngine().build(preset)
+
+    def assemble_bundle(
+        self,
+        user,
+        title: str = "Science — Practice Paper",
+        preset: str = "board",
+        chapter_slugs: list[str] | None = None,
+        weights: dict[str, float] | None = None,
+        difficulty: str = DEFAULT_PROFILE,
+    ) -> tuple[Paper, dict]:
+        spec = self._build_plan(preset)
+        inp = SelectionInput(
+            spec=spec,
+            chapter_slugs=list(chapter_slugs or []),
+            weights=weights,
+            difficulty=difficulty,
+        )
+        result = SelectionEngine().select(inp)
+        paper = self._persist(user, title, result)
+        bundle = BundleBuilder().build(paper, result, inp)
+        return paper, bundle
 
     def _select(
         self,

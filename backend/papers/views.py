@@ -37,8 +37,8 @@ class AssemblePaperView(APIView):
         # empty string here means "fall back".
         if not params.get("title"):
             params.pop("title", None)
-        paper = PaperAssembler().assemble(request.user, **params)
-        return Response(PaperSerializer(paper).data, status=status.HTTP_201_CREATED)
+        _paper, bundle = PaperAssembler().assemble_bundle(request.user, **params)
+        return Response(bundle, status=status.HTTP_201_CREATED)
 
 
 class PaperDetailView(APIView):

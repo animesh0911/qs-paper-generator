@@ -72,11 +72,16 @@ class SelectionReport:
         )
 
 
+_N_ALTERNATES = 3
+
+
 @dataclass
 class SelectionResult:
     spec: PaperSpec
     # Parallel to spec.slots; None means the slot is unfilled.
     question_ids: list[int | None]
+    # Parallel to spec.slots; swap candidates for each slot (not persisted).
+    alternate_ids: list[list[int]] = field(default_factory=list)
     report: SelectionReport = field(default_factory=SelectionReport)
 
     # Convenience pass-throughs used by callers and tests so they don't need
@@ -181,9 +186,17 @@ class SelectionEngine:
                 if cog_target.get(level, 0) > 0:
                     cog_target[level] -= 1
 
+        alternate_ids: list[list[int]] = [[] for _ in range(len(inp.spec.slots))]
+        for key, slot_indices in bucket_slot_indices.items():
+            candidates = pool.get(key, [])
+            alt_pool = [qid for qid, _, _ in candidates if qid not in used]
+            for slot_idx in slot_indices:
+                alternate_ids[slot_idx] = alt_pool[:_N_ALTERNATES]
+
         return SelectionResult(
             spec=inp.spec,
             question_ids=question_ids,
+            alternate_ids=alternate_ids,
             report=SelectionReport(
                 coverage=dict(coverage),
                 cog_coverage=dict(cog_coverage),

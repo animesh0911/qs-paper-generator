@@ -96,9 +96,7 @@ Numerical and diagram-requiring questions are bank-only in v1; no new diagrams a
 Bloom/CBSE cognitive-level tag (Remember/Understand/Apply/Analyse) and the profile maps to a target
 distribution across sections.
 
-**Review model:** The system produces a draft; the teacher reviews, edits, swaps, regenerates, and
-approves. Per-question edits are stored on the paper-question association and do not mutate the
-shared bank.
+**Review model:** The system produces a `PaperAssemblyBundleV1` JSON (per `contracts/v1_contract.md`) that the frontend renders into a BlockNote block editor. The teacher reviews, edits text, swaps questions (using `alternateQuestionIds` from the bundle), regenerates, and approves from within the editor. Per-question edits are stored on the paper-question association and do not mutate the shared bank.
 
 **Output & branding:** PDF + DOCX + answer key; CBSE-style section grammar, instruction blocks, and
 typography, but with the school's header/branding rather than CBSE codes/barcodes. Branding is

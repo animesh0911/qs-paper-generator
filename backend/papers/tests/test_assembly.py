@@ -71,25 +71,39 @@ def test_paper_to_layout_round_trips_structure(user, seeded_bank):
 
 
 @pytest.mark.django_db
-def test_assemble_endpoint_returns_201(api_client, seeded_bank):
+def test_assemble_endpoint_returns_bundle(api_client, seeded_bank):
     resp = api_client.post("/api/papers/assemble", {}, format="json")
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.data["total_marks"] > 0
-    assert len(resp.data["items"]) > 0
+    assert resp.data["schemaVersion"] == "paper_assembly_bundle.v1"
+    assert resp.data["paper"]["totalMarks"] > 0
+    assert len(resp.data["questions"]) > 0
+    assert len(resp.data["paper"]["sections"]) > 0
+
+
+@pytest.mark.django_db
+def test_bundle_slots_reference_questions_array(api_client, seeded_bank):
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+    question_ids = {q["questionId"] for q in resp.data["questions"]}
+    for section in resp.data["paper"]["sections"]:
+        for slot in section["slots"]:
+            if slot["selectedQuestionId"] is not None:
+                assert slot["selectedQuestionId"] in question_ids
 
 
 @pytest.mark.django_db
 def test_paper_detail_endpoint(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    detail = api_client.get(f"/api/papers/{create.data['id']}/")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    detail = api_client.get(f"/api/papers/{paper_pk}/")
     assert detail.status_code == status.HTTP_200_OK
-    assert detail.data["id"] == create.data["id"]
+    assert str(detail.data["id"]) == paper_pk
 
 
 @pytest.mark.django_db
 def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    pdf = api_client.get(f"/api/papers/{create.data['id']}/pdf/")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
     assert pdf.status_code == status.HTTP_200_OK
     assert pdf["Content-Type"] == "application/pdf"
     assert pdf.content[:4] == b"%PDF"
