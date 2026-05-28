@@ -17,13 +17,13 @@ HTTP POST /api/papers/assemble
 AssemblePaperView           ← validates payload (AssembleRequestSerializer)
         │
         ▼
-PaperAssembler.assemble()   ← coordinator: build plan → select → persist
+PaperBuilder.assemble()     ← coordinator: build template → pick questions → persist
         │
-        ├──▶ BlueprintEngine.build(preset)     → PaperSpec (ordered Slots, OR-groups)
+        ├──▶ TemplateBuilder.build(preset)     → PaperTemplate (ordered Slots, OR-groups)
         │
-        ├──▶ SelectionEngine.select(input)     → SelectionResult
+        ├──▶ QuestionPicker.select(opts)       → FilledTemplate
         │           │
-        │           ├──▶ _fetch_candidates()   → CandidatePool (one query per bucket)
+        │           ├──▶ _fetch_candidates()   → QuestionPool (one query per bucket)
         │           └──▶ _select_from_pool()   → pure allocator (chapter weights + cog mix)
         │
         └──▶ _persist()                        → Paper + PaperQuestion rows + report
@@ -48,10 +48,10 @@ PaperPdfView               ← cache lookup by paper id
 
 | Seam | Defined by | Why it exists |
 |---|---|---|
-| `PaperSpec` | `papers.blueprint` | Decouples "what kind of paper" (preset) from "what questions go in it" (selection). Add a new preset → no selection-engine change. |
-| `SelectionInput` / `SelectionResult` | `papers.selection` | Decouples teacher inputs (chapters, weights, difficulty) from algorithm and persistence. |
-| `CandidatePool` (internal) | `papers.selection` | Decouples ORM fetch from pure allocation. Algorithm is testable with hand-built pools, no DB. |
-| `SelectionReport` | `papers.selection` | Single source of truth for the report shape — persisted on Paper, returned in API responses, mirrored in TS types. |
+| `PaperTemplate` | `papers.template` | Decouples "what kind of paper" (preset) from "what questions go in it" (picking). Add a new preset → no picker change. |
+| `PaperOptions` / `FilledTemplate` | `papers.picker` | Decouples teacher inputs (chapters, weights, difficulty) from algorithm and persistence. |
+| `QuestionPool` (internal) | `papers.picker` | Decouples ORM fetch from pure allocation. Algorithm is testable with hand-built pools, no DB. |
+| `CoverageReport` | `papers.picker` | Single source of truth for the report shape — persisted on Paper, returned in API responses, mirrored in TS types. |
 | `PaperLayout` | `papers.layout` | Decouples PDF rendering from ORM. Renderer needs no model imports. |
 | `AssembleRequestSerializer` | `papers.serializers` | Declarative input contract for `POST /papers/assemble`. New fields accrete here. |
 | `useCoverageForm` | `frontend/hooks` | Owns the teacher's form state and builds the assemble payload. Page never constructs payloads inline. |
@@ -63,8 +63,8 @@ The product ships in vertical slices defined in `docs/PLAN.md`. Each slice cuts 
 | Slice | Status | What it adds |
 |---|---|---|
 | 1 — Walking skeleton | done | Auth, Question bank, fixed paper, PDF download. |
-| 2 — Blueprint + presets | done | `BlueprintEngine`, `PaperSpec`, OR-groups, board/half_yearly/unit_test presets. |
-| 3 — Selection engine | this PR | Chapter taxonomy + cognitive level + `SelectionEngine` + teacher form. |
+| 2 — Blueprint + presets | done | `TemplateBuilder`, `PaperTemplate`, OR-groups, board/half_yearly/unit_test presets. |
+| 3 — Selection engine | this PR | Chapter taxonomy + cognitive level + `QuestionPicker` + teacher form. |
 | 4 — Ingestion A (PDF parse) | next | Extract questions from `content/science_*` PDFs; auto-tag chapter + level. |
 | 5 — Ingestion B | upcoming | Diagrams, marking scheme, de-dup, human verification. |
 | 6 — Review / edit / approve | upcoming | Provenance on `PaperQuestion`. |

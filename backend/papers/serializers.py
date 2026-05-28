@@ -14,16 +14,16 @@ from rest_framework import serializers
 
 from bank.serializers import QuestionSerializer
 
-from .blueprint import PRESET_NAMES
+from .template import PRESET_NAMES
 from .models import Paper, PaperQuestion
-from .selection import DEFAULT_PROFILE, PROFILE_NAMES
+from .picker import DEFAULT_DIFFICULTY, DIFFICULTY_NAMES
 
 
 class AssembleRequestSerializer(serializers.Serializer):
     """Validate the payload accepted by AssemblePaperView.
 
     Owns the input contract for paper assembly. The view hands its
-    ``validated_data`` straight to ``PaperAssembler.assemble(**...)``, so
+    ``validated_data`` straight to ``PaperBuilder.assemble(**...)``, so
     field names here must stay in lockstep with that signature.
     """
 
@@ -44,7 +44,7 @@ class AssembleRequestSerializer(serializers.Serializer):
         default=dict,
     )
     difficulty = serializers.ChoiceField(
-        choices=PROFILE_NAMES, required=False, default=DEFAULT_PROFILE
+        choices=DIFFICULTY_NAMES, required=False, default=DEFAULT_DIFFICULTY
     )
 
     def validate_title(self, value: str) -> str:

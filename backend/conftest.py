@@ -59,9 +59,9 @@ def api_client(user):
 @pytest.fixture
 def seeded_bank(db):
     """Seed the minimum questions for the board preset to fill."""
-    from papers.blueprint import BlueprintEngine
+    from papers.template import TemplateBuilder
 
-    spec = BlueprintEngine().build("board")
+    spec = TemplateBuilder().build("board")
     needs: Counter = Counter()
     for slot in spec.slots:
         needs[(slot.section, slot.qtype, slot.marks)] += 1

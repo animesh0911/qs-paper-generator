@@ -13,55 +13,55 @@ A single bank item. Has section (A–E), question type (MCQ/VSA/SA/LA/CASE), mar
 A canonical CBSE Class 10 Science chapter, seeded from the NCERT taxonomy. Identified by slug. Lives in `bank.models.Chapter`.
 
 **CognitiveLevel**
-Bloom-style classification of a Question — Remember (R), Understand (U), Apply (Ap), Analyse (An). Drives the **DifficultyProfile** mix.
+Bloom-style classification of a Question — Remember (R), Understand (U), Apply (Ap), Analyse (An). Drives the **DifficultyLevel** mix.
 
-**DifficultyProfile**
-Named distribution of cognitive levels: `easy`, `standard`, `hard`. Defined in `papers.selection.DIFFICULTY_PROFILES`.
+**DifficultyLevel**
+Named distribution of cognitive levels: `easy`, `standard`, `hard`. Defined in `papers.picker.DIFFICULTY_LEVELS`.
 
 **Section**
 The five fixed sections of a CBSE Cl.10 Science paper: A (MCQ), B (VSA), C (SA), D (LA), E (Case-based).
 
 **Slot**
-One question position in a paper plan. Carries section, question type, marks, and optional **OR-group**. Lives in `papers.blueprint.Slot`.
+One question position in a paper template. Carries section, question type, marks, and optional **OR-group**. Lives in `papers.template.Slot`.
 
 **OR-group**
 A pair of Slots presenting an "Answer A OR B" choice to the student. Both slots draw distinct Questions; only one contributes to total marks. Identified by an `or_group: int` shared by exactly two Slots.
 
-**PaperSpec**
-An ordered list of Slots produced by the **BlueprintEngine** for a given preset. The contract between blueprint, selection, and assembly. Lives in `papers.blueprint.PaperSpec`.
+**PaperTemplate**
+An ordered list of Slots produced by the **TemplateBuilder** for a given preset. The contract between template building, picking, and assembly. Lives in `papers.template.PaperTemplate`.
 
 **Preset**
-A named PaperSpec factory — currently `board`, `half_yearly`, `unit_test`. Defined in `papers.blueprint._PRESETS`.
+A named PaperTemplate factory — currently `board`, `half_yearly`, `unit_test`. Defined in `papers.template._PRESETS`.
 
-**BlueprintEngine**
-Module that turns a preset name into a validated PaperSpec. The seam between "what kind of paper" (preset) and "what slots does that imply" (PaperSpec).
+**TemplateBuilder**
+Module that turns a preset name into a validated PaperTemplate. The seam between "what kind of paper" (preset) and "what slots does that imply" (PaperTemplate).
 
-**SelectionEngine**
-Module that fills a PaperSpec's Slots from the Question bank, honouring chapter weights and the DifficultyProfile's cognitive-level mix. Best-effort: unfillable slots are reported, not raised.
+**QuestionPicker**
+Module that fills a PaperTemplate's Slots from the Question bank, honouring chapter weights and the DifficultyLevel's cognitive-level mix. Best-effort: unfillable slots are reported, not raised.
 
-**CandidatePool**
-In-memory map of `(section, qtype, marks) → list[(question_id, chapter_slug, cognitive_level)]`. Internal seam of SelectionEngine that lets the allocator be tested without the ORM.
+**QuestionPool**
+In-memory map of `(section, qtype, marks) → list[(question_id, chapter_slug, cognitive_level)]`. Internal seam of QuestionPicker that lets the allocator be tested without the ORM.
 
-**SelectionInput**
-Teacher inputs to SelectionEngine: the PaperSpec, chosen chapter slugs (empty = all), per-chapter weights (optional), difficulty name.
+**PaperOptions**
+Teacher inputs to QuestionPicker: the PaperTemplate, chosen chapter slugs (empty = all), per-chapter weights (optional), difficulty name.
 
-**SelectionResult**
-Engine output: parallel list of question ids (None where unfilled), parallel list of alternate question id lists (swap candidates, not persisted), + a **SelectionReport**.
+**FilledTemplate**
+QuestionPicker output: parallel list of question ids (None where unfilled), parallel list of alternate question id lists (swap candidates, not persisted), + a **CoverageReport**.
 
-**SelectionReport**
+**CoverageReport**
 The persisted record of *what got covered and what couldn't be filled*: per-chapter counts, per-cognitive-level counts, list of unfilled slots with reasons. Lives on `Paper.report`.
 
 **Paper**
-A persisted question paper for a teacher. Owns title, total marks, the SelectionReport, and an ordered list of **PaperQuestions**.
+A persisted question paper for a teacher. Owns title, total marks, the CoverageReport, and an ordered list of **PaperQuestions**.
 
 **PaperQuestion**
 Ordered placement of a Question within a Paper. Carries paper, question, order, section, optional or_group. Per-question teacher edits will land here in later slices without mutating the shared bank Question.
 
-**PaperAssembler**
-The coordinator. `assemble(...) → Paper` (internal use/tests). `assemble_document(...) → (Paper, dict)` builds the persisted Paper and the `PaperDocumentV1` JSON in one call. Used by the API view. Calls BlueprintEngine, then SelectionEngine, then persists.
+**PaperBuilder**
+The coordinator. `assemble(...) → Paper` (internal use/tests). `assemble_document(...) → (Paper, dict)` builds the persisted Paper and the `PaperDocumentV1` JSON in one call. Used by the API view. Calls TemplateBuilder, then QuestionPicker, then persists.
 
 **PaperDocumentBuilder**
-Mapping layer that converts a `Paper`, `SelectionResult`, and `SelectionInput` into a `PaperDocumentV1` dict. No DB writes. All IDs are derived (`paperId = "paper_{pk}"`, `questionId = "q_{pk}"`, `slotId = "slot_{section}_{index}"`). Lives in `papers.document`.
+Mapping layer that converts a `Paper`, `FilledTemplate`, and `PaperOptions` into a `PaperDocumentV1` dict. No DB writes. All IDs are derived (`paperId = "paper_{pk}"`, `questionId = "q_{pk}"`, `slotId = "slot_{section}_{index}"`). Lives in `papers.document`.
 
 **PaperDocumentV1**
 The JSON contract returned by `POST /api/papers/assemble`. Section-wise, slot-based paper document consumed by the frontend BlockNote editor. Top-level shape: `{schemaVersion, request, template, paper, questions[]}`. Full specification in `contracts/v1_contract.md`.

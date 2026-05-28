@@ -16,39 +16,39 @@ The machine-readable copy lives in [`CONTEXT.md`](../CONTEXT.md) at the repo roo
 
 **CognitiveLevel** — R (Remember), U (Understand), Ap (Apply), An (Analyse). Bloom-style classification.
 
-## Paper plan
+## Paper template
 
-**Slot** — one position in a paper plan. (section, qtype, marks, or_group?).
+**Slot** — one question position in a paper template. (section, qtype, marks, or_group?).
 
 **OR-group** — pair of Slots representing "Answer A OR B". Both filled with distinct Questions; only one contributes to total marks.
 
-**PaperSpec** — ordered list of Slots for one paper. Output of BlueprintEngine, input to SelectionEngine.
+**PaperTemplate** — ordered list of Slots for one paper. Output of TemplateBuilder, input to QuestionPicker.
 
-**Preset** — named PaperSpec factory: `board`, `half_yearly`, `unit_test`.
+**Preset** — named PaperTemplate factory: `board`, `half_yearly`, `unit_test`.
 
-**BlueprintEngine** — preset name → validated PaperSpec.
+**TemplateBuilder** — turns a preset name into a validated PaperTemplate.
 
-## Selection
+## Question picking
 
-**DifficultyProfile** — named cognitive-level distribution. `easy` / `standard` / `hard`.
+**DifficultyLevel** — named cognitive-level distribution. `easy` / `standard` / `hard`.
 
-**SelectionInput** — teacher's selection: chapter slugs, weights, difficulty, the PaperSpec.
+**PaperOptions** — teacher's inputs to QuestionPicker: the PaperTemplate, chapter slugs, per-chapter weights, difficulty.
 
-**CandidatePool** — in-memory `{bucket → [(qid, chapter_slug, level)]}`. Internal seam in SelectionEngine.
+**QuestionPool** — in-memory `{bucket → [(qid, chapter_slug, level)]}`. Internal seam in QuestionPicker that lets the allocator be tested without the ORM.
 
-**SelectionResult** — engine output: parallel `question_ids` (None where unfilled) + a SelectionReport.
+**FilledTemplate** — QuestionPicker output: parallel `question_ids` (None where unfilled) + a CoverageReport.
 
-**SelectionReport** — `{coverage, cog_coverage, unfilled}`. Persisted on `Paper.report` and returned in API.
+**CoverageReport** — `{coverage, cog_coverage, unfilled}`. Persisted on `Paper.report` and returned in API.
 
-**SelectionEngine** — fills a PaperSpec's Slots best-effort, honouring chapter weights and the DifficultyProfile.
+**QuestionPicker** — fills a PaperTemplate's Slots best-effort, honouring chapter weights and the DifficultyLevel.
 
 ## Paper
 
-**Paper** — persisted paper. Title, total marks, SelectionReport, ordered PaperQuestions.
+**Paper** — persisted paper. Title, total marks, CoverageReport, ordered PaperQuestions.
 
 **PaperQuestion** — placement of a Question in a Paper. Order, section, or_group. Future teacher edits land here.
 
-**PaperAssembler** — coordinator that runs BlueprintEngine → SelectionEngine → persist.
+**PaperBuilder** — coordinator that runs TemplateBuilder → QuestionPicker → persist.
 
 **PaperLayout** — ORM-free flat structure consumed by the PDF renderer.
 
@@ -60,7 +60,7 @@ The machine-readable copy lives in [`CONTEXT.md`](../CONTEXT.md) at the repo roo
 
 ## What we avoid
 
-- "service" — say the specific module (`SelectionEngine`, `BlueprintEngine`).
+- "service" — say the specific module (`QuestionPicker`, `TemplateBuilder`).
 - "component" inside backend prose — Django doesn't use that term. Say "module" or "view" or "model".
 - "boundary" — say **seam** (overloaded with DDD's "bounded context").
 - "handler" — say "view" (Django) or the module name.

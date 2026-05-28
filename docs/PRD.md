@@ -71,11 +71,11 @@ Numerical and diagram-requiring questions are bank-only in v1; no new diagrams a
 (original figures are reused as cropped images).
 
 **Core modules (deep, isolated interfaces):**
-- **BlueprintEngine** — turns a preset + chapter weights + difficulty profile into a declarative
-  PaperSpec: an ordered set of slots, each with section, question type, marks, target cognitive
+- **TemplateBuilder** — turns a preset + chapter weights + difficulty level into a declarative
+  PaperTemplate: an ordered set of slots, each with section, question type, marks, target cognitive
   level, chapter allocation, diagram/numerical flags, and internal-choice grouping. Pure and
   deterministic.
-- **SelectionEngine** — given a PaperSpec, a candidate question pool, and usage history, selects
+- **QuestionPicker** — given a PaperTemplate, a candidate question pool, and usage history, selects
   bank questions to fill slots, enforcing chapter-weight allocation, cognitive-level distribution,
   no in-paper duplicates, and a less-recently-used preference. Reports filled vs. unfilled slots.
 - **GenerationService** — fills remaining text slots with questions grounded in the NCERT textbook,
@@ -127,11 +127,11 @@ ingestion parsing) are exercised with mocked model responses and canned fixtures
 is tested directly.
 
 Modules to be unit-tested in isolation:
-- **BlueprintEngine** — highest-ROI target: fully deterministic. Tests assert that, for given
-  presets/weights/difficulty, the produced PaperSpec has the correct section structure, total marks,
+- **TemplateBuilder** — highest-ROI target: fully deterministic. Tests assert that, for given
+  presets/weights/difficulty, the produced PaperTemplate has the correct section structure, total marks,
   question counts, chapter allocations, cognitive-level targets, and internal-choice grouping. Edge
   cases: extreme weightings, presets with custom marks, all-Easy/all-Hard profiles.
-- **SelectionEngine** — tests assert correct slot-filling against a synthetic candidate pool: chapter
+- **QuestionPicker** — tests assert correct slot-filling against a synthetic candidate pool: chapter
   weights respected, cognitive distribution met within tolerance, no in-paper duplicates, recently
   used items deprioritized, and unfilled slots correctly reported when the pool is insufficient.
 - **VerifierService** — tests assert that solver agreement passes an item, solver disagreement

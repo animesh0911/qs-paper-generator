@@ -3,14 +3,14 @@
 Three concepts live here:
 
 * **Section** / **QuestionType** / **CognitiveLevel** — fixed enumerations
-  shared by the bank, the blueprint, and the renderer.
+  shared by the bank, the template builder, and the renderer.
 * **Chapter** — canonical CBSE Cl.10 Science chapter, seeded by a data
   migration (``bank/migrations/0003_seed_chapters.py``).
 * **Question** — one bank item, tagged with section, qtype, marks, chapter
   and cognitive level.
 
 Where it fits:
-- Read by ``papers.selection.SelectionEngine`` to fetch candidate pools.
+- Read by ``papers.picker.QuestionPicker`` to fetch candidate pools.
 - Written by ``bank.management.commands.seed_questions`` and (Slice 4+) by
   ingestion of ``content/`` PDFs.
 - Exposed to the API via ``bank.serializers`` and ``bank.views``.
@@ -48,7 +48,7 @@ class Chapter(models.Model):
 
     Seeded as a fixed 13-row taxonomy in ``migrations/0003_seed_chapters.py``.
     The ``slug`` is the stable identifier used by API payloads and the
-    ``SelectionEngine`` (chapter weights are keyed by slug, not pk).
+    ``QuestionPicker`` (chapter weights are keyed by slug, not pk).
     """
 
     slug = models.SlugField(max_length=80, unique=True)
@@ -65,7 +65,7 @@ class Chapter(models.Model):
 class Question(models.Model):
     """A single bank question.
 
-    Owns enough metadata for ``SelectionEngine`` to allocate it under chapter
+    Owns enough metadata for ``QuestionPicker`` to allocate it under chapter
     weights and difficulty profiles: ``chapter`` (FK), ``cognitive_level``,
     ``section``, ``qtype``, ``marks``. ``answer`` is stored alongside but is
     only exposed through serializers gated on ``bank.policy.answer_visible``.

@@ -91,7 +91,7 @@ Where it fits:
 
 ## Vocabulary
 
-Use the terms from [`CONTEXT.md`](../CONTEXT.md) exactly — `Question`, `Chapter`, `PaperSpec`, `Slot`, `OR-group`, `SelectionEngine`, `SelectionReport`, `PaperLayout`, etc. Don't drift into `service`, `handler`, `component` when a domain term fits.
+Use the terms from [`CONTEXT.md`](../CONTEXT.md) exactly — `Question`, `Chapter`, `PaperTemplate`, `Slot`, `OR-group`, `QuestionPicker`, `CoverageReport`, `PaperLayout`, etc. Don't drift into `service`, `handler`, `component` when a domain term fits.
 
 For architecture talk, use the vocabulary in `.claude/skills/improve-codebase-architecture/LANGUAGE.md`: **module**, **interface**, **seam**, **adapter**, **depth**, **locality**.
 

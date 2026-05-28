@@ -1,11 +1,11 @@
 """HTTP views for paper assembly, detail, edit, approve, and PDF download.
 
-``AssemblePaperView`` — thin: validate, call PaperAssembler, return document.
+``AssemblePaperView`` — thin: validate, call PaperBuilder, return document.
 ``PaperDetailView`` — GET returns stored document; PATCH overwrites it (drafts only).
 ``PaperApproveView`` — POST approves draft: reconciles PaperQuestion rows, locks paper.
 ``PaperPdfView`` — GET returns rendered PDF (cached 24h after approve).
 
-Domain rules live in ``papers.assembler`` and ``papers.selection``.
+Domain rules live in ``papers.builder`` and ``papers.picker``.
 """
 from collections import defaultdict
 
@@ -17,7 +17,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .assembler import PaperAssembler
+from .builder import PaperBuilder
 from .layout import paper_to_layout
 from .models import Paper, PaperQuestion, PaperStatus
 from .pdf import render_paper_pdf
@@ -36,7 +36,7 @@ class AssemblePaperView(APIView):
         params = dict(req.validated_data)
         if not params.get("title"):
             params.pop("title", None)
-        _paper, document = PaperAssembler().assemble_document(request.user, **params)
+        _paper, document = PaperBuilder().assemble_document(request.user, **params)
         return Response(document, status=status.HTTP_201_CREATED)
 
 

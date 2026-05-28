@@ -9,9 +9,9 @@ from collections import defaultdict
 
 from bank.models import Question
 
-from .blueprint import Slot
+from .template import Slot
 from .models import Paper
-from .selection import SelectionInput, SelectionResult
+from .picker import FilledTemplate, PaperOptions
 
 
 _QTYPE_CONTRACT: dict[str, str] = {
@@ -70,13 +70,13 @@ class PaperDocumentBuilder:
     def build(
         self,
         paper: Paper,
-        result: SelectionResult,
-        inp: SelectionInput,
+        result: FilledTemplate,
+        inp: PaperOptions,
     ) -> dict:
         all_qids = self._all_question_ids(result)
         questions_by_pk = self._fetch_questions(all_qids)
 
-        preset = result.spec.name
+        preset = result.template.name
         exam_type = _PRESET_EXAM_TYPE.get(preset, preset)
 
         return {
@@ -91,7 +91,7 @@ class PaperDocumentBuilder:
 
     # --- internal helpers ---
 
-    def _all_question_ids(self, result: SelectionResult) -> list[int]:
+    def _all_question_ids(self, result: FilledTemplate) -> list[int]:
         ids: set[int] = set()
         for qid in result.question_ids:
             if qid is not None:
@@ -108,7 +108,7 @@ class PaperDocumentBuilder:
             for q in Question.objects.filter(pk__in=ids).select_related("chapter")
         }
 
-    def _build_request(self, paper: Paper, inp: SelectionInput, exam_type: str) -> dict:
+    def _build_request(self, paper: Paper, inp: PaperOptions, exam_type: str) -> dict:
         return {
             "requestId": f"req_{paper.pk}",
             "language": "en",
@@ -135,8 +135,8 @@ class PaperDocumentBuilder:
             "language": "en",
         }
 
-    def _build_paper(self, paper: Paper, result: SelectionResult) -> dict:
-        preset = result.spec.name
+    def _build_paper(self, paper: Paper, result: FilledTemplate) -> dict:
+        preset = result.template.name
         duration = _PRESET_DURATION.get(preset, 180)
         return {
             "paperId": f"paper_{paper.pk}",
@@ -167,12 +167,12 @@ class PaperDocumentBuilder:
             "sections": self._build_sections(result),
         }
 
-    def _build_sections(self, result: SelectionResult) -> list[dict]:
-        # Group slots by section, preserving PaperSpec order.
+    def _build_sections(self, result: FilledTemplate) -> list[dict]:
+        # Group slots by section, preserving PaperTemplate order.
         section_entries: dict[str, list[tuple[Slot, int | None, list[int]]]] = (
             defaultdict(list)
         )
-        for idx, slot in enumerate(result.spec.slots):
+        for idx, slot in enumerate(result.template.slots):
             qid = result.question_ids[idx]
             alts = result.alternate_ids[idx] if result.alternate_ids else []
             section_entries[slot.section].append((slot, qid, alts))

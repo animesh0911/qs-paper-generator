@@ -2,10 +2,8 @@
  * TypeScript mirrors of the backend's response shapes.
  *
  * Source of truth lives in Python:
- * - `Chapter`, `Question`, `Paper`, `PaperItem` mirror DRF serializers in
- *   `backend/bank/serializers.py` and `backend/papers/serializers.py`.
- * - `SelectionReport`, `UnfilledSlot` mirror
- *   `backend/papers/selection.py::SelectionReport`.
+ * - `PaperDocument` mirrors `PaperDocumentV1` from `backend/papers/document.py`.
+ * - `CoverageReport` mirrors `CoverageReport` from `backend/papers/selection.py`.
  * - `AssembleRequest` mirrors `AssembleRequestSerializer` input.
  *
  * If you change any of those Python files, update this module in the same PR.
@@ -28,8 +26,6 @@ export interface Question {
   cognitive_level: string;
   text: string;
   options: { label: string; text: string }[];
-  // Only present on dedicated answer-key endpoints; the default question
-  // serializer omits it so paper-assemble responses do not leak the key.
   answer?: string;
 }
 
@@ -47,19 +43,67 @@ export interface UnfilledSlot {
   reason: string;
 }
 
-export interface SelectionReport {
+export interface CoverageReport {
   coverage: Record<string, number>;
   cog_coverage: Record<string, number>;
   unfilled: UnfilledSlot[];
 }
 
+// Legacy Paper type — kept for PDF download helper
 export interface Paper {
   id: number;
   title: string;
   total_marks: number;
-  report: SelectionReport;
+  report: CoverageReport;
   created_at: string;
   items: PaperItem[];
+}
+
+// PaperDocumentV1 — returned by POST /api/papers/assemble
+export interface DocQuestionContent {
+  stem: { type: string; text: string }[];
+  options?: { label: string; content: { type: string; text: string }[] }[];
+}
+
+export interface DocQuestion {
+  questionId: string;
+  marks: number;
+  questionType: string;
+  rawText: string;
+  content: DocQuestionContent;
+  metadata: { chapterNames: string[]; difficulty: string };
+}
+
+export interface DocSlot {
+  slotId: string;
+  displayNumber: string;
+  marks: number;
+  questionType: string;
+  selectedQuestionId: string | null;
+  orGroup?: number;
+  alternateQuestionIds?: string[];
+}
+
+export interface DocSection {
+  sectionId: string;
+  title: string;
+  marks: number;
+  instructions: string;
+  slots: DocSlot[];
+}
+
+export interface DocPaper {
+  paperId: string;
+  title: string;
+  totalMarks: number;
+  durationMinutes: number;
+  sections: DocSection[];
+}
+
+export interface PaperDocument {
+  schemaVersion: string;
+  paper: DocPaper;
+  questions: DocQuestion[];
 }
 
 export interface AssembleRequest {

@@ -1,14 +1,14 @@
 """Persistence for assembled papers.
 
-``Paper`` rows are created by ``PaperAssembler._persist``. ``Paper.document``
+``Paper`` rows are created by ``PaperBuilder._persist``. ``Paper.document``
 snapshots the full ``PaperDocumentV1`` JSON at assemble time so the teacher
 can reload mid-review. PATCH /api/papers/{pk} overwrites ``document`` while
 the paper is a draft; POST /api/papers/{pk}/approve locks it (status →
 approved) and reconciles PaperQuestion rows from the final document.
 
-``Paper.report`` holds the SelectionEngine's report verbatim
-(``papers.selection.SelectionReport.to_dict()``). Its shape is owned in
-one place: see ``papers.selection.SelectionReport``.
+``Paper.report`` holds the QuestionPicker's report verbatim
+(``papers.picker.CoverageReport.to_dict()``). Its shape is owned in
+one place: see ``papers.picker.CoverageReport``.
 """
 from django.conf import settings
 from django.db import models
@@ -37,7 +37,7 @@ class Paper(models.Model):
     # Snapshot of PaperDocumentV1 at assemble time. Overwritten on PATCH,
     # frozen on approve. Null for papers assembled before this field existed.
     document = models.JSONField(null=True, blank=True)
-    # Selection report. Shape owned by papers.selection.SelectionReport:
+    # Selection report. Shape owned by papers.picker.CoverageReport:
     # {coverage: {chapter_slug: int}, cog_coverage: {level: int},
     #  unfilled: [{slot_index, section, qtype, marks, reason}]}
     report = models.JSONField(default=dict, blank=True)

@@ -1,23 +1,23 @@
 """Integration tests for the paper assembly flow.
 
 These tests verify the interface, not the skeleton implementation. When
-BlueprintEngine + SelectionEngine replace the skeleton in Slices 2/3, these
+TemplateBuilder + QuestionPicker replace the skeleton in Slices 2/3, these
 tests still pass or fail loudly.
 """
 import pytest
 from collections import Counter
 from rest_framework import status
 
-from papers.assembler import PaperAssembler
-from papers.blueprint import BlueprintEngine
+from papers.builder import PaperBuilder
+from papers.template import TemplateBuilder
 from papers.layout import paper_to_layout
 
 
 @pytest.mark.django_db
 def test_assemble_creates_paper_matching_board_spec(user, seeded_bank):
-    """Assembler produces a Paper whose slot counts match the board PaperSpec."""
-    spec = BlueprintEngine().build("board")
-    paper = PaperAssembler().assemble(user, title="Test Paper")
+    """Assembler produces a Paper whose slot counts match the board PaperTemplate."""
+    spec = TemplateBuilder().build("board")
+    paper = PaperBuilder().assemble(user, title="Test Paper")
 
     assert paper.pk is not None
     assert paper.created_by == user
@@ -31,7 +31,7 @@ def test_assemble_creates_paper_matching_board_spec(user, seeded_bank):
 @pytest.mark.django_db
 def test_assemble_counts_or_group_marks_once(user, seeded_bank):
     """Per-item marks summed across the Paper count each OR-group only once."""
-    paper = PaperAssembler().assemble(user)
+    paper = PaperBuilder().assemble(user)
     seen_groups: set[int] = set()
     total = 0
     for item in paper.items.select_related("question"):
@@ -51,8 +51,8 @@ def test_assemble_best_effort_when_bank_empty(user, db):
     Best-effort policy (Slice 3): the engine never raises on insufficient pool;
     teachers must be able to see which slots failed so they can fix inputs.
     """
-    paper = PaperAssembler().assemble(user)
-    spec = BlueprintEngine().build("board")
+    paper = PaperBuilder().assemble(user)
+    spec = TemplateBuilder().build("board")
     assert paper.items.count() == 0
     assert len(paper.report["unfilled"]) == len(spec.slots)
 
@@ -60,7 +60,7 @@ def test_assemble_best_effort_when_bank_empty(user, db):
 @pytest.mark.django_db
 def test_paper_to_layout_round_trips_structure(user, seeded_bank):
     """paper_to_layout produces sections matching the assembled Paper."""
-    paper = PaperAssembler().assemble(user)
+    paper = PaperBuilder().assemble(user)
     layout = paper_to_layout(paper)
 
     assert layout.title == paper.title

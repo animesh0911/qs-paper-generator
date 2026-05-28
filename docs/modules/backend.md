@@ -34,9 +34,9 @@ The paper-assembly pipeline.
 
 | File | Purpose | Seam? |
 |---|---|---|
-| `blueprint.py` | `BlueprintEngine`, `PaperSpec`, `Slot`, three presets. | ✅ |
-| `selection.py` | `SelectionEngine`, `SelectionInput`, `SelectionResult`, `SelectionReport`, `CandidatePool`, difficulty profiles. | ✅ |
-| `assembler.py` | `PaperAssembler` — coordinator. `_build_plan` → `_select` → `_persist`. | |
+| `template.py` | `TemplateBuilder`, `PaperTemplate`, `Slot`, three presets. | ✅ |
+| `picker.py` | `QuestionPicker`, `PaperOptions`, `FilledTemplate`, `CoverageReport`, `QuestionPool`, difficulty levels. | ✅ |
+| `builder.py` | `PaperBuilder` — coordinator. `_build_template` → `_select` → `_persist`. | |
 | `models.py` | `Paper` (with `report` JSON), `PaperQuestion`. | |
 | `serializers.py` | `AssembleRequestSerializer` (input contract), `PaperSerializer`. | ✅ |
 | `views.py` | `AssemblePaperView`, `PaperDetailView`, `PaperPdfView`. | |
@@ -58,8 +58,8 @@ Django project root.
 ## Reading order for a new dev
 
 1. `CONTEXT.md` (domain vocabulary).
-2. `papers/blueprint.py` (the smallest engine; sets the seam shape).
-3. `papers/selection.py` (the algorithm + how it tests).
-4. `papers/assembler.py` (how they compose).
+2. `papers/template.py` (the smallest engine; sets the seam shape).
+3. `papers/picker.py` (the algorithm + how it tests).
+4. `papers/builder.py` (how they compose).
 5. `papers/views.py` + `serializers.py` (the HTTP surface).
 6. `papers/layout.py` + `pdf.py` (rendering).

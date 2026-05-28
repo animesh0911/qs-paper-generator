@@ -40,7 +40,7 @@ Page-level routes. Each file ends in `.page.tsx`.
 
 | File | Purpose |
 |---|---|
-| `index.ts` | `Chapter`, `Question`, `PaperItem`, `Paper`, `SelectionReport`, `UnfilledSlot`, `AssembleRequest`. Mirrors `papers.selection.SelectionReport` and the assemble API. |
+| `index.ts` | `Chapter`, `Question`, `PaperItem`, `Paper`, `CoverageReport`, `UnfilledSlot`, `AssembleRequest`. Mirrors `papers.picker.CoverageReport` and the assemble API. |
 
 ## `src/constants/`
 

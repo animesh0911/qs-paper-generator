@@ -1,7 +1,7 @@
-"""SelectionEngine acceptance tests.
+"""QuestionPicker acceptance tests.
 
 These tests verify that selection honours chapter weighting, the cognitive-mix
-implied by the difficulty profile, and the no-duplicate / unfilled-reporting
+implied by the difficulty level, and the no-duplicate / unfilled-reporting
 contract called out in Slice 3.
 """
 from __future__ import annotations
@@ -12,18 +12,18 @@ import pytest
 from rest_framework import status
 
 from bank.models import Chapter, CognitiveLevel, Question, QuestionType, Section
-from papers.blueprint import PaperSpec, Slot
-from papers.selection import (
-    DIFFICULTY_PROFILES,
-    CandidatePool,
-    SelectionEngine,
-    SelectionInput,
-    SelectionReport,
+from papers.template import PaperTemplate, Slot
+from papers.picker import (
+    DIFFICULTY_LEVELS,
+    CoverageReport,
+    PaperOptions,
+    QuestionPicker,
+    QuestionPool,
 )
 
 
-def _spec(n_mcq: int) -> PaperSpec:
-    return PaperSpec(
+def _spec(n_mcq: int) -> PaperTemplate:
+    return PaperTemplate(
         name="mcq-only",
         slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(n_mcq)],
     )
@@ -65,13 +65,13 @@ def test_selection_respects_chapter_weights_70_30(big_pool):
     """A 70/30 chapter weight on a 10-slot paper allocates 7/3 questions.
 
     Why this matters: the teacher's per-chapter weights are the primary lever
-    for coverage; if the engine quietly ignores them the UI signal is a lie.
+    for coverage; if the picker quietly ignores them the UI signal is a lie.
     """
     ch1, ch2 = big_pool
     spec = _spec(10)
-    result = SelectionEngine().select(
-        SelectionInput(
-            spec=spec,
+    result = QuestionPicker().select(
+        PaperOptions(
+            template=spec,
             chapter_slugs=[ch1.slug, ch2.slug],
             weights={ch1.slug: 0.7, ch2.slug: 0.3},
             difficulty="standard",
@@ -87,7 +87,7 @@ def test_selection_respects_chapter_weights_70_30(big_pool):
 
 @pytest.mark.django_db
 def test_selection_meets_cognitive_mix_within_tolerance(big_pool):
-    """Cognitive-level counts match the difficulty profile within ±1.
+    """Cognitive-level counts match the difficulty level within ±1.
 
     Why ±1: largest-remainder allocation rounds quotas to integers, so the
     target can drift by at most one slot per cognitive bucket.
@@ -95,14 +95,14 @@ def test_selection_meets_cognitive_mix_within_tolerance(big_pool):
     ch1, ch2 = big_pool
     n = 20
     spec = _spec(n)
-    result = SelectionEngine().select(
-        SelectionInput(
-            spec=spec,
+    result = QuestionPicker().select(
+        PaperOptions(
+            template=spec,
             chapter_slugs=[ch1.slug, ch2.slug],
             difficulty="standard",
         )
     )
-    profile = DIFFICULTY_PROFILES["standard"]
+    profile = DIFFICULTY_LEVELS["standard"]
     actual = Counter()
     for qid in result.question_ids:
         actual[Question.objects.get(id=qid).cognitive_level] += 1
@@ -120,8 +120,8 @@ def test_selection_no_in_paper_duplicates(big_pool):
     """
     ch1, _ = big_pool
     spec = _spec(15)
-    result = SelectionEngine().select(
-        SelectionInput(spec=spec, chapter_slugs=[ch1.slug])
+    result = QuestionPicker().select(
+        PaperOptions(template=spec, chapter_slugs=[ch1.slug])
     )
     filled = [q for q in result.question_ids if q is not None]
     assert len(filled) == len(set(filled))
@@ -139,8 +139,8 @@ def test_selection_reports_unfilled_on_insufficient_pool(two_chapters):
     _make_question(chapter=ch1, level=CognitiveLevel.REMEMBER, idx=0)
     _make_question(chapter=ch1, level=CognitiveLevel.REMEMBER, idx=1)
     spec = _spec(5)
-    result = SelectionEngine().select(
-        SelectionInput(spec=spec, chapter_slugs=[ch1.slug])
+    result = QuestionPicker().select(
+        PaperOptions(template=spec, chapter_slugs=[ch1.slug])
     )
     assert sum(1 for q in result.question_ids if q is not None) == 2
     assert len(result.unfilled) == 3
@@ -197,55 +197,55 @@ def test_assemble_persists_coverage_on_paper(api_client, big_pool):
 
 
 def test_pure_allocator_honours_chapter_weights_with_hand_built_pool():
-    """Hand-built CandidatePool exercises allocation with no DB rows.
+    """Hand-built QuestionPool exercises allocation with no DB rows.
 
     Why this test exists: the algorithm should be reproducible from a pure
     in-memory pool. If a future refactor makes _select_from_pool reach into
     the ORM, this test fails immediately without any fixture cost.
     """
     bucket = (Section.A, QuestionType.MCQ, 1)
-    pool: CandidatePool = {
+    pool: QuestionPool = {
         bucket: [
             (i, "electricity" if i < 50 else "life-processes", "R")
             for i in range(1, 101)
         ]
     }
-    spec = PaperSpec(
+    spec = PaperTemplate(
         name="t", slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(10)]
     )
-    inp = SelectionInput(
-        spec=spec,
+    opts = PaperOptions(
+        template=spec,
         chapter_slugs=["electricity", "life-processes"],
         weights={"electricity": 0.8, "life-processes": 0.2},
         difficulty="standard",
     )
-    result = SelectionEngine._select_from_pool(inp, pool)
+    result = QuestionPicker._select_from_pool(opts, pool)
     coverage = result.coverage
     assert coverage["electricity"] == 8
     assert coverage["life-processes"] == 2
 
 
-def test_selection_report_round_trips_through_dict():
-    """to_dict()/from_dict() guards drift between engine output and storage.
+def test_coverage_report_round_trips_through_dict():
+    """to_dict()/from_dict() guards drift between picker output and storage.
 
     Why this test exists: the report shape is defined once in Python and
     must survive a JSON round-trip into Paper.report. A regression that
     drops a field or renames one fails here before it ships.
     """
-    r = SelectionReport(
+    r = CoverageReport(
         coverage={"electricity": 2, "life-processes": 3},
         cog_coverage={"R": 2, "U": 3},
         unfilled=[{"slot_index": 0, "section": "A", "qtype": "MCQ", "marks": 1, "reason": "x"}],
     )
-    assert SelectionReport.from_dict(r.to_dict()) == r
+    assert CoverageReport.from_dict(r.to_dict()) == r
 
 
 def test_pure_allocator_reports_unfilled_with_empty_pool():
-    spec = PaperSpec(
+    spec = PaperTemplate(
         name="t", slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(3)]
     )
-    inp = SelectionInput(spec=spec, chapter_slugs=["x"], difficulty="standard")
-    result = SelectionEngine._select_from_pool(inp, {})
+    opts = PaperOptions(template=spec, chapter_slugs=["x"], difficulty="standard")
+    result = QuestionPicker._select_from_pool(opts, {})
     assert result.question_ids == [None, None, None]
     assert len(result.unfilled) == 3
 

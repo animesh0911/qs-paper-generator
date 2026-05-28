@@ -1,7 +1,7 @@
-"""Declarative paper blueprints.
+"""Paper templates and presets.
 
-BlueprintEngine.build(preset) → PaperSpec
-PaperSpec is the seam the Assembler and SelectionEngine (Slice 3) consume.
+TemplateBuilder.build(preset) → PaperTemplate
+PaperTemplate is the skeleton the PaperBuilder and QuestionPicker consume.
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ class Slot:
 
 
 @dataclass
-class PaperSpec:
+class PaperTemplate:
     name: str
     slots: list[Slot] = field(default_factory=list)
 
@@ -56,7 +56,7 @@ class PaperSpec:
             raise ValueError(f"OR groups must have exactly 2 slots; bad groups: {bad}")
 
 
-def _board_spec() -> PaperSpec:
+def _board_spec() -> PaperTemplate:
     slots: list[Slot] = []
     for _ in range(20):
         slots.append(Slot(Section.A, QuestionType.MCQ, 1))
@@ -70,10 +70,10 @@ def _board_spec() -> PaperSpec:
     for g in range(3):
         slots.append(Slot(Section.E, QuestionType.CASE, 4, 3 + g))
         slots.append(Slot(Section.E, QuestionType.CASE, 4, 3 + g))
-    return PaperSpec(name="board", slots=slots)
+    return PaperTemplate(name="board", slots=slots)
 
 
-def _half_yearly_spec() -> PaperSpec:
+def _half_yearly_spec() -> PaperTemplate:
     slots: list[Slot] = []
     for _ in range(10):
         slots.append(Slot(Section.A, QuestionType.MCQ, 1))
@@ -87,10 +87,10 @@ def _half_yearly_spec() -> PaperSpec:
     for g in range(2):
         slots.append(Slot(Section.E, QuestionType.CASE, 4, 2 + g))
         slots.append(Slot(Section.E, QuestionType.CASE, 4, 2 + g))
-    return PaperSpec(name="half_yearly", slots=slots)
+    return PaperTemplate(name="half_yearly", slots=slots)
 
 
-def _unit_test_spec() -> PaperSpec:
+def _unit_test_spec() -> PaperTemplate:
     slots: list[Slot] = []
     for _ in range(5):
         slots.append(Slot(Section.A, QuestionType.MCQ, 1))
@@ -100,10 +100,10 @@ def _unit_test_spec() -> PaperSpec:
         slots.append(Slot(Section.C, QuestionType.SA, 3))
     slots.append(Slot(Section.D, QuestionType.LA, 5, 0))
     slots.append(Slot(Section.D, QuestionType.LA, 5, 0))
-    return PaperSpec(name="unit_test", slots=slots)
+    return PaperTemplate(name="unit_test", slots=slots)
 
 
-_PRESETS: dict[str, Callable[[], PaperSpec]] = {
+_PRESETS: dict[str, Callable[[], PaperTemplate]] = {
     "board": _board_spec,
     "half_yearly": _half_yearly_spec,
     "unit_test": _unit_test_spec,
@@ -112,8 +112,8 @@ _PRESETS: dict[str, Callable[[], PaperSpec]] = {
 PRESET_NAMES: list[str] = list(_PRESETS)
 
 
-class BlueprintEngine:
-    def build(self, preset: str = "board") -> PaperSpec:
+class TemplateBuilder:
+    def build(self, preset: str = "board") -> PaperTemplate:
         factory = _PRESETS.get(preset)
         if factory is None:
             raise ValueError(
