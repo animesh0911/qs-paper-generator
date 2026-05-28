@@ -14,6 +14,7 @@ class QuestionLayout:
     text: str
     marks: int
     options: list[dict]
+    or_group: int | None = None
 
 
 @dataclass
@@ -49,6 +50,7 @@ def paper_to_layout(paper) -> PaperLayout:
                 text=q.text,
                 marks=q.marks,
                 options=q.options or [],
+                or_group=item.or_group,
             )
         )
     return PaperLayout(

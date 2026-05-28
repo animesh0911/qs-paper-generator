@@ -22,7 +22,8 @@ class AssemblePaperView(APIView):
 
     def post(self, request):
         title = request.data.get("title") or "Science — Practice Paper"
-        paper = PaperAssembler().assemble(request.user, title=title)
+        preset = request.data.get("preset") or "board"
+        paper = PaperAssembler().assemble(request.user, title=title, preset=preset)
         return Response(PaperSerializer(paper).data, status=status.HTTP_201_CREATED)
 
 

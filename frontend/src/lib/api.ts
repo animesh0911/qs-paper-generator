@@ -69,7 +69,7 @@ export async function fetchMetadata(): Promise<Metadata> {
 }
 
 export async function downloadPaperPdf(id: number) {
-  const res = await request(`/papers/${id}/pdf`, { method: 'GET' });
+  const res = await request(`/papers/${id}/pdf/`, { method: 'GET' });
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

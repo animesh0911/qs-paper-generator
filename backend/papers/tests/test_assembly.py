@@ -5,39 +5,44 @@ BlueprintEngine + SelectionEngine replace the skeleton in Slices 2/3, these
 tests still pass or fail loudly.
 """
 import pytest
+from collections import Counter
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
-from papers.assembler import SKELETON_PLAN, PaperAssembler
+from papers.assembler import PaperAssembler
+from papers.blueprint import BlueprintEngine
 from papers.layout import paper_to_layout
 
 
 @pytest.mark.django_db
-def test_assemble_creates_paper_with_correct_sections(user, seeded_bank):
-    """Assembler produces a Paper with the section counts from SKELETON_PLAN."""
+def test_assemble_creates_paper_matching_board_spec(user, seeded_bank):
+    """Assembler produces a Paper whose slot counts match the board PaperSpec."""
+    spec = BlueprintEngine().build("board")
     paper = PaperAssembler().assemble(user, title="Test Paper")
 
     assert paper.pk is not None
     assert paper.created_by == user
-    assert paper.total_marks > 0
+    assert paper.total_marks == spec.total_marks
 
-    section_counts = {}
-    for item in paper.items.all():
-        section_counts[item.section] = section_counts.get(item.section, 0) + 1
-
-    for section, expected_count in SKELETON_PLAN:
-        assert section_counts.get(section) == expected_count, (
-            f"Section {section}: expected {expected_count} questions, "
-            f"got {section_counts.get(section, 0)}"
-        )
+    expected_section_counts = Counter(s.section for s in spec.slots)
+    actual_section_counts = Counter(item.section for item in paper.items.all())
+    assert actual_section_counts == expected_section_counts
 
 
 @pytest.mark.django_db
-def test_assemble_sums_marks_correctly(user, seeded_bank):
-    """Paper.total_marks equals the sum of all placed question marks."""
+def test_assemble_counts_or_group_marks_once(user, seeded_bank):
+    """Per-item marks summed across the Paper count each OR-group only once."""
     paper = PaperAssembler().assemble(user)
-    expected = sum(item.question.marks for item in paper.items.select_related("question"))
-    assert paper.total_marks == expected
+    seen_groups: set[int] = set()
+    total = 0
+    for item in paper.items.select_related("question"):
+        if item.or_group is None:
+            total += item.question.marks
+        elif item.or_group not in seen_groups:
+            seen_groups.add(item.or_group)
+            total += item.question.marks
+    assert total == paper.total_marks
+    assert seen_groups, "board preset must produce at least one OR-group"
 
 
 @pytest.mark.django_db
