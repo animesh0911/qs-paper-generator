@@ -32,6 +32,7 @@ services:
       POSTGRES_USER: qpg
       POSTGRES_PASSWORD: qpg
       REDIS_URL: redis://redis:6379/0
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
       - ./backend:/app
     ports:
@@ -52,6 +53,7 @@ services:
       POSTGRES_USER: qpg
       POSTGRES_PASSWORD: qpg
       REDIS_URL: redis://redis:6379/0
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
       - ./backend:/app
     depends_on:
