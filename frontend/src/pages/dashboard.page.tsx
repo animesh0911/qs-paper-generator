@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { assemblePaper, downloadPaperPdf } from '@/lib/api';
+import { useEffect, useState } from 'react';
+import { assemblePaper, downloadPaperPdf, fetchMetadata } from '@/lib/api';
 import type { Paper } from '@/types';
 import { SECTION_TITLES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth.hook';
@@ -11,6 +11,20 @@ export default function Dashboard() {
   const [paper, setPaper] = useState<Paper | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [sectionTitles, setSectionTitles] =
+    useState<Record<string, string>>(SECTION_TITLES);
+
+  useEffect(() => {
+    fetchMetadata()
+      .then(({ sections }) =>
+        setSectionTitles(
+          Object.fromEntries(sections.map((s) => [s.code, s.label])),
+        ),
+      )
+      .catch(() => {
+        // fallback to static SECTION_TITLES stays in state
+      });
+  }, []);
 
   async function generate() {
     setBusy(true);
@@ -72,7 +86,7 @@ export default function Dashboard() {
               {sections.map((section) => (
                 <div key={section.key}>
                   <h2 className="font-semibold mb-2">
-                    {SECTION_TITLES[section.key] ?? `Section ${section.key}`}
+                    {sectionTitles[section.key] ?? `Section ${section.key}`}
                   </h2>
                   <ol className="space-y-3">
                     {section.items.map((item) => (

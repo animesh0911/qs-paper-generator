@@ -58,6 +58,16 @@ export async function assemblePaper(): Promise<Paper> {
   return res.json();
 }
 
+export interface Metadata {
+  sections: { code: string; label: string }[];
+  question_types: { code: string; label: string }[];
+}
+
+export async function fetchMetadata(): Promise<Metadata> {
+  const res = await request('/bank/metadata/');
+  return res.json();
+}
+
 export async function downloadPaperPdf(id: number) {
   const res = await request(`/papers/${id}/pdf`, { method: 'GET' });
   const blob = await res.blob();

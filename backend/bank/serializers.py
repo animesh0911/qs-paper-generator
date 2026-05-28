@@ -17,6 +17,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class QuestionWithAnswerSerializer(serializers.ModelSerializer):
+    """Include answer field. Gate the endpoint on bank.policy.answer_visible()."""
+
     class Meta:
         model = Question
         fields = ["id", "section", "qtype", "marks", "text", "options", "answer"]
