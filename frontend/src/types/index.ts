@@ -1,3 +1,17 @@
+/**
+ * TypeScript mirrors of the backend's response shapes.
+ *
+ * Source of truth lives in Python:
+ * - `Chapter`, `Question`, `Paper`, `PaperItem` mirror DRF serializers in
+ *   `backend/bank/serializers.py` and `backend/papers/serializers.py`.
+ * - `SelectionReport`, `UnfilledSlot` mirror
+ *   `backend/papers/selection.py::SelectionReport`.
+ * - `AssembleRequest` mirrors `AssembleRequestSerializer` input.
+ *
+ * If you change any of those Python files, update this module in the same PR.
+ *
+ * @module types
+ */
 export interface Chapter {
   id: number;
   slug: string;

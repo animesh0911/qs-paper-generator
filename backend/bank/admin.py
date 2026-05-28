@@ -1,3 +1,9 @@
+"""Django admin registration for the question bank.
+
+Light-touch admin so teachers and operators can spot-check seeded data and
+diagnose unfilled-slot reports by filtering questions on chapter and
+cognitive level.
+"""
 from django.contrib import admin
 
 from .models import Chapter, Question

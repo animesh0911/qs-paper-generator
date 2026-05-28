@@ -1,3 +1,13 @@
+/**
+ * Renders an assembled `Paper`: report panel + sections + questions.
+ *
+ * Receives a fully-resolved `Paper` plus the lookup tables it needs
+ * (`sectionTitles`, `chapterNameBySlug`). Pure — no fetches, no state
+ * beyond the section-grouping memo. The forwarded ref is used by the
+ * dashboard to scroll the card into view after generation.
+ *
+ * @module PaperPreview
+ */
 import { forwardRef, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Paper } from '@/types';

@@ -1,3 +1,20 @@
+/**
+ * Dashboard — the only authenticated page in Slice 3.
+ *
+ * Pure orchestration: wires the `useCoverageForm` hook to the
+ * `CoverageFormView`, posts to `assemblePaper`, and renders the result via
+ * `PaperPreview`. All form state lives in the hook; all render logic lives
+ * in the components. The page itself only owns the assemble call, the
+ * scroll-into-view nudge, and the error string.
+ *
+ * Where it fits:
+ * - Uses: `lib/api.assemblePaper`, `lib/api.fetchMetadata`,
+ *   `lib/api.downloadPaperPdf`, `hooks/useCoverageForm`,
+ *   `components/coverage/*`.
+ * - Rendered by: `App.tsx` behind a `RequireAuth` guard.
+ *
+ * @module DashboardPage
+ */
 import { useEffect, useRef, useState } from 'react';
 import { assemblePaper, downloadPaperPdf, fetchMetadata } from '@/lib/api';
 import type { Paper } from '@/types';

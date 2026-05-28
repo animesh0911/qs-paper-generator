@@ -1,3 +1,13 @@
+"""Read-only bank endpoints.
+
+Two endpoints, both consumed by the frontend at startup:
+
+* ``GET /api/bank/metadata/`` — canonical labels for ``Section``,
+  ``QuestionType``, ``CognitiveLevel``. The frontend uses this to render
+  section titles and difficulty options without hardcoding strings.
+* ``GET /api/bank/chapters/`` — full 13-chapter taxonomy. Drives the
+  chapter checklist in the coverage form.
+"""
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 

@@ -1,3 +1,12 @@
+"""HTTP views for paper assembly, detail, and PDF download.
+
+``AssemblePaperView`` is intentionally thin: validate via
+``AssembleRequestSerializer``, call ``PaperAssembler``, serialize. Domain
+rules live in ``papers.assembler`` and ``papers.selection``.
+
+``PaperPdfView`` memoises the rendered PDF for 24h keyed on paper id —
+papers are immutable once assembled, so the cache is safe.
+"""
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404

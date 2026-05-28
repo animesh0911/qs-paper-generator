@@ -1,3 +1,14 @@
+/**
+ * Renders the Slice 3 coverage form: difficulty buttons, chapter checklist
+ * with per-chapter weight inputs, and the Generate button.
+ *
+ * Owns no state — the parent owns `useCoverageForm` and threads its API
+ * through `props.form`. The `trailing` slot lets the parent add a
+ * Download-PDF button next to Generate without bleeding paper concerns
+ * into this view.
+ *
+ * @module CoverageFormView
+ */
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

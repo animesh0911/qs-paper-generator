@@ -1,3 +1,9 @@
+"""DRF serializers for the auth endpoints.
+
+Lightweight: login / register accept ``{email, password}`` and a serializer
+exposes the current user. Domain-level user concerns live in
+``accounts.models``.
+"""
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 

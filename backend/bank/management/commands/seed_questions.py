@@ -1,3 +1,15 @@
+"""Demo seed for local dev — a school, a teacher, and ~11 hand-entered questions.
+
+Run as ``python manage.py seed_questions``. Idempotent: re-runs backfill
+chapter and cognitive-level tags on existing rows without duplicating
+questions.
+
+Used by:
+- ``backend/entrypoint.sh`` (auto-runs on container start).
+- Manual ``docker exec ... python manage.py seed_questions`` during dev.
+
+Not used by tests — tests build questions via ``conftest.QuestionFactory``.
+"""
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 

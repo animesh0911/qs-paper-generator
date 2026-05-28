@@ -1,3 +1,12 @@
+"""Identity models — School (tenant) and User (email-based auth).
+
+``School`` is the tenant. Both ``bank.Question`` and ``papers.Paper`` carry
+an optional ``school`` FK so a future multi-tenant rollout can scope data
+without a schema change.
+
+``User`` overrides Django's default to use email as the username field and
+to carry an optional ``school`` FK so teachers belong to a school.
+"""
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 

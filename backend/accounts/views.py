@@ -1,3 +1,10 @@
+"""Auth endpoints — register, login, current user.
+
+Token-based auth via DRF's ``authtoken``. Tokens are returned in the login
+and register responses and stored in localStorage on the client. The
+frontend's ``lib/api.ts`` sets ``Authorization: Token <value>`` on every
+subsequent request.
+"""
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated

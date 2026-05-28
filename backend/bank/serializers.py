@@ -1,3 +1,16 @@
+"""DRF serializers for the question bank.
+
+Two key adapters:
+
+* ``QuestionSerializer`` — the default question shape; **omits ``answer``**.
+  Used by ``papers.serializers.PaperSerializer`` so paper-assemble and
+  paper-detail responses never leak the answer key.
+* ``QuestionWithAnswerSerializer`` — same shape plus ``answer``. Only mount
+  it behind ``bank.policy.answer_visible``-gated endpoints.
+
+``ChapterSerializer`` is used both standalone (``GET /api/bank/chapters/``)
+and nested inside the question shapes.
+"""
 from rest_framework import serializers
 
 from .models import Chapter, Question

@@ -1,3 +1,15 @@
+"""DRF serializers for the paper-assembly API.
+
+Two roles:
+
+* ``AssembleRequestSerializer`` — input contract for
+  ``POST /api/papers/assemble``. Owns every constraint on assemble input
+  (preset whitelist, difficulty whitelist, slug list shape, weights as
+  ``{slug: float >= 0}``). New input fields accrete here, not in the view.
+* ``PaperSerializer`` / ``PaperQuestionSerializer`` — output shape returned
+  by assemble and detail endpoints. ``PaperQuestionSerializer`` nests
+  ``QuestionSerializer``, which omits the answer key.
+"""
 from rest_framework import serializers
 
 from bank.serializers import QuestionSerializer

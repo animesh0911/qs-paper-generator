@@ -1,3 +1,18 @@
+/**
+ * Single HTTP adapter for the backend.
+ *
+ * All requests go through the private `request()` helper, which:
+ * - prefixes `/api`,
+ * - attaches `Authorization: Token <value>` if a token is present,
+ * - parses DRF error envelopes into a readable `Error.message`.
+ *
+ * Token storage is the boring localStorage approach — the same token the
+ * backend returns from `/api/auth/login`. The choice to omit a refresh
+ * flow is deliberate for the MVP; revisit when sessions need to outlive
+ * a browser tab.
+ *
+ * @module api
+ */
 import type { AssembleRequest, Chapter, Paper } from '@/types';
 
 const TOKEN_KEY = 'qpg_token';
