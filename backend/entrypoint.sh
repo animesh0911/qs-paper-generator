@@ -9,7 +9,9 @@ echo "Postgres is up."
 
 if [ "${RUN_MIGRATIONS:-0}" = "1" ]; then
   echo "Applying migrations and seeding..."
-  python manage.py makemigrations accounts bank papers --noinput
+  # Do NOT run makemigrations here: migrations are committed in VCS and
+  # generating them at boot would (a) write root-owned files into the host
+  # volume in dev and (b) mask "missing migration" errors in prod.
   python manage.py migrate --noinput
   python manage.py seed_questions
 fi
