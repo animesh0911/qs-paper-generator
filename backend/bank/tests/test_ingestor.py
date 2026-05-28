@@ -117,6 +117,9 @@ class StubParser:
     def parse(self, pdf_bytes: bytes) -> str:
         return self._text
 
+    def parse_pages(self, pdf_bytes: bytes) -> list[str]:
+        return [self._text]
+
 
 class StubTagger:
     """Tagger adapter that assigns a fixed chapter/level to every question."""

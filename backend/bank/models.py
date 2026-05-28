@@ -89,6 +89,12 @@ class Question(models.Model):
     answer = models.TextField(blank=True)
     # False until a human verifier approves (Slice 5). Picker excludes unverified.
     verified = models.BooleanField(default=False)
+    # Slice 5 — ingestion enrichment flags
+    has_diagram = models.BooleanField(default=False)
+    is_numerical = models.BooleanField(default=False)
+    diagram = models.FileField(upload_to="diagrams/", null=True, blank=True)
+    # MD5 of normalised question text — used for de-duplication on re-ingest.
+    source_hash = models.CharField(max_length=32, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
