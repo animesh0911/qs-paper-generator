@@ -46,6 +46,7 @@ services:
     build: ./backend
     command: ["celery", "-A", "config", "worker", "-l", "info"]
     environment:
+      DJANGO_DEBUG: "1"
       POSTGRES_HOST: db
       POSTGRES_DB: qpg
       POSTGRES_USER: qpg

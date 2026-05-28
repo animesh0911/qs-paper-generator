@@ -21,9 +21,20 @@ def env_bool(key, default=False):
     return val.lower() in ("1", "true", "yes", "on")
 
 
-SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-insecure-key-change-me")
-DEBUG = env_bool("DJANGO_DEBUG", True)
-ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", "*").split(",")
+# Secure-by-default: DEBUG and SECRET_KEY must be set explicitly for any
+# non-dev run. The dev fallbacks only kick in when DEBUG=True is requested.
+DEBUG = env_bool("DJANGO_DEBUG", False)
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-insecure-key-change-me"  # noqa: S105 — dev-only fallback
+    else:
+        raise RuntimeError(
+            "DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is not enabled."
+        )
+ALLOWED_HOSTS = [h for h in env("DJANGO_ALLOWED_HOSTS", "").split(",") if h]
+if DEBUG and not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "web"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -109,13 +120,35 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    # Throttling: AnonRateThrottle is the global anonymous floor;
+    # ScopedRateThrottle lets views opt into a tighter scope via
+    # ``throttle_scope`` (used by the auth endpoints).
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "120/min",
+        "auth": "5/min",
+    },
 }
 
-# CORS — permissive in dev so the Vite dev server can call the API.
-CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", True)
+# CORS — default-deny. In DEBUG we open it up so the Vite dev server works
+# without ceremony; in prod set CORS_ALLOWED_ORIGINS explicitly.
+CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", DEBUG)
 
 # Celery / Redis
 REDIS_URL = env("REDIS_URL", "redis://redis:6379/0")
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER", False)
+
+# Cache — Redis-backed so PDF bytes can be memoised across requests.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
+}

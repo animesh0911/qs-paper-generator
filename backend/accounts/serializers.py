@@ -9,6 +9,9 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=6)
 
     def validate_email(self, value):
+        # Store lowercased so login (which lowercases before authenticate)
+        # always matches; Django's normalize_email only lowercases the domain.
+        value = value.lower()
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("An account with this email already exists.")
         return value
