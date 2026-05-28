@@ -1,9 +1,9 @@
-"""PDF rendering for a paper (Slice 1).
+"""PDF rendering for a paper.
 
-Accepts a PaperLayout (pure data) — no model imports. Tests can construct a
-PaperLayout directly without a database. The full CBSE-style/branded renderer
-arrives in Slice 9; branding slots in at the paper_to_layout() stage without
-touching this renderer.
+Consumes `PaperDocumentV1` (the same dict shape the frontend reads) and
+emits PDF bytes. No model imports — tests construct a document dict directly.
+
+The full CBSE-style/branded renderer arrives in Slice 9.
 """
 import io
 
@@ -19,11 +19,14 @@ from reportlab.platypus import (
     Spacer,
 )
 
-from .layout import PaperLayout
 
+def render_paper_pdf(document: dict) -> bytes:
+    """Render a PaperDocumentV1 dict as PDF bytes."""
+    paper = document["paper"]
+    title = paper["title"]
+    total_marks = paper["totalMarks"]
+    questions_by_id = {q["questionId"]: q for q in document.get("questions", [])}
 
-def render_paper_pdf(layout: PaperLayout) -> bytes:
-    """Return the layout rendered as PDF bytes."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
@@ -32,7 +35,7 @@ def render_paper_pdf(layout: PaperLayout) -> bytes:
         bottomMargin=18 * mm,
         leftMargin=18 * mm,
         rightMargin=18 * mm,
-        title=layout.title,
+        title=title,
     )
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle("title", parent=styles["Title"], fontSize=16)
@@ -47,30 +50,44 @@ def render_paper_pdf(layout: PaperLayout) -> bytes:
     )
 
     story = [
-        Paragraph(layout.title, title_style),
+        Paragraph(title, title_style),
         Paragraph("Class 10 — Science", meta_style),
-        Paragraph(f"Maximum Marks: {layout.total_marks}", meta_style),
+        Paragraph(f"Maximum Marks: {total_marks}", meta_style),
         Spacer(1, 8),
     ]
 
-    for section in layout.sections:
-        story.append(Paragraph(section.title, section_style))
-        for q in section.questions:
+    for section in paper.get("sections", []):
+        story.append(Paragraph(section["title"], section_style))
+        for slot in section.get("slots", []):
+            qid = slot.get("selectedQuestionId")
+            question = questions_by_id.get(qid) if qid else None
+            marks = slot["marks"]
+            number = slot["displayNumber"]
+            if question is None:
+                story.append(
+                    Paragraph(
+                        f"<b>Q{number}.</b> <i>(unfilled, {marks} mark{'s' if marks != 1 else ''})</i>",
+                        q_style,
+                    )
+                )
+                story.append(Spacer(1, 4))
+                continue
             story.append(
                 Paragraph(
-                    f"<b>Q{q.number}.</b> {q.text} "
-                    f"<i>({q.marks} mark{'s' if q.marks != 1 else ''})</i>",
+                    f"<b>Q{number}.</b> {question['rawText']} "
+                    f"<i>({marks} mark{'s' if marks != 1 else ''})</i>",
                     q_style,
                 )
             )
-            if q.options:
+            options = question.get("content", {}).get("options") or []
+            if options:
                 opts = [
                     ListItem(
                         Paragraph(
-                            f"({o.get('label')}) {o.get('text')}", q_style
+                            f"({opt['label']}) {opt['content'][0]['text']}", q_style
                         )
                     )
-                    for o in q.options
+                    for opt in options
                 ]
                 story.append(
                     ListFlowable(opts, bulletType="bullet", start="circle", leftIndent=18)

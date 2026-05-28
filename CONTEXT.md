@@ -61,19 +61,16 @@ The persisted record of *what got covered and what couldn't be filled*: per-chap
 A persisted question paper for a teacher. Owns title, total marks, the CoverageReport, and an ordered list of **PaperQuestions**.
 
 **PaperQuestion**
-Ordered placement of a Question within a Paper. Carries paper, question, order, section, optional or_group. Per-question teacher edits will land here in later slices without mutating the shared bank Question.
+Ordered placement of a Question within a Paper at assembly time. Carries paper, question, order, section, optional or_group. **Not** read at render time — the renderer consumes `Paper.document` (PaperDocumentV1). PaperQuestion rows are the assembly snapshot, kept for cross-paper analytics (e.g. UsageTracker in Slice 10).
 
 **PaperBuilder**
-The coordinator. `assemble(...) → Paper` (internal use/tests). `assemble_document(...) → (Paper, dict)` builds the persisted Paper and the `PaperDocumentV1` JSON in one call. Used by the API view. Calls TemplateBuilder, then QuestionPicker, then persists.
+The coordinator. `assemble(...) → AssemblyResult{paper, document}` — single entry point. Calls TemplateBuilder, runs QuestionPicker, persists the Paper + PaperQuestion rows, maps to PaperDocumentV1, and saves the document on the Paper. Used by the assemble view and tests.
 
 **PaperDocumentBuilder**
 Mapping layer that converts a `Paper`, `FilledTemplate`, and `PaperOptions` into a `PaperDocumentV1` dict. No DB writes. All IDs are derived (`paperId = "paper_{pk}"`, `questionId = "q_{pk}"`, `slotId = "slot_{section}_{index}"`). Lives in `papers.document`.
 
 **PaperDocumentV1**
-The JSON contract returned by `POST /api/papers/assemble`. Section-wise, slot-based paper document consumed by the frontend BlockNote editor. Top-level shape: `{schemaVersion, request, template, paper, questions[]}`. Full specification in `contracts/v1_contract.md`.
-
-**PaperLayout**
-Flat data structure consumed by the PDF renderer. The seam between persistence (Paper + PaperQuestion + Question) and rendering. Lives in `papers.layout`.
+The JSON contract returned by `POST /api/papers/assemble`. Section-wise, slot-based paper document consumed by the frontend BlockNote editor AND the PDF renderer. Top-level shape: `{schemaVersion, request, template, paper, questions[]}`. Single source of truth at render time — `papers.pdf.render_paper_pdf(document)` reads it directly. Full specification in `contracts/v1_contract.md`.
 
 **School**
 A tenant. Optional FK on Question and Paper. Slice 1 keeps multi-tenancy passive; full enforcement comes later.

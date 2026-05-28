@@ -2,13 +2,11 @@
 
 ``AssemblePaperView`` — thin: validate, call PaperBuilder, return document.
 ``PaperDetailView`` — GET returns stored document; PATCH overwrites it (drafts only).
-``PaperApproveView`` — POST approves draft: reconciles PaperQuestion rows, locks paper.
-``PaperPdfView`` — GET returns rendered PDF (cached 24h after approve).
+``PaperApproveView`` — POST locks paper to APPROVED.
+``PaperPdfView`` — GET renders PDF from paper.document (cached 24h after approve).
 
 Domain rules live in ``papers.builder`` and ``papers.picker``.
 """
-from collections import defaultdict
-
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -18,8 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .builder import PaperBuilder
-from .layout import paper_to_layout
-from .models import Paper, PaperQuestion, PaperStatus
+from .models import Paper, PaperStatus
 from .pdf import render_paper_pdf
 from .serializers import AssembleRequestSerializer, PaperSerializer
 
@@ -77,7 +74,6 @@ class PaperApproveView(APIView):
                 {"error": "Paper is already approved."},
                 status=status.HTTP_409_CONFLICT,
             )
-        _reconcile_paper_questions(paper)
         paper.status = PaperStatus.APPROVED
         paper.save(update_fields=["status"])
         return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
@@ -91,43 +87,8 @@ class PaperPdfView(APIView):
         cache_key = f"paper-pdf:{paper.pk}"
         pdf = cache.get(cache_key)
         if pdf is None:
-            pdf = render_paper_pdf(paper_to_layout(paper))
+            pdf = render_paper_pdf(paper.document or {})
             cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = f'inline; filename="paper-{paper.pk}.pdf"'
         return response
-
-
-def _reconcile_paper_questions(paper: Paper) -> None:
-    """Sync PaperQuestion rows to match selectedQuestionId in the document.
-
-    Called at approve time so PaperQuestion rows (used by paper_to_layout and
-    future UsageTracker) reflect the teacher's final slot selections.
-    """
-    if not paper.document:
-        return
-
-    # Build map: section -> [PaperQuestion ordered by .order]
-    pqs = list(paper.items.order_by("section", "order"))
-    section_pqs: dict[str, list[PaperQuestion]] = defaultdict(list)
-    for pq in pqs:
-        section_pqs[pq.section].append(pq)
-
-    updates: list[PaperQuestion] = []
-    for section in paper.document.get("paper", {}).get("sections", []):
-        section_key = section["sectionId"]
-        rows = section_pqs.get(section_key, [])
-        for local_idx, slot in enumerate(section.get("slots", [])):
-            if local_idx >= len(rows):
-                continue
-            selected = slot.get("selectedQuestionId")
-            if not selected:
-                continue
-            new_qid = int(selected.removeprefix("q_"))
-            pq = rows[local_idx]
-            if pq.question_id != new_qid:
-                pq.question_id = new_qid
-                updates.append(pq)
-
-    if updates:
-        PaperQuestion.objects.bulk_update(updates, ["question_id"])

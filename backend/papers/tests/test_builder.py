@@ -10,7 +10,6 @@ from rest_framework import status
 
 from papers.builder import PaperBuilder
 from papers.template import TemplateBuilder
-from papers.layout import paper_to_layout
 
 
 @pytest.mark.django_db
@@ -55,19 +54,6 @@ def test_assemble_best_effort_when_bank_empty(user, db):
     spec = TemplateBuilder().build("board")
     assert paper.items.count() == 0
     assert len(paper.report["unfilled"]) == len(spec.slots)
-
-
-@pytest.mark.django_db
-def test_paper_to_layout_round_trips_structure(user, seeded_bank):
-    """paper_to_layout produces sections matching the assembled Paper."""
-    paper = PaperBuilder().assemble(user).paper
-    layout = paper_to_layout(paper)
-
-    assert layout.title == paper.title
-    assert layout.total_marks == paper.total_marks
-    assert len(layout.sections) == len({item.section for item in paper.items.all()})
-    total_questions = sum(len(s.questions) for s in layout.sections)
-    assert total_questions == paper.items.count()
 
 
 @pytest.mark.django_db
