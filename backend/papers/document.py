@@ -22,24 +22,6 @@ _QTYPE_CONTRACT: dict[str, str] = {
     "CASE": "case_based",
 }
 
-_PRESET_EXAM_TYPE: dict[str, str] = {
-    "board": "full_term",
-    "half_yearly": "half_term",
-    "unit_test": "unit_test",
-}
-
-_PRESET_TEMPLATE_NAME: dict[str, str] = {
-    "board": "CBSE Class 10 Science Full Term",
-    "half_yearly": "CBSE Class 10 Science Half Yearly",
-    "unit_test": "CBSE Class 10 Science Unit Test",
-}
-
-_PRESET_DURATION: dict[str, int] = {
-    "board": 180,
-    "half_yearly": 120,
-    "unit_test": 60,
-}
-
 _SECTION_TITLE: dict[str, str] = {
     "A": "Section A",
     "B": "Section B",
@@ -76,13 +58,12 @@ class PaperDocumentBuilder:
         all_qids = self._all_question_ids(result)
         questions_by_pk = self._fetch_questions(all_qids)
 
-        preset = result.template.name
-        exam_type = _PRESET_EXAM_TYPE.get(preset, preset)
+        preset = result.template.preset
 
         return {
             "schemaVersion": "paper_document.v1",
-            "request": self._build_request(paper, inp, exam_type),
-            "template": self._build_template(paper, preset, exam_type),
+            "request": self._build_request(paper, inp, preset.exam_type),
+            "template": self._build_template(paper, preset),
             "paper": self._build_paper(paper, result),
             "questions": [
                 self._build_question(q) for q in questions_by_pk.values()
@@ -122,22 +103,21 @@ class PaperDocumentBuilder:
             },
         }
 
-    def _build_template(self, paper: Paper, preset: str, exam_type: str) -> dict:
+    def _build_template(self, paper: Paper, preset) -> dict:
         return {
-            "templateId": f"cbse_science_class_10_{preset}_v1",
-            "templateName": _PRESET_TEMPLATE_NAME.get(preset, preset),
+            "templateId": f"cbse_science_class_10_{preset.name}_v1",
+            "templateName": preset.template_name,
             "board": "CBSE",
             "classLevel": "10",
             "subject": "Science",
-            "examType": exam_type,
+            "examType": preset.exam_type,
             "totalMarks": paper.total_marks,
-            "durationMinutes": _PRESET_DURATION.get(preset, 180),
+            "durationMinutes": preset.duration_minutes,
             "language": "en",
         }
 
     def _build_paper(self, paper: Paper, result: FilledTemplate) -> dict:
-        preset = result.template.name
-        duration = _PRESET_DURATION.get(preset, 180)
+        duration = result.template.preset.duration_minutes
         return {
             "paperId": f"paper_{paper.pk}",
             "title": paper.title,

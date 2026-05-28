@@ -4,7 +4,7 @@ from collections import Counter
 import pytest
 
 from bank.models import QuestionType, Section
-from papers.template import PaperTemplate, PRESET_NAMES, Slot, TemplateBuilder
+from papers.template import PaperTemplate, PRESET_NAMES, Preset, Slot, TemplateBuilder
 
 
 # ---------------------------------------------------------------------------
@@ -121,7 +121,7 @@ def test_unknown_preset_raises_value_error():
 
 def test_paper_template_counts_or_marks_once():
     spec = PaperTemplate(
-        name="custom",
+        preset=Preset(name="custom"),
         slots=[
             Slot(Section.A, QuestionType.MCQ, 1),
             Slot(Section.A, QuestionType.MCQ, 1),
@@ -135,7 +135,7 @@ def test_paper_template_counts_or_marks_once():
 
 def test_paper_template_validate_rejects_odd_or_group():
     spec = PaperTemplate(
-        name="bad",
+        preset=Preset(name="bad"),
         slots=[
             Slot(Section.D, QuestionType.LA, 5, or_group=0),
         ],
@@ -146,7 +146,7 @@ def test_paper_template_validate_rejects_odd_or_group():
 
 def test_all_standalone_spec():
     spec = PaperTemplate(
-        name="standalone",
+        preset=Preset(name="standalone"),
         slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(5)],
     )
     assert spec.total_marks == 5

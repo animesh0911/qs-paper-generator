@@ -28,10 +28,10 @@ One question position in a paper template. Carries section, question type, marks
 A pair of Slots presenting an "Answer A OR B" choice to the student. Both slots draw distinct Questions; only one contributes to total marks. Identified by an `or_group: int` shared by exactly two Slots.
 
 **PaperTemplate**
-An ordered list of Slots produced by the **TemplateBuilder** for a given preset. The contract between template building, picking, and assembly. Lives in `papers.template.PaperTemplate`.
+A **Preset** plus its expanded list of Slots. Produced by the **TemplateBuilder**, consumed by the **QuestionPicker** and **PaperBuilder**. Lives in `papers.template.PaperTemplate`.
 
 **Preset**
-A named PaperTemplate factory — currently `board`, `half_yearly`, `unit_test`. Defined in `papers.template._PRESETS`.
+A named recipe for a kind of paper — currently `board`, `half_yearly`, `unit_test`. Bundles the slot-layout function with display metadata (`template_name`, `exam_type`, `duration_minutes`) used to populate **PaperDocumentV1**. Single source of truth for "what defines this kind of paper". Lives in `papers.template.Preset`; instances in `_PRESETS`.
 
 **TemplateBuilder**
 Module that turns a preset name into a validated PaperTemplate. The seam between "what kind of paper" (preset) and "what slots does that imply" (PaperTemplate).

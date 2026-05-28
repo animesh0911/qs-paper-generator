@@ -12,7 +12,7 @@ import pytest
 from rest_framework import status
 
 from bank.models import Chapter, CognitiveLevel, Question, QuestionType, Section
-from papers.template import PaperTemplate, Slot
+from papers.template import PaperTemplate, Preset, Slot
 from papers.picker import (
     DIFFICULTY_LEVELS,
     CoverageReport,
@@ -24,7 +24,7 @@ from papers.picker import (
 
 def _spec(n_mcq: int) -> PaperTemplate:
     return PaperTemplate(
-        name="mcq-only",
+        preset=Preset(name="mcq-only"),
         slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(n_mcq)],
     )
 
@@ -212,7 +212,8 @@ def test_pure_allocator_honours_chapter_weights_with_hand_built_pool():
         ]
     }
     spec = PaperTemplate(
-        name="t", slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(10)]
+        preset=Preset(name="t"),
+        slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(10)],
     )
     opts = PaperOptions(
         template=spec,
@@ -243,7 +244,8 @@ def test_coverage_report_round_trips_through_dict():
 
 def test_pure_allocator_reports_unfilled_with_empty_pool():
     spec = PaperTemplate(
-        name="t", slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(3)]
+        preset=Preset(name="t"),
+        slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(3)],
     )
     opts = PaperOptions(template=spec, chapter_slugs=["x"], difficulty="standard")
     result = QuestionPicker._select_from_pool(opts, {})
