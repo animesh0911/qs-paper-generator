@@ -52,6 +52,8 @@ class PaperAssembler:
         result = SelectionEngine().select(inp)
         paper = self._persist(user, title, result)
         document = PaperDocumentBuilder().build(paper, result, inp)
+        paper.document = document
+        paper.save(update_fields=["document"])
         return paper, document
 
     def _select(

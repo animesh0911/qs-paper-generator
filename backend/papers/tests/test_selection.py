@@ -179,9 +179,9 @@ def test_assemble_persists_coverage_on_paper(api_client, big_pool):
         format="json",
     )
     assert resp.status_code == status.HTTP_201_CREATED
-    paper_pk = resp.data["paper"]["paperId"].removeprefix("paper_")
-    detail = api_client.get(f"/api/papers/{paper_pk}/")
-    report = detail.data["report"]
+    paper_pk = int(resp.data["paper"]["paperId"].removeprefix("paper_"))
+    from papers.models import Paper
+    report = Paper.objects.get(pk=paper_pk).report
     assert "coverage" in report
     assert "cog_coverage" in report
     assert "unfilled" in report

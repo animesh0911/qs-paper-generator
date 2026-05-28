@@ -1,10 +1,10 @@
 """Persistence for assembled papers.
 
-``Paper`` rows are created by ``PaperAssembler._persist``. Once created they
-are immutable for the lifetime of Slice 3 — the PDF cache assumes this.
-``PaperQuestion`` is the ordered placement of bank Questions inside a
-Paper; future teacher edits will mutate ``PaperQuestion`` so the shared
-``bank.Question`` row is never touched.
+``Paper`` rows are created by ``PaperAssembler._persist``. ``Paper.document``
+snapshots the full ``PaperDocumentV1`` JSON at assemble time so the teacher
+can reload mid-review. PATCH /api/papers/{pk} overwrites ``document`` while
+the paper is a draft; POST /api/papers/{pk}/approve locks it (status →
+approved) and reconciles PaperQuestion rows from the final document.
 
 ``Paper.report`` holds the SelectionEngine's report verbatim
 (``papers.selection.SelectionReport.to_dict()``). Its shape is owned in
@@ -17,6 +17,11 @@ from accounts.models import School
 from bank.models import Question
 
 
+class PaperStatus(models.TextChoices):
+    DRAFT = "draft", "Draft"
+    APPROVED = "approved", "Approved"
+
+
 class Paper(models.Model):
     school = models.ForeignKey(
         School, null=True, blank=True, on_delete=models.SET_NULL, related_name="papers"
@@ -26,6 +31,12 @@ class Paper(models.Model):
     )
     title = models.CharField(max_length=255, default="Science — Practice Paper")
     total_marks = models.PositiveSmallIntegerField(default=0)
+    status = models.CharField(
+        max_length=10, choices=PaperStatus.choices, default=PaperStatus.DRAFT
+    )
+    # Snapshot of PaperDocumentV1 at assemble time. Overwritten on PATCH,
+    # frozen on approve. Null for papers assembled before this field existed.
+    document = models.JSONField(null=True, blank=True)
     # Selection report. Shape owned by papers.selection.SelectionReport:
     # {coverage: {chapter_slug: int}, cog_coverage: {level: int},
     #  unfilled: [{slot_index, section, qtype, marks, reason}]}

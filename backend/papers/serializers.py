@@ -68,6 +68,6 @@ class PaperSerializer(serializers.ModelSerializer):
         model = Paper
         fields = [
             "id", "title", "total_marks",
-            "report",
+            "status", "report",
             "created_at", "items",
         ]

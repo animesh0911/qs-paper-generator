@@ -91,12 +91,54 @@ def test_document_slots_reference_questions_array(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
-def test_paper_detail_endpoint(api_client, seeded_bank):
+def test_paper_detail_returns_stored_document(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
     detail = api_client.get(f"/api/papers/{paper_pk}/")
     assert detail.status_code == status.HTTP_200_OK
-    assert str(detail.data["id"]) == paper_pk
+    assert detail.data["schemaVersion"] == "paper_document.v1"
+
+
+@pytest.mark.django_db
+def test_patch_saves_edited_document(api_client, seeded_bank):
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    edited_doc = dict(create.data)
+    edited_doc["paper"] = dict(edited_doc["paper"])
+    edited_doc["paper"]["title"] = "Edited Title"
+    resp = api_client.patch(
+        f"/api/papers/{paper_pk}/",
+        {"document": edited_doc},
+        format="json",
+    )
+    assert resp.status_code == status.HTTP_200_OK
+    detail = api_client.get(f"/api/papers/{paper_pk}/")
+    assert detail.data["paper"]["title"] == "Edited Title"
+
+
+@pytest.mark.django_db
+def test_patch_rejected_wrong_schema(api_client, seeded_bank):
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    bad_doc = {"schemaVersion": "wrong.v1"}
+    resp = api_client.patch(f"/api/papers/{paper_pk}/", {"document": bad_doc}, format="json")
+    assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_approve_locks_paper(api_client, seeded_bank):
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    approve = api_client.post(f"/api/papers/{paper_pk}/approve/")
+    assert approve.status_code == status.HTTP_200_OK
+    assert approve.data["status"] == "approved"
+    # Further PATCH rejected
+    resp = api_client.patch(
+        f"/api/papers/{paper_pk}/",
+        {"document": create.data},
+        format="json",
+    )
+    assert resp.status_code == status.HTTP_409_CONFLICT
 
 
 @pytest.mark.django_db
