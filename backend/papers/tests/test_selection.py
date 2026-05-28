@@ -15,8 +15,10 @@ from bank.models import Chapter, CognitiveLevel, Question, QuestionType, Section
 from papers.blueprint import PaperSpec, Slot
 from papers.selection import (
     DIFFICULTY_PROFILES,
+    CandidatePool,
     SelectionEngine,
     SelectionInput,
+    SelectionReport,
 )
 
 
@@ -177,12 +179,73 @@ def test_assemble_persists_coverage_on_paper(api_client, big_pool):
         format="json",
     )
     assert resp.status_code == status.HTTP_201_CREATED
-    assert "coverage" in resp.data
-    assert "cog_coverage" in resp.data
-    assert "unfilled" in resp.data
+    report = resp.data["report"]
+    assert "coverage" in report
+    assert "cog_coverage" in report
+    assert "unfilled" in report
     # Both selected chapters appear in coverage.
-    assert ch1.slug in resp.data["coverage"]
-    assert ch2.slug in resp.data["coverage"]
+    assert ch1.slug in report["coverage"]
+    assert ch2.slug in report["coverage"]
+
+
+# ---------------------------------------------------------------------------
+# Pure-allocator tests: exercise _select_from_pool without touching the DB.
+# These guard the algorithm independently of the ORM fetch step.
+# ---------------------------------------------------------------------------
+
+
+def test_pure_allocator_honours_chapter_weights_with_hand_built_pool():
+    """Hand-built CandidatePool exercises allocation with no DB rows.
+
+    Why this test exists: the algorithm should be reproducible from a pure
+    in-memory pool. If a future refactor makes _select_from_pool reach into
+    the ORM, this test fails immediately without any fixture cost.
+    """
+    bucket = (Section.A, QuestionType.MCQ, 1)
+    pool: CandidatePool = {
+        bucket: [
+            (i, "electricity" if i < 50 else "life-processes", "R")
+            for i in range(1, 101)
+        ]
+    }
+    spec = PaperSpec(
+        name="t", slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(10)]
+    )
+    inp = SelectionInput(
+        spec=spec,
+        chapter_slugs=["electricity", "life-processes"],
+        weights={"electricity": 0.8, "life-processes": 0.2},
+        difficulty="standard",
+    )
+    result = SelectionEngine._select_from_pool(inp, pool)
+    coverage = result.coverage
+    assert coverage["electricity"] == 8
+    assert coverage["life-processes"] == 2
+
+
+def test_selection_report_round_trips_through_dict():
+    """to_dict()/from_dict() guards drift between engine output and storage.
+
+    Why this test exists: the report shape is defined once in Python and
+    must survive a JSON round-trip into Paper.report. A regression that
+    drops a field or renames one fails here before it ships.
+    """
+    r = SelectionReport(
+        coverage={"electricity": 2, "life-processes": 3},
+        cog_coverage={"R": 2, "U": 3},
+        unfilled=[{"slot_index": 0, "section": "A", "qtype": "MCQ", "marks": 1, "reason": "x"}],
+    )
+    assert SelectionReport.from_dict(r.to_dict()) == r
+
+
+def test_pure_allocator_reports_unfilled_with_empty_pool():
+    spec = PaperSpec(
+        name="t", slots=[Slot(Section.A, QuestionType.MCQ, 1) for _ in range(3)]
+    )
+    inp = SelectionInput(spec=spec, chapter_slugs=["x"], difficulty="standard")
+    result = SelectionEngine._select_from_pool(inp, {})
+    assert result.question_ids == [None, None, None]
+    assert len(result.unfilled) == 3
 
 
 @pytest.mark.django_db

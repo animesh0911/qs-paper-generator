@@ -52,9 +52,7 @@ class PaperAssembler:
             school=getattr(user, "school", None),
             title=title,
             total_marks=spec.total_marks,
-            coverage=result.coverage,
-            cog_coverage=result.cog_coverage,
-            unfilled=result.unfilled,
+            report=result.report.to_dict(),
         )
 
         rows = []

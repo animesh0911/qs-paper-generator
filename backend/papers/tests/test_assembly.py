@@ -54,7 +54,7 @@ def test_assemble_best_effort_when_bank_empty(user, db):
     paper = PaperAssembler().assemble(user)
     spec = BlueprintEngine().build("board")
     assert paper.items.count() == 0
-    assert len(paper.unfilled) == len(spec.slots)
+    assert len(paper.report["unfilled"]) == len(spec.slots)
 
 
 @pytest.mark.django_db

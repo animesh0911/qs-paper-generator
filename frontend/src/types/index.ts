@@ -33,13 +33,17 @@ export interface UnfilledSlot {
   reason: string;
 }
 
+export interface SelectionReport {
+  coverage: Record<string, number>;
+  cog_coverage: Record<string, number>;
+  unfilled: UnfilledSlot[];
+}
+
 export interface Paper {
   id: number;
   title: string;
   total_marks: number;
-  coverage: Record<string, number>;
-  cog_coverage: Record<string, number>;
-  unfilled: UnfilledSlot[];
+  report: SelectionReport;
   created_at: string;
   items: PaperItem[];
 }

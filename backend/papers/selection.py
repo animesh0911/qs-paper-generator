@@ -4,8 +4,13 @@ SelectionEngine fills each Slot from the bank honouring chapter weights and
 the cognitive-level distribution implied by the difficulty profile, with no
 in-paper duplicates. Best-effort: unfillable slots are reported, not raised.
 
-Seam: PaperAssembler calls SelectionEngine().select(SelectionInput) and uses
-the returned ids + report.
+Internal seam: ``_fetch_candidates`` produces an in-memory ``CandidatePool``
+from the ORM; ``_select_from_pool`` is the pure allocator the engine runs
+over that pool. Tests can hand-build a pool and exercise the allocator
+without touching the database.
+
+External seam: PaperAssembler calls SelectionEngine().select(SelectionInput)
+and uses the returned ids + report.
 """
 from __future__ import annotations
 
@@ -38,16 +43,62 @@ class SelectionInput:
 
 
 @dataclass
-class SelectionResult:
-    spec: PaperSpec
-    # Parallel to spec.slots; None means the slot is unfilled.
-    question_ids: list[int | None]
+class SelectionReport:
+    """Selection report persisted on Paper and returned to the client.
+
+    Single source of truth for the report shape. ``to_dict`` produces the
+    canonical JSON form for storage; ``from_dict`` reconstructs the object.
+    Round-trippable so storage and the engine can never disagree.
+    """
+
     coverage: dict[str, int] = field(default_factory=dict)        # chapter slug -> count
     cog_coverage: dict[str, int] = field(default_factory=dict)    # level code -> count
     unfilled: list[dict] = field(default_factory=list)
 
+    def to_dict(self) -> dict:
+        return {
+            "coverage": dict(self.coverage),
+            "cog_coverage": dict(self.cog_coverage),
+            "unfilled": list(self.unfilled),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict | None) -> "SelectionReport":
+        data = data or {}
+        return cls(
+            coverage=dict(data.get("coverage", {})),
+            cog_coverage=dict(data.get("cog_coverage", {})),
+            unfilled=list(data.get("unfilled", [])),
+        )
+
+
+@dataclass
+class SelectionResult:
+    spec: PaperSpec
+    # Parallel to spec.slots; None means the slot is unfilled.
+    question_ids: list[int | None]
+    report: SelectionReport = field(default_factory=SelectionReport)
+
+    # Convenience pass-throughs used by callers and tests so they don't need
+    # to reach into result.report.X every time.
+    @property
+    def coverage(self) -> dict[str, int]:
+        return self.report.coverage
+
+    @property
+    def cog_coverage(self) -> dict[str, int]:
+        return self.report.cog_coverage
+
+    @property
+    def unfilled(self) -> list[dict]:
+        return self.report.unfilled
+
 
 _BucketKey = tuple[str, str, int]
+# A pool row: (question_id, chapter_slug or None, cognitive_level code).
+PoolRow = tuple[int, str | None, str]
+# In-memory candidate pool keyed by bucket.
+CandidatePool = dict[_BucketKey, list[PoolRow]]
 
 
 class SelectionEngine:
@@ -56,25 +107,42 @@ class SelectionEngine:
             raise ValueError(
                 f"Unknown difficulty {inp.difficulty!r}. Choose from {PROFILE_NAMES}"
             )
-        profile = DIFFICULTY_PROFILES[inp.difficulty]
+        pool = self._fetch_candidates(inp)
+        return self._select_from_pool(inp, pool)
 
-        # Group slot indices by (section, qtype, marks) so we fetch one
-        # candidate pool per bucket rather than one per slot.
-        bucket_slot_indices: dict[_BucketKey, list[int]] = defaultdict(list)
-        for idx, slot in enumerate(inp.spec.slots):
-            bucket_slot_indices[(slot.section, slot.qtype, slot.marks)].append(idx)
-
-        bucket_candidates: dict[_BucketKey, list[tuple[int, str | None, str]]] = {}
-        for key in bucket_slot_indices:
+    @staticmethod
+    def _fetch_candidates(inp: SelectionInput) -> CandidatePool:
+        """Issue one ORM query per (section, qtype, marks) bucket."""
+        buckets: set[_BucketKey] = {
+            (s.section, s.qtype, s.marks) for s in inp.spec.slots
+        }
+        pool: CandidatePool = {}
+        for key in buckets:
             section, qtype, marks = key
             qs = Question.objects.filter(section=section, qtype=qtype, marks=marks)
             if inp.chapter_slugs:
                 qs = qs.filter(chapter__slug__in=inp.chapter_slugs)
-            bucket_candidates[key] = list(
+            pool[key] = list(
                 qs.order_by("id").values_list("id", "chapter__slug", "cognitive_level")
             )
+        return pool
 
-        chapter_weights = self._normalise_weights(inp, bucket_candidates)
+    @classmethod
+    def _select_from_pool(
+        cls, inp: SelectionInput, pool: CandidatePool
+    ) -> SelectionResult:
+        """Pure allocator: take a pool and an input, produce the report.
+
+        No ORM access. All tests of allocation invariants — chapter weighting,
+        cognitive mix, no-dup, unfilled reporting — flow through this method.
+        """
+        profile = DIFFICULTY_PROFILES[inp.difficulty]
+
+        bucket_slot_indices: dict[_BucketKey, list[int]] = defaultdict(list)
+        for idx, slot in enumerate(inp.spec.slots):
+            bucket_slot_indices[(slot.section, slot.qtype, slot.marks)].append(idx)
+
+        chapter_weights = cls._normalise_weights(inp, pool)
 
         question_ids: list[int | None] = [None] * len(inp.spec.slots)
         used: set[int] = set()
@@ -85,12 +153,12 @@ class SelectionEngine:
         for key, slot_indices in bucket_slot_indices.items():
             section, qtype, marks = key
             n = len(slot_indices)
-            chapter_target = self._allocate(n, chapter_weights)
-            cog_target = self._allocate(n, profile)
-            candidates = bucket_candidates[key]
+            chapter_target = cls._allocate(n, chapter_weights)
+            cog_target = cls._allocate(n, profile)
+            candidates = pool.get(key, [])
 
             for slot_idx in slot_indices:
-                pick = self._pick(candidates, used, chapter_target, cog_target)
+                pick = cls._pick(candidates, used, chapter_target, cog_target)
                 if pick is None:
                     unfilled.append(
                         {
@@ -116,22 +184,24 @@ class SelectionEngine:
         return SelectionResult(
             spec=inp.spec,
             question_ids=question_ids,
-            coverage=dict(coverage),
-            cog_coverage=dict(cog_coverage),
-            unfilled=unfilled,
+            report=SelectionReport(
+                coverage=dict(coverage),
+                cog_coverage=dict(cog_coverage),
+                unfilled=unfilled,
+            ),
         )
 
     @staticmethod
     def _normalise_weights(
         inp: SelectionInput,
-        bucket_candidates: dict[_BucketKey, list[tuple[int, str | None, str]]],
+        pool: CandidatePool,
     ) -> dict[str, float]:
         if inp.chapter_slugs:
             slugs = list(inp.chapter_slugs)
         else:
             seen = {
                 slug
-                for rows in bucket_candidates.values()
+                for rows in pool.values()
                 for _, slug, _ in rows
                 if slug
             }
@@ -163,17 +233,17 @@ class SelectionEngine:
 
     @staticmethod
     def _pick(
-        candidates: list[tuple[int, str | None, str]],
+        candidates: list[PoolRow],
         used: set[int],
         chapter_target: dict[str, int],
         cog_target: dict[str, int],
-    ) -> tuple[int, str | None, str] | None:
+    ) -> PoolRow | None:
         """Pick the unused candidate that best fills remaining quotas.
 
         Priority: highest remaining chapter quota, then highest remaining
         cognitive-level quota, then lowest id (deterministic).
         """
-        best: tuple[int, str | None, str] | None = None
+        best: PoolRow | None = None
         best_key: tuple[int, int, int] | None = None
         for qid, ch_slug, level in candidates:
             if qid in used:
