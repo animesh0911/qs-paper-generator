@@ -30,6 +30,7 @@ class QuestionFactory(DjangoModelFactory):
     section = Section.A
     qtype = QuestionType.MCQ
     marks = 1
+    verified = True
     text = factory.Sequence(lambda n: f"Question {n} text?")
     options = factory.LazyFunction(
         lambda: [

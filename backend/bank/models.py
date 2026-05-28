@@ -87,6 +87,8 @@ class Question(models.Model):
     # For MCQ: list of {"label": "A", "text": "..."} options. Empty otherwise.
     options = models.JSONField(default=list, blank=True)
     answer = models.TextField(blank=True)
+    # False until a human verifier approves (Slice 5). Picker excludes unverified.
+    verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
