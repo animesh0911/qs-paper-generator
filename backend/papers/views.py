@@ -36,8 +36,8 @@ class AssemblePaperView(APIView):
         params = dict(req.validated_data)
         if not params.get("title"):
             params.pop("title", None)
-        _paper, document = PaperBuilder().assemble_document(request.user, **params)
-        return Response(document, status=status.HTTP_201_CREATED)
+        result = PaperBuilder().assemble(request.user, **params)
+        return Response(result.document, status=status.HTTP_201_CREATED)
 
 
 class PaperDetailView(APIView):
