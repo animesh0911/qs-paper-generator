@@ -18,7 +18,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^2.6.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.x",
@@ -34,13 +35,13 @@
     "eslint-plugin-react-hooks": "^5.x",
     "eslint-plugin-react-refresh": "^0.4.x",
     "globals": "^16.x",
+    "lint-staged": "^15.x",
     "postcss": "^8.4.49",
     "prettier": "^3.x",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.x",
-    "vite": "^6.0.7",
-    "lint-staged": "^15.x"
+    "vite": "^6.0.7"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
