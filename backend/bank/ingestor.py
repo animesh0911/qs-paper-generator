@@ -1,29 +1,35 @@
 """Ingestion A: parse a CBSE past-paper PDF and auto-tag questions via Claude.
 
-Pipeline:
-  extract_text(pdf_bytes) -> str          (pdfplumber; mockable in tests)
-  strip_hindi(text)       -> str          (pure; Devanagari Unicode range)
-  segment_questions(text) -> list[dict]   (pure; regex-based)
-  tag_with_claude(qs, chapters) -> list[dict]  (Claude haiku; mockable in tests)
+`Ingestor` is the coordinator. It runs the pipeline and persists Question rows
+(verified=False). Two seams are injected as adapters:
 
-Callers combine these steps and bulk-create Question objects with verified=False.
+* `Parser`  — turns PDF bytes into plain text.  Default: `PdfplumberParser`.
+* `Tagger`  — assigns chapter_slug + cognitive_level to each raw question.
+              Default: `ClaudeTagger` (Anthropic Claude Haiku).
+
+`strip_hindi` and `segment_questions` are pure helpers between the two seams;
+they're not configurable so they remain module-level functions.
+
+Tests construct ad-hoc Parser/Tagger stubs and pass them to Ingestor —
+no module-level patching required.
 """
 from __future__ import annotations
 
 import io
 import json
 import re
+from dataclasses import dataclass
+from typing import Protocol
 
 import anthropic
 import pdfplumber
 
+from .models import Chapter, CognitiveLevel, Question
+
 _DEVANAGARI_RE = re.compile(r"[ऀ-ॿ]+")
 _SECTION_RE = re.compile(r"\bSECTION\s+([A-E])\b", re.IGNORECASE)
-# Matches "1.", "Q1.", "1 .", "Q. 1." at the start of a line
 _QNUM_RE = re.compile(r"^\s*(?:Q\.?\s*)?(\d{1,2})\s*[.)]\s+", re.MULTILINE)
-# "[2]" or "(2 marks)" or "(2 Mark)"
 _MARKS_RE = re.compile(r"\[(\d)\]|\((\d)\s*[Mm]arks?\)")
-# MCQ options like (A) text (B) text …
 _OPTION_RE = re.compile(r"\(([A-D])\)\s*(.*?)(?=\s*\([A-D]\)|$)", re.DOTALL)
 
 SECTION_DEFAULT_MARKS: dict[str, int] = {"A": 1, "B": 2, "C": 3, "D": 5, "E": 4}
@@ -36,7 +42,7 @@ SECTION_DEFAULT_QTYPE: dict[str, str] = {
 }
 
 _CLAUDE_MODEL = "claude-haiku-4-5-20251001"
-_TAG_BATCH = 30  # questions per Claude call
+_TAG_BATCH = 30
 
 
 # ---------------------------------------------------------------------------
@@ -128,68 +134,132 @@ def segment_questions(text: str) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# I/O helpers (injectable in tests)
+# Seams
 # ---------------------------------------------------------------------------
 
 
-def extract_text(pdf_bytes: bytes) -> str:
-    """Return plain text from all pages of a PDF."""
-    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        return "\n".join(page.extract_text() or "" for page in pdf.pages)
+class Parser(Protocol):
+    def parse(self, pdf_bytes: bytes) -> str: ...
 
 
-def tag_with_claude(
-    raw_questions: list[dict],
-    chapters: list,  # list[Chapter]
-) -> list[dict]:
-    """Return raw_questions with chapter_slug + cognitive_level added.
+class Tagger(Protocol):
+    def tag(
+        self, raw_questions: list[dict], chapters: list[Chapter]
+    ) -> list[dict]: ...
 
-    Sends questions to Claude in batches of _TAG_BATCH. Each batch is a single
-    API call that returns a JSON array of {index, chapter_slug, cognitive_level}.
-    """
-    if not raw_questions:
-        return []
 
-    chapter_list = [{"slug": c.slug, "name": c.name} for c in chapters]
-    client = anthropic.Anthropic()
+class PdfplumberParser:
+    """Default Parser — extracts text from each PDF page via pdfplumber."""
 
-    tagged = list(raw_questions)
+    def parse(self, pdf_bytes: bytes) -> str:
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            return "\n".join(page.extract_text() or "" for page in pdf.pages)
 
-    for batch_start in range(0, len(raw_questions), _TAG_BATCH):
-        batch = raw_questions[batch_start : batch_start + _TAG_BATCH]
 
-        prompt = (
-            "You are tagging CBSE Class 10 Science questions for a question bank.\n\n"
-            f"Chapters:\n{json.dumps(chapter_list, indent=2)}\n\n"
-            "Cognitive levels: R (Remember), U (Understand), Ap (Apply), An (Analyse)\n\n"
-            "For each question return a JSON array of objects with:\n"
-            "  index        — same as input\n"
-            "  chapter_slug — closest chapter slug, or null if unclear\n"
-            "  cognitive_level — one of R / U / Ap / An\n\n"
-            "Questions:\n"
-            + json.dumps(
-                [{"index": batch_start + i, "text": q["text"]} for i, q in enumerate(batch)],
-                indent=2,
+class ClaudeTagger:
+    """Default Tagger — batches questions to Claude Haiku for chapter/level tagging."""
+
+    def tag(
+        self, raw_questions: list[dict], chapters: list[Chapter]
+    ) -> list[dict]:
+        if not raw_questions:
+            return []
+
+        chapter_list = [{"slug": c.slug, "name": c.name} for c in chapters]
+        client = anthropic.Anthropic()
+        tagged = list(raw_questions)
+
+        for batch_start in range(0, len(raw_questions), _TAG_BATCH):
+            batch = raw_questions[batch_start : batch_start + _TAG_BATCH]
+            prompt = (
+                "You are tagging CBSE Class 10 Science questions for a question bank.\n\n"
+                f"Chapters:\n{json.dumps(chapter_list, indent=2)}\n\n"
+                "Cognitive levels: R (Remember), U (Understand), Ap (Apply), An (Analyse)\n\n"
+                "For each question return a JSON array of objects with:\n"
+                "  index        — same as input\n"
+                "  chapter_slug — closest chapter slug, or null if unclear\n"
+                "  cognitive_level — one of R / U / Ap / An\n\n"
+                "Questions:\n"
+                + json.dumps(
+                    [{"index": batch_start + i, "text": q["text"]} for i, q in enumerate(batch)],
+                    indent=2,
+                )
+                + "\n\nRespond with only the JSON array."
             )
-            + "\n\nRespond with only the JSON array."
-        )
+            message = client.messages.create(
+                model=_CLAUDE_MODEL,
+                max_tokens=2048,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            response_text = message.content[0].text.strip()
+            # Strip markdown fences if the model wraps output
+            response_text = re.sub(r"^```\w*\n?", "", response_text)
+            response_text = re.sub(r"\n?```$", "", response_text)
 
-        message = client.messages.create(
-            model=_CLAUDE_MODEL,
-            max_tokens=2048,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        response_text = message.content[0].text.strip()
-        # Strip markdown fences if the model wraps output
-        response_text = re.sub(r"^```\w*\n?", "", response_text)
-        response_text = re.sub(r"\n?```$", "", response_text)
+            for tag in json.loads(response_text):
+                idx = tag["index"]
+                tagged[idx] = {
+                    **tagged[idx],
+                    "chapter_slug": tag.get("chapter_slug"),
+                    "cognitive_level": tag.get("cognitive_level", "R"),
+                }
 
-        for tag in json.loads(response_text):
-            idx = tag["index"]
-            tagged[idx] = {
-                **tagged[idx],
-                "chapter_slug": tag.get("chapter_slug"),
-                "cognitive_level": tag.get("cognitive_level", "R"),
-            }
+        return tagged
 
-    return tagged
+
+# ---------------------------------------------------------------------------
+# Coordinator
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class IngestResult:
+    created: int
+
+
+class Ingestor:
+    """Pipeline coordinator. Parser + Tagger are injectable adapters.
+
+    The default constructor wires the production adapters
+    (PdfplumberParser, ClaudeTagger); tests pass stubs.
+    """
+
+    def __init__(
+        self,
+        parser: Parser | None = None,
+        tagger: Tagger | None = None,
+    ):
+        self.parser = parser or PdfplumberParser()
+        self.tagger = tagger or ClaudeTagger()
+
+    def ingest(self, pdf_bytes: bytes) -> IngestResult:
+        raw_text = self.parser.parse(pdf_bytes)
+        clean_text = strip_hindi(raw_text)
+        raw_questions = segment_questions(clean_text)
+        if not raw_questions:
+            return IngestResult(created=0)
+
+        chapters = list(Chapter.objects.all())
+        tagged = self.tagger.tag(raw_questions, chapters)
+        chapter_by_slug = {c.slug: c for c in chapters}
+        created = self._persist(tagged, chapter_by_slug)
+        return IngestResult(created=created)
+
+    @staticmethod
+    def _persist(tagged: list[dict], chapter_by_slug: dict[str, Chapter]) -> int:
+        rows = [
+            Question(
+                chapter=chapter_by_slug.get(q.get("chapter_slug")),
+                section=q["section"],
+                qtype=q["qtype"],
+                marks=q["marks"],
+                cognitive_level=q.get("cognitive_level", CognitiveLevel.REMEMBER),
+                text=q["text"],
+                options=q.get("options", []),
+                answer="",
+                verified=False,
+            )
+            for q in tagged
+        ]
+        Question.objects.bulk_create(rows)
+        return len(rows)

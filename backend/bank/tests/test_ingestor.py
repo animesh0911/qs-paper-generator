@@ -1,18 +1,15 @@
-"""Tests for bank.ingestor — parse and tag pipeline.
+"""Tests for bank.ingestor.
 
-Pure functions (strip_hindi, segment_questions) are tested without any mocks.
-tag_with_claude is tested by injecting a fake Claude client via monkeypatching
-the `anthropic` module imported inside the function.
+Pure helpers (strip_hindi, segment_questions) tested directly.
+Ingestor coordinator tested end-to-end with stub Parser/Tagger adapters —
+no mock.patch on module globals.
 """
 from __future__ import annotations
 
-import json
-from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
-
 import pytest
 
-from bank.ingestor import segment_questions, strip_hindi, tag_with_claude
+from bank.ingestor import Ingestor, segment_questions, strip_hindi
+from bank.models import Chapter, Question
 
 
 # ---------------------------------------------------------------------------
@@ -107,64 +104,74 @@ def test_segment_no_sections():
 
 
 # ---------------------------------------------------------------------------
-# tag_with_claude
+# Ingestor — end-to-end with stub adapters
 # ---------------------------------------------------------------------------
 
 
-def _make_chapters(*slugs: str):
-    return [SimpleNamespace(slug=s, name=s.replace("-", " ").title()) for s in slugs]
+class StubParser:
+    """Parser adapter that returns canned text."""
+
+    def __init__(self, text: str):
+        self._text = text
+
+    def parse(self, pdf_bytes: bytes) -> str:
+        return self._text
 
 
-def _fake_claude_response(tags: list[dict]) -> MagicMock:
-    """Build a mock anthropic.Anthropic().messages.create() return value."""
-    content_block = SimpleNamespace(text=json.dumps(tags))
-    message = SimpleNamespace(content=[content_block])
-    client = MagicMock()
-    client.messages.create.return_value = message
-    return client
+class StubTagger:
+    """Tagger adapter that assigns a fixed chapter/level to every question."""
 
+    def __init__(self, chapter_slug: str, level: str = "U"):
+        self.chapter_slug = chapter_slug
+        self.level = level
+        self.calls: list[tuple[int, int]] = []  # (n_questions, n_chapters)
 
-@pytest.mark.django_db
-def test_tag_with_claude_adds_chapter_and_level():
-    chapters = _make_chapters("electricity", "life-processes")
-    raw = [
-        {"section": "A", "qtype": "MCQ", "marks": 1, "text": "Q about electricity", "options": []},
-        {"section": "B", "qtype": "VSA", "marks": 2, "text": "Q about life processes", "options": []},
-    ]
-    expected_tags = [
-        {"index": 0, "chapter_slug": "electricity", "cognitive_level": "R"},
-        {"index": 1, "chapter_slug": "life-processes", "cognitive_level": "U"},
-    ]
-    fake_client = _fake_claude_response(expected_tags)
-
-    with patch("bank.ingestor.anthropic") as mock_anthropic:
-        mock_anthropic.Anthropic.return_value = fake_client
-        result = tag_with_claude(raw, chapters)
-
-    assert result[0]["chapter_slug"] == "electricity"
-    assert result[0]["cognitive_level"] == "R"
-    assert result[1]["chapter_slug"] == "life-processes"
-    assert result[1]["cognitive_level"] == "U"
+    def tag(self, raw_questions, chapters):
+        self.calls.append((len(raw_questions), len(chapters)))
+        return [
+            {**q, "chapter_slug": self.chapter_slug, "cognitive_level": self.level}
+            for q in raw_questions
+        ]
 
 
 @pytest.mark.django_db
-def test_tag_with_claude_empty_input():
-    result = tag_with_claude([], _make_chapters("electricity"))
-    assert result == []
+def test_ingestor_persists_unverified_questions_with_tags():
+    """End-to-end: parser → segmenter → tagger → DB.
+
+    Why this matters: this is the only test that proves the coordinator
+    actually wires the pipeline end to end. If the order changes or a step
+    is skipped, this test fails.
+    """
+    parser = StubParser(_SAMPLE_TEXT)
+    tagger = StubTagger(chapter_slug="electricity", level="Ap")
+    result = Ingestor(parser=parser, tagger=tagger).ingest(b"ignored")
+
+    assert result.created == 5
+    assert Question.objects.count() == 5
+    assert all(q.verified is False for q in Question.objects.all())
+
+    electricity = Chapter.objects.get(slug="electricity")
+    assert all(q.chapter_id == electricity.pk for q in Question.objects.all())
+    assert all(q.cognitive_level == "Ap" for q in Question.objects.all())
 
 
 @pytest.mark.django_db
-def test_tag_with_claude_preserves_original_fields():
-    chapters = _make_chapters("electricity")
-    raw = [{"section": "A", "qtype": "MCQ", "marks": 1, "text": "Q?", "options": []}]
-    fake_client = _fake_claude_response(
-        [{"index": 0, "chapter_slug": "electricity", "cognitive_level": "Ap"}]
-    )
+def test_ingestor_empty_pdf_creates_nothing():
+    parser = StubParser("")
+    tagger = StubTagger(chapter_slug="electricity")
+    result = Ingestor(parser=parser, tagger=tagger).ingest(b"")
 
-    with patch("bank.ingestor.anthropic") as mock_anthropic:
-        mock_anthropic.Anthropic.return_value = fake_client
-        result = tag_with_claude(raw, chapters)
+    assert result.created == 0
+    assert Question.objects.count() == 0
+    assert tagger.calls == []  # tagger not invoked when there's nothing to tag
 
-    assert result[0]["section"] == "A"
-    assert result[0]["marks"] == 1
-    assert result[0]["text"] == "Q?"
+
+@pytest.mark.django_db
+def test_ingestor_unknown_chapter_slug_persists_without_chapter():
+    """Tagger returns a slug not in the bank → chapter stays None, ingestion still succeeds."""
+    parser = StubParser(_SAMPLE_TEXT)
+    tagger = StubTagger(chapter_slug="no-such-chapter")
+    result = Ingestor(parser=parser, tagger=tagger).ingest(b"x")
+
+    assert result.created == 5
+    assert all(q.chapter_id is None for q in Question.objects.all())
