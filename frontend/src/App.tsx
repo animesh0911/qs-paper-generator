@@ -1,21 +1,21 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import { getToken } from "@/lib/api";
-import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth.hook';
+import { LoginPage, DashboardPage } from '@/pages';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  return getToken() ? <>{children}</> : <Navigate to="/login" replace />;
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route
         path="/"
         element={
           <RequireAuth>
-            <Dashboard />
+            <DashboardPage />
           </RequireAuth>
         }
       />

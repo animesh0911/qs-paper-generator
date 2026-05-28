@@ -1,26 +1,26 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login, register } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login, register } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("teacher@example.com");
-  const [password, setPassword] = useState("teacher123");
-  const [error, setError] = useState("");
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('teacher@example.com');
+  const [password, setPassword] = useState('teacher123');
+  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
+    setError('');
     setBusy(true);
     try {
-      if (mode === "login") await login(email, password);
+      if (mode === 'login') await login(email, password);
       else await register(email, password);
-      navigate("/");
+      navigate('/');
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -33,7 +33,7 @@ export default function Login() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>
-            {mode === "login" ? "Sign in" : "Create account"}
+            {mode === 'login' ? 'Sign in' : 'Create account'}
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Question Paper Generator — Class 10 Science
@@ -57,19 +57,23 @@ export default function Login() {
             />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={busy}>
-              {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Register"}
+              {busy
+                ? 'Please wait…'
+                : mode === 'login'
+                  ? 'Sign in'
+                  : 'Register'}
             </Button>
           </form>
           <button
             className="mt-4 text-sm text-muted-foreground underline w-full text-center"
             onClick={() => {
-              setError("");
-              setMode(mode === "login" ? "register" : "login");
+              setError('');
+              setMode(mode === 'login' ? 'register' : 'login');
             }}
           >
-            {mode === "login"
-              ? "Need an account? Register"
-              : "Have an account? Sign in"}
+            {mode === 'login'
+              ? 'Need an account? Register'
+              : 'Have an account? Sign in'}
           </button>
         </CardContent>
       </Card>

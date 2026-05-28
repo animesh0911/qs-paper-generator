@@ -1,0 +1,15 @@
+[ -n "$CI" ] && exit 0
+
+echo "Running pre-commit tasks..."
+
+# Frontend: ESLint --fix + Prettier on staged TS/TSX/JSON/MD files
+(cd frontend && npx lint-staged --allow-empty)
+
+# Backend: ruff on staged Python files (skipped if ruff not installed)
+STAGED_PY=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$' || true)
+if [ -n "$STAGED_PY" ] && command -v ruff >/dev/null 2>&1; then
+  ruff check --fix $STAGED_PY
+  git add $STAGED_PY
+fi
+
+echo "Done."
