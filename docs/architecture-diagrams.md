@@ -49,12 +49,12 @@ flowchart LR
     GM["Gemini API"]
   end
 
-  FE -- "HTTPS JSON<br/>/api/**" --> VITE
+  FE -- "HTTPS JSON /api/**" --> VITE
   VITE -. "dev proxy" .-> DJ
-  FE -- "PDF GET<br/>/api/papers/{id}/pdf/" --> DJ
+  FE -- "PDF GET /api/papers/id/pdf/" --> DJ
 
-  DJ <-- "ORM (psycopg)" --> PG
-  CW <-- "ORM" --> PG
+  DJ -- "ORM psycopg" --> PG
+  CW -- "ORM" --> PG
   DJ -- "enqueue" --> RDS
   CW -- "consume / result" --> RDS
 
@@ -120,7 +120,7 @@ flowchart TB
   PB --> PDOC
   PB --> PMOD
   PV --> PDF
-  PDOC -. "stored on Paper.document (JSON)" .- PMOD
+  PDOC -. "stored on Paper.document JSON" .-> PMOD
 ```
 
 ---
