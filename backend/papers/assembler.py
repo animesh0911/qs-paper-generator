@@ -1,64 +1,85 @@
 """Paper assembly coordinator.
 
 The view calls PaperAssembler().assemble(). All assembly logic lives inside
-this class. _build_plan() is the seam: Slices 2/3 replace it with
-BlueprintEngine without touching the view or this coordinator's interface.
+this class. _build_plan() is the seam: Slice 3 replaces it with
+SelectionEngine without touching the view or this coordinator's interface.
 """
+from collections import defaultdict
+from collections import deque
+
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
-from bank.models import Question, Section
+from bank.models import Question
 
+from .blueprint import BlueprintEngine, PaperSpec, Slot
 from .models import Paper, PaperQuestion
 
-SKELETON_PLAN = [
-    (Section.A, 4),
-    (Section.B, 2),
-    (Section.C, 2),
-    (Section.D, 2),
-    (Section.E, 1),
-]
+_SlotKey = tuple[str, str, int]  # (section, qtype, marks)
+
+
+def _slot_key(slot: Slot) -> _SlotKey:
+    return (slot.section, slot.qtype, slot.marks)
 
 
 class PaperAssembler:
-    def assemble(self, user, title: str = "Science — Practice Paper") -> Paper:
-        plan = self._build_plan()
-        return self._fill_slots(user, title, plan)
+    def assemble(
+        self, user, title: str = "Science — Practice Paper", preset: str = "board"
+    ) -> Paper:
+        spec = self._build_plan(preset)
+        return self._fill_slots(user, title, spec)
 
-    def _build_plan(self):
-        # Slice 2 replaces this with BlueprintEngine(user, config).plan()
-        return SKELETON_PLAN
+    def _build_plan(self, preset: str) -> PaperSpec:
+        return BlueprintEngine().build(preset)
 
     @transaction.atomic
-    def _fill_slots(self, user, title, plan) -> Paper:
-        """Create a Paper by filling slots from available bank questions.
+    def _fill_slots(self, user, title: str, spec: PaperSpec) -> Paper:
+        """Create a Paper by filling each slot from the bank.
 
-        Raises ValidationError (→ HTTP 400) when the bank cannot fill any
-        section, rather than silently producing a short paper.
+        Fetches one query per unique (section, qtype, marks) key, then
+        allocates from in-memory pools. OR-group slots draw distinct
+        questions from the same pool.
         """
+        # Count how many questions each slot key needs.
+        needed: dict[_SlotKey, int] = defaultdict(int)
+        for slot in spec.slots:
+            needed[_slot_key(slot)] += 1
+
+        # One SELECT per unique key.
+        pools: dict[_SlotKey, deque[int]] = {}
+        for key, count in needed.items():
+            section, qtype, marks = key
+            ids = list(
+                Question.objects.filter(section=section, qtype=qtype, marks=marks)
+                .order_by("id")
+                .values_list("id", flat=True)[:count]
+            )
+            if len(ids) < count:
+                raise ValidationError(
+                    f"Question bank only has {len(ids)}/{count} questions for "
+                    f"section={section}, qtype={qtype}, marks={marks}. "
+                    f"Add more questions or run `manage.py seed_questions`."
+                )
+            pools[key] = deque(ids)
+
         paper = Paper.objects.create(
             created_by=user,
             school=getattr(user, "school", None),
             title=title,
         )
-        order = 1
-        total_marks = 0
-        for section, count in plan:
-            questions = list(
-                Question.objects.filter(section=section).order_by("id")[:count]
+
+        rows = [
+            PaperQuestion(
+                paper=paper,
+                question_id=pools[_slot_key(slot)].popleft(),
+                order=i + 1,
+                section=slot.section,
+                or_group=slot.or_group,
             )
-            if len(questions) < count:
-                raise ValidationError(
-                    f"Question bank only has {len(questions)}/{count} questions "
-                    f"for section {section}. Run `manage.py seed_questions` or "
-                    f"add more questions before assembling."
-                )
-            for q in questions:
-                PaperQuestion.objects.create(
-                    paper=paper, question=q, order=order, section=section
-                )
-                total_marks += q.marks
-                order += 1
-        paper.total_marks = total_marks
+            for i, slot in enumerate(spec.slots)
+        ]
+        PaperQuestion.objects.bulk_create(rows)
+
+        paper.total_marks = spec.total_marks
         paper.save(update_fields=["total_marks"])
         return paper
