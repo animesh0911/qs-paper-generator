@@ -100,6 +100,22 @@ def test_ingestor_dedup_skips_existing_questions():
 
 
 @pytest.mark.django_db
+def test_ingestor_dedup_within_single_pdf():
+    """Repeated questions within one PDF must collapse to a single row."""
+    text = """\
+SECTION B
+1. Define decomposition reaction.
+2. Define decomposition reaction.
+3. What is the function of the stomata in a leaf?
+"""
+    parser = _StubParser(text)
+    r = Ingestor(parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()).ingest(b"x")
+    assert r.created == 2
+    assert r.skipped_duplicates == 1
+    assert Question.objects.count() == 2
+
+
+@pytest.mark.django_db
 def test_ingestor_dedup_only_skips_exact_matches():
     """A slightly different question must NOT be skipped."""
     text1 = """\

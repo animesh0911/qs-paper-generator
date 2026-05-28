@@ -38,3 +38,4 @@ dist/
 # Claude Code — machine-local settings & playwright session artifacts
 .claude/settings.local.json
 .playwright-mcp/
+frontend/tsconfig.tsbuildinfo

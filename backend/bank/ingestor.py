@@ -198,21 +198,20 @@ class PdfplumberDiagramExtractor:
             return []
 
         results: list[bytes | None] = [None] * len(raw_questions)
-        question_texts = [q["text"] for q in raw_questions]
-
         try:
-            return self._extract_inner(pdf_bytes, raw_questions, results, question_texts)
+            self._crop_images_into(pdf_bytes, raw_questions, results)
         except Exception:
-            # Non-PDF bytes or rendering failure — degrade gracefully.
-            return self._flag_diagram_keywords(raw_questions, results)
+            # Non-PDF bytes or rendering failure — fall through to keyword fallback.
+            pass
+        return self._flag_diagram_keywords(raw_questions, results)
 
-    def _extract_inner(
+    def _crop_images_into(
         self,
         pdf_bytes: bytes,
         raw_questions: list[dict],
         results: list[bytes | None],
-        question_texts: list[str],
-    ) -> list[bytes | None]:
+    ) -> None:
+        question_texts = [q["text"] for q in raw_questions]
         with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
             # Build per-page flat text so we can locate questions by page.
             page_texts = [page.extract_text() or "" for page in pdf.pages]
@@ -257,8 +256,6 @@ class PdfplumberDiagramExtractor:
                             best_qi = qi
                     if best_qi is not None and results[best_qi] is None:
                         results[best_qi] = img_bytes
-
-        return self._flag_diagram_keywords(raw_questions, results)
 
     @staticmethod
     def _flag_diagram_keywords(
@@ -367,17 +364,22 @@ class Ingestor:
         if not raw_questions:
             return IngestResult(created=0)
 
-        # De-duplication: skip questions already in the bank by normalised text hash.
-        fingerprints = [_fingerprint(q["text"]) for q in raw_questions]
-        existing_hashes = set(
-            Question.objects.filter(source_hash__in=fingerprints).values_list(
+        # De-duplication: skip questions already in the bank AND repeats within this PDF.
+        all_fingerprints = [_fingerprint(q["text"]) for q in raw_questions]
+        seen = set(
+            Question.objects.filter(source_hash__in=all_fingerprints).values_list(
                 "source_hash", flat=True
             )
         )
-        unique_indices = [i for i, fp in enumerate(fingerprints) if fp not in existing_hashes]
+        unique_indices: list[int] = []
+        for i, fp in enumerate(all_fingerprints):
+            if fp in seen:
+                continue
+            seen.add(fp)
+            unique_indices.append(i)
         skipped = len(raw_questions) - len(unique_indices)
         raw_questions = [raw_questions[i] for i in unique_indices]
-        fingerprints = [fingerprints[i] for i in unique_indices]
+        fingerprints = [all_fingerprints[i] for i in unique_indices]
 
         if not raw_questions:
             return IngestResult(created=0, skipped_duplicates=skipped)
