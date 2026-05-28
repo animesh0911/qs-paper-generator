@@ -1,5 +1,5 @@
 /**
- * Dashboard — the only authenticated page in Slice 3.
+ * Dashboard — the only authenticated page.
  *
  * Pure orchestration: wires the `useCoverageForm` hook to the
  * `CoverageFormView`, posts to `assemblePaper`, and renders the result via
@@ -7,18 +7,11 @@
  * in the components. The page itself only owns the assemble call, the
  * scroll-into-view nudge, and the error string.
  *
- * Where it fits:
- * - Uses: `lib/api.assemblePaper`, `lib/api.fetchMetadata`,
- *   `lib/api.downloadPaperPdf`, `hooks/useCoverageForm`,
- *   `components/coverage/*`.
- * - Rendered by: `App.tsx` behind a `RequireAuth` guard.
- *
  * @module DashboardPage
  */
-import { useEffect, useRef, useState } from 'react';
-import { assemblePaper, downloadPaperPdf, fetchMetadata } from '@/lib/api';
-import type { Paper } from '@/types';
-import { SECTION_TITLES } from '@/constants';
+import { useRef, useState } from 'react';
+import { assemblePaper, downloadPaperPdf } from '@/lib/api';
+import type { PaperDocument } from '@/types';
 import { useAuth } from '@/hooks/useAuth.hook';
 import { useCoverageForm } from '@/hooks/useCoverageForm.hook';
 import { Button } from '@/components/ui/button';
@@ -29,24 +22,10 @@ export default function Dashboard() {
   const { logout } = useAuth();
   const form = useCoverageForm();
 
-  const [paper, setPaper] = useState<Paper | null>(null);
+  const [paper, setPaper] = useState<PaperDocument | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [sectionTitles, setSectionTitles] =
-    useState<Record<string, string>>(SECTION_TITLES);
   const paperRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetchMetadata()
-      .then(({ sections }) =>
-        setSectionTitles(
-          Object.fromEntries(sections.map((s) => [s.code, s.label])),
-        ),
-      )
-      .catch(() => {
-        // fallback to static SECTION_TITLES stays in state
-      });
-  }, []);
 
   async function generate() {
     setBusy(true);
@@ -54,8 +33,6 @@ export default function Dashboard() {
     try {
       const next = await assemblePaper(form.toAssemblePayload());
       setPaper(next);
-      // Paper card renders below a long chapter list; scroll it into view so
-      // the teacher sees the result without hunting for it.
       requestAnimationFrame(() => {
         paperRef.current?.scrollIntoView({
           behavior: 'smooth',
@@ -96,7 +73,7 @@ export default function Dashboard() {
                 paper && (
                   <Button
                     variant="outline"
-                    onClick={() => downloadPaperPdf(paper.id)}
+                    onClick={() => downloadPaperPdf(paper.paper.paperId)}
                   >
                     Download PDF
                   </Button>
@@ -107,14 +84,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {paper && (
-          <PaperPreview
-            ref={paperRef}
-            paper={paper}
-            sectionTitles={sectionTitles}
-            chapterNameBySlug={form.chapterNameBySlug}
-          />
-        )}
+        {paper && <PaperPreview ref={paperRef} paper={paper} />}
       </main>
     </div>
   );

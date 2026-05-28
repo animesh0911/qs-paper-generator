@@ -13,7 +13,7 @@
  *
  * @module api
  */
-import type { AssembleRequest, Chapter, Paper } from '@/types';
+import type { AssembleRequest, Chapter, PaperDocument } from '@/types';
 
 const TOKEN_KEY = 'qpg_token';
 
@@ -70,7 +70,7 @@ export const register = (email: string, password: string) =>
 
 export async function assemblePaper(
   body: AssembleRequest = {},
-): Promise<Paper> {
+): Promise<PaperDocument> {
   const res = await request('/papers/assemble', {
     method: 'POST',
     body: JSON.stringify(body),
@@ -94,13 +94,14 @@ export async function fetchChapters(): Promise<Chapter[]> {
   return res.json();
 }
 
-export async function downloadPaperPdf(id: number) {
+export async function downloadPaperPdf(paperId: string) {
+  const id = paperId.replace(/^paper_/, '');
   const res = await request(`/papers/${id}/pdf/`, { method: 'GET' });
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `paper-${id}.pdf`;
+  a.download = `${paperId}.pdf`;
   document.body.appendChild(a);
   a.click();
   a.remove();
