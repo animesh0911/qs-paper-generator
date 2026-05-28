@@ -1,11 +1,11 @@
-"""Ingestion A: parse a CBSE past-paper PDF and auto-tag questions via Claude.
+"""Ingestion A: parse a CBSE past-paper PDF and auto-tag questions via an LLM.
 
 `Ingestor` is the coordinator. It runs the pipeline and persists Question rows
 (verified=False). Two seams are injected as adapters:
 
-* `Parser`  — turns PDF bytes into plain text.  Default: `PdfplumberParser`.
-* `Tagger`  — assigns chapter_slug + cognitive_level to each raw question.
-              Default: `ClaudeTagger` (Anthropic Claude Haiku).
+* `Parser` — turns PDF bytes into plain text. Default: `PdfplumberParser`.
+* `Tagger` — assigns chapter_slug + cognitive_level to each raw question.
+             Default: `LLMTagger` (uses any provider via `bank.llm.LLMClient`).
 
 `strip_hindi` and `segment_questions` are pure helpers between the two seams;
 they're not configurable so they remain module-level functions.
@@ -21,9 +21,9 @@ import re
 from dataclasses import dataclass
 from typing import Protocol
 
-import anthropic
 import pdfplumber
 
+from .llm import LLMClient, make_llm_client
 from .models import Chapter, CognitiveLevel, Question
 
 _DEVANAGARI_RE = re.compile(r"[ऀ-ॿ]+")
@@ -41,7 +41,6 @@ SECTION_DEFAULT_QTYPE: dict[str, str] = {
     "E": "CASE",
 }
 
-_CLAUDE_MODEL = "claude-haiku-4-5-20251001"
 _TAG_BATCH = 30
 
 
@@ -156,8 +155,15 @@ class PdfplumberParser:
             return "\n".join(page.extract_text() or "" for page in pdf.pages)
 
 
-class ClaudeTagger:
-    """Default Tagger — batches questions to Claude Haiku for chapter/level tagging."""
+class LLMTagger:
+    """Default Tagger — batches questions to an LLM for chapter/level tagging.
+
+    Provider-agnostic: takes any `LLMClient`. Defaults to the one
+    `make_llm_client()` returns (driven by `LLM_PROVIDER` env var).
+    """
+
+    def __init__(self, client: LLMClient | None = None):
+        self.client = client or make_llm_client()
 
     def tag(
         self, raw_questions: list[dict], chapters: list[Chapter]
@@ -166,7 +172,6 @@ class ClaudeTagger:
             return []
 
         chapter_list = [{"slug": c.slug, "name": c.name} for c in chapters]
-        client = anthropic.Anthropic()
         tagged = list(raw_questions)
 
         for batch_start in range(0, len(raw_questions), _TAG_BATCH):
@@ -186,12 +191,7 @@ class ClaudeTagger:
                 )
                 + "\n\nRespond with only the JSON array."
             )
-            message = client.messages.create(
-                model=_CLAUDE_MODEL,
-                max_tokens=2048,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            response_text = message.content[0].text.strip()
+            response_text = self.client.complete(prompt, max_tokens=2048).strip()
             # Strip markdown fences if the model wraps output
             response_text = re.sub(r"^```\w*\n?", "", response_text)
             response_text = re.sub(r"\n?```$", "", response_text)
@@ -221,7 +221,7 @@ class Ingestor:
     """Pipeline coordinator. Parser + Tagger are injectable adapters.
 
     The default constructor wires the production adapters
-    (PdfplumberParser, ClaudeTagger); tests pass stubs.
+    (PdfplumberParser, LLMTagger); tests pass stubs.
     """
 
     def __init__(
@@ -230,7 +230,7 @@ class Ingestor:
         tagger: Tagger | None = None,
     ):
         self.parser = parser or PdfplumberParser()
-        self.tagger = tagger or ClaudeTagger()
+        self.tagger = tagger or LLMTagger()
 
     def ingest(self, pdf_bytes: bytes) -> IngestResult:
         raw_text = self.parser.parse(pdf_bytes)

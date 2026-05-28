@@ -13,10 +13,13 @@ A single bank item. Has section (A–E), question type (MCQ/VSA/SA/LA/CASE), mar
 A canonical CBSE Class 10 Science chapter, seeded from the NCERT taxonomy. Identified by slug. Lives in `bank.models.Chapter`.
 
 **Ingestor**
-Coordinator for the ingestion pipeline. Reads PDF bytes, parses them to text, strips Hindi, segments into raw questions, tags each with chapter + cognitive level, and persists `Question` rows as `verified=False`. Adapters at two seams: **Parser** (default `PdfplumberParser`) and **Tagger** (default `ClaudeTagger`, using Anthropic Claude Haiku). Lives in `bank.ingestor.Ingestor`. Symmetric to `PaperBuilder`.
+Coordinator for the ingestion pipeline. Reads PDF bytes, parses them to text, strips Hindi, segments into raw questions, tags each with chapter + cognitive level, and persists `Question` rows as `verified=False`. Adapters at two seams: **Parser** (default `PdfplumberParser`) and **Tagger** (default `LLMTagger`). Lives in `bank.ingestor.Ingestor`. Symmetric to `PaperBuilder`.
 
 **Parser / Tagger**
 The two adapter seams of the Ingestor. `Parser.parse(pdf_bytes) → str`. `Tagger.tag(raw_questions, chapters) → list[dict]` with `chapter_slug` + `cognitive_level` added. Tests inject stub adapters.
+
+**LLMClient**
+Provider-agnostic LLM seam used by `LLMTagger` (and future ingestion features). `complete(prompt, max_tokens) → str`. Three adapters ship: `AnthropicClient`, `OpenAIClient`, `GeminiClient` — each imports its SDK lazily. Selected via `LLM_PROVIDER` env var (default `anthropic`). Lives in `bank.llm`.
 
 **CognitiveLevel**
 Bloom-style classification of a Question — Remember (R), Understand (U), Apply (Ap), Analyse (An). Drives the **DifficultyLevel** mix.

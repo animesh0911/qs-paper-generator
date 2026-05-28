@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from bank.ingestor import Ingestor, segment_questions, strip_hindi
+from bank.ingestor import Ingestor, LLMTagger, segment_questions, strip_hindi
 from bank.models import Chapter, Question
 
 
@@ -175,3 +175,71 @@ def test_ingestor_unknown_chapter_slug_persists_without_chapter():
 
     assert result.created == 5
     assert all(q.chapter_id is None for q in Question.objects.all())
+
+
+# ---------------------------------------------------------------------------
+# LLMTagger — provider-agnostic, driven by an LLMClient
+# ---------------------------------------------------------------------------
+
+
+import json as _json  # noqa: E402  (alias so the per-test prompt builds cleanly)
+
+
+class StubLLMClient:
+    """LLMClient stub that returns canned JSON regardless of prompt."""
+
+    def __init__(self, tags: list[dict], wrap_fences: bool = False):
+        self.tags = tags
+        self.wrap_fences = wrap_fences
+        self.calls: list[str] = []
+
+    def complete(self, prompt: str, max_tokens: int = 2048) -> str:
+        self.calls.append(prompt)
+        payload = _json.dumps(self.tags)
+        if self.wrap_fences:
+            return f"```json\n{payload}\n```"
+        return payload
+
+
+@pytest.mark.django_db
+def test_llm_tagger_calls_client_and_attaches_tags():
+    """LLMTagger calls the injected client, parses JSON, returns tagged dicts.
+
+    Why this matters: this is the only test that verifies LLMTagger correctly
+    composes the prompt + parses the response. Swapping the underlying provider
+    must not break this contract.
+    """
+    raw = [
+        {"section": "A", "qtype": "MCQ", "marks": 1, "text": "Q one", "options": []},
+        {"section": "B", "qtype": "VSA", "marks": 2, "text": "Q two", "options": []},
+    ]
+    client = StubLLMClient(tags=[
+        {"index": 0, "chapter_slug": "electricity", "cognitive_level": "R"},
+        {"index": 1, "chapter_slug": "life-processes", "cognitive_level": "Ap"},
+    ])
+    tagged = LLMTagger(client=client).tag(raw, chapters=[])
+
+    assert tagged[0]["chapter_slug"] == "electricity"
+    assert tagged[0]["cognitive_level"] == "R"
+    assert tagged[1]["chapter_slug"] == "life-processes"
+    assert tagged[1]["cognitive_level"] == "Ap"
+    assert len(client.calls) == 1
+
+
+@pytest.mark.django_db
+def test_llm_tagger_strips_markdown_fences():
+    """Some providers wrap JSON in ```json fences; tagger must strip them."""
+    raw = [{"section": "A", "qtype": "MCQ", "marks": 1, "text": "Q", "options": []}]
+    client = StubLLMClient(
+        tags=[{"index": 0, "chapter_slug": "electricity", "cognitive_level": "U"}],
+        wrap_fences=True,
+    )
+    tagged = LLMTagger(client=client).tag(raw, chapters=[])
+    assert tagged[0]["chapter_slug"] == "electricity"
+
+
+def test_llm_tagger_empty_input_skips_llm_call():
+    client = StubLLMClient(tags=[])
+    result = LLMTagger(client=client).tag([], chapters=[])
+    assert result == []
+    assert client.calls == []
