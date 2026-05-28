@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   assemblePaper,
   downloadPaperPdf,
@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [sectionTitles, setSectionTitles] =
     useState<Record<string, string>>(SECTION_TITLES);
 
+  const paperRef = useRef<HTMLDivElement>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());
   const [weights, setWeights] = useState<Record<string, string>>({});
@@ -67,7 +68,16 @@ export default function Dashboard() {
           }),
         ),
       };
-      setPaper(await assemblePaper(payload));
+      const next = await assemblePaper(payload);
+      setPaper(next);
+      // Paper card renders below a long chapter list; scroll it into view so
+      // the teacher sees the result without hunting for it.
+      requestAnimationFrame(() => {
+        paperRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -194,7 +204,7 @@ export default function Dashboard() {
         </Card>
 
         {paper && (
-          <Card>
+          <Card ref={paperRef}>
             <CardHeader>
               <CardTitle>{paper.title}</CardTitle>
               <p className="text-sm text-muted-foreground">
