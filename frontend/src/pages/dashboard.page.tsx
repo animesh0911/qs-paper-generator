@@ -1,18 +1,40 @@
-import { useEffect, useState } from 'react';
+/**
+ * Dashboard — the only authenticated page in Slice 3.
+ *
+ * Pure orchestration: wires the `useCoverageForm` hook to the
+ * `CoverageFormView`, posts to `assemblePaper`, and renders the result via
+ * `PaperPreview`. All form state lives in the hook; all render logic lives
+ * in the components. The page itself only owns the assemble call, the
+ * scroll-into-view nudge, and the error string.
+ *
+ * Where it fits:
+ * - Uses: `lib/api.assemblePaper`, `lib/api.fetchMetadata`,
+ *   `lib/api.downloadPaperPdf`, `hooks/useCoverageForm`,
+ *   `components/coverage/*`.
+ * - Rendered by: `App.tsx` behind a `RequireAuth` guard.
+ *
+ * @module DashboardPage
+ */
+import { useEffect, useRef, useState } from 'react';
 import { assemblePaper, downloadPaperPdf, fetchMetadata } from '@/lib/api';
 import type { Paper } from '@/types';
 import { SECTION_TITLES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth.hook';
+import { useCoverageForm } from '@/hooks/useCoverageForm.hook';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CoverageFormView, PaperPreview } from '@/components/coverage';
 
 export default function Dashboard() {
   const { logout } = useAuth();
+  const form = useCoverageForm();
+
   const [paper, setPaper] = useState<Paper | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [sectionTitles, setSectionTitles] =
     useState<Record<string, string>>(SECTION_TITLES);
+  const paperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchMetadata()
@@ -30,24 +52,22 @@ export default function Dashboard() {
     setBusy(true);
     setError('');
     try {
-      setPaper(await assemblePaper());
+      const next = await assemblePaper(form.toAssemblePayload());
+      setPaper(next);
+      // Paper card renders below a long chapter list; scroll it into view so
+      // the teacher sees the result without hunting for it.
+      requestAnimationFrame(() => {
+        paperRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setBusy(false);
     }
   }
-
-  // Group items by section, preserving order.
-  const sections: { key: string; items: Paper['items'] }[] = [];
-  paper?.items.forEach((item) => {
-    let group = sections.find((s) => s.key === item.section);
-    if (!group) {
-      group = { key: item.section, items: [] };
-      sections.push(group);
-    }
-    group.items.push(item);
-  });
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -59,60 +79,41 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-3xl p-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <Button onClick={generate} disabled={busy}>
-            {busy ? 'Generating…' : 'Generate paper'}
-          </Button>
-          {paper && (
-            <Button
-              variant="outline"
-              onClick={() => downloadPaperPdf(paper.id)}
-            >
-              Download PDF
-            </Button>
-          )}
-        </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        <Card>
+          <CardHeader>
+            <CardTitle>Coverage</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Select chapters and optionally weight them. Difficulty profile
+              sets the Remember / Understand / Apply / Analyse mix.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <CoverageFormView
+              form={form}
+              busy={busy}
+              onGenerate={generate}
+              trailing={
+                paper && (
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadPaperPdf(paper.id)}
+                  >
+                    Download PDF
+                  </Button>
+                )
+              }
+            />
+            {error && <p className="text-sm text-destructive mt-2">{error}</p>}
+          </CardContent>
+        </Card>
 
         {paper && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{paper.title}</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Class 10 — Science · Maximum Marks: {paper.total_marks}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              {sections.map((section) => (
-                <div key={section.key}>
-                  <h2 className="font-semibold mb-2">
-                    {sectionTitles[section.key] ?? `Section ${section.key}`}
-                  </h2>
-                  <ol className="space-y-3">
-                    {section.items.map((item) => (
-                      <li key={item.order} className="text-sm">
-                        <span className="font-medium">Q{item.order}.</span>{' '}
-                        {item.question.text}{' '}
-                        <span className="text-muted-foreground">
-                          ({item.question.marks} mark
-                          {item.question.marks !== 1 ? 's' : ''})
-                        </span>
-                        {item.question.options.length > 0 && (
-                          <ul className="ml-6 mt-1 space-y-0.5 text-muted-foreground">
-                            {item.question.options.map((o) => (
-                              <li key={o.label}>
-                                ({o.label}) {o.text}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <PaperPreview
+            ref={paperRef}
+            paper={paper}
+            sectionTitles={sectionTitles}
+            chapterNameBySlug={form.chapterNameBySlug}
+          />
         )}
       </main>
     </div>

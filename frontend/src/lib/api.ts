@@ -1,4 +1,19 @@
-import type { Paper } from '@/types';
+/**
+ * Single HTTP adapter for the backend.
+ *
+ * All requests go through the private `request()` helper, which:
+ * - prefixes `/api`,
+ * - attaches `Authorization: Token <value>` if a token is present,
+ * - parses DRF error envelopes into a readable `Error.message`.
+ *
+ * Token storage is the boring localStorage approach — the same token the
+ * backend returns from `/api/auth/login`. The choice to omit a refresh
+ * flow is deliberate for the MVP; revisit when sessions need to outlive
+ * a browser tab.
+ *
+ * @module api
+ */
+import type { AssembleRequest, Chapter, Paper } from '@/types';
 
 const TOKEN_KEY = 'qpg_token';
 
@@ -53,18 +68,29 @@ export const login = (email: string, password: string) =>
 export const register = (email: string, password: string) =>
   authResult('/auth/register', email, password);
 
-export async function assemblePaper(): Promise<Paper> {
-  const res = await request('/papers/assemble', { method: 'POST', body: '{}' });
+export async function assemblePaper(
+  body: AssembleRequest = {},
+): Promise<Paper> {
+  const res = await request('/papers/assemble', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
   return res.json();
 }
 
 export interface Metadata {
   sections: { code: string; label: string }[];
   question_types: { code: string; label: string }[];
+  cognitive_levels: { code: string; label: string }[];
 }
 
 export async function fetchMetadata(): Promise<Metadata> {
   const res = await request('/bank/metadata/');
+  return res.json();
+}
+
+export async function fetchChapters(): Promise<Chapter[]> {
+  const res = await request('/bank/chapters/');
   return res.json();
 }
 

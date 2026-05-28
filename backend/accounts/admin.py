@@ -1,3 +1,4 @@
+"""Django admin registration for School and User."""
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 

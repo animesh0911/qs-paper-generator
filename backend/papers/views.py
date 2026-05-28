@@ -1,3 +1,12 @@
+"""HTTP views for paper assembly, detail, and PDF download.
+
+``AssemblePaperView`` is intentionally thin: validate via
+``AssembleRequestSerializer``, call ``PaperAssembler``, serialize. Domain
+rules live in ``papers.assembler`` and ``papers.selection``.
+
+``PaperPdfView`` memoises the rendered PDF for 24h keyed on paper id —
+papers are immutable once assembled, so the cache is safe.
+"""
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -10,7 +19,7 @@ from .assembler import PaperAssembler
 from .layout import paper_to_layout
 from .models import Paper
 from .pdf import render_paper_pdf
-from .serializers import PaperSerializer
+from .serializers import AssembleRequestSerializer, PaperSerializer
 
 # Paper rows are immutable once assembled (no edit endpoint), so the rendered
 # PDF can be memoised by pk indefinitely.
@@ -21,9 +30,14 @@ class AssemblePaperView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        title = request.data.get("title") or "Science — Practice Paper"
-        preset = request.data.get("preset") or "board"
-        paper = PaperAssembler().assemble(request.user, title=title, preset=preset)
+        req = AssembleRequestSerializer(data=request.data or {})
+        req.is_valid(raise_exception=True)
+        params = dict(req.validated_data)
+        # Title defaults are owned by the assembler, not the validator, so an
+        # empty string here means "fall back".
+        if not params.get("title"):
+            params.pop("title", None)
+        paper = PaperAssembler().assemble(request.user, **params)
         return Response(PaperSerializer(paper).data, status=status.HTTP_201_CREATED)
 
 

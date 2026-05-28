@@ -7,7 +7,6 @@ tests still pass or fail loudly.
 import pytest
 from collections import Counter
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
 
 from papers.assembler import PaperAssembler
 from papers.blueprint import BlueprintEngine
@@ -46,10 +45,16 @@ def test_assemble_counts_or_group_marks_once(user, seeded_bank):
 
 
 @pytest.mark.django_db
-def test_assemble_rejects_insufficient_bank(user, db):
-    """Assembler raises ValidationError when a section cannot be filled."""
-    with pytest.raises(ValidationError):
-        PaperAssembler().assemble(user)
+def test_assemble_best_effort_when_bank_empty(user, db):
+    """Empty bank produces a paper with no items and every slot reported as unfilled.
+
+    Best-effort policy (Slice 3): the engine never raises on insufficient pool;
+    teachers must be able to see which slots failed so they can fix inputs.
+    """
+    paper = PaperAssembler().assemble(user)
+    spec = BlueprintEngine().build("board")
+    assert paper.items.count() == 0
+    assert len(paper.report["unfilled"]) == len(spec.slots)
 
 
 @pytest.mark.django_db

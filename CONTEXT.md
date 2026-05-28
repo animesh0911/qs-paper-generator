@@ -1,0 +1,78 @@
+# CONTEXT — domain glossary
+
+Single source of truth for the vocabulary used in this codebase. Module names, class names, and documentation should use these terms exactly. New names must be added here before they are used in code.
+
+This file is read by `/improve-codebase-architecture` and other architecture-aware agents.
+
+## Domain terms
+
+**Question**
+A single bank item. Has section (A–E), question type (MCQ/VSA/SA/LA/CASE), marks, chapter, cognitive level, text, optional MCQ options, optional answer. Lives in `bank.models.Question`.
+
+**Chapter**
+A canonical CBSE Class 10 Science chapter, seeded from the NCERT taxonomy. Identified by slug. Lives in `bank.models.Chapter`.
+
+**CognitiveLevel**
+Bloom-style classification of a Question — Remember (R), Understand (U), Apply (Ap), Analyse (An). Drives the **DifficultyProfile** mix.
+
+**DifficultyProfile**
+Named distribution of cognitive levels: `easy`, `standard`, `hard`. Defined in `papers.selection.DIFFICULTY_PROFILES`.
+
+**Section**
+The five fixed sections of a CBSE Cl.10 Science paper: A (MCQ), B (VSA), C (SA), D (LA), E (Case-based).
+
+**Slot**
+One question position in a paper plan. Carries section, question type, marks, and optional **OR-group**. Lives in `papers.blueprint.Slot`.
+
+**OR-group**
+A pair of Slots presenting an "Answer A OR B" choice to the student. Both slots draw distinct Questions; only one contributes to total marks. Identified by an `or_group: int` shared by exactly two Slots.
+
+**PaperSpec**
+An ordered list of Slots produced by the **BlueprintEngine** for a given preset. The contract between blueprint, selection, and assembly. Lives in `papers.blueprint.PaperSpec`.
+
+**Preset**
+A named PaperSpec factory — currently `board`, `half_yearly`, `unit_test`. Defined in `papers.blueprint._PRESETS`.
+
+**BlueprintEngine**
+Module that turns a preset name into a validated PaperSpec. The seam between "what kind of paper" (preset) and "what slots does that imply" (PaperSpec).
+
+**SelectionEngine**
+Module that fills a PaperSpec's Slots from the Question bank, honouring chapter weights and the DifficultyProfile's cognitive-level mix. Best-effort: unfillable slots are reported, not raised.
+
+**CandidatePool**
+In-memory map of `(section, qtype, marks) → list[(question_id, chapter_slug, cognitive_level)]`. Internal seam of SelectionEngine that lets the allocator be tested without the ORM.
+
+**SelectionInput**
+Teacher inputs to SelectionEngine: the PaperSpec, chosen chapter slugs (empty = all), per-chapter weights (optional), difficulty name.
+
+**SelectionResult**
+Engine output: parallel list of question ids (None where unfilled) + a **SelectionReport**.
+
+**SelectionReport**
+The persisted record of *what got covered and what couldn't be filled*: per-chapter counts, per-cognitive-level counts, list of unfilled slots with reasons. Lives on `Paper.report`.
+
+**Paper**
+A persisted question paper for a teacher. Owns title, total marks, the SelectionReport, and an ordered list of **PaperQuestions**.
+
+**PaperQuestion**
+Ordered placement of a Question within a Paper. Carries paper, question, order, section, optional or_group. Per-question teacher edits will land here in later slices without mutating the shared bank Question.
+
+**PaperAssembler**
+The coordinator. `assemble(user, preset, chapter_slugs, weights, difficulty, title) → Paper`. Calls BlueprintEngine, then SelectionEngine, then persists.
+
+**PaperLayout**
+Flat data structure consumed by the PDF renderer. The seam between persistence (Paper + PaperQuestion + Question) and rendering. Lives in `papers.layout`.
+
+**School**
+A tenant. Optional FK on Question and Paper. Slice 1 keeps multi-tenancy passive; full enforcement comes later.
+
+## Architecture terms
+
+These mirror `.claude/skills/improve-codebase-architecture/LANGUAGE.md`. Reuse the vocabulary in PRs, ADRs, and docstrings.
+
+- **Module** — anything with an interface and an implementation.
+- **Interface** — everything a caller must know to use the module.
+- **Seam** — where an interface lives; a place to alter behaviour without editing in place.
+- **Adapter** — a concrete thing satisfying an interface at a seam.
+- **Depth** — leverage at the interface (a lot of behaviour, small interface).
+- **Locality** — change, bugs, knowledge concentrated in one place.

@@ -1,3 +1,12 @@
+/**
+ * Login / Register page — the only anonymous route.
+ *
+ * Talks directly to `lib/api.login` / `lib/api.register`, which store the
+ * returned token in localStorage. On success, navigates to `/` where the
+ * Dashboard renders.
+ *
+ * @module LoginPage
+ */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, register } from '@/lib/api';
