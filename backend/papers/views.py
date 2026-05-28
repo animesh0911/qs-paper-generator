@@ -6,10 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from rest_framework.exceptions import ValidationError
+
 from .assembler import PaperAssembler
 from .layout import paper_to_layout
 from .models import Paper
 from .pdf import render_paper_pdf
+from .selection import DEFAULT_PROFILE, PROFILE_NAMES
 from .serializers import PaperSerializer
 
 # Paper rows are immutable once assembled (no edit endpoint), so the rendered
@@ -21,9 +24,37 @@ class AssemblePaperView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        title = request.data.get("title") or "Science — Practice Paper"
-        preset = request.data.get("preset") or "board"
-        paper = PaperAssembler().assemble(request.user, title=title, preset=preset)
+        data = request.data or {}
+        title = data.get("title") or "Science — Practice Paper"
+        preset = data.get("preset") or "board"
+        chapter_slugs = data.get("chapter_slugs") or []
+        weights = data.get("weights") or {}
+        difficulty = data.get("difficulty") or DEFAULT_PROFILE
+
+        if not isinstance(chapter_slugs, list) or not all(
+            isinstance(s, str) for s in chapter_slugs
+        ):
+            raise ValidationError({"chapter_slugs": "must be a list of slug strings"})
+        if not isinstance(weights, dict):
+            raise ValidationError({"weights": "must be an object mapping slug -> number"})
+        for k, v in weights.items():
+            if not isinstance(k, str) or not isinstance(v, (int, float)):
+                raise ValidationError(
+                    {"weights": "keys must be slug strings, values numeric"}
+                )
+        if difficulty not in PROFILE_NAMES:
+            raise ValidationError(
+                {"difficulty": f"must be one of {PROFILE_NAMES}"}
+            )
+
+        paper = PaperAssembler().assemble(
+            request.user,
+            title=title,
+            preset=preset,
+            chapter_slugs=chapter_slugs,
+            weights=weights,
+            difficulty=difficulty,
+        )
         return Response(PaperSerializer(paper).data, status=status.HTTP_201_CREATED)
 
 

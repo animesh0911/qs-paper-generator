@@ -19,19 +19,42 @@ class QuestionType(models.TextChoices):
     CASE = "CASE", "Case-based"
 
 
-class Question(models.Model):
-    """A single bank question.
+class CognitiveLevel(models.TextChoices):
+    REMEMBER = "R", "Remember"
+    UNDERSTAND = "U", "Understand"
+    APPLY = "Ap", "Apply"
+    ANALYSE = "An", "Analyse"
 
-    Slice 1 keeps this minimal; later slices add chapter, cognitive level,
-    diagrams, verification status, etc.
-    """
+
+class Chapter(models.Model):
+    """Canonical CBSE Class 10 Science chapter."""
+
+    slug = models.SlugField(max_length=80, unique=True)
+    name = models.CharField(max_length=160)
+    order = models.PositiveSmallIntegerField(unique=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"{self.order}. {self.name}"
+
+
+class Question(models.Model):
+    """A single bank question."""
 
     school = models.ForeignKey(
         School, null=True, blank=True, on_delete=models.SET_NULL, related_name="questions"
     )
+    chapter = models.ForeignKey(
+        Chapter, null=True, blank=True, on_delete=models.PROTECT, related_name="questions"
+    )
     section = models.CharField(max_length=4, choices=Section.choices)
     qtype = models.CharField(max_length=4, choices=QuestionType.choices)
     marks = models.PositiveSmallIntegerField()
+    cognitive_level = models.CharField(
+        max_length=2, choices=CognitiveLevel.choices, default=CognitiveLevel.REMEMBER
+    )
     text = models.TextField()
     # For MCQ: list of {"label": "A", "text": "..."} options. Empty otherwise.
     options = models.JSONField(default=list, blank=True)

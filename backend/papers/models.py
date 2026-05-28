@@ -14,6 +14,11 @@ class Paper(models.Model):
     )
     title = models.CharField(max_length=255, default="Science — Practice Paper")
     total_marks = models.PositiveSmallIntegerField(default=0)
+    # Selection report. coverage maps chapter slug -> filled count; unfilled
+    # is a list of {slot_index, section, qtype, marks, reason} entries.
+    coverage = models.JSONField(default=dict, blank=True)
+    cog_coverage = models.JSONField(default=dict, blank=True)
+    unfilled = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

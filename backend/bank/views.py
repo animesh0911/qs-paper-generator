@@ -1,7 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import QuestionType, Section
+from .models import Chapter, CognitiveLevel, QuestionType, Section
+from .serializers import ChapterSerializer
 
 
 @api_view(["GET"])
@@ -14,5 +15,13 @@ def metadata(request):
         {
             "sections": [{"code": k, "label": v} for k, v in Section.choices],
             "question_types": [{"code": k, "label": v} for k, v in QuestionType.choices],
+            "cognitive_levels": [
+                {"code": k, "label": v} for k, v in CognitiveLevel.choices
+            ],
         }
     )
+
+
+@api_view(["GET"])
+def chapters(request):
+    return Response(ChapterSerializer(Chapter.objects.all(), many=True).data)

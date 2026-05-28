@@ -1,4 +1,4 @@
-import type { Paper } from '@/types';
+import type { AssembleRequest, Chapter, Paper } from '@/types';
 
 const TOKEN_KEY = 'qpg_token';
 
@@ -53,18 +53,29 @@ export const login = (email: string, password: string) =>
 export const register = (email: string, password: string) =>
   authResult('/auth/register', email, password);
 
-export async function assemblePaper(): Promise<Paper> {
-  const res = await request('/papers/assemble', { method: 'POST', body: '{}' });
+export async function assemblePaper(
+  body: AssembleRequest = {},
+): Promise<Paper> {
+  const res = await request('/papers/assemble', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
   return res.json();
 }
 
 export interface Metadata {
   sections: { code: string; label: string }[];
   question_types: { code: string; label: string }[];
+  cognitive_levels: { code: string; label: string }[];
 }
 
 export async function fetchMetadata(): Promise<Metadata> {
   const res = await request('/bank/metadata/');
+  return res.json();
+}
+
+export async function fetchChapters(): Promise<Chapter[]> {
+  const res = await request('/bank/chapters/');
   return res.json();
 }
 
