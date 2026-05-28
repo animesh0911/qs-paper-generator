@@ -34,6 +34,7 @@ class PaperQuestion(models.Model):
     question = models.ForeignKey(Question, on_delete=models.PROTECT)
     order = models.PositiveSmallIntegerField()
     section = models.CharField(max_length=4)
+    or_group = models.PositiveSmallIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ["order"]

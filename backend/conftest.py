@@ -1,5 +1,6 @@
 import pytest
 import factory
+from collections import Counter
 from factory.django import DjangoModelFactory
 
 from accounts.models import School, User
@@ -57,19 +58,16 @@ def api_client(user):
 
 @pytest.fixture
 def seeded_bank(db):
-    """Seed the minimum questions for SKELETON_PLAN to fill."""
-    from papers.assembler import SKELETON_PLAN
+    """Seed the minimum questions for the board preset to fill."""
+    from papers.blueprint import BlueprintEngine
 
-    slot_config = {
-        Section.A: (QuestionType.MCQ, 1),
-        Section.B: (QuestionType.VSA, 2),
-        Section.C: (QuestionType.SA, 3),
-        Section.D: (QuestionType.LA, 5),
-        Section.E: (QuestionType.CASE, 4),
-    }
+    spec = BlueprintEngine().build("board")
+    needs: Counter = Counter()
+    for slot in spec.slots:
+        needs[(slot.section, slot.qtype, slot.marks)] += 1
+
     questions = []
-    for section, count in SKELETON_PLAN:
-        qtype, marks = slot_config[section]
+    for (section, qtype, marks), count in needs.items():
         for _ in range(count):
             questions.append(
                 QuestionFactory(section=section, qtype=qtype, marks=marks)
