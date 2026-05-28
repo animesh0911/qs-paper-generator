@@ -182,7 +182,7 @@ sequenceDiagram
   PB->>DB: INSERT Paper + PaperQuestion rows
   PB->>PD: to_document(paper, filled, options)
   PD-->>PB: PaperDocumentV1 (JSON)
-  PB->>DB: Paper.document = doc; Paper.report = coverage
+  PB->>DB: save Paper.document = doc and Paper.report = coverage
   API-->>FE: 200 PaperDocumentV1 (Zod-validated client side)
 
   Note over FE,PDF: Render path reads document only
