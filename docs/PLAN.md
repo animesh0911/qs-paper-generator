@@ -2,7 +2,7 @@
 
 _CBSE Class 10 Science · MVP · single school · stack-compatible with Apptension SaaS boilerplate_
 
-Last updated: 2026-05-28
+Last updated: 2026-05-29
 
 ---
 

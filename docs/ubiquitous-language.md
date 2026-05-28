@@ -6,7 +6,7 @@ The machine-readable copy lives in [`CONTEXT.md`](../CONTEXT.md) at the repo roo
 
 ## Bank
 
-**Question** — single bank item. Section, qtype, marks, chapter, cognitive level, text, options, answer.
+**Question** — single bank item. Section, qtype, marks, chapter, cognitive level, text, options, answer, `verified` flag.
 
 **Chapter** — NCERT Cl.10 Science chapter. Identified by slug (e.g. `electricity`, `life-processes`). Order matches the textbook.
 
@@ -16,15 +16,21 @@ The machine-readable copy lives in [`CONTEXT.md`](../CONTEXT.md) at the repo roo
 
 **CognitiveLevel** — R (Remember), U (Understand), Ap (Apply), An (Analyse). Bloom-style classification.
 
+**Ingestor** — coordinator for the ingestion pipeline. Parses a PDF, segments into raw questions, tags them, persists `Question` rows as `verified=False`.
+
+**Parser / Tagger** — the two adapter seams of the Ingestor. Default `PdfplumberParser` and `LLMTagger`. Tests inject stubs.
+
+**LLMClient** — provider-agnostic LLM seam. `complete(prompt, max_tokens) → str`. Adapters: `AnthropicClient`, `OpenAIClient`, `GeminiClient`. Chosen via `LLM_PROVIDER` env var.
+
 ## Paper template
 
 **Slot** — one question position in a paper template. (section, qtype, marks, or_group?).
 
 **OR-group** — pair of Slots representing "Answer A OR B". Both filled with distinct Questions; only one contributes to total marks.
 
-**PaperTemplate** — ordered list of Slots for one paper. Output of TemplateBuilder, input to QuestionPicker.
+**PaperTemplate** — a `Preset` plus its expanded list of Slots. Output of TemplateBuilder, input to QuestionPicker.
 
-**Preset** — named PaperTemplate factory: `board`, `half_yearly`, `unit_test`.
+**Preset** — bundled recipe for a kind of paper: name, template_name, exam_type, duration_minutes, build_slots. Currently `board`, `half_yearly`, `unit_test`. Single source of truth — used by both TemplateBuilder and PaperDocumentBuilder.
 
 **TemplateBuilder** — turns a preset name into a validated PaperTemplate.
 
@@ -44,13 +50,15 @@ The machine-readable copy lives in [`CONTEXT.md`](../CONTEXT.md) at the repo roo
 
 ## Paper
 
-**Paper** — persisted paper. Title, total marks, CoverageReport, ordered PaperQuestions.
+**Paper** — persisted paper. Title, total marks, CoverageReport, ordered PaperQuestions, `document` (PaperDocumentV1), `status` (draft/approved).
 
-**PaperQuestion** — placement of a Question in a Paper. Order, section, or_group. Future teacher edits land here.
+**PaperQuestion** — placement of a Question in a Paper at assembly time. Order, section, or_group. **Not** read at render time — the document is the render-time source of truth. Kept for cross-paper analytics (UsageTracker, Slice 10).
 
-**PaperBuilder** — coordinator that runs TemplateBuilder → QuestionPicker → persist.
+**PaperBuilder** — single `assemble(...)` coordinator. Builds template → picks questions → persists Paper + PaperQuestions → maps to PaperDocumentV1 → returns `AssemblyResult{paper, document}`.
 
-**PaperLayout** — ORM-free flat structure consumed by the PDF renderer.
+**PaperDocumentBuilder** — mapping layer that converts a `Paper` + `FilledTemplate` + `PaperOptions` into a `PaperDocumentV1` dict. No DB writes.
+
+**PaperDocumentV1** — single render-time contract returned by `POST /papers/assemble`. Consumed by both the frontend BlockNote editor and the PDF renderer.
 
 ## Identity
 
