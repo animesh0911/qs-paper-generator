@@ -3,6 +3,16 @@
 These rules apply to every task in this project unless explicitly overridden.
 Bias: caution over speed on non-trivial work. Use judgment on trivial tasks.
 
+## Coding standards
+
+Mechanical conventions (formatters, linters, file naming, docstrings, import
+order, pre-commit gates) live in [`docs/coding-standards.md`](docs/coding-standards.md).
+Read it before writing or reviewing code; conformance is mandatory and Rule 11
+takes precedence over personal taste.
+
+Domain vocabulary lives in [`CONTEXT.md`](CONTEXT.md) — use those terms
+exactly in module names, class names, and docstrings.
+
 ## Rule 1 — Think Before Coding
 State assumptions explicitly. If uncertain, ask rather than guess.
 Present multiple interpretations when ambiguity exists.
