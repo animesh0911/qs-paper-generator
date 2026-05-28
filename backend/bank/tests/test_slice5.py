@@ -3,8 +3,13 @@ from __future__ import annotations
 
 import pytest
 
-from bank.ingestor import Ingestor, _detect_numerical, _fingerprint, segment_questions
-from bank.marking_scheme import parse_marking_scheme, apply_marking_scheme
+from bank.ingestor import (
+    Ingestor,
+    MarkingSchemeAnswerSource,
+    _detect_numerical,
+    _fingerprint,
+    segment_questions,
+)
 from bank.models import Question
 
 
@@ -171,7 +176,7 @@ def test_ingestor_does_not_flag_conceptual_question(db):
 
 
 # ---------------------------------------------------------------------------
-# DiagramExtractor — keyword sentinel
+# Diagram keyword detection — moved from extractor to coordinator
 # ---------------------------------------------------------------------------
 
 _DIAGRAM_KEYWORD_TEXT = """\
@@ -182,43 +187,32 @@ SECTION B
 
 
 @pytest.mark.django_db
-def test_ingestor_flags_diagram_keyword_question():
-    """Questions mentioning 'Fig.' must be flagged has_diagram even without real PDF."""
-    extractor = _NullExtractor()  # returns all None — falls back to keyword scan
-    # Override: use PdfplumberDiagramExtractor which has keyword fallback built in.
-    from bank.ingestor import PdfplumberDiagramExtractor
-
-    qs = segment_questions(_DIAGRAM_KEYWORD_TEXT)
-    results = PdfplumberDiagramExtractor().extract(b"not-a-pdf", qs)
-    # First question mentions "Fig." → sentinel empty bytes
-    assert results[0] == b""
-    # Second question is plain text → None
-    assert results[1] is None
+def test_ingestor_flags_diagram_keyword_question_via_text_only():
+    """Questions mentioning 'Fig.' get has_diagram=True even when no image is extracted."""
+    parser = _StubParser(_DIAGRAM_KEYWORD_TEXT)
+    Ingestor(
+        parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()
+    ).ingest(b"not-a-pdf")
+    qs = Question.objects.order_by("id")
+    assert qs[0].has_diagram is True   # mentions "Fig. 3"
+    assert qs[1].has_diagram is False  # plain text
 
 
 # ---------------------------------------------------------------------------
-# Marking scheme — parse_marking_scheme
+# AnswerSource — MarkingSchemeAnswerSource
 # ---------------------------------------------------------------------------
 
-_SCHEME_TEXT = b""  # will be provided as fake PDF — tested via parse_marking_scheme directly
 
-_SCHEME_PLAIN = """
-1. Oxygen (O2)
-2. The SI unit of current is Ampere.
-3. Decomposition is the breakdown of a compound into simpler substances.
-"""
-
-
-def test_parse_marking_scheme_extracts_answers(monkeypatch):
-    """parse_marking_scheme called with real PDF bytes; we monkeypatch pdfplumber."""
+def _fake_pdf(monkeypatch, text: str | None = None) -> None:
+    """Monkeypatch pdfplumber.open so MarkingSchemeAnswerSource sees `text`."""
     import pdfplumber
 
     class FakePage:
         def extract_text(self):
-            return _SCHEME_PLAIN
+            return text
 
     class FakePDF:
-        pages = [FakePage()]
+        pages = [FakePage()] if text is not None else []
 
         def __enter__(self):
             return self
@@ -227,63 +221,59 @@ def test_parse_marking_scheme_extracts_answers(monkeypatch):
             pass
 
     monkeypatch.setattr(pdfplumber, "open", lambda *a, **kw: FakePDF())
-    scheme = parse_marking_scheme(b"fake")
 
+
+def test_marking_scheme_answer_source_extracts_answers(monkeypatch):
+    _fake_pdf(
+        monkeypatch,
+        text=(
+            "1. Oxygen (O2)\n"
+            "2. The SI unit of current is Ampere.\n"
+            "3. Decomposition is the breakdown of a compound into simpler substances.\n"
+        ),
+    )
+    scheme = MarkingSchemeAnswerSource().answers(b"fake")
     assert scheme[1] == "Oxygen (O2)"
     assert scheme[2] == "The SI unit of current is Ampere."
     assert scheme[3] == "Decomposition is the breakdown of a compound into simpler substances."
 
 
-def test_parse_marking_scheme_empty_pdf(monkeypatch):
-    import pdfplumber
-
-    class FakePDF:
-        pages = []
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            pass
-
-    monkeypatch.setattr(pdfplumber, "open", lambda *a, **kw: FakePDF())
-    assert parse_marking_scheme(b"fake") == {}
+def test_marking_scheme_answer_source_empty_pdf(monkeypatch):
+    _fake_pdf(monkeypatch, text=None)
+    assert MarkingSchemeAnswerSource().answers(b"fake") == {}
 
 
 # ---------------------------------------------------------------------------
-# Marking scheme — apply_marking_scheme
+# Ingestor.apply_answers — coordinator method
 # ---------------------------------------------------------------------------
+
+
+class _StubAnswerSource:
+    def __init__(self, scheme: dict[int, str]):
+        self.scheme = scheme
+
+    def answers(self, pdf_bytes: bytes) -> dict[int, str]:
+        return self.scheme
 
 
 @pytest.mark.django_db
-def test_apply_marking_scheme_updates_answers(monkeypatch):
-    """apply_marking_scheme must fill in answer fields for unverified questions."""
-    import pdfplumber
-
+def test_apply_answers_fills_unverified_rows_by_position():
+    """n-th answer in the scheme maps to the n-th unverified Question by id."""
     q1 = Question.objects.create(
-        section="B", qtype="VSA", marks=2, text="Q1 text?", verified=False, answer=""
+        section="B", qtype="VSA", marks=2, text="Q1?", verified=False, answer=""
     )
     q2 = Question.objects.create(
-        section="B", qtype="VSA", marks=2, text="Q2 text?", verified=False, answer=""
+        section="B", qtype="VSA", marks=2, text="Q2?", verified=False, answer=""
     )
 
-    class FakePage:
-        def extract_text(self):
-            return "1. Answer one\n2. Answer two\n"
+    ingestor = Ingestor(
+        parser=_StubParser(""),
+        tagger=_StubTagger(),
+        extractor=_NullExtractor(),
+        answer_source=_StubAnswerSource({1: "Answer one", 2: "Answer two"}),
+    )
+    assert ingestor.apply_answers(b"x") == 2
 
-    class FakePDF:
-        pages = [FakePage()]
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            pass
-
-    monkeypatch.setattr(pdfplumber, "open", lambda *a, **kw: FakePDF())
-    updated = apply_marking_scheme(b"fake")
-
-    assert updated == 2
     q1.refresh_from_db()
     q2.refresh_from_db()
     assert q1.answer == "Answer one"
@@ -291,28 +281,15 @@ def test_apply_marking_scheme_updates_answers(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_apply_marking_scheme_skips_verified_questions(monkeypatch):
-    """Verified questions must not be overwritten by marking scheme."""
-    import pdfplumber
-
+def test_apply_answers_skips_verified_questions():
+    """Verified questions are excluded from the candidate list, so they are never overwritten."""
     Question.objects.create(
-        section="B", qtype="VSA", marks=2, text="Verified Q?", verified=True, answer="correct"
+        section="B", qtype="VSA", marks=2, text="Verified?", verified=True, answer="correct"
     )
-
-    class FakePage:
-        def extract_text(self):
-            return "1. Wrong answer\n"
-
-    class FakePDF:
-        pages = [FakePage()]
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            pass
-
-    monkeypatch.setattr(pdfplumber, "open", lambda *a, **kw: FakePDF())
-    updated = apply_marking_scheme(b"fake")
-
-    assert updated == 0
+    ingestor = Ingestor(
+        parser=_StubParser(""),
+        tagger=_StubTagger(),
+        extractor=_NullExtractor(),
+        answer_source=_StubAnswerSource({1: "Wrong answer"}),
+    )
+    assert ingestor.apply_answers(b"x") == 0

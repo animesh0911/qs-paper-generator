@@ -1,15 +1,26 @@
 """Ingestion pipeline: parse a CBSE past-paper PDF and auto-tag questions via an LLM.
 
 `Ingestor` is the coordinator. It runs the pipeline and persists Question rows
-(verified=False). Three seams are injected as adapters:
+(verified=False). Four seams are injected as adapters:
 
 * `Parser`           — turns PDF bytes into plain text. Default: `PdfplumberParser`.
 * `Tagger`           — assigns chapter_slug + cognitive_level. Default: `LLMTagger`.
 * `DiagramExtractor` — crops images from the PDF and associates them with questions.
                        Default: `PdfplumberDiagramExtractor`.
+* `AnswerSource`     — parses an answer/marking-scheme PDF into
+                       `{question_number: answer_text}`. Default:
+                       `MarkingSchemeAnswerSource`. Consumed by
+                       `Ingestor.apply_answers`.
 
-Pure helpers (`strip_hindi`, `segment_questions`) are not configurable and remain
-module-level. Tests inject stub adapters into Ingestor — no module-level patching.
+Match strategy for `apply_answers` is a documented coordinator invariant: the
+n-th answer in the parsed scheme is assigned to the n-th unverified Question row
+ordered by id. CBSE marking schemes mirror the question paper's numbering so
+the picker doesn't need a more clever key today. Revisit when out-of-order
+schemes appear.
+
+Pure text predicates (`strip_hindi`, `segment_questions`, `_detect_numerical`,
+`_mentions_diagram`) are not configurable and remain module-level. Tests inject
+stub adapters into Ingestor — no module-level patching.
 """
 from __future__ import annotations
 
@@ -40,6 +51,17 @@ _NUMERICAL_RE = re.compile(
     re.VERBOSE | re.IGNORECASE,
 )
 _DIAGRAM_RE = re.compile(r"\bfig(?:ure)?\.?\s*\d*\b|\bdiagram\b", re.IGNORECASE)
+_SCHEME_ANS_LINE_RE = re.compile(
+    r"""
+    ^\s*
+    (?:Q\.?\s*)?          # optional "Q" prefix
+    (\d{1,2})             # question number
+    [.)\s]+               # separator
+    (.+)                  # answer text (rest of line)
+    """,
+    re.VERBOSE,
+)
+_SCHEME_ANS_HEADER_RE = re.compile(r"\bAns(?:wer)?\.?\s*[:—-]?\s*(.+)", re.IGNORECASE)
 
 SECTION_DEFAULT_MARKS: dict[str, int] = {"A": 1, "B": 2, "C": 3, "D": 5, "E": 4}
 SECTION_DEFAULT_QTYPE: dict[str, str] = {
@@ -90,6 +112,11 @@ def _fingerprint(text: str) -> str:
 def _detect_numerical(text: str) -> bool:
     """True if the question involves numerical calculation (SI units, equations)."""
     return bool(_NUMERICAL_RE.search(text))
+
+
+def _mentions_diagram(text: str) -> bool:
+    """True if the question text references a figure/diagram (image may be absent)."""
+    return bool(_DIAGRAM_RE.search(text))
 
 
 def segment_questions(text: str) -> list[dict]:
@@ -169,9 +196,15 @@ class Tagger(Protocol):
 
 
 class DiagramExtractor(Protocol):
-    """Returns one entry per question: image bytes if a diagram was found, else None."""
+    """Returns one entry per question: cropped image bytes, or None if no image was found."""
 
     def extract(self, pdf_bytes: bytes, raw_questions: list[dict]) -> list[bytes | None]: ...
+
+
+class AnswerSource(Protocol):
+    """Parses an answer/marking-scheme PDF into `{question_number: answer_text}`."""
+
+    def answers(self, pdf_bytes: bytes) -> dict[int, str]: ...
 
 
 class PdfplumberParser:
@@ -201,9 +234,10 @@ class PdfplumberDiagramExtractor:
         try:
             self._crop_images_into(pdf_bytes, raw_questions, results)
         except Exception:
-            # Non-PDF bytes or rendering failure — fall through to keyword fallback.
+            # Non-PDF bytes or rendering failure — degrade to "no images extracted".
+            # The coordinator still flags has_diagram via _mentions_diagram on the text.
             pass
-        return self._flag_diagram_keywords(raw_questions, results)
+        return results
 
     def _crop_images_into(
         self,
@@ -256,16 +290,6 @@ class PdfplumberDiagramExtractor:
                             best_qi = qi
                     if best_qi is not None and results[best_qi] is None:
                         results[best_qi] = img_bytes
-
-    @staticmethod
-    def _flag_diagram_keywords(
-        raw_questions: list[dict], results: list[bytes | None]
-    ) -> list[bytes | None]:
-        """Flag questions mentioning diagram keywords even without extracted bytes."""
-        for qi, q in enumerate(raw_questions):
-            if _DIAGRAM_RE.search(q["text"]) and results[qi] is None:
-                results[qi] = b""  # sentinel: has_diagram=True, no actual bytes
-        return results
 
     @staticmethod
     def _crop_image(page: "pdfplumber.page.Page", img: dict) -> bytes | None:
@@ -330,6 +354,47 @@ class LLMTagger:
         return tagged
 
 
+class MarkingSchemeAnswerSource:
+    """Default AnswerSource — parses CBSE marking-scheme PDFs.
+
+    Looks for lines like ``1. <answer>`` / ``Q1) <answer>`` and merges
+    contiguous continuation lines (and ``Ans.`` headers) into the most
+    recently seen question number.
+    """
+
+    def answers(self, pdf_bytes: bytes) -> dict[int, str]:
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+
+        result: dict[int, str] = {}
+        current_qnum: int | None = None
+        current_lines: list[str] = []
+
+        for line in text.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+
+            ans_header = _SCHEME_ANS_HEADER_RE.match(line)
+            if ans_header and current_qnum is not None:
+                current_lines.append(ans_header.group(1).strip())
+                continue
+
+            num_match = _SCHEME_ANS_LINE_RE.match(line)
+            if num_match:
+                if current_qnum is not None:
+                    result[current_qnum] = " ".join(current_lines).strip()
+                current_qnum = int(num_match.group(1))
+                current_lines = [num_match.group(2).strip()]
+            elif current_qnum is not None:
+                current_lines.append(line)
+
+        if current_qnum is not None:
+            result[current_qnum] = " ".join(current_lines).strip()
+
+        return result
+
+
 # ---------------------------------------------------------------------------
 # Coordinator
 # ---------------------------------------------------------------------------
@@ -342,7 +407,7 @@ class IngestResult:
 
 
 class Ingestor:
-    """Pipeline coordinator. Parser, Tagger, and DiagramExtractor are injectable.
+    """Pipeline coordinator. All four adapters are injectable.
 
     The default constructor wires the production adapters; tests pass stubs.
     """
@@ -352,10 +417,12 @@ class Ingestor:
         parser: Parser | None = None,
         tagger: Tagger | None = None,
         extractor: DiagramExtractor | None = None,
+        answer_source: AnswerSource | None = None,
     ):
         self.parser = parser or PdfplumberParser()
         self.tagger = tagger or LLMTagger()
         self.extractor = extractor or PdfplumberDiagramExtractor()
+        self.answer_source = answer_source or MarkingSchemeAnswerSource()
 
     def ingest(self, pdf_bytes: bytes) -> IngestResult:
         raw_text = self.parser.parse(pdf_bytes)
@@ -393,6 +460,28 @@ class Ingestor:
         created = self._persist(tagged, fingerprints, diagram_bytes_list, chapter_by_slug)
         return IngestResult(created=created, skipped_duplicates=skipped)
 
+    def apply_answers(self, answer_pdf_bytes: bytes) -> int:
+        """Parse an answer/marking-scheme PDF and fill in ``Question.answer``.
+
+        Match strategy: the n-th answer in the parsed scheme assigns to the
+        n-th unverified Question row ordered by id. See module docstring for
+        why this is sufficient for CBSE marking schemes today.
+        """
+        scheme = self.answer_source.answers(answer_pdf_bytes)
+        if not scheme:
+            return 0
+
+        questions = list(Question.objects.filter(verified=False).order_by("id"))
+        updated = 0
+        for q_num, answer_text in scheme.items():
+            idx = q_num - 1
+            if 0 <= idx < len(questions) and answer_text:
+                q = questions[idx]
+                q.answer = answer_text
+                q.save(update_fields=["answer"])
+                updated += 1
+        return updated
+
     @staticmethod
     def _persist(
         tagged: list[dict],
@@ -404,10 +493,8 @@ class Ingestor:
 
         rows: list[Question] = []
         for i, q in enumerate(tagged):
-            db_img = diagram_bytes_list[i] if i < len(diagram_bytes_list) else None
-            has_diagram = db_img is not None
-            # Empty bytes = sentinel meaning flag only, no actual image.
-            actual_bytes = db_img if (db_img is not None and len(db_img) > 0) else None
+            image_bytes = diagram_bytes_list[i] if i < len(diagram_bytes_list) else None
+            has_diagram = image_bytes is not None or _mentions_diagram(q["text"])
 
             row = Question(
                 chapter=chapter_by_slug.get(q.get("chapter_slug")),
@@ -423,10 +510,10 @@ class Ingestor:
                 is_numerical=_detect_numerical(q["text"]),
                 source_hash=fingerprints[i],
             )
-            if actual_bytes:
+            if image_bytes:
                 row.diagram.save(
                     f"q_{fingerprints[i][:8]}.png",
-                    ContentFile(actual_bytes),
+                    ContentFile(image_bytes),
                     save=False,
                 )
             rows.append(row)

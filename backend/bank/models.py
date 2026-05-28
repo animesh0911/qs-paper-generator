@@ -68,7 +68,8 @@ class Question(models.Model):
     Owns enough metadata for ``QuestionPicker`` to allocate it under chapter
     weights and difficulty profiles: ``chapter`` (FK), ``cognitive_level``,
     ``section``, ``qtype``, ``marks``. ``answer`` is stored alongside but is
-    only exposed through serializers gated on ``bank.policy.answer_visible``.
+    omitted by ``QuestionSerializer``; an answer-revealing serializer + its
+    access rule will land with the answer-key endpoint (Slice 9).
     """
 
     school = models.ForeignKey(

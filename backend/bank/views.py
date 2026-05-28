@@ -61,11 +61,11 @@ def ingest_marking_scheme(request):
     Request: multipart/form-data with field ``pdf`` (file).
     Response: ``{"updated": N}`` — count of Question rows with answers filled in.
     """
-    from .marking_scheme import apply_marking_scheme
+    from .ingestor import Ingestor
 
     pdf_file = request.FILES.get("pdf")
     if pdf_file is None:
         return Response({"detail": "Field 'pdf' is required."}, status=400)
 
-    updated = apply_marking_scheme(pdf_file.read())
+    updated = Ingestor().apply_answers(pdf_file.read())
     return Response({"updated": updated})
