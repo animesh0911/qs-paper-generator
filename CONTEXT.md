@@ -58,13 +58,13 @@ A persisted question paper for a teacher. Owns title, total marks, the Selection
 Ordered placement of a Question within a Paper. Carries paper, question, order, section, optional or_group. Per-question teacher edits will land here in later slices without mutating the shared bank Question.
 
 **PaperAssembler**
-The coordinator. `assemble(...) → Paper` (internal use/tests). `assemble_bundle(...) → (Paper, dict)` builds the persisted Paper and the `PaperAssemblyBundleV1` JSON in one call. Used by the API view. Calls BlueprintEngine, then SelectionEngine, then persists.
+The coordinator. `assemble(...) → Paper` (internal use/tests). `assemble_document(...) → (Paper, dict)` builds the persisted Paper and the `PaperDocumentV1` JSON in one call. Used by the API view. Calls BlueprintEngine, then SelectionEngine, then persists.
 
-**BundleBuilder**
-Mapping layer that converts a `Paper`, `SelectionResult`, and `SelectionInput` into a `PaperAssemblyBundleV1` dict. No DB writes. All IDs are derived (`paperId = "paper_{pk}"`, `questionId = "q_{pk}"`, `slotId = "slot_{section}_{index}"`). Lives in `papers.bundle`.
+**PaperDocumentBuilder**
+Mapping layer that converts a `Paper`, `SelectionResult`, and `SelectionInput` into a `PaperDocumentV1` dict. No DB writes. All IDs are derived (`paperId = "paper_{pk}"`, `questionId = "q_{pk}"`, `slotId = "slot_{section}_{index}"`). Lives in `papers.document`.
 
-**PaperAssemblyBundleV1**
-The JSON contract returned by `POST /api/papers/assemble`. Section-wise, slot-based paper bundle consumed by the frontend BlockNote editor. Top-level shape: `{schemaVersion, request, template, paper, questions[]}`. Full specification in `contracts/v1_contract.md`.
+**PaperDocumentV1**
+The JSON contract returned by `POST /api/papers/assemble`. Section-wise, slot-based paper document consumed by the frontend BlockNote editor. Top-level shape: `{schemaVersion, request, template, paper, questions[]}`. Full specification in `contracts/v1_contract.md`.
 
 **PaperLayout**
 Flat data structure consumed by the PDF renderer. The seam between persistence (Paper + PaperQuestion + Question) and rendering. Lives in `papers.layout`.

@@ -141,7 +141,7 @@ blueprint config** so presets are just scaled variants reusing the same section 
 6. **Verify** each generated item: a *separate* solver call must independently produce the same
    answer; mismatch → drop or flag low-confidence.
 7. **Assemble** draft with internal-choice ("OR") pairs where the blueprint expects them.
-8. **Return `PaperAssemblyBundleV1`** — section-wise, slot-based JSON with selected + alternate questions, per `contracts/v1_contract.md`. Frontend renders into BlockNote editor.
+8. **Return `PaperDocumentV1`** — section-wise, slot-based JSON with selected + alternate questions, per `contracts/v1_contract.md`. Frontend renders into BlockNote editor.
 9. On **approve** → render PDF + DOCX + answer key; record `QuestionUsage`.
 
 ---
@@ -186,8 +186,8 @@ GraphQL addition); shadcn UI (copy-paste compatible); Docker (matches their cont
 
 **Phase 2 — Bank-only generator (prove format fidelity)**
 - Selection engine (blueprint + chapter weights + difficulty + no-repeat).
-- `POST /api/papers/assemble` returns `PaperAssemblyBundleV1` (section-wise, slot-based JSON per `contracts/v1_contract.md`).
-- BlockNote-based frontend editor consumes the bundle: teachers review, swap slots, and edit questions.
+- `POST /api/papers/assemble` returns `PaperDocumentV1` (section-wise, slot-based JSON per `contracts/v1_contract.md`).
+- BlockNote-based frontend editor consumes the document: teachers review, swap slots, and edit questions.
 - PDF + DOCX + answer-key renderer with school branding.
 - _Milestone: a teacher can produce a real, board-faithful paper entirely from vetted questions._
 

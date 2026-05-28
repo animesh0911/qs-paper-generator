@@ -1,9 +1,9 @@
-# Question Paper Assembly Contract V1
+# Question Paper Document Contract V1
 
 **Product:** AI-assisted question-paper builder  
 **Audience:** Frontend and backend teams  
 **Frontend editor:** BlockNote / block-based paper editor  
-**Contract goal:** Backend returns one section-wise, slot-based paper bundle that the frontend can render, edit, validate, swap, and later save/export.
+**Contract goal:** Backend returns one section-wise, slot-based paper document that the frontend can render, edit, validate, swap, and later save/export.
 
 ---
 
@@ -13,7 +13,7 @@ For V1, use the simple contract shape:
 
 ```json
 {
-  "schemaVersion": "paper_assembly_bundle.v1",
+  "schemaVersion": "paper_document.v1",
   "request": {},
   "template": {},
   "paper": {},
@@ -44,7 +44,7 @@ Backend must not remove or rename required fields without changing `schemaVersio
 
 ## 2. Core Principle
 
-Backend must return a ready-to-render, section-wise, slot-based paper bundle.
+Backend must return a ready-to-render, section-wise, slot-based paper document.
 
 The frontend should not receive only a flat question list. Every question must be placed into a stable slot so the frontend can know:
 
@@ -55,10 +55,10 @@ The frontend should not receive only a flat question list. Every question must b
 - which alternates can be used for instant swap
 - what metadata should be preserved during AI/edit actions
 
-The frontend will transform the backend bundle into:
+The frontend will transform the backend document into:
 
 ```text
-PaperAssemblyBundleV1
+PaperDocumentV1
   -> runtime validation
   -> normalized questionsById
   -> paper sections and slots
@@ -71,7 +71,7 @@ PaperAssemblyBundleV1
 
 ```json
 {
-  "schemaVersion": "paper_assembly_bundle.v1",
+  "schemaVersion": "paper_document.v1",
   "request": {},
   "template": {},
   "paper": {},
@@ -81,7 +81,7 @@ PaperAssemblyBundleV1
 
 | Field | Required | Purpose |
 |---|---:|---|
-| `schemaVersion` | Yes | Identifies the contract version. Must be `paper_assembly_bundle.v1`. |
+| `schemaVersion` | Yes | Identifies the contract version. Must be `paper_document.v1`. |
 | `request` | Yes | Teacher/user input that produced the paper. |
 | `template` | Yes | Expected paper format and constraints. |
 | `paper` | Yes | Actual assembled paper with sections and slots. |
@@ -847,7 +847,7 @@ visible editable block <-> slotId <-> selectedQuestionId <-> original backend qu
 
 Before rendering, frontend should validate:
 
-- `schemaVersion` is `paper_assembly_bundle.v1`
+- `schemaVersion` is `paper_document.v1`
 - required top-level objects exist
 - every section has stable `sectionId`
 - every slot has stable `slotId`
@@ -902,7 +902,7 @@ Endpoint names can change. Conceptually, the frontend needs these.
 POST /api/papers/assemble
 ```
 
-Returns `PaperAssemblyBundleV1`.
+Returns `PaperDocumentV1`.
 
 ### Fetch replacement candidates
 
@@ -947,7 +947,7 @@ Frontend sends canonical edited paper state after teacher edits.
 
 ```json
 {
-  "schemaVersion": "paper_assembly_bundle.v1",
+  "schemaVersion": "paper_document.v1",
   "request": {
     "requestId": "req_123",
     "language": "en",
@@ -1093,7 +1093,7 @@ Frontend sends canonical edited paper state after teacher edits.
 
 ## 27. Backend V1 Checklist
 
-- [ ] Return one `PaperAssemblyBundleV1` response.
+- [ ] Return one `PaperDocumentV1` response.
 - [ ] Include section-wise paper structure.
 - [ ] Include one slot for every question position.
 - [ ] Include stable `slotId` for every slot.

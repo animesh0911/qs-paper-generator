@@ -1,4 +1,4 @@
-"""Builds PaperAssemblyBundleV1 from assembled domain objects.
+"""Builds PaperDocumentV1 from assembled domain objects.
 
 Mapping layer between internal domain objects and the frontend contract
 defined in contracts/v1_contract.md. No DB writes; all IDs are derived.
@@ -64,8 +64,8 @@ _COG_TO_DIFFICULTY: dict[str, str] = {
 }
 
 
-class BundleBuilder:
-    """Builds PaperAssemblyBundleV1 dict from internal domain objects."""
+class PaperDocumentBuilder:
+    """Builds PaperDocumentV1 dict from internal domain objects."""
 
     def build(
         self,
@@ -80,7 +80,7 @@ class BundleBuilder:
         exam_type = _PRESET_EXAM_TYPE.get(preset, preset)
 
         return {
-            "schemaVersion": "paper_assembly_bundle.v1",
+            "schemaVersion": "paper_document.v1",
             "request": self._build_request(paper, inp, exam_type),
             "template": self._build_template(paper, preset, exam_type),
             "paper": self._build_paper(paper, result),

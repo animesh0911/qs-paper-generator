@@ -1,17 +1,17 @@
 """Paper assembly coordinator.
 
-The view calls PaperAssembler().assemble_bundle(), which persists a Paper
-and returns the PaperAssemblyBundleV1 dict. assemble() is the lower-level
-entry point used by tests and internal callers that only need the Paper.
+The view calls PaperAssembler().assemble_document(), which persists a Paper
+and returns the PaperDocumentV1 dict. assemble() is the lower-level entry
+point used by tests and internal callers that only need the Paper.
 
 _build_plan() returns the PaperSpec; _select() runs the SelectionEngine;
-_persist() writes the Paper + PaperQuestion rows; BundleBuilder maps the
-domain objects to the contract JSON.
+_persist() writes the Paper + PaperQuestion rows; PaperDocumentBuilder
+maps the domain objects to the contract JSON.
 """
 from django.db import transaction
 
 from .blueprint import BlueprintEngine, PaperSpec
-from .bundle import BundleBuilder
+from .document import PaperDocumentBuilder
 from .models import Paper, PaperQuestion
 from .selection import DEFAULT_PROFILE, SelectionEngine, SelectionInput, SelectionResult
 
@@ -33,7 +33,7 @@ class PaperAssembler:
     def _build_plan(self, preset: str) -> PaperSpec:
         return BlueprintEngine().build(preset)
 
-    def assemble_bundle(
+    def assemble_document(
         self,
         user,
         title: str = "Science — Practice Paper",
@@ -51,8 +51,8 @@ class PaperAssembler:
         )
         result = SelectionEngine().select(inp)
         paper = self._persist(user, title, result)
-        bundle = BundleBuilder().build(paper, result, inp)
-        return paper, bundle
+        document = PaperDocumentBuilder().build(paper, result, inp)
+        return paper, document
 
     def _select(
         self,
