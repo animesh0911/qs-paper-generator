@@ -17,10 +17,16 @@ class SchoolFactory(DjangoModelFactory):
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
+        skip_postgeneration_save = True
 
     email = factory.Sequence(lambda n: f"teacher{n}@example.com")
-    password = factory.PostGenerationMethodCall("set_password", "pass")
     school = factory.SubFactory(SchoolFactory)
+
+    @factory.post_generation
+    def password(self, create, extracted, **kwargs):
+        self.set_password(extracted or "pass")
+        if create:
+            self.save()
 
 
 class QuestionFactory(DjangoModelFactory):
