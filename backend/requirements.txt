@@ -8,4 +8,4 @@ reportlab>=4.0
 pytest-django>=4.8
 factory-boy>=3.3
 pdfplumber>=0.11
-anthropic>=0.27
+litellm>=1.83.7,<1.84

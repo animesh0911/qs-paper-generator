@@ -7,7 +7,7 @@ select = ["E", "F", "I", "N", "W", "UP"]
 ignore = ["N818"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["accounts", "bank", "papers", "config"]
+known-first-party = ["accounts", "ai_services", "bank", "papers", "config"]
 
 [tool.black]
 line-length = 88
