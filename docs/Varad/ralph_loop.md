@@ -10,8 +10,9 @@ implementation stalls.
 2. Read the issue, `docs/Varad/v1_contract.md`, relevant PRDs, and any prior
    scratchboard for the issue.
 3. Choose skills from `.claude/skills`.
-4. Create a fresh scratchboard:
-   `docs/Varad/scratchboards/issue-XX-implementation.md`.
+4. Create a fresh scratchboard in the issue owner's docs directory:
+   `docs/Varad/scratchboards/issue-XX-implementation.md` for `V` issues, or
+   `docs/Animesh/scratchboards/issue-XX-implementation.md` for `A` issues.
 5. Define the public interface under test.
 6. Implement with `tdd`: one RED/GREEN slice at a time.
 7. Run local verification.
@@ -74,6 +75,12 @@ Every implementation issue gets a scratchboard with:
 - decisions worth carrying forward
 
 Scratchboards are working notes. Keep them useful, not polished.
+
+Keep owner scratchboards separated by directory. Varad/frontend issue notes
+belong under `docs/Varad/scratchboards/`; Animesh/backend issue notes belong
+under `docs/Animesh/scratchboards/`. Do not create backend handoff notes in the
+Varad scratchboard directory, or frontend implementation notes in the Animesh
+scratchboard directory.
 
 ## TDD Gate
 
