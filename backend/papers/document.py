@@ -64,6 +64,7 @@ class PaperDocumentBuilder:
             "schemaVersion": "paper_document.v1",
             "request": self._build_request(paper, inp, preset.exam_type),
             "template": self._build_template(paper, preset),
+            "format": self._build_format(),
             "paper": self._build_paper(paper, result),
             "questions": [
                 self._build_question(q) for q in questions_by_pk.values()
@@ -101,6 +102,31 @@ class PaperDocumentBuilder:
                 "topics": [],
                 "englishOnly": True,
             },
+        }
+
+    def _build_format(self) -> dict:
+        return {
+            "formatId": "cbse_science_class_10_v1",
+            "page": {"size": "A4", "orientation": "portrait"},
+            "paperChrome": {
+                "showOuterBorder": True,
+                "sectionStyle": "boxed",
+                "marksPlacement": "right",
+            },
+            "numbering": {
+                "scope": "paper",
+                "style": "decimal",
+                "recomputeOnSectionReorder": True,
+            },
+            "sections": {
+                "allowQuestionReorderWithinSection": True,
+                "allowCrossSectionMove": False,
+            },
+            "questionRegions": {
+                "allowRegionReorder": False,
+                "allowRegionDelete": False,
+            },
+            "mcqOptions": {"layout": "vertical"},
         }
 
     def _build_template(self, paper: Paper, preset) -> dict:
@@ -183,10 +209,9 @@ class PaperDocumentBuilder:
                     "marks": slot.marks,
                     "questionType": contract_qtype,
                     "selectedQuestionId": f"q_{qid}" if qid is not None else None,
+                    "alternateQuestionIds": [f"q_{aid}" for aid in alts],
                     "locked": False,
                 }
-                if alts:
-                    slot_data["alternateQuestionIds"] = [f"q_{aid}" for aid in alts]
                 if slot.or_group is not None:
                     slot_data["orGroup"] = slot.or_group
                 slots_data.append(slot_data)
