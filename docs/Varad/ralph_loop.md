@@ -1,8 +1,7 @@
 # Varad Ralph Loop
 
-Use this loop for each `V` issue. The goal is steady issue-by-issue delivery
-with enough process to keep agents from drifting, but not so much process that
-implementation stalls.
+Use this loop for each `V` issue. Keep this file project-specific; detailed
+skill behavior lives in `.claude/skills`.
 
 ## Loop
 
@@ -51,15 +50,9 @@ run code-review, then commit only the relevant files.
 
 ## Skill Use
 
-- `zoom-out`: use at the start when the code area is unfamiliar.
-- `tdd`: primary implementation loop.
-- `prototype`: use only for unclear UI/state design.
-- `diagnose`: use only when a failure is confusing or not reproducible.
-- `code-review`: required after implementation and before commit.
-- `grill-with-docs`: use only when a domain/contract decision is unclear.
-- `to-issues`: use if the current issue is too large and needs splitting.
-- `improve-codebase-architecture`: use only when logic starts spreading across
-  shallow modules.
+- Use `.claude/skills/tdd` for implementation.
+- Use `.claude/skills/code-review` before commit.
+- Use other `.claude/skills` only when the issue actually needs them.
 
 ## Scratchboard
 
@@ -84,24 +77,8 @@ scratchboard directory.
 
 ## TDD Gate
 
-Before coding, name the public interface under test.
-
-Good examples:
-
-```ts
-paperDocumentSchema.parse(mockPaperDocumentV1)
-normalizePaperDocument(document)
-applyPaperAction(state, action)
-validateAiProposal(state, proposal)
-```
-
-Rules:
-
-- Write one failing behavior test first.
-- Make only enough code pass that test.
-- Add the next behavior test after the previous slice is green.
-- Do not test private helpers.
-- Do not mock our own modules.
+Name the public interface under test in the scratchboard, then follow
+`.claude/skills/tdd/SKILL.md`.
 
 ## Verification Gate
 
@@ -130,9 +107,8 @@ answer and scratchboard.
 
 ## Acceptance-Criteria Gate
 
-After TDD development, code review, and verification are complete, re-read the
-GitHub issue and check every acceptance criterion against the verified
-implementation.
+After TDD, code review, and verification, re-read the GitHub issue and check
+each acceptance criterion against the verified implementation.
 
 - If every acceptance criterion passes, record that in the scratchboard and
   proceed to commit, push, and the close-issue gate.
@@ -145,23 +121,8 @@ implementation.
 
 ## Code-Review Gate
 
-After implementation, use the `code-review` skill on the diff.
-
-Review for:
-
-- mismatch with issue acceptance criteria
-- missing behavior tests
-- future-issue scope creep
-- unclear public interfaces
-- shallow modules or scattered rules
-- unsafe casts or unchecked assumptions
-- credential leaks or provider keys in frontend code
-- unrelated file changes
-
-Fix findings, then re-run verification.
-
-Cap review/fix at two rounds. If meaningful issues remain after that, document
-them and ask before continuing.
+Run `.claude/skills/code-review/SKILL.md` on the diff. Fix findings, then
+re-run verification. Cap review/fix at two rounds; document remaining issues.
 
 ## Commit Gate
 
