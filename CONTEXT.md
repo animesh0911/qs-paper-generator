@@ -7,16 +7,34 @@ This file is read by `/improve-codebase-architecture` and other architecture-awa
 ## Domain terms
 
 **Question**
-A single bank item. Has section (A–E), question type (MCQ/VSA/SA/LA/CASE), marks, chapter, cognitive level, text, optional MCQ options, optional answer. Lives in `bank.models.Question`.
+A single bank item. Has section (A–E), **QuestionType** (contract-string enum), marks, chapter, cognitive level, **rawText**, structured **content** (contract-shape JSON), **topic_names** (freeform LLM-emitted strings), **source provenance** (`source_type`, `source_name`, `source_file_name`, `source_page_number`, `source_original_qnum`), **parse_quality**, **verified**, optional answer, optional diagram. Lives in `bank.models.Question`.
+
+**QuestionType**
+Enum on `Question.qtype`. Values are **identical to PaperDocumentV1 `questionType` strings** — no mapping layer. Members: `mcq`, `assertion_reason`, `very_short_answer`, `short_answer`, `long_answer`, `case_based`, `internal_choice`, `diagram_based`, `table_based`, `custom`. Classified at ingest from the question's structure (e.g. `assertion`+`reason` keys → `assertion_reason`), with section default as fallback. See ADR-0001.
+
+**SubjectArea**
+The three CBSE Science streams: `Biology`, `Chemistry`, `Physics`. Lives on `Chapter.subject_area` (Bio = chapters 5, 6, 7, 8, 13; Chem = 1–4; Phys = 9–12). Derived onto questions via `Question.chapter.subject_area`; surfaces in `PaperDocumentV1` `metadata.subjectArea` and section subtitles.
 
 **Chapter**
-A canonical CBSE Class 10 Science chapter, seeded from the NCERT taxonomy. Identified by slug. Lives in `bank.models.Chapter`.
+A canonical CBSE Class 10 Science chapter, seeded from the NCERT taxonomy. Identified by slug. Carries **subject_area**. Lives in `bank.models.Chapter`. Hardcoded taxonomy in `migrations/0003_seed_chapters.py` — LLM tagger picks from this closed list, never invents new chapters.
+
+**Topic**
+A subdivision *within* a chapter (e.g. "Monohybrid Cross" inside `heredity`). V1 stores topics as **freeform LLM-emitted strings** on `Question.topic_names = list[str]`. No `Topic` model. Canonicalisation deferred until V2 (cluster strings or seed from textbook TOC then).
+
+**parse_quality**
+Field on `Question` — the parser's self-assessment of structural completeness. Values: `clean` (parsed structure matches detected qtype exactly), `partial` (parsed but with caveats, e.g. options truncated), `broken` (parser confidence too low, or teacher explicitly marked unsalvageable). **The picker gate**: only `clean` + `partial` are eligible for picking. Replaces the previous `verified=True` gate. See ADR-0002.
+
+**verified**
+Field on `Question`. Semantics: **"a human has seen this question in an approved paper and did not reject it."** Set to `True` automatically when `Paper.approve` runs — every referenced question is flipped. **Not** a picker gate. Used by analytics and future "show only battle-tested questions" filters. See ADR-0002.
+
+**source provenance**
+Five flat fields on `Question` recording where a row came from: `source_type` (e.g. `previous_year_paper`, `sample_paper`, `question_bank`), `source_name` (e.g. `"31-2-1 Science 2026"`), `source_file_name` (e.g. `"31-2-1.pdf"`), `source_page_number`, `source_original_qnum`. Parsed once per PDF by an ingestor filename helper. Maps directly to `PaperDocumentV1` `source` object.
 
 **Ingestor**
-Coordinator for the ingestion pipeline. Reads PDF bytes, parses them to text, strips Hindi, segments into raw questions, tags each with chapter + cognitive level, extracts diagrams, and persists `Question` rows as `verified=False`. Separately, `Ingestor.apply_answers(answer_pdf_bytes) → int` fills in `Question.answer` from a marking-scheme PDF. Adapters at four seams: **Parser** (default `PdfplumberParser`), **Tagger** (default `LLMTagger`), **DiagramExtractor** (default `PdfplumberDiagramExtractor`), **AnswerSource** (default `MarkingSchemeAnswerSource`). Lives in `bank.ingestor.Ingestor`. Symmetric to `PaperBuilder`.
+Coordinator for the ingestion pipeline. Reads PDF bytes, parses to text per page, strips Hindi, segments into raw questions, **classifies qtype from structure** (assertion-reason / case-based / internal-choice / section-default), **builds structured `content`** matching the contract shape per qtype, tags each with chapter + cognitive level + **topic_names** + **primary_form** via LLM, extracts diagrams, **records source provenance** from the source filename, **computes `parse_quality`** per row, and persists `Question` rows with `verified=False`. Separately, `Ingestor.apply_answers(answer_pdf_bytes) → int` fills in `Question.answer` from a marking-scheme PDF. Adapters at four seams: **Parser** (default `PdfplumberParser`), **Tagger** (default `LLMTagger`), **DiagramExtractor** (default `PdfplumberDiagramExtractor`), **AnswerSource** (default `MarkingSchemeAnswerSource`). Lives in `bank.ingestor.Ingestor`. Symmetric to `PaperBuilder`.
 
 **Parser / Tagger / DiagramExtractor / AnswerSource**
-The four adapter seams of the Ingestor. `Parser.parse(pdf_bytes) → str`. `Tagger.tag(raw_questions, chapters) → list[dict]` with `chapter_slug` + `cognitive_level` added. `DiagramExtractor.extract(pdf_bytes, raw_questions) → list[bytes | None]` returning cropped image bytes or None per question. `AnswerSource.answers(pdf_bytes) → dict[int, str]` mapping question number to answer text — consumed by `Ingestor.apply_answers`, which assigns the n-th parsed answer to the n-th unverified Question ordered by id (CBSE marking schemes mirror the paper's numbering). Tests inject stub adapters.
+The four adapter seams of the Ingestor. `Parser.parse(pdf_bytes) → str`. `Tagger.tag(raw_questions, chapters) → list[dict]` — adds `chapter_slug`, `cognitive_level`, `topic_names: list[str]`, and `primary_form ∈ {none, diagram_based, table_based}` per question. `DiagramExtractor.extract(pdf_bytes, raw_questions) → list[bytes | None]` returning cropped image bytes or None per question. `AnswerSource.answers(pdf_bytes) → dict[int, str]` mapping question number to answer text — consumed by `Ingestor.apply_answers`, which assigns the n-th parsed answer to the n-th unverified Question ordered by id (CBSE marking schemes mirror the paper's numbering). Tests inject stub adapters.
 
 **LLMClient**
 Provider-agnostic LLM seam used by `LLMTagger` (and future ingestion features). `complete(prompt, max_tokens) → str`. Three adapters ship: `AnthropicClient`, `OpenAIClient`, `GeminiClient` — each imports its SDK lazily. Selected via `LLM_PROVIDER` env var (default `anthropic`). Lives in `bank.llm`.
@@ -46,7 +64,7 @@ A named recipe for a kind of paper — currently `board`, `half_yearly`, `unit_t
 Module that turns a preset name into a validated PaperTemplate. The seam between "what kind of paper" (preset) and "what slots does that imply" (PaperTemplate).
 
 **QuestionPicker**
-Module that fills a PaperTemplate's Slots from the Question bank, honouring chapter weights and the DifficultyLevel's cognitive-level mix. Best-effort: unfillable slots are reported, not raised.
+Module that fills a PaperTemplate's Slots from the Question bank, honouring chapter weights and the DifficultyLevel's cognitive-level mix. Best-effort: unfillable slots are reported, not raised. **Pool gate:** `parse_quality__in=['clean','partial']` — see ADR-0002.
 
 **QuestionPool**
 In-memory map of `(section, qtype, marks) → list[(question_id, chapter_slug, cognitive_level)]`. Internal seam of QuestionPicker that lets the allocator be tested without the ORM.

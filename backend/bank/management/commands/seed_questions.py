@@ -179,6 +179,7 @@ class Command(BaseCommand):
                     "cognitive_level": q["level"],
                     "options": q.get("options", []),
                     "answer": q.get("answer", ""),
+                    "parse_quality": "clean",
                 },
             )
             if not was_created:
