@@ -15,6 +15,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from bank.models import Question
+
 from .builder import PaperBuilder
 from .models import Paper, PaperStatus
 from .pdf import render_paper_pdf
@@ -76,6 +78,9 @@ class PaperApproveView(APIView):
             )
         paper.status = PaperStatus.APPROVED
         paper.save(update_fields=["status"])
+        # ADR-0002: verification emerges from approval. Flip every referenced
+        # question to verified=True. Idempotent (already-verified rows no-op).
+        Question.objects.filter(paperquestion__paper=paper).update(verified=True)
         return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
 
 

@@ -128,6 +128,66 @@ def test_approve_locks_paper(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
+def test_approve_flips_verified_on_referenced_questions(api_client, seeded_bank):
+    """ADR-0002: approving a paper marks every referenced question verified=True.
+
+    The verified flag changed semantics — it no longer gates the picker (Q.parse_quality
+    does). It now records "a human has seen this question in an approved paper context."
+    This test pins that behavior so future regressions surface immediately.
+    """
+    from bank.models import Question
+
+    Question.objects.update(verified=False)  # reset seeded fixture
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    selected_ids = {
+        int(slot["selectedQuestionId"].removeprefix("q_"))
+        for section in create.data["paper"]["sections"]
+        for slot in section["slots"]
+        if slot["selectedQuestionId"] is not None
+    }
+    assert selected_ids, "assembler must have placed at least one question"
+
+    api_client.post(f"/api/papers/{paper_pk}/approve/")
+    verified_ids = set(
+        Question.objects.filter(pk__in=selected_ids, verified=True).values_list("pk", flat=True)
+    )
+    assert verified_ids == selected_ids
+
+
+@pytest.mark.django_db
+def test_picker_excludes_broken_parse_quality(api_client, seeded_bank):
+    """Picker must skip parse_quality='broken' rows even if section/qtype/marks match."""
+    from bank.models import Question
+
+    Question.objects.update(parse_quality="broken")
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+    # Best-effort: best assembly with no eligible questions = all slots unfilled.
+    selected = [
+        slot["selectedQuestionId"]
+        for section in resp.data["paper"]["sections"]
+        for slot in section["slots"]
+    ]
+    assert all(s is None for s in selected), "broken rows must not be picked"
+
+
+@pytest.mark.django_db
+def test_picker_includes_partial_parse_quality(api_client, seeded_bank):
+    """parse_quality='partial' rows must be pickable — only 'broken' is excluded."""
+    from bank.models import Question
+
+    Question.objects.update(parse_quality="partial")
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+    selected = [
+        slot["selectedQuestionId"]
+        for section in resp.data["paper"]["sections"]
+        for slot in section["slots"]
+        if slot["selectedQuestionId"] is not None
+    ]
+    assert selected, "partial rows must be eligible for the picker"
+
+
+@pytest.mark.django_db
 def test_assemble_response_includes_format_object(api_client, seeded_bank):
     """Assemble response must include top-level format satisfying V1 contract."""
     resp = api_client.post("/api/papers/assemble", {}, format="json")

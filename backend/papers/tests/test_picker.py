@@ -39,7 +39,7 @@ def _make_question(*, chapter: Chapter | None, level: str, idx: int) -> Question
         text=f"Q-{chapter.slug if chapter else 'no'}-{level}-{idx}",
         options=[{"label": "A", "text": "a"}],
         answer="A",
-        verified=True,
+        parse_quality="clean",
     )
 
 
