@@ -128,6 +128,37 @@ def test_approve_locks_paper(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
+def test_assemble_response_includes_format_object(api_client, seeded_bank):
+    """Assemble response must include top-level format satisfying V1 contract."""
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+    assert resp.status_code == status.HTTP_201_CREATED
+    fmt = resp.data.get("format")
+    assert fmt is not None, "format object missing from response"
+    assert fmt["formatId"] == "cbse_science_class_10_v1"
+    assert fmt["page"]["size"] == "A4"
+    assert fmt["page"]["orientation"] == "portrait"
+    assert "paperChrome" in fmt
+    assert "numbering" in fmt
+    assert fmt["sections"]["allowCrossSectionMove"] is False
+    assert fmt["questionRegions"]["allowRegionReorder"] is False
+    assert fmt["questionRegions"]["allowRegionDelete"] is False
+    assert fmt["mcqOptions"]["layout"] == "vertical"
+
+
+@pytest.mark.django_db
+def test_every_slot_has_alternate_question_ids(api_client, seeded_bank):
+    """Every slot must include alternateQuestionIds ([] when no alternates exist)."""
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+    assert resp.status_code == status.HTTP_201_CREATED
+    for section in resp.data["paper"]["sections"]:
+        for slot in section["slots"]:
+            assert "alternateQuestionIds" in slot, (
+                f"slot {slot.get('slotId')} missing alternateQuestionIds"
+            )
+            assert isinstance(slot["alternateQuestionIds"], list)
+
+
+@pytest.mark.django_db
 def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
