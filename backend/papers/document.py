@@ -14,14 +14,6 @@ from .models import Paper
 from .picker import FilledTemplate, PaperOptions
 
 
-_QTYPE_CONTRACT: dict[str, str] = {
-    "MCQ": "mcq",
-    "VSA": "very_short_answer",
-    "SA": "short_answer",
-    "LA": "long_answer",
-    "CASE": "case_based",
-}
-
 _SECTION_TITLE: dict[str, str] = {
     "A": "Section A",
     "B": "Section B",
@@ -202,12 +194,11 @@ class PaperDocumentBuilder:
 
             slots_data = []
             for local_idx, (slot, qid, alts) in enumerate(entries, start=1):
-                contract_qtype = _QTYPE_CONTRACT.get(slot.qtype, slot.qtype.lower())
                 slot_data: dict = {
                     "slotId": f"slot_{section_key}_{local_idx:02d}",
                     "displayNumber": str(display_counter),
                     "marks": slot.marks,
-                    "questionType": contract_qtype,
+                    "questionType": slot.qtype,
                     "selectedQuestionId": f"q_{qid}" if qid is not None else None,
                     "alternateQuestionIds": [f"q_{aid}" for aid in alts],
                     "locked": False,
@@ -232,7 +223,7 @@ class PaperDocumentBuilder:
             "questionId": f"q_{q.pk}",
             "language": "en",
             "marks": q.marks,
-            "questionType": _QTYPE_CONTRACT.get(q.qtype, q.qtype.lower()),
+            "questionType": q.qtype,
             "rawText": q.text,
             "content": self._build_content(q),
             "metadata": self._build_metadata(q),
@@ -240,7 +231,7 @@ class PaperDocumentBuilder:
         }
 
     def _build_content(self, q: Question) -> dict:
-        if q.qtype == "MCQ":
+        if q.qtype == "mcq":
             return {
                 "stem": [{"type": "paragraph", "text": q.text}],
                 "options": [

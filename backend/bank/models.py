@@ -29,11 +29,20 @@ class Section(models.TextChoices):
 
 
 class QuestionType(models.TextChoices):
-    MCQ = "MCQ", "Multiple Choice"
-    VSA = "VSA", "Very Short Answer"
-    SA = "SA", "Short Answer"
-    LA = "LA", "Long Answer"
-    CASE = "CASE", "Case-based"
+    """Question type — values are identical to PaperDocumentV1 `questionType`
+    strings in `contracts/v1_contract.md`. No mapping layer exists between DB
+    and API. See ADR-0001."""
+
+    MCQ = "mcq", "Multiple Choice"
+    ASSERTION_REASON = "assertion_reason", "Assertion-Reason"
+    VSA = "very_short_answer", "Very Short Answer"
+    SA = "short_answer", "Short Answer"
+    LA = "long_answer", "Long Answer"
+    CASE = "case_based", "Case-based"
+    INTERNAL_CHOICE = "internal_choice", "Internal Choice"
+    DIAGRAM_BASED = "diagram_based", "Diagram-based"
+    TABLE_BASED = "table_based", "Table-based"
+    CUSTOM = "custom", "Custom"
 
 
 class CognitiveLevel(models.TextChoices):
@@ -94,7 +103,7 @@ class Question(models.Model):
         Chapter, null=True, blank=True, on_delete=models.PROTECT, related_name="questions"
     )
     section = models.CharField(max_length=4, choices=Section.choices)
-    qtype = models.CharField(max_length=4, choices=QuestionType.choices)
+    qtype = models.CharField(max_length=20, choices=QuestionType.choices)
     marks = models.PositiveSmallIntegerField()
     cognitive_level = models.CharField(
         max_length=2, choices=CognitiveLevel.choices, default=CognitiveLevel.REMEMBER
