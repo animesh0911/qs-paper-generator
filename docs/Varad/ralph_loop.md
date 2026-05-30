@@ -22,7 +22,7 @@ skill behavior lives in `.claude/skills`.
 10. Re-run verification.
 11. Re-check every acceptance criterion from the GitHub issue against the
     verified implementation.
-12. Update scratchboard and handoff if decisions changed.
+12. Update scratchboard.
 13. Commit and push.
 14. Close the GitHub issue after the pushed branch contains the completed,
     verified work.
