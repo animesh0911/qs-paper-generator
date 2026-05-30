@@ -14,6 +14,24 @@ next steps only.
 
 ## Log
 
+### 2026-05-30 — Mocked PaperDocumentV1 Frontend Contract
+
+Commit: `9ddedb9`
+Owner: Varad / Codex
+
+Changed: issue #20 now has Vitest-backed frontend contract tests,
+`mockPaperDocumentV1`, and TypeScript/Zod contract updates.
+
+Files: `frontend/src/mocks/*`, `frontend/src/types/*`,
+`frontend/package.json`, `docs/Varad/ralph_loop.md`,
+`docs/Varad/scratchboards/issue-20-implementation.md`
+
+Boundary: no normalization, BlockNote rendering, editor UI, or backend
+generation changes are included.
+
+Next: implement #21 normalization/runtime validation; backend still needs to
+emit top-level `format` and required slot fields for live assemble responses.
+
 ### 2026-05-30 — Varad Contract + Upstream Skills
 
 Commit: `c2dd0ee`
