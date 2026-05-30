@@ -124,7 +124,12 @@ class QuestionPicker:
         pool: QuestionPool = {}
         for key in buckets:
             section, qtype, marks = key
-            qs = Question.objects.filter(section=section, qtype=qtype, marks=marks, verified=True)
+            qs = Question.objects.filter(
+                section=section,
+                qtype=qtype,
+                marks=marks,
+                parse_quality__in=["clean", "partial"],
+            )
             if opts.chapter_slugs:
                 qs = qs.filter(chapter__slug__in=opts.chapter_slugs)
             pool[key] = list(

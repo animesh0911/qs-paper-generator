@@ -36,7 +36,8 @@ class QuestionFactory(DjangoModelFactory):
     section = Section.A
     qtype = QuestionType.MCQ
     marks = 1
-    verified = True
+    verified = True  # legacy field, no longer a picker gate (ADR-0002)
+    parse_quality = "clean"
     text = factory.Sequence(lambda n: f"Question {n} text?")
     options = factory.LazyFunction(
         lambda: [
