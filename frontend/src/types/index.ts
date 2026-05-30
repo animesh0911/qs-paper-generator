@@ -126,7 +126,7 @@ export interface DocSection {
   title: string;
   subtitle?: string;
   marks: number;
-  instructions: string;
+  instructions?: string;
   slots: DocSlot[];
 }
 

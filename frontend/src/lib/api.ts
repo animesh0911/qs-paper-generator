@@ -14,7 +14,7 @@
  * @module api
  */
 import type { AssembleRequest, Chapter, PaperDocument } from '@/types';
-import { paperDocumentSchema } from '@/types/paper-document.schema';
+import { assertPaperDocument } from './paper-document';
 
 const TOKEN_KEY = 'qpg_token';
 
@@ -76,14 +76,7 @@ export async function assemblePaper(
     method: 'POST',
     body: JSON.stringify(body),
   });
-  // Runtime contract check — see paper-document.schema.ts for rationale.
-  const parsed = paperDocumentSchema.safeParse(await res.json());
-  if (!parsed.success) {
-    throw new Error(
-      `Backend returned an unexpected PaperDocument shape: ${parsed.error.message}`,
-    );
-  }
-  return parsed.data as PaperDocument;
+  return assertPaperDocument(await res.json());
 }
 
 export interface Metadata {

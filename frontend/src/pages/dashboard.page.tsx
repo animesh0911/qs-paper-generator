@@ -11,6 +11,7 @@
  */
 import { useRef, useState } from 'react';
 import { assemblePaper, downloadPaperPdf } from '@/lib/api';
+import { getPaperDocumentErrorMessage } from '@/lib/paper-document';
 import type { PaperDocument } from '@/types';
 import { useAuth } from '@/hooks/useAuth.hook';
 import { useCoverageForm } from '@/hooks/useCoverageForm.hook';
@@ -40,7 +41,10 @@ export default function Dashboard() {
         });
       });
     } catch (err) {
-      setError((err as Error).message);
+      if (import.meta.env.DEV) {
+        console.error(err);
+      }
+      setError(getPaperDocumentErrorMessage(err));
     } finally {
       setBusy(false);
     }

@@ -18,8 +18,12 @@ implementation stalls.
 8. Run the `code-review` skill on the diff.
 9. Fix review findings.
 10. Re-run verification.
-11. Update scratchboard and handoff if decisions changed.
-12. Commit and push.
+11. Re-check every acceptance criterion from the GitHub issue against the
+    verified implementation.
+12. Update scratchboard and handoff if decisions changed.
+13. Commit and push.
+14. Close the GitHub issue after the pushed branch contains the completed,
+    verified work.
 
 ## Agent Invocation
 
@@ -117,6 +121,21 @@ python -m compileall .
 If a command is unavailable or skipped, record that explicitly in the final
 answer and scratchboard.
 
+## Acceptance-Criteria Gate
+
+After TDD development, code review, and verification are complete, re-read the
+GitHub issue and check every acceptance criterion against the verified
+implementation.
+
+- If every acceptance criterion passes, record that in the scratchboard and
+  proceed to commit, push, and the close-issue gate.
+- If any acceptance criterion does not pass, do not close the issue. Add the
+  GitHub label `needs more work`, leave a short issue comment naming the failed
+  criteria and the blocker or follow-up, record the result in the scratchboard,
+  and move on to the next issue.
+- If scope has intentionally moved to another issue, link the follow-up issue
+  when explaining why the current issue is or is not complete.
+
 ## Code-Review Gate
 
 After implementation, use the `code-review` skill on the diff.
@@ -149,3 +168,11 @@ Before commit:
 
 Do not close the GitHub issue until the pushed branch contains the completed
 work and verification has passed.
+
+## Close-Issue Gate
+
+Closing an issue means shipping the change: commit the relevant files, push the
+branch, then close the GitHub issue with a short completion comment that names
+the delivered slice and any known verification caveats. Once verification has
+passed and every acceptance criterion passes, do not wait for extra user
+confirmation before committing, pushing, and closing the issue.

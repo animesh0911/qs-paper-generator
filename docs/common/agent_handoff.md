@@ -14,6 +14,24 @@ next steps only.
 
 ## Log
 
+### 2026-05-30 — Backend PaperDocumentV1 Assemble Gap
+
+Commit: PENDING
+Owner: Backend / Animesh
+
+Changed: frontend issue #21 now validates and normalizes `PaperDocumentV1`,
+but live backend assemble responses still need backend-owned V1 alignment in
+GitHub issue #38.
+
+Files: `backend/papers/document.py`, `backend/papers/tests/test_builder.py`
+
+Boundary: no backend code is changed in the frontend #21 branch; do not carry
+unverified backend edits in Varad/frontend work.
+
+Next: for #38, backend should emit top-level `format` and always-present
+`alternateQuestionIds` (`[]` when empty) from `/api/papers/assemble`, with
+backend pytest coverage.
+
 ### 2026-05-30 — Mocked PaperDocumentV1 Frontend Contract
 
 Commit: `9ddedb9`
