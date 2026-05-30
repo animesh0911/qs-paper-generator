@@ -8,7 +8,9 @@ skill behavior lives in `.claude/skills`.
 1. Pick one GitHub issue.
 2. Read the issue, `docs/Varad/v1_contract.md`, relevant PRDs, and any prior
    scratchboard for the issue.
-3. Choose skills from `.claude/skills`.
+3. Inspect `.claude/skills`, choose the issue-relevant skills, read each chosen
+   `SKILL.md` before relying on it, and record the selected skills plus why in
+   the scratchboard.
 4. Create a fresh scratchboard in the issue owner's docs directory:
    `docs/Varad/scratchboards/issue-XX-implementation.md` for `V` issues, or
    `docs/Animesh/scratchboards/issue-XX-implementation.md` for `A` issues.
