@@ -14,6 +14,25 @@ next steps only.
 
 ## Log
 
+### 2026-05-30 — Varad Contract + Upstream Skills
+
+Commit: `d94dbd2`
+Owner: Varad / Codex
+
+Changed: finalized Varad `PaperDocumentV1` backbone for backend/frontend work
+and refreshed `.claude/skills` to prioritize upstream engineering skills.
+
+Files: `docs/Varad/v1_contract.md`,
+`docs/Varad/scratchboards/issue-20-mocked-paperdocument-v1.md`,
+`.claude/skills/*`, `docs/agents/*`, `AGENTS.md`, `CLAUDE.md`
+
+Boundary: this handoff commit intentionally excludes frontend Vitest/mock
+implementation files; backend team should build against the documented
+contract, including `format`, slot alternates/locks, and slot-level overrides.
+
+Next: backend should emit top-level `format` and align `PaperDocumentBuilder`
+with required slot fields before editor normalization work proceeds.
+
 ### 2026-05-29 — Shared LiteLLM Gateway
 
 Commit: `db0edda`
