@@ -121,10 +121,10 @@ export default function EditorPage() {
         </div>
       </header>
 
-      <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[12rem_minmax(0,1fr)_14rem] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:hidden max-lg:[&_.editor-left-rail]:static max-sm:px-3">
+      <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:hidden max-lg:[&_.editor-left-rail]:static max-sm:px-3">
         <aside
           data-editor-chrome
-          className="editor-left-rail sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-3 max-lg:h-auto"
+          className="editor-left-rail sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-3 max-lg:order-2 max-lg:h-auto"
         >
           <h2 className="mb-3 text-sm font-semibold">Paper outline</h2>
           <nav aria-label="Paper sections" className="space-y-1">
@@ -174,8 +174,8 @@ export default function EditorPage() {
           </div>
         </aside>
 
-        <main className="flex justify-center">
-          <article className="paper-canvas w-full max-w-[44rem] bg-background px-12 py-10 text-[15px] leading-7 shadow-none 2xl:max-w-[52rem] max-sm:px-5 max-sm:py-8">
+        <main className="flex justify-center max-lg:order-1">
+          <article className="paper-canvas w-full max-w-[56rem] bg-background px-14 py-10 text-[15px] leading-7 shadow-none max-xl:px-10 max-lg:max-w-[48rem] max-sm:px-5 max-sm:py-8">
             <header className="mb-6 text-center">
               <h1 className="text-lg font-bold leading-7">{view.title}</h1>
               {view.subtitle && (

@@ -39,3 +39,7 @@ dist/
 .claude/settings.local.json
 .playwright-mcp/
 frontend/tsconfig.tsbuildinfo
+
+# Codex / design-tool local state
+.codex/
+.impeccable/

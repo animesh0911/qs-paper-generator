@@ -45,13 +45,17 @@
 
   .qpg-question-blocknote .bn-editor {
     padding: 0;
+    color: hsl(var(--foreground));
     font-size: 15px;
     line-height: 1.65;
+    opacity: 1;
   }
 
   .qpg-question-blocknote .bn-block-content {
+    color: hsl(var(--foreground));
     margin: 0;
     padding: 0;
+    opacity: 1;
   }
 
   .qpg-question-blocknote .bn-block-outer {

@@ -16,6 +16,7 @@ skill behavior lives in `.claude/skills`.
    `docs/Animesh/scratchboards/issue-XX-implementation.md` for `A` issues.
 5. Define the public interface under test.
 6. Implement with `tdd`: one RED/GREEN slice at a time.
+6.5 Download anything and everything you need for the dev work.
 7. Run local verification.
 8. Run the `code-review` skill on the diff.
 9. Fix review findings.
