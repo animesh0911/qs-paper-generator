@@ -31,3 +31,57 @@
     color: hsl(var(--foreground));
   }
 }
+
+@layer components {
+  .paper-canvas {
+    min-height: 70rem;
+    border: 1px solid hsl(var(--foreground));
+  }
+
+  .qpg-question-blocknote .bn-container,
+  .qpg-question-blocknote .bn-editor {
+    background: transparent;
+  }
+
+  .qpg-question-blocknote .bn-editor {
+    padding: 0;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .qpg-question-blocknote .bn-block-content {
+    margin: 0;
+    padding: 0;
+  }
+
+  .qpg-question-blocknote .bn-block-outer {
+    margin: 0;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm;
+  }
+
+  [data-editor-chrome] {
+    display: none !important;
+  }
+
+  body,
+  .editor-shell {
+    background: white !important;
+  }
+
+  .editor-shell {
+    min-height: auto;
+  }
+
+  .paper-canvas {
+    max-width: none !important;
+    min-height: auto;
+    border: 1px solid #111;
+    padding: 0 !important;
+  }
+}

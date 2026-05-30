@@ -8,7 +8,10 @@
  */
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth.hook';
-import { LoginPage, DashboardPage } from '@/pages';
+import { DashboardPage, LoginPage } from '@/pages';
+import { lazy, Suspense } from 'react';
+
+const EditorPage = lazy(() => import('@/pages/editor.page'));
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -24,6 +27,22 @@ export default function App() {
         element={
           <RequireAuth>
             <DashboardPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/editor"
+        element={
+          <RequireAuth>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-secondary p-6 text-sm">
+                  Loading editor...
+                </div>
+              }
+            >
+              <EditorPage />
+            </Suspense>
           </RequireAuth>
         }
       />
