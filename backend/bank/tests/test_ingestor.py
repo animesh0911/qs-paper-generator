@@ -213,8 +213,8 @@ def test_llm_tagger_calls_client_and_attaches_tags():
     must not break this contract.
     """
     raw = [
-        {"section": "A", "qtype": "MCQ", "marks": 1, "text": "Q one", "options": []},
-        {"section": "B", "qtype": "VSA", "marks": 2, "text": "Q two", "options": []},
+        {"section": "A", "qtype": "mcq", "marks": 1, "text": "Q one", "options": []},
+        {"section": "B", "qtype": "very_short_answer", "marks": 2, "text": "Q two", "options": []},
     ]
     client = StubLLMClient(tags=[
         {"index": 0, "chapter_slug": "electricity", "cognitive_level": "R"},
@@ -232,7 +232,7 @@ def test_llm_tagger_calls_client_and_attaches_tags():
 @pytest.mark.django_db
 def test_llm_tagger_strips_markdown_fences():
     """Some providers wrap JSON in ```json fences; tagger must strip them."""
-    raw = [{"section": "A", "qtype": "MCQ", "marks": 1, "text": "Q", "options": []}]
+    raw = [{"section": "A", "qtype": "mcq", "marks": 1, "text": "Q", "options": []}]
     client = StubLLMClient(
         tags=[{"index": 0, "chapter_slug": "electricity", "cognitive_level": "U"}],
         wrap_fences=True,

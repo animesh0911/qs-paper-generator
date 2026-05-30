@@ -65,11 +65,11 @@ _SCHEME_ANS_HEADER_RE = re.compile(r"\bAns(?:wer)?\.?\s*[:—-]?\s*(.+)", re.IGN
 
 SECTION_DEFAULT_MARKS: dict[str, int] = {"A": 1, "B": 2, "C": 3, "D": 5, "E": 4}
 SECTION_DEFAULT_QTYPE: dict[str, str] = {
-    "A": "MCQ",
-    "B": "VSA",
-    "C": "SA",
-    "D": "LA",
-    "E": "CASE",
+    "A": "mcq",
+    "B": "very_short_answer",
+    "C": "short_answer",
+    "D": "long_answer",
+    "E": "case_based",
 }
 
 _TAG_BATCH = 30
@@ -146,7 +146,7 @@ def segment_questions(text: str) -> list[dict]:
 
     for section_code, block in section_blocks:
         default_marks = SECTION_DEFAULT_MARKS.get(section_code, 1)
-        default_qtype = SECTION_DEFAULT_QTYPE.get(section_code, "SA")
+        default_qtype = SECTION_DEFAULT_QTYPE.get(section_code, "short_answer")
 
         splits = list(_QNUM_RE.finditer(block))
         for i, match in enumerate(splits):
