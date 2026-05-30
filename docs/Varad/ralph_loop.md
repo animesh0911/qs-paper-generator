@@ -83,8 +83,12 @@ Every implementation issue gets a scratchboard with:
 - verification commands/results
 - review findings and fixes
 - decisions worth carrying forward
+- final code-level change summary
 
-Scratchboards are working notes. Keep them useful, not polished.
+Scratchboards are working notes. Keep them useful, not polished. At the end of
+the issue, add a concise code-level summary so a human can see what changed
+without reconstructing the diff. Name the touched modules/files and the concrete
+interfaces, schemas, state shapes, tests, or behavior changed.
 
 Keep owner scratchboards separated by directory. Varad/frontend issue notes
 belong under `docs/Varad/scratchboards/`; Animesh/backend issue notes belong
