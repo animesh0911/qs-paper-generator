@@ -16,7 +16,7 @@ next steps only.
 
 ### 2026-05-30 — Varad Contract + Upstream Skills
 
-Commit: `d94dbd2`
+Commit: `c2dd0ee`
 Owner: Varad / Codex
 
 Changed: finalized Varad `PaperDocumentV1` backbone for backend/frontend work
