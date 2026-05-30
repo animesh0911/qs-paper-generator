@@ -50,9 +50,26 @@ run code-review, then commit only the relevant files.
 
 ## Skill Use
 
-- Use `.claude/skills/tdd` for implementation.
-- Use `.claude/skills/code-review` before commit.
-- Use other `.claude/skills` only when the issue actually needs them.
+Use skills freely; they are part of the workflow, not optional decoration. Read
+the relevant `SKILL.md` before using a skill. If you are not confident about the
+skill's workflow, read it thoroughly before acting.
+
+- `tdd`: default implementation skill. Use for feature work, bug fixes,
+  contract changes, and any issue with acceptance criteria.
+- `code-review`: mandatory before commit. Use on the diff after implementation
+  and verification; fix findings before final verification.
+- `zoom-out`: use when the code area is unfamiliar and you need a fast map of
+  modules, callers, and seams before editing.
+- `diagnose`: use when a failure is confusing, flaky, or not reproducible from
+  the obvious command.
+- `prototype`: use only for unclear UI/state design where a small spike reduces
+  risk before the TDD path.
+- `grill-with-docs`: use when terminology, contract ownership, or domain docs
+  are unclear and need a sharper decision.
+- `to-issues`: use when the current issue is too large and should be split
+  before implementation.
+- `improve-codebase-architecture`: use when the solution starts spreading
+  shallow logic across modules and needs a deeper interface.
 
 ## Scratchboard
 
