@@ -13,6 +13,23 @@ takes precedence over personal taste.
 Domain vocabulary lives in [`CONTEXT.md`](CONTEXT.md) — use those terms
 exactly in module names, class names, and docstrings.
 
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs live in GitHub Issues for `animesh0911/qs-paper-generator`;
+Varad/editor work uses the `V` label. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the default Matt Pocock triage role names when triaging; create labels only
+when triage work starts needing them. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repo with root `CONTEXT.md` and optional ADRs under
+`docs/adr/`. See `docs/agents/domain.md`.
+
 ## Rule 1 — Think Before Coding
 State assumptions explicitly. If uncertain, ask rather than guess.
 Present multiple interpretations when ambiguity exists.

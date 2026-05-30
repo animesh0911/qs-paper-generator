@@ -21,42 +21,39 @@ At system boundaries, design interfaces that are easy to mock:
 
 Pass external dependencies in rather than creating them internally:
 
-```python
-# Easy to mock
-def process_payment(order, payment_client):
-    return payment_client.charge(order.total)
+```typescript
+// Easy to mock
+function processPayment(order, paymentClient) {
+  return paymentClient.charge(order.total);
+}
 
-# Hard to mock
-def process_payment(order):
-    client = StripeClient(settings.STRIPE_KEY)
-    return client.charge(order.total)
+// Hard to mock
+function processPayment(order) {
+  const client = new StripeClient(process.env.STRIPE_KEY);
+  return client.charge(order.total);
+}
 ```
 
 **2. Prefer SDK-style interfaces over generic fetchers**
 
 Create specific functions for each external operation instead of one generic function with conditional logic:
 
-```python
-# GOOD: Each function is independently mockable
-class Api:
-    def get_user(self, user_id: int):
-        return requests.get(f"/users/{user_id}").json()
+```typescript
+// GOOD: Each function is independently mockable
+const api = {
+  getUser: (id) => fetch(`/users/${id}`),
+  getOrders: (userId) => fetch(`/users/${userId}/orders`),
+  createOrder: (data) => fetch('/orders', { method: 'POST', body: data }),
+};
 
-    def get_orders(self, user_id: int):
-        return requests.get(f"/users/{user_id}/orders").json()
-
-    def create_order(self, data: dict):
-        return requests.post("/orders", json=data).json()
-
-# BAD: Mocking requires conditional logic inside the mock
-class Api:
-    def fetch(self, endpoint: str, **options):
-        return requests.request(endpoint, **options)
+// BAD: Mocking requires conditional logic inside the mock
+const api = {
+  fetch: (endpoint, options) => fetch(endpoint, options),
+};
 ```
 
 The SDK approach means:
-
 - Each mock returns one specific shape
 - No conditional logic in test setup
 - Easier to see which endpoints a test exercises
-- Type safety per endpoint (with type hints)
+- Type safety per endpoint
