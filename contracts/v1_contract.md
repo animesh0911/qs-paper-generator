@@ -207,8 +207,8 @@ Header and instruction text should also be editable. Backend can send simple tex
 ```json
 {
   "blockId": "instruction_001",
-  "blockType": "instruction",
-  "text": "Maximum Marks: 80. Time allowed: 3 hours.",
+  "blockType": "general_instruction",
+  "text": "This question paper contain 39 questions. All questions are compulsory.",
   "editable": true
 }
 ```
@@ -216,9 +216,21 @@ Header and instruction text should also be editable. Backend can send simple tex
 | Field | Required | Notes |
 |---|---:|---|
 | `blockId` | Yes | Stable block ID. |
-| `blockType` | Yes | Example: `paper_header`, `instruction`, `direction`. |
+| `blockType` | Yes | Example: `paper_header`, `note_heading`, `note`, `general_instructions_heading`, `general_instruction`, `direction`. |
 | `text` | Yes | Rendered text. |
 | `editable` | Optional | Defaults to `true`. |
+
+For the CBSE Class 10 Science MVP, `paper.instructionBlocks[]` should model the
+front-matter instructions visible on the paper, not only app help text. The
+2026 Science papers use a NOTE block followed by General Instructions. A
+representative English-only instruction block sequence is:
+
+- `note_heading`: `NOTE`
+- `note`: printed page count / question count / serial-number / reading-time
+  notices
+- `general_instructions_heading`: `General Instructions`
+- `general_instruction`: compulsory questions, section split, question types,
+  case-based question rule, answer-sheet sectioning, and internal choice rule
 
 ---
 
@@ -232,7 +244,7 @@ Each section contains section metadata and ordered slots.
   "title": "Section A",
   "subtitle": "Biology",
   "marks": 30,
-  "instructions": "Questions 1 to 16 are from Biology.",
+  "instructions": "Answer the Biology questions in this section. Instructions are given with each question, wherever necessary.",
   "slots": []
 }
 ```
@@ -988,9 +1000,27 @@ Frontend sends canonical edited paper state after teacher edits.
     ],
     "instructionBlocks": [
       {
-        "blockId": "instruction_001",
-        "blockType": "instruction",
-        "text": "Maximum Marks: 80. Time allowed: 3 hours.",
+        "blockId": "note_heading",
+        "blockType": "note_heading",
+        "text": "NOTE",
+        "editable": true
+      },
+      {
+        "blockId": "note_question_count",
+        "blockType": "note",
+        "text": "Please check that this question paper contains 39 questions.",
+        "editable": true
+      },
+      {
+        "blockId": "general_instructions_heading",
+        "blockType": "general_instructions_heading",
+        "text": "General Instructions",
+        "editable": true
+      },
+      {
+        "blockId": "general_instruction_sections",
+        "blockType": "general_instruction",
+        "text": "The question paper is divided into three sections — A, B and C. Section A: Biology (30 marks), Section B: Chemistry (25 marks), Section C: Physics (25 marks).",
         "editable": true
       }
     ],
@@ -1000,7 +1030,7 @@ Frontend sends canonical edited paper state after teacher edits.
         "title": "Section A",
         "subtitle": "Biology",
         "marks": 30,
-        "instructions": "Questions 1 to 16 are from Biology.",
+        "instructions": "Answer the Biology questions in this section. Instructions are given with each question, wherever necessary.",
         "slots": [
           {
             "slotId": "slot_A_01",

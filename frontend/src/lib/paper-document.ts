@@ -19,8 +19,11 @@
  * @module paperDocument
  */
 import type {
+  ContentItem,
+  EditableTextBlock,
   DocQuestion,
   DocSlot,
+  DocSection,
   PaperDocument,
   PaperFormat,
   SlotOverrides,
@@ -100,4 +103,108 @@ export function normalizePaperDocument(
     lockStateBySlotId,
     formatRules: document.format,
   };
+}
+
+export function setSlotRegionOverride(
+  state: NormalizedPaperDocument,
+  slotId: string,
+  regionKey: string,
+  content: ContentItem[],
+): NormalizedPaperDocument {
+  const currentEdits = state.slotEditsById[slotId] ?? {
+    modifiedFromSource: false,
+    regions: {},
+  };
+
+  return {
+    ...state,
+    slotEditsById: {
+      ...state.slotEditsById,
+      [slotId]: {
+        modifiedFromSource: true,
+        regions: {
+          ...currentEdits.regions,
+          [regionKey]: content,
+        },
+      },
+    },
+  };
+}
+
+export function restoreSlotSource(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): NormalizedPaperDocument {
+  return {
+    ...state,
+    slotEditsById: {
+      ...state.slotEditsById,
+      [slotId]: {
+        modifiedFromSource: false,
+        regions: {},
+      },
+    },
+  };
+}
+
+export function setPaperChromeText(
+  state: NormalizedPaperDocument,
+  regionKey: string,
+  text: string,
+): NormalizedPaperDocument {
+  return {
+    ...state,
+    document: {
+      ...state.document,
+      paper: {
+        ...state.document.paper,
+        title: regionKey === 'paper:title' ? text : state.document.paper.title,
+        subtitle:
+          regionKey === 'paper:subtitle' ? text : state.document.paper.subtitle,
+        headerBlocks: updateEditableTextBlocks(
+          state.document.paper.headerBlocks,
+          'header',
+          regionKey,
+          text,
+        ),
+        instructionBlocks: updateEditableTextBlocks(
+          state.document.paper.instructionBlocks,
+          'instruction',
+          regionKey,
+          text,
+        ),
+        sections: state.document.paper.sections.map((section) =>
+          updateSectionChromeText(section, regionKey, text),
+        ),
+      },
+    },
+  };
+}
+
+function updateEditableTextBlocks(
+  blocks: EditableTextBlock[] | undefined,
+  prefix: string,
+  regionKey: string,
+  text: string,
+) {
+  return blocks?.map((block) =>
+    regionKey === `${prefix}:${block.blockId}` ? { ...block, text } : block,
+  );
+}
+
+function updateSectionChromeText(
+  section: DocSection,
+  regionKey: string,
+  text: string,
+): DocSection {
+  if (regionKey === `section:${section.sectionId}:title`) {
+    return { ...section, title: text };
+  }
+  if (regionKey === `section:${section.sectionId}:subtitle`) {
+    return { ...section, subtitle: text };
+  }
+  if (regionKey === `section:${section.sectionId}:instructions`) {
+    return { ...section, instructions: text };
+  }
+  return section;
 }

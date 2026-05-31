@@ -6,6 +6,9 @@ import {
   normalizePaperDocument,
   PaperDocumentContractError,
   parsePaperDocument,
+  restoreSlotSource,
+  setPaperChromeText,
+  setSlotRegionOverride,
 } from './paper-document';
 
 describe('PaperDocumentV1 validation', () => {
@@ -95,5 +98,53 @@ describe('PaperDocumentV1 normalization', () => {
     );
     expect(state.lockStateBySlotId[firstSlot.slotId]).toBe(firstSlot.locked);
     expect(state.formatRules).toBe(parsed.data.format);
+  });
+
+  it('stores and restores manual edits as slot-level region overrides', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const editedState = setSlotRegionOverride(state, 'slot_A_01', 'stem', [
+      {
+        type: 'paragraph',
+        text: 'Paper-specific stem text.',
+      },
+    ]);
+
+    expect(editedState.slotEditsById.slot_A_01).toEqual({
+      modifiedFromSource: true,
+      regions: {
+        stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
+      },
+    });
+    expect(editedState.questionsById.q_mcq_heredity_001).toBe(
+      state.questionsById.q_mcq_heredity_001,
+    );
+
+    const restoredState = restoreSlotSource(editedState, 'slot_A_01');
+
+    expect(restoredState.slotEditsById.slot_A_01).toEqual({
+      modifiedFromSource: false,
+      regions: {},
+    });
+    expect(restoredState.questionsById.q_mcq_heredity_001.rawText).toBe(
+      state.questionsById.q_mcq_heredity_001.rawText,
+    );
+  });
+
+  it('updates editable paper chrome without changing source questions', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const editedState = setPaperChromeText(
+      state,
+      'section:A:instructions',
+      'Edited Biology section directions.',
+    );
+
+    expect(editedState.document.paper.sections[0].instructions).toBe(
+      'Edited Biology section directions.',
+    );
+    expect(editedState.questionsById.q_mcq_heredity_001).toBe(
+      state.questionsById.q_mcq_heredity_001,
+    );
   });
 });

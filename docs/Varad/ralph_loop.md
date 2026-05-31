@@ -21,11 +21,14 @@ skill behavior lives in `.claude/skills`.
 8. Run the `code-review` skill on the diff.
 9. Fix review findings.
 10. Re-run verification.
-11. Re-check every acceptance criterion from the GitHub issue against the
-    verified implementation.
-12. Update scratchboard.
-13. Commit and push.
-14. Close the GitHub issue after the pushed branch contains the completed,
+11. Prune the scratchboard to the final handoff shape: Selected Skills, Public
+    Interfaces, and Main Flow only.
+12. In Main Flow, explain the data/control flow created or changed by the
+    issue, with code-level references to the key interfaces, API calls, schemas,
+    state shapes, persistence models, and tests.
+13. Re-read the GitHub issue for obvious scope misses before commit.
+14. Commit and push.
+15. Close the GitHub issue after the pushed branch contains the completed,
     verified work.
 
 ## Agent Invocation
@@ -76,22 +79,21 @@ skill's workflow, read it thoroughly before acting.
 
 ## Scratchboard
 
-Every implementation issue gets a scratchboard with:
+Every implementation issue gets a scratchboard. During implementation, it may
+temporarily hold assumptions, RED/GREEN notes, verification notes, or review
+findings. Before handoff, prune it back to exactly these sections:
 
-- issue link
-- selected skills
-- assumptions
-- public interfaces
-- RED/GREEN slices
-- verification commands/results
-- review findings and fixes
-- decisions worth carrying forward
-- final code-level change summary
+- Selected Skills
+- Public Interfaces
+- Main Flow
 
-Scratchboards are working notes. Keep them useful, not polished. At the end of
-the issue, add a concise code-level summary so a human can see what changed
-without reconstructing the diff. Name the touched modules/files and the concrete
-interfaces, schemas, state shapes, tests, or behavior changed.
+Scratchboards are working notes, not a permanent log. Keep them lean. Do not
+duplicate acceptance criteria, paste issue checklists, or retain verification
+transcripts unless a specific result changes the public interface or main flow.
+The final scratchboard should read like a compact handoff from the implementer
+to a human maintainer: identify the main flow created by the work and annotate
+it with code references. Depending on the issue, this may be a data flow, API
+request flow, UI state flow, persistence flow, or validation flow.
 
 Keep owner scratchboards separated by directory. Varad/frontend issue notes
 belong under `docs/Varad/scratchboards/`; Animesh/backend issue notes belong
@@ -129,20 +131,6 @@ python -m compileall .
 If a command is unavailable or skipped, record that explicitly in the final
 answer and scratchboard.
 
-## Acceptance-Criteria Gate
-
-After TDD, code review, and verification, re-read the GitHub issue and check
-each acceptance criterion against the verified implementation.
-
-- If every acceptance criterion passes, record that in the scratchboard and
-  proceed to commit, push, and the close-issue gate.
-- If any acceptance criterion does not pass, do not close the issue. Add the
-  GitHub label `needs more work`, leave a short issue comment naming the failed
-  criteria and the blocker or follow-up, record the result in the scratchboard,
-  and move on to the next issue.
-- If scope has intentionally moved to another issue, link the follow-up issue
-  when explaining why the current issue is or is not complete.
-
 ## Code-Review Gate
 
 Run `.claude/skills/code-review/SKILL.md` on the diff. Fix findings, then
@@ -165,6 +153,6 @@ work and verification has passed.
 
 Closing an issue means shipping the change: commit the relevant files, push the
 branch, then close the GitHub issue with a short completion comment that names
-the delivered slice and any known verification caveats. Once verification has
-passed and every acceptance criterion passes, do not wait for extra user
-confirmation before committing, pushing, and closing the issue.
+the delivered slice and any known verification caveats. Before closing, re-read
+the issue for obvious scope misses; do not close if the verified implementation
+clearly does not deliver the requested slice.

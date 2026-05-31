@@ -51,15 +51,115 @@
     opacity: 1;
   }
 
+  .qpg-question-blocknote .bn-block-group,
+  .qpg-question-blocknote .bn-block-outer,
+  .qpg-question-blocknote .bn-block {
+    line-height: inherit;
+  }
+
   .qpg-question-blocknote .bn-block-content {
     color: hsl(var(--foreground));
+    line-height: inherit;
     margin: 0;
     padding: 0;
     opacity: 1;
   }
 
+  .qpg-question-blocknote .bn-inline-content {
+    line-height: inherit;
+  }
+
+  .qpg-question-region-text {
+    color: hsl(var(--foreground));
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 24.75px;
+  }
+
   .qpg-question-blocknote .bn-block-outer {
     margin: 0;
+  }
+
+  .qpg-question-blocknote .bn-trailing-block {
+    display: none;
+    height: 0;
+  }
+
+  .qpg-paper-chrome-hit {
+    padding: 1px 2px;
+  }
+
+  .qpg-paper-chrome-text {
+    cursor: text;
+    color: hsl(var(--foreground));
+  }
+
+  .qpg-paper-chrome-text p {
+    margin: 0;
+  }
+
+  .qpg-paper-title .bn-editor,
+  .qpg-paper-title.qpg-paper-chrome-text {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.55;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .qpg-paper-subtitle .bn-editor,
+  .qpg-paper-subtitle.qpg-paper-chrome-text,
+  .qpg-section-subtitle .bn-editor,
+  .qpg-section-subtitle.qpg-paper-chrome-text {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  .qpg-section-title .bn-editor,
+  .qpg-section-title.qpg-paper-chrome-text {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.55;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .qpg-instruction-heading .bn-editor,
+  .qpg-instruction-heading.qpg-paper-chrome-text {
+    font-weight: 700;
+    line-height: 1.6;
+    margin-top: 0.625rem;
+  }
+
+  .qpg-instruction-line .bn-editor,
+  .qpg-instruction-line.qpg-paper-chrome-text,
+  .qpg-section-instructions .bn-editor,
+  .qpg-section-instructions.qpg-paper-chrome-text {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .qpg-section-instructions.qpg-paper-chrome-text {
+    margin-top: 0.375rem;
+    text-align: center;
+  }
+
+  .qpg-paper-title .bn-block-content,
+  .qpg-paper-subtitle .bn-block-content,
+  .qpg-section-title .bn-block-content,
+  .qpg-section-subtitle .bn-block-content,
+  .qpg-section-instructions .bn-block-content {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper-section,
+  .paper-section * {
+    transition-duration: 0ms !important;
   }
 }
 
