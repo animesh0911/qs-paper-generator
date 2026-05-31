@@ -10,12 +10,10 @@
  *
  * @module EditorInspector
  */
-import { RotateCcw } from 'lucide-react';
+import { Maximize2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type {
-  EditorQuestionAlternativeView,
-  EditorPaperSlotView,
-} from '@/lib/editor-paper';
+import type { EditorPaperSlotView } from '@/lib/editor-paper';
+import { cn } from '@/lib/utils';
 import type { DocQuestion } from '@/types';
 import type { AlternativesIntent, InspectorMode } from './editor-types';
 
@@ -26,8 +24,9 @@ export function EditorInspector({
   alternativesIntent,
   onInspectorModeChange,
   onShowAllAlternatives,
-  onUseAlternative,
+  onOpenAlternatives,
   onRestoreSelectedSlot,
+  highlighted,
 }: {
   selectedSlot?: EditorPaperSlotView;
   selectedQuestion?: DocQuestion;
@@ -35,13 +34,17 @@ export function EditorInspector({
   alternativesIntent: AlternativesIntent;
   onInspectorModeChange: (mode: InspectorMode) => void;
   onShowAllAlternatives: () => void;
-  onUseAlternative: (questionId: string) => void;
+  onOpenAlternatives: () => void;
   onRestoreSelectedSlot: () => void;
+  highlighted: boolean;
 }) {
   return (
     <aside
       data-editor-chrome
-      className="editor-inspector sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-4"
+      className={cn(
+        'editor-inspector sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-4 transition-shadow duration-200',
+        highlighted && 'ring-2 ring-ring ring-offset-2 ring-offset-secondary',
+      )}
     >
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold">Inspector</h2>
@@ -64,7 +67,10 @@ export function EditorInspector({
               variant={inspectorMode === 'alternatives' ? 'secondary' : 'ghost'}
               size="sm"
               className="h-7 px-2 text-xs"
-              onClick={() => onInspectorModeChange('alternatives')}
+              onClick={() => {
+                onInspectorModeChange('alternatives');
+                onOpenAlternatives();
+              }}
             >
               Alternatives
             </Button>
@@ -83,7 +89,7 @@ export function EditorInspector({
             selectedSlot={selectedSlot}
             alternativesIntent={alternativesIntent}
             onShowAllAlternatives={onShowAllAlternatives}
-            onUseAlternative={onUseAlternative}
+            onOpenAlternatives={onOpenAlternatives}
           />
         )
       ) : (
@@ -192,13 +198,15 @@ function AlternativesPanel({
   selectedSlot,
   alternativesIntent,
   onShowAllAlternatives,
-  onUseAlternative,
+  onOpenAlternatives,
 }: {
   selectedSlot: EditorPaperSlotView;
   alternativesIntent: AlternativesIntent;
   onShowAllAlternatives: () => void;
-  onUseAlternative: (questionId: string) => void;
+  onOpenAlternatives: () => void;
 }) {
+  const hasAlternatives = selectedSlot.alternateQuestions.length > 0;
+
   return (
     <div className="mt-4 space-y-3 text-sm">
       <div>
@@ -209,16 +217,22 @@ function AlternativesPanel({
             : `${selectedSlot.alternateQuestions.length} slot-safe option${selectedSlot.alternateQuestions.length === 1 ? '' : 's'}`}
         </p>
       </div>
-      {selectedSlot.alternateQuestions.length > 0 ? (
-        <div className="space-y-2">
-          {selectedSlot.alternateQuestions.map((alternative) => (
-            <AlternativeCard
-              key={alternative.questionId}
-              alternative={alternative}
-              disabled={selectedSlot.locked}
-              onUseAlternative={onUseAlternative}
-            />
-          ))}
+      {hasAlternatives ? (
+        <div className="rounded-md border bg-secondary/60 p-3">
+          <p className="leading-6 text-muted-foreground">
+            Open the full comparison view to scan question text, source,
+            chapter, topics, difficulty, and relevance.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-3 w-full"
+            onClick={onOpenAlternatives}
+          >
+            <Maximize2 className="mr-2 h-4 w-4" aria-hidden="true" />
+            Open alternatives
+          </Button>
         </div>
       ) : (
         <div className="space-y-2 rounded-md border p-3">
@@ -241,61 +255,6 @@ function AlternativesPanel({
         </div>
       )}
     </div>
-  );
-}
-
-function AlternativeCard({
-  alternative,
-  disabled,
-  onUseAlternative,
-}: {
-  alternative: EditorQuestionAlternativeView;
-  disabled: boolean;
-  onUseAlternative: (questionId: string) => void;
-}) {
-  const relevance = formatRelevance(alternative.cbseRelevance);
-
-  return (
-    <div className="rounded-md border p-3">
-      <p className="font-medium leading-5">{alternative.questionText}</p>
-      <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-        <MetadataChip>{`${alternative.marks} marks`}</MetadataChip>
-        <MetadataChip>
-          {formatQuestionType(alternative.questionType)}
-        </MetadataChip>
-        <MetadataChip>{alternative.difficulty}</MetadataChip>
-        {relevance && <MetadataChip>{`${relevance} relevance`}</MetadataChip>}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-        {alternative.chapterNames.map((chapterName) => (
-          <MetadataChip key={chapterName}>{chapterName}</MetadataChip>
-        ))}
-        {alternative.topicNames.map((topicName) => (
-          <MetadataChip key={topicName}>{topicName}</MetadataChip>
-        ))}
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        {alternative.sourceName}
-      </p>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="mt-3 w-full"
-        disabled={disabled}
-        onClick={() => onUseAlternative(alternative.questionId)}
-      >
-        Use this question
-      </Button>
-    </div>
-  );
-}
-
-function MetadataChip({ children }: { children: string | number }) {
-  return (
-    <span className="rounded border bg-secondary px-1.5 py-0.5 text-muted-foreground">
-      {children}
-    </span>
   );
 }
 

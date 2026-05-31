@@ -40,6 +40,7 @@ import {
   setSlotRegionOverride,
 } from '@/lib/paper-document';
 import {
+  EditorAlternativesOverlay,
   EditorInspector,
   EditorOutlineRail,
   PaperChromeEditor,
@@ -69,8 +70,10 @@ export default function EditorPage() {
     string | null
   >(null);
   const [inspectorMode, setInspectorMode] = useState<InspectorMode>('info');
+  const [inspectorHighlighted, setInspectorHighlighted] = useState(false);
   const [alternativesIntent, setAlternativesIntent] =
     useState<AlternativesIntent>('swap');
+  const [alternativesOverlayOpen, setAlternativesOverlayOpen] = useState(false);
   const [chatValue, setChatValue] = useState('');
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
@@ -78,6 +81,8 @@ export default function EditorPage() {
     Record<string, number>
   >({});
   const chatInputRef = useRef<HTMLInputElement>(null);
+  const alternativesOpenerRef = useRef<HTMLElement | null>(null);
+  const inspectorHighlightTimeoutRef = useRef<number | null>(null);
   const view = useMemo(
     () =>
       buildEditorPaperView(paperState.document, {
@@ -102,12 +107,14 @@ export default function EditorPage() {
       if (!(target instanceof Element)) return;
       if (
         target.closest(
-          '[data-question-slot], .qpg-question-action-rail, .editor-inspector',
+          '[data-question-slot], .qpg-question-action-rail, .editor-inspector, .editor-alternatives-overlay, .editor-chat-footer, .editor-left-rail, header',
         )
       ) {
         return;
       }
       setActiveRailSlotId(null);
+      setSelectedSlotId(null);
+      setSelectedChromeBlockId(null);
     }
 
     window.document.addEventListener('pointerdown', handleOutsidePointerDown);
@@ -116,6 +123,14 @@ export default function EditorPage() {
         'pointerdown',
         handleOutsidePointerDown,
       );
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (inspectorHighlightTimeoutRef.current !== null) {
+        window.clearTimeout(inspectorHighlightTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -147,10 +162,11 @@ export default function EditorPage() {
     }));
   }
 
-  function handleSelectSlot(slotId: string) {
+  function handleSelectSlot(slotId: string, mode: InspectorMode = 'info') {
     setSelectedChromeBlockId(null);
     setSelectedSlotId(slotId);
     setActiveRailSlotId(slotId);
+    setInspectorMode(mode);
   }
 
   function handleSelectChromeBlock(regionKey: string) {
@@ -160,14 +176,21 @@ export default function EditorPage() {
   }
 
   function handleShowInfo(slotId: string) {
-    handleSelectSlot(slotId);
-    setInspectorMode('info');
+    handleSelectSlot(slotId, 'info');
+    setInspectorHighlighted(true);
+    if (inspectorHighlightTimeoutRef.current !== null) {
+      window.clearTimeout(inspectorHighlightTimeoutRef.current);
+    }
+    inspectorHighlightTimeoutRef.current = window.setTimeout(() => {
+      setInspectorHighlighted(false);
+      inspectorHighlightTimeoutRef.current = null;
+    }, 900);
   }
 
   function handleShowAlternatives(slotId: string, intent: AlternativesIntent) {
-    handleSelectSlot(slotId);
+    handleSelectSlot(slotId, 'alternatives');
     setAlternativesIntent(intent);
-    setInspectorMode('alternatives');
+    openAlternativesOverlay();
   }
 
   function handleToggleLock(slotId: string, locked: boolean) {
@@ -183,19 +206,11 @@ export default function EditorPage() {
       .find((candidate) => candidate.slotId === slotId);
     if (!slot) return;
 
-    if (
-      slot.modifiedFromSource &&
-      !window.confirm(
-        'Replacing this question will clear manual edits for this slot. Continue?',
-      )
-    ) {
-      return;
-    }
-
     handleSelectSlot(slotId);
     setPaperState((currentState) =>
       setSlotSelectedQuestion(currentState, slotId, questionId),
     );
+    setAlternativesOverlayOpen(false);
     setRestoreVersionBySlotId((currentVersions) => ({
       ...currentVersions,
       [slotId]: (currentVersions[slotId] ?? 0) + 1,
@@ -206,6 +221,19 @@ export default function EditorPage() {
     handleSelectSlot(slotId);
     setChatValue(`Question ${displayNumber}: `);
     window.setTimeout(() => chatInputRef.current?.focus(), 0);
+  }
+
+  function openAlternativesOverlay() {
+    alternativesOpenerRef.current =
+      window.document.activeElement instanceof HTMLElement
+        ? window.document.activeElement
+        : null;
+    setAlternativesOverlayOpen(true);
+  }
+
+  function closeAlternativesOverlay() {
+    setAlternativesOverlayOpen(false);
+    window.setTimeout(() => alternativesOpenerRef.current?.focus(), 0);
   }
 
   return (
@@ -538,17 +566,30 @@ export default function EditorPage() {
           alternativesIntent={alternativesIntent}
           onInspectorModeChange={setInspectorMode}
           onShowAllAlternatives={() => setAlternativesIntent('swap')}
-          onUseAlternative={(questionId) => {
-            if (!selectedSlot) return;
-            handleUseAlternative(selectedSlot.slotId, questionId);
-          }}
+          onOpenAlternatives={openAlternativesOverlay}
           onRestoreSelectedSlot={handleRestoreSelectedSlot}
+          highlighted={inspectorHighlighted}
         />
       </div>
 
+      {alternativesOverlayOpen && selectedSlot && selectedQuestion && (
+        <div className="editor-alternatives-overlay">
+          <EditorAlternativesOverlay
+            selectedSlot={selectedSlot}
+            selectedQuestion={selectedQuestion}
+            alternativesIntent={alternativesIntent}
+            onAlternativesIntentChange={setAlternativesIntent}
+            onClose={closeAlternativesOverlay}
+            onUseAlternative={(questionId) =>
+              handleUseAlternative(selectedSlot.slotId, questionId)
+            }
+          />
+        </div>
+      )}
+
       <div
         data-editor-chrome
-        className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 px-4 py-3 backdrop-blur"
+        className="editor-chat-footer fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 px-4 py-3 backdrop-blur"
       >
         <div className="mx-auto flex max-w-3xl items-center gap-3 rounded-lg border bg-background p-2">
           <MessageSquareText

@@ -10,16 +10,7 @@
  *
  * @module QuestionActionRail
  */
-import {
-  Info,
-  Lock,
-  MessageSquareText,
-  Shuffle,
-  Tags,
-  TrendingDown,
-  TrendingUp,
-  Unlock,
-} from 'lucide-react';
+import { Info, Lock, MessageSquareText, Shuffle, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AlternativesIntent } from './editor-types';
 
@@ -69,45 +60,6 @@ export function QuestionActionRail({
       >
         <Shuffle className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
         Swap
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Find same-topic options'}
-        aria-label="Find same-topic alternatives"
-        disabled={locked}
-        onClick={() => onAlternatives('topic')}
-      >
-        <Tags className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Topic
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Find easier alternatives'}
-        aria-label="Find easier alternatives"
-        disabled={locked}
-        onClick={() => onAlternatives('easier')}
-      >
-        <TrendingDown className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Easier
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Find harder alternatives'}
-        aria-label="Find harder alternatives"
-        disabled={locked}
-        onClick={() => onAlternatives('harder')}
-      >
-        <TrendingUp className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Harder
       </Button>
       <Button
         type="button"

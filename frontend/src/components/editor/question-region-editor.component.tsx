@@ -48,6 +48,8 @@ function ActiveQuestionRegionEditor({
   const mountedRef = useRef(false);
   const suppressInitialChangeRef = useRef(true);
   const latestContentRef = useRef(region.content);
+  const committedContentRef = useRef(region.content);
+  const onCommitRef = useRef(onCommit);
   const editor = useCreateBlockNote(
     {
       animations: false,
@@ -57,21 +59,39 @@ function ActiveQuestionRegionEditor({
   );
 
   useEffect(() => {
+    onCommitRef.current = onCommit;
+  }, [onCommit]);
+
+  useEffect(() => {
     mountedRef.current = true;
     suppressInitialChangeRef.current = true;
     latestContentRef.current = region.content;
+    committedContentRef.current = region.content;
     const timeoutId = window.setTimeout(() => {
       suppressInitialChangeRef.current = false;
     }, 0);
 
     return () => {
+      commitLatestContent();
       mountedRef.current = false;
       window.clearTimeout(timeoutId);
     };
   }, [region.content, region.regionKey, region.text]);
 
+  function commitLatestContent() {
+    if (
+      JSON.stringify(latestContentRef.current) ===
+      JSON.stringify(committedContentRef.current)
+    ) {
+      return;
+    }
+
+    onCommitRef.current(latestContentRef.current);
+    committedContentRef.current = latestContentRef.current;
+  }
+
   function handleCommit() {
-    onCommit(latestContentRef.current);
+    commitLatestContent();
   }
 
   return (
