@@ -4,6 +4,7 @@ Pure helpers (strip_hindi, segment_questions) tested directly.
 Ingestor coordinator tested end-to-end with stub Parser/Tagger adapters —
 no mock.patch on module globals.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -24,7 +25,6 @@ from bank.ingestor import (
     strip_hindi,
 )
 from bank.models import Chapter, Question
-
 
 # ---------------------------------------------------------------------------
 # strip_hindi
@@ -161,9 +161,9 @@ def test_ingestor_persists_unverified_questions_with_tags():
     """
     parser = StubParser(_SAMPLE_TEXT)
     tagger = StubTagger(chapter_slug="electricity", level="Ap")
-    result = Ingestor(
-        parser=parser, segmenter=RegexSegmenter(), tagger=tagger
-    ).ingest(b"ignored")
+    result = Ingestor(parser=parser, segmenter=RegexSegmenter(), tagger=tagger).ingest(
+        b"ignored"
+    )
 
     assert result.created == 5
     assert Question.objects.count() == 5
@@ -178,9 +178,9 @@ def test_ingestor_persists_unverified_questions_with_tags():
 def test_ingestor_empty_pdf_creates_nothing():
     parser = StubParser("")
     tagger = StubTagger(chapter_slug="electricity")
-    result = Ingestor(
-        parser=parser, segmenter=RegexSegmenter(), tagger=tagger
-    ).ingest(b"")
+    result = Ingestor(parser=parser, segmenter=RegexSegmenter(), tagger=tagger).ingest(
+        b""
+    )
 
     assert result.created == 0
     assert Question.objects.count() == 0
@@ -189,12 +189,12 @@ def test_ingestor_empty_pdf_creates_nothing():
 
 @pytest.mark.django_db
 def test_ingestor_unknown_chapter_slug_persists_without_chapter():
-    """Tagger returns a slug not in the bank → chapter stays None, ingestion still succeeds."""
+    """Tagger returns an unknown slug → chapter stays None, ingestion succeeds."""
     parser = StubParser(_SAMPLE_TEXT)
     tagger = StubTagger(chapter_slug="no-such-chapter")
-    result = Ingestor(
-        parser=parser, segmenter=RegexSegmenter(), tagger=tagger
-    ).ingest(b"x")
+    result = Ingestor(parser=parser, segmenter=RegexSegmenter(), tagger=tagger).ingest(
+        b"x"
+    )
 
     assert result.created == 5
     assert all(q.chapter_id is None for q in Question.objects.all())
@@ -234,12 +234,20 @@ def test_llm_tagger_calls_client_and_attaches_tags():
     """
     raw = [
         {"section": "A", "qtype": "mcq", "marks": 1, "text": "Q one", "options": []},
-        {"section": "B", "qtype": "very_short_answer", "marks": 2, "text": "Q two", "options": []},
+        {
+            "section": "B",
+            "qtype": "very_short_answer",
+            "marks": 2,
+            "text": "Q two",
+            "options": [],
+        },
     ]
-    client = StubLLMClient(tags=[
-        {"index": 0, "chapter_slug": "electricity", "cognitive_level": "R"},
-        {"index": 1, "chapter_slug": "life-processes", "cognitive_level": "Ap"},
-    ])
+    client = StubLLMClient(
+        tags=[
+            {"index": 0, "chapter_slug": "electricity", "cognitive_level": "R"},
+            {"index": 1, "chapter_slug": "life-processes", "cognitive_level": "Ap"},
+        ]
+    )
     tagged = LLMTagger(client=client).tag(raw, chapters=[])
 
     assert tagged[0]["chapter_slug"] == "electricity"
@@ -427,7 +435,10 @@ def test_compute_parse_quality_broken_mcq_missing_options():
 
 
 def test_compute_parse_quality_clean_mcq_four_options():
-    opts = [{"label": l, "text": t} for l, t in [("A", "O2"), ("B", "CO2"), ("C", "N2"), ("D", "H2")]]
+    opts = [
+        {"label": label, "text": t}
+        for label, t in [("A", "O2"), ("B", "CO2"), ("C", "N2"), ("D", "H2")]
+    ]
     content = {"stem": [{"type": "paragraph", "text": "Which gas?"}], "options": []}
     raw_q = {"text": "Which gas?", "options": opts, "content": content}
     assert _compute_parse_quality(raw_q, "mcq") == "clean"
@@ -510,7 +521,7 @@ def test_llm_segmenter_empty_text_skips_llm_call():
 
 
 def test_llm_segmenter_malformed_response_falls_back_to_regex():
-    """A bad LLM round-trip must degrade to the deterministic rules, not drop the paper."""
+    """A bad LLM round-trip must degrade to deterministic rules, not drop the paper."""
 
     class BadLLMClient:
         def __init__(self):
@@ -562,7 +573,7 @@ def test_verify_faithful_text_keeps_structural_quality():
 
 
 def test_verify_coverage_mismatch_degrades_clean_to_partial():
-    """Fewer emitted questions than source anchors → can't trust completeness → partial."""
+    """Fewer questions than source anchors → can't trust completeness → partial."""
     source = "1. Which gas is released during photosynthesis?\n2. Define inertia.\n"
     q = {
         "section": "A",
@@ -578,14 +589,25 @@ def test_verify_coverage_mismatch_degrades_clean_to_partial():
 
 def test_verify_out_of_order_question_is_broken():
     """Questions emitted out of source reading order signal a merge/reorder error."""
-    source = "1. First question about photosynthesis here.\n2. Second question about inertia here.\n"
+    source = (
+        "1. First question about photosynthesis here.\n"
+        "2. Second question about inertia here.\n"
+    )
     first = {
-        "section": "A", "qtype": "short_answer", "marks": 1,
-        "text": "First question about photosynthesis here.", "options": [], "content": {},
+        "section": "A",
+        "qtype": "short_answer",
+        "marks": 1,
+        "text": "First question about photosynthesis here.",
+        "options": [],
+        "content": {},
     }
     second = {
-        "section": "A", "qtype": "short_answer", "marks": 1,
-        "text": "Second question about inertia here.", "options": [], "content": {},
+        "section": "A",
+        "qtype": "short_answer",
+        "marks": 1,
+        "text": "Second question about inertia here.",
+        "options": [],
+        "content": {},
     }
     out = _verify([second, first], source)  # emitted in reversed order
     assert out[0]["parse_quality"] != "broken"  # first emitted establishes position
@@ -594,7 +616,9 @@ def test_verify_out_of_order_question_is_broken():
 
 def test_verify_swapped_mcq_options_is_broken():
     """Option texts emitted out of source order = swapped labels → broken."""
-    source = "Which gas is released during photosynthesis?\n(A) CO2 (B) O2 (C) N2 (D) H2\n"
+    source = (
+        "Which gas is released during photosynthesis?\n(A) CO2 (B) O2 (C) N2 (D) H2\n"
+    )
     q = {
         "section": "A",
         "qtype": "mcq",
@@ -631,12 +655,20 @@ def test_ingestor_verification_marks_hallucinated_row_broken():
     hallucinations cap yield (excluded by the picker) instead of corrupting the bank."""
     source = "SECTION A\n1. Which gas is released during photosynthesis?\n"
     faithful = {
-        "section": "A", "qtype": "short_answer", "marks": 1,
-        "text": "Which gas is released during photosynthesis?", "options": [], "content": {},
+        "section": "A",
+        "qtype": "short_answer",
+        "marks": 1,
+        "text": "Which gas is released during photosynthesis?",
+        "options": [],
+        "content": {},
     }
     fabricated = {
-        "section": "A", "qtype": "short_answer", "marks": 1,
-        "text": "Explain quantum chromodynamics in full detail.", "options": [], "content": {},
+        "section": "A",
+        "qtype": "short_answer",
+        "marks": 1,
+        "text": "Explain quantum chromodynamics in full detail.",
+        "options": [],
+        "content": {},
     }
     result = Ingestor(
         parser=StubParser(source),
