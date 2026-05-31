@@ -180,6 +180,51 @@ export function setSlotLockState(
   };
 }
 
+export function setSlotSelectedQuestion(
+  state: NormalizedPaperDocument,
+  slotId: string,
+  selectedQuestionId: string,
+): NormalizedPaperDocument {
+  const resetOverrides: SlotOverrides = {
+    modifiedFromSource: false,
+    regions: {},
+  };
+
+  return {
+    ...state,
+    slotEditsById: {
+      ...state.slotEditsById,
+      [slotId]: resetOverrides,
+    },
+    slotsById: {
+      ...state.slotsById,
+      [slotId]: {
+        ...state.slotsById[slotId],
+        selectedQuestionId,
+        overrides: resetOverrides,
+      },
+    },
+    document: {
+      ...state.document,
+      paper: {
+        ...state.document.paper,
+        sections: state.document.paper.sections.map((section) => ({
+          ...section,
+          slots: section.slots.map((slot) =>
+            slot.slotId === slotId
+              ? {
+                  ...slot,
+                  selectedQuestionId,
+                  overrides: resetOverrides,
+                }
+              : slot,
+          ),
+        })),
+      },
+    },
+  };
+}
+
 export function setPaperChromeText(
   state: NormalizedPaperDocument,
   regionKey: string,

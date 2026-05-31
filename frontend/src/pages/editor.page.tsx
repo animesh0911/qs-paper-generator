@@ -18,378 +18,42 @@
  * @module EditorPage
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useCreateBlockNote } from '@blocknote/react';
-import { BlockNoteView } from '@blocknote/mantine';
 import {
   CheckCircle2,
   Download,
   FileCheck2,
-  Info,
   Lock,
   MessageSquareText,
   RotateCcw,
   Save,
-  SearchCheck,
-  Shuffle,
-  Tags,
-  TrendingDown,
-  TrendingUp,
-  Unlock,
 } from 'lucide-react';
 import '@blocknote/mantine/style.css';
 import { mockPaperDocumentV1 } from '@/mocks';
-import {
-  blockNoteBlocksToContentItems,
-  blockNoteBlocksToText,
-  buildEditorPaperView,
-  type EditorPaperChromeBlock,
-  type EditorQuestionRegionBlock,
-} from '@/lib/editor-paper';
+import { buildEditorPaperView } from '@/lib/editor-paper';
 import {
   assertPaperDocument,
   normalizePaperDocument,
   restoreSlotSource,
   setPaperChromeText,
   setSlotLockState,
+  setSlotSelectedQuestion,
   setSlotRegionOverride,
 } from '@/lib/paper-document';
+import {
+  EditorInspector,
+  EditorOutlineRail,
+  PaperChromeEditor,
+  QuestionActionRail,
+  QuestionRegionEditor,
+  type AlternativesIntent,
+  type InspectorMode,
+} from '@/components/editor';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ContentItem } from '@/types';
 
-type InspectorMode = 'info' | 'alternatives';
-type AlternativesIntent = 'swap' | 'topic' | 'easier' | 'harder';
-
-function QuestionRegionEditor({
-  region,
-  editable,
-  onCommit,
-}: {
-  region: EditorQuestionRegionBlock;
-  editable: boolean;
-  onCommit: (content: ContentItem[]) => void;
-}) {
-  if (!editable) {
-    return (
-      <div className="qpg-question-blocknote qpg-question-region-text">
-        {region.text}
-      </div>
-    );
-  }
-
-  return <ActiveQuestionRegionEditor region={region} onCommit={onCommit} />;
-}
-
-function ActiveQuestionRegionEditor({
-  region,
-  onCommit,
-}: {
-  region: EditorQuestionRegionBlock;
-  onCommit: (content: ContentItem[]) => void;
-}) {
-  const mountedRef = useRef(false);
-  const suppressInitialChangeRef = useRef(true);
-  const latestContentRef = useRef(region.content);
-  const editor = useCreateBlockNote(
-    {
-      animations: false,
-      initialContent: region.blockNoteBlocks,
-    },
-    [region.regionKey, region.text],
-  );
-
-  useEffect(() => {
-    mountedRef.current = true;
-    suppressInitialChangeRef.current = true;
-    latestContentRef.current = region.content;
-    const timeoutId = window.setTimeout(() => {
-      suppressInitialChangeRef.current = false;
-    }, 0);
-
-    return () => {
-      mountedRef.current = false;
-      window.clearTimeout(timeoutId);
-    };
-  }, [region.content, region.regionKey, region.text]);
-
-  function handleCommit() {
-    onCommit(latestContentRef.current);
-  }
-
-  return (
-    <div onBlurCapture={handleCommit}>
-      <BlockNoteView
-        editor={editor}
-        editable
-        onChange={(changedEditor) => {
-          if (!mountedRef.current || suppressInitialChangeRef.current) return;
-          latestContentRef.current = blockNoteBlocksToContentItems(
-            changedEditor.document,
-          );
-        }}
-        formattingToolbar={false}
-        linkToolbar={false}
-        slashMenu={false}
-        sideMenu={false}
-        filePanel={false}
-        tableHandles={false}
-        emojiPicker={false}
-        comments={false}
-        className="qpg-question-blocknote"
-      />
-    </div>
-  );
-}
-
-function PaperChromeEditor({
-  block,
-  editable,
-  className,
-  onCommit,
-}: {
-  block: EditorPaperChromeBlock;
-  editable: boolean;
-  className?: string;
-  onCommit: (text: string) => void;
-}) {
-  if (!editable) {
-    return (
-      <div className={cn('qpg-paper-chrome-text', className)}>
-        {block.text.split('\n').map((line, index) => (
-          <p key={`${block.regionKey}:${index}`}>{line}</p>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <ActivePaperChromeEditor
-      block={block}
-      className={className}
-      onCommit={onCommit}
-    />
-  );
-}
-
-function ActivePaperChromeEditor({
-  block,
-  className,
-  onCommit,
-}: {
-  block: EditorPaperChromeBlock;
-  className?: string;
-  onCommit: (text: string) => void;
-}) {
-  const mountedRef = useRef(false);
-  const suppressInitialChangeRef = useRef(true);
-  const latestTextRef = useRef(block.text);
-  const editor = useCreateBlockNote(
-    {
-      animations: false,
-      initialContent: block.blockNoteBlocks,
-    },
-    [block.regionKey, block.text],
-  );
-
-  useEffect(() => {
-    mountedRef.current = true;
-    suppressInitialChangeRef.current = true;
-    latestTextRef.current = block.text;
-    const timeoutId = window.setTimeout(() => {
-      suppressInitialChangeRef.current = false;
-    }, 0);
-
-    return () => {
-      mountedRef.current = false;
-      window.clearTimeout(timeoutId);
-    };
-  }, [block.regionKey, block.text]);
-
-  function handleCommit() {
-    onCommit(latestTextRef.current);
-  }
-
-  return (
-    <div onBlurCapture={handleCommit}>
-      <BlockNoteView
-        editor={editor}
-        editable
-        onChange={(changedEditor) => {
-          if (!mountedRef.current || suppressInitialChangeRef.current) return;
-          latestTextRef.current = blockNoteBlocksToText(
-            changedEditor.document,
-          ).join('\n');
-        }}
-        formattingToolbar={false}
-        linkToolbar={false}
-        slashMenu={false}
-        sideMenu={false}
-        filePanel={false}
-        tableHandles={false}
-        emojiPicker={false}
-        comments={false}
-        className={cn('qpg-question-blocknote', className)}
-      />
-    </div>
-  );
-}
-
 function contentItemsEqual(left: ContentItem[], right: ContentItem[]) {
   return JSON.stringify(left) === JSON.stringify(right);
-}
-
-function formatQuestionType(questionType: string) {
-  return questionType.replace(/_/g, ' ');
-}
-
-function formatRelevance(relevance: string | number | undefined) {
-  if (relevance === undefined) return undefined;
-  return typeof relevance === 'number' ? `${relevance}/100` : relevance;
-}
-
-function sourceDetails(source: {
-  fileName?: string;
-  pageNumber?: number;
-  originalQuestionNumber?: string;
-}) {
-  return [
-    source.fileName,
-    source.pageNumber ? `p. ${source.pageNumber}` : undefined,
-    source.originalQuestionNumber
-      ? `Q${source.originalQuestionNumber}`
-      : undefined,
-  ].filter((value): value is string => Boolean(value));
-}
-
-function alternativesHeading(intent: AlternativesIntent) {
-  switch (intent) {
-    case 'topic':
-      return 'Topic alternatives';
-    case 'easier':
-      return 'Easier alternatives';
-    case 'harder':
-      return 'Harder alternatives';
-    default:
-      return 'Swap alternatives';
-  }
-}
-
-function QuestionActionRail({
-  locked,
-  onInfo,
-  onAlternatives,
-  onToggleLock,
-  onAsk,
-}: {
-  locked: boolean;
-  onInfo: () => void;
-  onAlternatives: (intent: AlternativesIntent) => void;
-  onToggleLock: () => void;
-  onAsk: () => void;
-}) {
-  const replacementDisabledLabel =
-    'Unlock this question before choosing replacements.';
-
-  return (
-    <div
-      data-editor-chrome
-      className="qpg-question-action-rail absolute left-[calc(100%+0.5rem)] top-3 z-10 flex w-28 flex-col gap-1 rounded-lg border bg-background p-1 shadow-[0_8px_24px_rgba(15,23,42,0.12)] max-lg:left-auto max-lg:right-3"
-      onClick={(event) => event.stopPropagation()}
-    >
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title="Show question info"
-        aria-label="Show question info"
-        onClick={onInfo}
-      >
-        <Info className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Info
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Show swap alternatives'}
-        aria-label="Show swap alternatives"
-        disabled={locked}
-        onClick={() => onAlternatives('swap')}
-      >
-        <Shuffle className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Swap
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Find same-topic options'}
-        aria-label="Find same-topic alternatives"
-        disabled={locked}
-        onClick={() => onAlternatives('topic')}
-      >
-        <Tags className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Topic
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Find easier alternatives'}
-        aria-label="Find easier alternatives"
-        disabled={locked}
-        onClick={() => onAlternatives('easier')}
-      >
-        <TrendingDown className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Easier
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Find harder alternatives'}
-        aria-label="Find harder alternatives"
-        disabled={locked}
-        onClick={() => onAlternatives('harder')}
-      >
-        <TrendingUp className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Harder
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={locked ? 'Unlock question' : 'Lock question'}
-        aria-label={locked ? 'Unlock question' : 'Lock question'}
-        onClick={onToggleLock}
-      >
-        {locked ? (
-          <Unlock className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        ) : (
-          <Lock className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        )}
-        {locked ? 'Unlock' : 'Lock'}
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title="Ask about this question"
-        aria-label="Ask about this question"
-        onClick={onAsk}
-      >
-        <MessageSquareText className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Ask
-      </Button>
-    </div>
-  );
 }
 
 export default function EditorPage() {
@@ -400,6 +64,7 @@ export default function EditorPage() {
   );
   const [paperState, setPaperState] = useState(initialPaperState);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [activeRailSlotId, setActiveRailSlotId] = useState<string | null>(null);
   const [selectedChromeBlockId, setSelectedChromeBlockId] = useState<
     string | null
   >(null);
@@ -417,8 +82,11 @@ export default function EditorPage() {
     () =>
       buildEditorPaperView(paperState.document, {
         slotEditsById: paperState.slotEditsById,
+        alternativesIntentBySlotId: selectedSlotId
+          ? { [selectedSlotId]: alternativesIntent }
+          : undefined,
       }),
-    [paperState],
+    [alternativesIntent, paperState, selectedSlotId],
   );
 
   const selectedSlot = view.sections
@@ -427,6 +95,29 @@ export default function EditorPage() {
   const selectedQuestion = selectedSlot?.questionBlockTree.questionId
     ? paperState.questionsById[selectedSlot.questionBlockTree.questionId]
     : undefined;
+
+  useEffect(() => {
+    function handleOutsidePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (
+        target.closest(
+          '[data-question-slot], .qpg-question-action-rail, .editor-inspector',
+        )
+      ) {
+        return;
+      }
+      setActiveRailSlotId(null);
+    }
+
+    window.document.addEventListener('pointerdown', handleOutsidePointerDown);
+    return () => {
+      window.document.removeEventListener(
+        'pointerdown',
+        handleOutsidePointerDown,
+      );
+    };
+  }, []);
 
   function handleRegionChange(
     slotId: string,
@@ -459,10 +150,12 @@ export default function EditorPage() {
   function handleSelectSlot(slotId: string) {
     setSelectedChromeBlockId(null);
     setSelectedSlotId(slotId);
+    setActiveRailSlotId(slotId);
   }
 
   function handleSelectChromeBlock(regionKey: string) {
     setSelectedSlotId(null);
+    setActiveRailSlotId(null);
     setSelectedChromeBlockId(regionKey);
   }
 
@@ -471,10 +164,7 @@ export default function EditorPage() {
     setInspectorMode('info');
   }
 
-  function handleShowAlternatives(
-    slotId: string,
-    intent: AlternativesIntent,
-  ) {
+  function handleShowAlternatives(slotId: string, intent: AlternativesIntent) {
     handleSelectSlot(slotId);
     setAlternativesIntent(intent);
     setInspectorMode('alternatives');
@@ -485,6 +175,31 @@ export default function EditorPage() {
     setPaperState((currentState) =>
       setSlotLockState(currentState, slotId, !locked),
     );
+  }
+
+  function handleUseAlternative(slotId: string, questionId: string) {
+    const slot = view.sections
+      .flatMap((section) => section.slots)
+      .find((candidate) => candidate.slotId === slotId);
+    if (!slot) return;
+
+    if (
+      slot.modifiedFromSource &&
+      !window.confirm(
+        'Replacing this question will clear manual edits for this slot. Continue?',
+      )
+    ) {
+      return;
+    }
+
+    handleSelectSlot(slotId);
+    setPaperState((currentState) =>
+      setSlotSelectedQuestion(currentState, slotId, questionId),
+    );
+    setRestoreVersionBySlotId((currentVersions) => ({
+      ...currentVersions,
+      [slotId]: (currentVersions[slotId] ?? 0) + 1,
+    }));
   }
 
   function handleAskQuestion(slotId: string, displayNumber: string) {
@@ -547,57 +262,7 @@ export default function EditorPage() {
       </header>
 
       <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:hidden max-lg:[&_.editor-left-rail]:static max-sm:px-3">
-        <aside
-          data-editor-chrome
-          className="editor-left-rail sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-3 max-lg:order-2 max-lg:h-auto"
-        >
-          <h2 className="mb-3 text-sm font-semibold">Paper outline</h2>
-          <nav aria-label="Paper sections" className="space-y-1">
-            {view.outline.map((item) => (
-              <a
-                key={item.sectionId}
-                href={`#section-${item.sectionId}`}
-                className="flex items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <span>{item.title}</span>
-                <span className="text-xs text-muted-foreground">
-                  {item.slotCount} q · {item.marks}m
-                </span>
-              </a>
-            ))}
-          </nav>
-
-          <div className="mt-5 border-t pt-4">
-            <h2 className="mb-3 text-sm font-semibold">Validation</h2>
-            <dl className="grid grid-cols-2 gap-2 text-sm">
-              <div className="rounded-md bg-secondary p-2">
-                <dt className="text-xs text-muted-foreground">Filled</dt>
-                <dd className="font-semibold">
-                  {view.validationSummary.filledSlots}/
-                  {view.validationSummary.totalSlots}
-                </dd>
-              </div>
-              <div className="rounded-md bg-secondary p-2">
-                <dt className="text-xs text-muted-foreground">Locked</dt>
-                <dd className="font-semibold">
-                  {view.validationSummary.lockedSlots}
-                </dd>
-              </div>
-            </dl>
-            {view.validationSummary.warnings.length === 0 ? (
-              <p className="mt-3 flex items-center gap-2 text-sm text-emerald-700">
-                <SearchCheck className="h-4 w-4" aria-hidden="true" />
-                No structural warnings
-              </p>
-            ) : (
-              <ul className="mt-3 space-y-2 text-sm text-destructive">
-                {view.validationSummary.warnings.map((warning) => (
-                  <li key={warning}>{warning}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </aside>
+        <EditorOutlineRail view={view} />
 
         <main className="flex justify-center max-lg:order-1">
           <article className="paper-canvas w-full max-w-[56rem] bg-background px-14 py-10 text-[15px] leading-7 shadow-none max-xl:px-10 max-lg:max-w-[48rem] max-sm:px-5 max-sm:py-8">
@@ -755,6 +420,7 @@ export default function EditorPage() {
                       {section.slots.map((slot) => (
                         <div
                           key={slot.slotId}
+                          data-question-slot
                           tabIndex={0}
                           aria-label={`Question ${slot.displayNumber}`}
                           onClick={() => handleSelectSlot(slot.slotId)}
@@ -837,7 +503,7 @@ export default function EditorPage() {
                           <div className="text-right text-sm font-medium">
                             [{slot.marksLabel}]
                           </div>
-                          {selectedSlotId === slot.slotId && (
+                          {activeRailSlotId === slot.slotId && (
                             <QuestionActionRail
                               locked={slot.locked}
                               onInfo={() => handleShowInfo(slot.slotId)}
@@ -865,214 +531,19 @@ export default function EditorPage() {
           </article>
         </main>
 
-        <aside
-          data-editor-chrome
-          className="editor-inspector sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-4"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold">Inspector</h2>
-            {selectedSlot && selectedQuestion && (
-              <div
-                className="flex rounded-md border bg-secondary p-0.5"
-                aria-label="Inspector mode"
-              >
-                <Button
-                  type="button"
-                  variant={inspectorMode === 'info' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2 text-xs"
-                  onClick={() => setInspectorMode('info')}
-                >
-                  Info
-                </Button>
-                <Button
-                  type="button"
-                  variant={
-                    inspectorMode === 'alternatives' ? 'secondary' : 'ghost'
-                  }
-                  size="sm"
-                  className="h-7 px-2 text-xs"
-                  onClick={() => setInspectorMode('alternatives')}
-                >
-                  Alternatives
-                </Button>
-              </div>
-            )}
-          </div>
-          {selectedSlot && selectedQuestion ? (
-            inspectorMode === 'info' ? (
-              <div className="mt-4 space-y-4 text-sm">
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    Question {selectedSlot.displayNumber}
-                  </p>
-                  <p className="mt-1 font-medium">
-                    {selectedQuestion.rawText}
-                  </p>
-                </div>
-                <dl className="space-y-3">
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Marks</dt>
-                    <dd>{selectedSlot.marksLabel}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Type</dt>
-                    <dd>{formatQuestionType(selectedSlot.questionType)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Chapter</dt>
-                    <dd>
-                      {selectedQuestion.metadata.chapterNames.join(', ') ||
-                        'Not tagged'}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Topics</dt>
-                    <dd>
-                      {selectedQuestion.metadata.topicNames?.join(', ') ||
-                        'Not tagged'}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">
-                      Difficulty
-                    </dt>
-                    <dd>{selectedQuestion.metadata.difficulty}</dd>
-                  </div>
-                  {formatRelevance(
-                    selectedQuestion.metadata.cbseRelevance,
-                  ) && (
-                    <div>
-                      <dt className="text-xs text-muted-foreground">
-                        CBSE relevance
-                      </dt>
-                      <dd>
-                        {formatRelevance(
-                          selectedQuestion.metadata.cbseRelevance,
-                        )}
-                      </dd>
-                    </div>
-                  )}
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Source</dt>
-                    <dd>{selectedQuestion.source.sourceName}</dd>
-                    {sourceDetails(selectedQuestion.source).length > 0 && (
-                      <dd className="text-xs text-muted-foreground">
-                        {sourceDetails(selectedQuestion.source).join(' · ')}
-                      </dd>
-                    )}
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">
-                      Lock state
-                    </dt>
-                    <dd>{selectedSlot.locked ? 'Locked' : 'Unlocked'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">
-                      Modified state
-                    </dt>
-                    <dd>
-                      {selectedSlot.modifiedFromSource
-                        ? 'Modified from source'
-                        : 'Original source text'}
-                    </dd>
-                  </div>
-                </dl>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  disabled={!selectedSlot.modifiedFromSource}
-                  onMouseDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    handleRestoreSelectedSlot();
-                  }}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleRestoreSelectedSlot();
-                  }}
-                >
-                  <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Restore original
-                </Button>
-              </div>
-            ) : (
-              <div className="mt-4 space-y-3 text-sm">
-                <div>
-                  <p className="font-medium">
-                    {alternativesHeading(alternativesIntent)}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    {selectedSlot.locked
-                      ? 'Unlock this question before replacing it.'
-                      : `${selectedSlot.alternateQuestions.length} slot-safe option${selectedSlot.alternateQuestions.length === 1 ? '' : 's'}`}
-                  </p>
-                </div>
-                {selectedSlot.alternateQuestions.length > 0 ? (
-                  <div className="space-y-2">
-                    {selectedSlot.alternateQuestions.map((alternative) => (
-                      <div
-                        key={alternative.questionId}
-                        className="rounded-md border p-3"
-                      >
-                        <p className="font-medium leading-5">
-                          {alternative.questionText}
-                        </p>
-                        <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <dt className="text-muted-foreground">Marks</dt>
-                            <dd>{alternative.marks}</dd>
-                          </div>
-                          <div>
-                            <dt className="text-muted-foreground">
-                              Difficulty
-                            </dt>
-                            <dd>{alternative.difficulty}</dd>
-                          </div>
-                          <div className="col-span-2">
-                            <dt className="text-muted-foreground">Chapter</dt>
-                            <dd>{alternative.chapterNames.join(', ')}</dd>
-                          </div>
-                          <div className="col-span-2">
-                            <dt className="text-muted-foreground">Topics</dt>
-                            <dd>
-                              {alternative.topicNames.join(', ') ||
-                                'Not tagged'}
-                            </dd>
-                          </div>
-                          <div className="col-span-2">
-                            <dt className="text-muted-foreground">Source</dt>
-                            <dd>{alternative.sourceName}</dd>
-                          </div>
-                        </dl>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="mt-3 w-full"
-                          disabled={selectedSlot.locked}
-                        >
-                          Use this question
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="rounded-md border p-3 text-muted-foreground">
-                    No slot-safe alternatives are available for this question.
-                  </p>
-                )}
-              </div>
-            )
-          ) : (
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Select a question to inspect source, chapter, difficulty, and safe
-              swap options.
-            </p>
-          )}
-        </aside>
+        <EditorInspector
+          selectedSlot={selectedSlot}
+          selectedQuestion={selectedQuestion}
+          inspectorMode={inspectorMode}
+          alternativesIntent={alternativesIntent}
+          onInspectorModeChange={setInspectorMode}
+          onShowAllAlternatives={() => setAlternativesIntent('swap')}
+          onUseAlternative={(questionId) => {
+            if (!selectedSlot) return;
+            handleUseAlternative(selectedSlot.slotId, questionId);
+          }}
+          onRestoreSelectedSlot={handleRestoreSelectedSlot}
+        />
       </div>
 
       <div

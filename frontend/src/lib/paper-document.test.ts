@@ -1,3 +1,11 @@
+/**
+ * Tests for PaperDocumentV1 validation and normalized editor state helpers.
+ *
+ * These tests pin the API-boundary contract checks and the state transitions
+ * used by editor actions so source questions stay immutable.
+ *
+ * @module paperDocumentTests
+ */
 import { describe, expect, it } from 'vitest';
 import { mockPaperDocumentV1 } from '@/mocks';
 import {
@@ -9,6 +17,7 @@ import {
   restoreSlotSource,
   setPaperChromeText,
   setSlotLockState,
+  setSlotSelectedQuestion,
   setSlotRegionOverride,
 } from './paper-document';
 
@@ -159,6 +168,43 @@ describe('PaperDocumentV1 normalization', () => {
     expect(lockedState.document.paper.sections[0].slots[0].locked).toBe(true);
     expect(lockedState.questionsById.q_mcq_heredity_001).toBe(
       state.questionsById.q_mcq_heredity_001,
+    );
+  });
+
+  it('replaces a slot selected question without changing slot placement or source questions', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const editedState = setSlotRegionOverride(state, 'slot_A_01', 'stem', [
+      {
+        type: 'paragraph',
+        text: 'Manual edit that belongs only to this Slot.',
+      },
+    ]);
+
+    const replacedState = setSlotSelectedQuestion(
+      editedState,
+      'slot_A_01',
+      'q_mcq_heredity_002',
+    );
+    const replacedSlot = replacedState.slotsById.slot_A_01;
+    const canonicalSlot = replacedState.document.paper.sections[0].slots[0];
+
+    expect(replacedSlot).toEqual({
+      ...state.slotsById.slot_A_01,
+      selectedQuestionId: 'q_mcq_heredity_002',
+      overrides: {
+        modifiedFromSource: false,
+        regions: {},
+      },
+    });
+    expect(canonicalSlot).toEqual(replacedSlot);
+    expect(replacedState.slotEditsById.slot_A_01).toEqual({
+      modifiedFromSource: false,
+      regions: {},
+    });
+    expect(replacedState.questionsById).toBe(editedState.questionsById);
+    expect(replacedState.questionsById.q_mcq_heredity_001.rawText).toBe(
+      state.questionsById.q_mcq_heredity_001.rawText,
     );
   });
 });

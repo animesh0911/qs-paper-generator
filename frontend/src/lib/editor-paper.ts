@@ -136,7 +136,10 @@ export interface EditorPaperView {
 
 export interface BuildEditorPaperViewOptions {
   slotEditsById?: Record<string, SlotOverrides>;
+  alternativesIntentBySlotId?: Record<string, EditorAlternativesIntent>;
 }
+
+export type EditorAlternativesIntent = 'swap' | 'topic' | 'easier' | 'harder';
 
 export function buildEditorPaperView(
   document: PaperDocument,
@@ -206,12 +209,14 @@ export function buildEditorPaperView(
         locked: slot.locked,
         modifiedFromSource: slotOverrides?.modifiedFromSource ?? false,
         questionBlockTree,
-        alternateQuestions: slot.alternateQuestionIds.flatMap((questionId) => {
-          const alternateQuestion = questionsById.get(questionId);
-          return alternateQuestion
-            ? [questionToAlternativeView(alternateQuestion)]
-            : [];
-        }),
+        alternateQuestions: filterAlternatives(
+          question,
+          slot.alternateQuestionIds.flatMap((questionId) => {
+            const alternateQuestion = questionsById.get(questionId);
+            return alternateQuestion ? [alternateQuestion] : [];
+          }),
+          options.alternativesIntentBySlotId?.[slot.slotId] ?? 'swap',
+        ).map(questionToAlternativeView),
         blockNoteBlocks:
           questionBlockTree.children.length > 0
             ? questionBlockTree.children.flatMap(
@@ -294,6 +299,67 @@ export function buildEditorPaperView(
       warnings,
     },
   };
+}
+
+function filterAlternatives(
+  currentQuestion: DocQuestion | undefined,
+  alternatives: DocQuestion[],
+  intent: EditorAlternativesIntent,
+) {
+  const candidates = currentQuestion
+    ? alternatives.filter(
+        (question) => question.questionId !== currentQuestion.questionId,
+      )
+    : alternatives;
+
+  if (!currentQuestion || intent === 'swap') return candidates;
+
+  if (intent === 'topic') {
+    const topicMatches = candidates.filter((candidate) =>
+      overlaps(
+        currentQuestion.metadata.topicNames ?? [],
+        candidate.metadata.topicNames ?? [],
+      ),
+    );
+    if (topicMatches.length > 0) return topicMatches;
+
+    return candidates.filter((candidate) =>
+      overlaps(
+        currentQuestion.metadata.chapterNames,
+        candidate.metadata.chapterNames,
+      ),
+    );
+  }
+
+  const currentDifficulty = difficultyRank(currentQuestion.metadata.difficulty);
+  if (currentDifficulty === undefined) return [];
+
+  return candidates.filter((candidate) => {
+    const candidateDifficulty = difficultyRank(candidate.metadata.difficulty);
+    if (candidateDifficulty === undefined) return false;
+    return intent === 'easier'
+      ? candidateDifficulty < currentDifficulty
+      : candidateDifficulty > currentDifficulty;
+  });
+}
+
+function overlaps(left: string[], right: string[]) {
+  const normalizedRight = new Set(right.map(normalizeMetadataToken));
+  return left.some((value) =>
+    normalizedRight.has(normalizeMetadataToken(value)),
+  );
+}
+
+function normalizeMetadataToken(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function difficultyRank(difficulty: string) {
+  const normalized = difficulty.trim().toLowerCase();
+  if (normalized === 'easy') return 1;
+  if (normalized === 'medium' || normalized === 'standard') return 2;
+  if (normalized === 'hard') return 3;
+  return undefined;
 }
 
 function questionToAlternativeView(

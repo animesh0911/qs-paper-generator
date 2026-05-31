@@ -248,8 +248,78 @@ describe('editor paper view model', () => {
         chapterNames: ['Electricity'],
         difficulty: 'easy',
       }),
+      expect.objectContaining({
+        questionId: 'q_mcq_chemotropism_001',
+        chapterNames: ['Control and Coordination'],
+        difficulty: 'easy',
+      }),
+      expect.objectContaining({
+        questionId: 'q_mcq_spirogyra_001',
+        chapterNames: ['How do Organisms Reproduce'],
+        difficulty: 'medium',
+      }),
+      expect.objectContaining({
+        questionId: 'q_mcq_photosynthesis_001',
+        chapterNames: ['Life Processes'],
+        difficulty: 'medium',
+      }),
     ]);
     expect(lockedSlot.locked).toBe(true);
-    expect(lockedSlot.alternateQuestions).toHaveLength(1);
+    expect(lockedSlot.alternateQuestions).toHaveLength(4);
+  });
+
+  it('filters alternatives by topic first and falls back to chapter matches', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const topicView = buildEditorPaperView(document, {
+      alternativesIntentBySlotId: {
+        slot_A_01: 'topic',
+        slot_B_01: 'topic',
+      },
+    });
+    const hereditarySlot = findSlot(topicView, 'slot_A_01');
+    const stomataSlot = findSlot(topicView, 'slot_B_01');
+
+    expect(hereditarySlot.alternateQuestions).toEqual([
+      expect.objectContaining({ questionId: 'q_mcq_heredity_002' }),
+    ]);
+    expect(stomataSlot.alternateQuestions).toEqual([
+      expect.objectContaining({ questionId: 'q_short_stomata_002' }),
+    ]);
+  });
+
+  it('filters alternatives by difficulty relative to the current question', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const filteredView = buildEditorPaperView(document, {
+      alternativesIntentBySlotId: {
+        slot_B_01: 'harder',
+        slot_E_02: 'easier',
+      },
+    });
+    const stomataSlot = findSlot(filteredView, 'slot_B_01');
+    const metalsSlot = findSlot(filteredView, 'slot_E_02');
+
+    expect(
+      stomataSlot.alternateQuestions.map((question) => question.questionId),
+    ).toEqual([
+      'q_short_stomata_002',
+      'q_short_hormones_001',
+      'q_short_electrical_impulse_001',
+      'q_short_variation_001',
+    ]);
+    expect(
+      metalsSlot.alternateQuestions.map((question) => question.questionId),
+    ).toEqual(['q_table_metals_002']);
   });
 });
+
+function findSlot(
+  view: ReturnType<typeof buildEditorPaperView>,
+  slotId: string,
+) {
+  const slot = view.sections
+    .flatMap((section) => section.slots)
+    .find((candidate) => candidate.slotId === slotId);
+
+  expect(slot).toBeDefined();
+  return slot!;
+}
