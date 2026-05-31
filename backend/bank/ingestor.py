@@ -22,6 +22,7 @@ Pure text predicates (`strip_hindi`, `segment_questions`, `_detect_numerical`,
 `_mentions_diagram`) are not configurable and remain module-level. Tests inject
 stub adapters into Ingestor — no module-level patching.
 """
+
 from __future__ import annotations
 
 import difflib
@@ -139,7 +140,7 @@ def _mentions_diagram(text: str) -> bool:
 
 
 def _parse_assertion_reason(text: str) -> dict | None:
-    """Detect Assertion (A): / Reason (R): pattern; return structured content or None."""
+    """Detect Assertion (A)/Reason (R) pattern; return structured content or None."""
     a_match = _AR_ASSERTION_RE.search(text)
     r_match = _AR_REASON_RE.search(text)
     if not a_match or not r_match:
@@ -150,7 +151,7 @@ def _parse_assertion_reason(text: str) -> dict | None:
         return None
     # Parse MCQ options from text after the reason block to avoid matching
     # the "Assertion (A):" prefix as an option label.
-    options_text = text[r_match.end():]
+    options_text = text[r_match.end() :]
     options, _ = _parse_options(options_text)
     return {
         "assertion": [{"type": "paragraph", "text": assertion_text}],
@@ -221,7 +222,7 @@ def _parse_internal_choice(text: str) -> dict | None:
 
 
 def _parse_long_answer_subparts(text: str) -> list[dict] | None:
-    """Split roman-numeral/lettered subparts from a long-answer text; return list or None."""
+    """Split roman/lettered subparts from a long-answer text; return list or None."""
     matches = list(_LA_SUBPART_RE.finditer(text))
     if not matches:
         return None
@@ -243,7 +244,7 @@ def _parse_long_answer_subparts(text: str) -> list[dict] | None:
 
 
 def _classify_qtype(raw_question: dict, section: str) -> str:
-    """Return contract qtype string. Detected structure wins; section default fallback."""
+    """Return qtype string. Detected structure wins; section default fallback."""
     text = raw_question.get("text", "")
     if _parse_assertion_reason(text) is not None:
         return "assertion_reason"
@@ -255,7 +256,7 @@ def _classify_qtype(raw_question: dict, section: str) -> str:
 
 
 def _compute_parse_quality(raw_question: dict, classified_qtype: str) -> str:
-    """Return 'clean', 'partial', or 'broken' based on how well structure matches qtype."""
+    """Return clean/partial/broken based on how well structure matches qtype."""
     text = raw_question.get("text", "")
     content = raw_question.get("content", {})
 
@@ -395,7 +396,7 @@ def _normalize_ws(text: str) -> str:
 
 
 def _source_offset(norm_source: str, text: str) -> int | None:
-    """Offset of `text` within the normalised source, or None if it isn't faithfully present.
+    """Offset of `text` in the normalised source, or None if not faithfully present.
 
     Exact substring first; falls back to the longest common block and accepts it
     only if it covers >= `_FIDELITY_THRESHOLD` of the candidate text. Returns the
@@ -426,7 +427,7 @@ def _option_texts(question: dict) -> list[str]:
 
 
 def _options_in_source_order(question: dict, norm_source: str) -> bool:
-    """True if every option's text is faithfully present and they appear in source order."""
+    """True if every option text is faithfully present, in source order."""
     offsets: list[int] = []
     for text in _option_texts(question):
         offset = _source_offset(norm_source, text)
@@ -505,9 +506,11 @@ class Tagger(Protocol):
 
 
 class DiagramExtractor(Protocol):
-    """Returns one entry per question: cropped image bytes, or None if no image was found."""
+    """One entry per question: cropped image bytes, or None if no image found."""
 
-    def extract(self, pdf_bytes: bytes, raw_questions: list[dict]) -> list[bytes | None]: ...
+    def extract(
+        self, pdf_bytes: bytes, raw_questions: list[dict]
+    ) -> list[bytes | None]: ...
 
 
 class AnswerSource(Protocol):
@@ -590,7 +593,9 @@ class LLMSegmenter:
     to the deterministic rules rather than dropping the whole paper.
     """
 
-    def __init__(self, client: LLMClient | None = None, fallback: Segmenter | None = None):
+    def __init__(
+        self, client: LLMClient | None = None, fallback: Segmenter | None = None
+    ):
         self.client = client or make_llm_client()
         self.fallback = fallback or RegexSegmenter()
 
@@ -598,7 +603,9 @@ class LLMSegmenter:
         if not text.strip():
             return []
         try:
-            response = self.client.complete(_SEGMENT_PROMPT + text, max_tokens=4096).strip()
+            response = self.client.complete(
+                _SEGMENT_PROMPT + text, max_tokens=4096
+            ).strip()
             response = re.sub(r"^```\w*\n?", "", response)
             response = re.sub(r"\n?```$", "", response)
             data = json.loads(response)
@@ -617,7 +624,9 @@ class PdfplumberDiagramExtractor:
     mentioning 'Fig.' / 'diagram' are also flagged regardless of detected images.
     """
 
-    def extract(self, pdf_bytes: bytes, raw_questions: list[dict]) -> list[bytes | None]:
+    def extract(
+        self, pdf_bytes: bytes, raw_questions: list[dict]
+    ) -> list[bytes | None]:
         if not raw_questions:
             return []
 
@@ -656,7 +665,9 @@ class PdfplumberDiagramExtractor:
                     continue
 
                 # Indices of questions on this page, in document order.
-                qs_on_page = [qi for qi, pg in enumerate(question_pages) if pg == page_idx]
+                qs_on_page = [
+                    qi for qi, pg in enumerate(question_pages) if pg == page_idx
+                ]
                 if not qs_on_page:
                     continue
 
@@ -674,7 +685,9 @@ class PdfplumberDiagramExtractor:
                     for qi in qs_on_page:
                         snippet = question_texts[qi][:40]
                         word_tops = [
-                            w["top"] for w in page_words if snippet[:10] in w.get("text", "")
+                            w["top"]
+                            for w in page_words
+                            if snippet[:10] in w.get("text", "")
                         ]
                         q_top = min(word_tops) if word_tops else float("inf")
                         if q_top <= img_top:
@@ -683,7 +696,7 @@ class PdfplumberDiagramExtractor:
                         results[best_qi] = img_bytes
 
     @staticmethod
-    def _crop_image(page: "pdfplumber.page.Page", img: dict) -> bytes | None:
+    def _crop_image(page: pdfplumber.page.Page, img: dict) -> bytes | None:
         """Render the image bbox as PNG bytes. Returns None on failure."""
         try:
             bbox = (img["x0"], img["top"], img["x1"], img["bottom"])
@@ -716,16 +729,21 @@ class LLMTagger:
         for batch_start in range(0, len(raw_questions), _TAG_BATCH):
             batch = raw_questions[batch_start : batch_start + _TAG_BATCH]
             prompt = (
-                "You are tagging CBSE Class 10 Science questions for a question bank.\n\n"
+                "You are tagging CBSE Class 10 Science questions "
+                "for a question bank.\n\n"
                 f"Chapters:\n{json.dumps(chapter_list, indent=2)}\n\n"
-                "Cognitive levels: R (Remember), U (Understand), Ap (Apply), An (Analyse)\n\n"
+                "Cognitive levels: R (Remember), U (Understand), "
+                "Ap (Apply), An (Analyse)\n\n"
                 "For each question return a JSON array of objects with:\n"
                 "  index        — same as input\n"
                 "  chapter_slug — closest chapter slug, or null if unclear\n"
                 "  cognitive_level — one of R / U / Ap / An\n\n"
                 "Questions:\n"
                 + json.dumps(
-                    [{"index": batch_start + i, "text": q["text"]} for i, q in enumerate(batch)],
+                    [
+                        {"index": batch_start + i, "text": q["text"]}
+                        for i, q in enumerate(batch)
+                    ],
                     indent=2,
                 )
                 + "\n\nRespond with only the JSON array."
@@ -827,7 +845,8 @@ class Ingestor:
         # Guardrail: score LLM output against the source text before trusting it.
         raw_questions = _verify(raw_questions, clean_text)
 
-        # De-duplication: skip questions already in the bank AND repeats within this PDF.
+        # De-duplication: skip questions already in the bank AND repeats
+        # within this PDF.
         all_fingerprints = [_fingerprint(q["text"]) for q in raw_questions]
         seen = set(
             Question.objects.filter(source_hash__in=all_fingerprints).values_list(
@@ -853,7 +872,9 @@ class Ingestor:
         chapters = list(Chapter.objects.all())
         tagged = self.tagger.tag(raw_questions, chapters)
         chapter_by_slug = {c.slug: c for c in chapters}
-        created = self._persist(tagged, fingerprints, diagram_bytes_list, chapter_by_slug)
+        created = self._persist(
+            tagged, fingerprints, diagram_bytes_list, chapter_by_slug
+        )
         return IngestResult(created=created, skipped_duplicates=skipped)
 
     def apply_answers(self, answer_pdf_bytes: bytes) -> int:
