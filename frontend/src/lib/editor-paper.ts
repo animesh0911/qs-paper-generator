@@ -70,6 +70,18 @@ export interface EditorQuestionContainerBlock {
   children: EditorQuestionRegionBlock[];
 }
 
+export interface EditorQuestionAlternativeView {
+  questionId: string;
+  questionText: string;
+  marks: number;
+  questionType: string;
+  chapterNames: string[];
+  topicNames: string[];
+  difficulty: string;
+  cbseRelevance?: string | number;
+  sourceName: string;
+}
+
 export interface EditorPaperSlotView {
   slotId: string;
   displayNumber: string;
@@ -79,6 +91,7 @@ export interface EditorPaperSlotView {
   locked: boolean;
   modifiedFromSource: boolean;
   questionBlockTree: EditorQuestionContainerBlock;
+  alternateQuestions: EditorQuestionAlternativeView[];
   blockNoteBlocks: PartialBlock[];
 }
 
@@ -193,6 +206,12 @@ export function buildEditorPaperView(
         locked: slot.locked,
         modifiedFromSource: slotOverrides?.modifiedFromSource ?? false,
         questionBlockTree,
+        alternateQuestions: slot.alternateQuestionIds.flatMap((questionId) => {
+          const alternateQuestion = questionsById.get(questionId);
+          return alternateQuestion
+            ? [questionToAlternativeView(alternateQuestion)]
+            : [];
+        }),
         blockNoteBlocks:
           questionBlockTree.children.length > 0
             ? questionBlockTree.children.flatMap(
@@ -274,6 +293,22 @@ export function buildEditorPaperView(
       lockedSlots,
       warnings,
     },
+  };
+}
+
+function questionToAlternativeView(
+  question: DocQuestion,
+): EditorQuestionAlternativeView {
+  return {
+    questionId: question.questionId,
+    questionText: question.rawText,
+    marks: question.marks,
+    questionType: question.questionType,
+    chapterNames: question.metadata.chapterNames,
+    topicNames: question.metadata.topicNames ?? [],
+    difficulty: question.metadata.difficulty,
+    cbseRelevance: question.metadata.cbseRelevance,
+    sourceName: question.source.sourceName,
   };
 }
 

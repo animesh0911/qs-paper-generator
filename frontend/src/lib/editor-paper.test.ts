@@ -226,4 +226,30 @@ describe('editor paper view model', () => {
       warnings: [],
     });
   });
+
+  it('resolves slot alternatives for the selected-question inspector', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const view = buildEditorPaperView(document);
+    const firstSlot = view.sections[0].slots[0];
+    const lockedSlot = view.sections[0].slots[2];
+
+    expect(firstSlot.alternateQuestions).toEqual([
+      expect.objectContaining({
+        questionId: 'q_mcq_heredity_002',
+        marks: 1,
+        questionType: 'mcq',
+        chapterNames: ['Heredity'],
+        topicNames: ['Mendel Experiments'],
+        difficulty: 'easy',
+        sourceName: 'School Science Question Bank',
+      }),
+      expect.objectContaining({
+        questionId: 'q_mcq_electricity_001',
+        chapterNames: ['Electricity'],
+        difficulty: 'easy',
+      }),
+    ]);
+    expect(lockedSlot.locked).toBe(true);
+    expect(lockedSlot.alternateQuestions).toHaveLength(1);
+  });
 });

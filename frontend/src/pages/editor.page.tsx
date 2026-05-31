@@ -24,11 +24,17 @@ import {
   CheckCircle2,
   Download,
   FileCheck2,
+  Info,
   Lock,
   MessageSquareText,
   RotateCcw,
   Save,
   SearchCheck,
+  Shuffle,
+  Tags,
+  TrendingDown,
+  TrendingUp,
+  Unlock,
 } from 'lucide-react';
 import '@blocknote/mantine/style.css';
 import { mockPaperDocumentV1 } from '@/mocks';
@@ -44,11 +50,15 @@ import {
   normalizePaperDocument,
   restoreSlotSource,
   setPaperChromeText,
+  setSlotLockState,
   setSlotRegionOverride,
 } from '@/lib/paper-document';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ContentItem } from '@/types';
+
+type InspectorMode = 'info' | 'alternatives';
+type AlternativesIntent = 'swap' | 'topic' | 'easier' | 'harder';
 
 function QuestionRegionEditor({
   region,
@@ -228,6 +238,160 @@ function contentItemsEqual(left: ContentItem[], right: ContentItem[]) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function formatQuestionType(questionType: string) {
+  return questionType.replace(/_/g, ' ');
+}
+
+function formatRelevance(relevance: string | number | undefined) {
+  if (relevance === undefined) return undefined;
+  return typeof relevance === 'number' ? `${relevance}/100` : relevance;
+}
+
+function sourceDetails(source: {
+  fileName?: string;
+  pageNumber?: number;
+  originalQuestionNumber?: string;
+}) {
+  return [
+    source.fileName,
+    source.pageNumber ? `p. ${source.pageNumber}` : undefined,
+    source.originalQuestionNumber
+      ? `Q${source.originalQuestionNumber}`
+      : undefined,
+  ].filter((value): value is string => Boolean(value));
+}
+
+function alternativesHeading(intent: AlternativesIntent) {
+  switch (intent) {
+    case 'topic':
+      return 'Topic alternatives';
+    case 'easier':
+      return 'Easier alternatives';
+    case 'harder':
+      return 'Harder alternatives';
+    default:
+      return 'Swap alternatives';
+  }
+}
+
+function QuestionActionRail({
+  locked,
+  onInfo,
+  onAlternatives,
+  onToggleLock,
+  onAsk,
+}: {
+  locked: boolean;
+  onInfo: () => void;
+  onAlternatives: (intent: AlternativesIntent) => void;
+  onToggleLock: () => void;
+  onAsk: () => void;
+}) {
+  const replacementDisabledLabel =
+    'Unlock this question before choosing replacements.';
+
+  return (
+    <div
+      data-editor-chrome
+      className="qpg-question-action-rail absolute left-[calc(100%+0.5rem)] top-3 z-10 flex w-28 flex-col gap-1 rounded-lg border bg-background p-1 shadow-[0_8px_24px_rgba(15,23,42,0.12)] max-lg:left-auto max-lg:right-3"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title="Show question info"
+        aria-label="Show question info"
+        onClick={onInfo}
+      >
+        <Info className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        Info
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title={locked ? replacementDisabledLabel : 'Show swap alternatives'}
+        aria-label="Show swap alternatives"
+        disabled={locked}
+        onClick={() => onAlternatives('swap')}
+      >
+        <Shuffle className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        Swap
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title={locked ? replacementDisabledLabel : 'Find same-topic options'}
+        aria-label="Find same-topic alternatives"
+        disabled={locked}
+        onClick={() => onAlternatives('topic')}
+      >
+        <Tags className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        Topic
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title={locked ? replacementDisabledLabel : 'Find easier alternatives'}
+        aria-label="Find easier alternatives"
+        disabled={locked}
+        onClick={() => onAlternatives('easier')}
+      >
+        <TrendingDown className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        Easier
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title={locked ? replacementDisabledLabel : 'Find harder alternatives'}
+        aria-label="Find harder alternatives"
+        disabled={locked}
+        onClick={() => onAlternatives('harder')}
+      >
+        <TrendingUp className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        Harder
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title={locked ? 'Unlock question' : 'Lock question'}
+        aria-label={locked ? 'Unlock question' : 'Lock question'}
+        onClick={onToggleLock}
+      >
+        {locked ? (
+          <Unlock className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        ) : (
+          <Lock className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        )}
+        {locked ? 'Unlock' : 'Lock'}
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title="Ask about this question"
+        aria-label="Ask about this question"
+        onClick={onAsk}
+      >
+        <MessageSquareText className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        Ask
+      </Button>
+    </div>
+  );
+}
+
 export default function EditorPage() {
   const document = useMemo(() => assertPaperDocument(mockPaperDocumentV1), []);
   const initialPaperState = useMemo(
@@ -239,11 +403,16 @@ export default function EditorPage() {
   const [selectedChromeBlockId, setSelectedChromeBlockId] = useState<
     string | null
   >(null);
+  const [inspectorMode, setInspectorMode] = useState<InspectorMode>('info');
+  const [alternativesIntent, setAlternativesIntent] =
+    useState<AlternativesIntent>('swap');
+  const [chatValue, setChatValue] = useState('');
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
   const [restoreVersionBySlotId, setRestoreVersionBySlotId] = useState<
     Record<string, number>
   >({});
+  const chatInputRef = useRef<HTMLInputElement>(null);
   const view = useMemo(
     () =>
       buildEditorPaperView(paperState.document, {
@@ -295,6 +464,33 @@ export default function EditorPage() {
   function handleSelectChromeBlock(regionKey: string) {
     setSelectedSlotId(null);
     setSelectedChromeBlockId(regionKey);
+  }
+
+  function handleShowInfo(slotId: string) {
+    handleSelectSlot(slotId);
+    setInspectorMode('info');
+  }
+
+  function handleShowAlternatives(
+    slotId: string,
+    intent: AlternativesIntent,
+  ) {
+    handleSelectSlot(slotId);
+    setAlternativesIntent(intent);
+    setInspectorMode('alternatives');
+  }
+
+  function handleToggleLock(slotId: string, locked: boolean) {
+    handleSelectSlot(slotId);
+    setPaperState((currentState) =>
+      setSlotLockState(currentState, slotId, !locked),
+    );
+  }
+
+  function handleAskQuestion(slotId: string, displayNumber: string) {
+    handleSelectSlot(slotId);
+    setChatValue(`Question ${displayNumber}: `);
+    window.setTimeout(() => chatInputRef.current?.focus(), 0);
   }
 
   return (
@@ -559,14 +755,17 @@ export default function EditorPage() {
                       {section.slots.map((slot) => (
                         <div
                           key={slot.slotId}
+                          tabIndex={0}
+                          aria-label={`Question ${slot.displayNumber}`}
                           onClick={() => handleSelectSlot(slot.slotId)}
+                          onFocus={() => handleSelectSlot(slot.slotId)}
                           onMouseEnter={() => {
                             setHoveredSlotId(slot.slotId);
                             setHoveredSectionId(section.sectionId);
                           }}
                           onMouseLeave={() => setHoveredSlotId(null)}
                           className={cn(
-                            'grid cursor-text grid-cols-[2.5rem_minmax(0,1fr)_5rem] gap-3 px-4 py-4 outline-none transition-colors duration-150 ease-out max-sm:grid-cols-[1.75rem_minmax(0,1fr)_4.25rem] max-sm:px-3',
+                            'relative grid cursor-text grid-cols-[2.5rem_minmax(0,1fr)_5rem] gap-3 px-4 py-4 outline-none transition-colors duration-150 ease-out focus-visible:ring-2 focus-visible:ring-ring max-sm:grid-cols-[1.75rem_minmax(0,1fr)_4.25rem] max-sm:px-3',
                             hoveredSlotId === slot.slotId &&
                               selectedSlotId !== slot.slotId &&
                               'bg-secondary/45',
@@ -638,6 +837,24 @@ export default function EditorPage() {
                           <div className="text-right text-sm font-medium">
                             [{slot.marksLabel}]
                           </div>
+                          {selectedSlotId === slot.slotId && (
+                            <QuestionActionRail
+                              locked={slot.locked}
+                              onInfo={() => handleShowInfo(slot.slotId)}
+                              onAlternatives={(intent) =>
+                                handleShowAlternatives(slot.slotId, intent)
+                              }
+                              onToggleLock={() =>
+                                handleToggleLock(slot.slotId, slot.locked)
+                              }
+                              onAsk={() =>
+                                handleAskQuestion(
+                                  slot.slotId,
+                                  slot.displayNumber,
+                                )
+                              }
+                            />
+                          )}
                         </div>
                       ))}
                     </div>
@@ -650,56 +867,205 @@ export default function EditorPage() {
 
         <aside
           data-editor-chrome
-          className="editor-inspector sticky top-[4.5rem] h-[calc(100vh-6rem)] rounded-lg border bg-background p-4"
+          className="editor-inspector sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-4"
         >
-          <h2 className="text-sm font-semibold">Inspector</h2>
-          {selectedSlot && selectedQuestion ? (
-            <div className="mt-4 space-y-4 text-sm">
-              <div>
-                <p className="text-xs uppercase text-muted-foreground">
-                  Question {selectedSlot.displayNumber}
-                </p>
-                <p className="mt-1 font-medium">
-                  {selectedQuestion.metadata.chapterNames.join(', ')}
-                </p>
-                <p className="text-muted-foreground">
-                  {selectedQuestion.metadata.topicNames?.join(', ') ??
-                    selectedQuestion.metadata.difficulty}
-                </p>
-              </div>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="text-xs text-muted-foreground">Source</dt>
-                  <dd>{selectedQuestion.source.sourceName}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-muted-foreground">Edit state</dt>
-                  <dd>
-                    {selectedSlot.modifiedFromSource
-                      ? 'Modified from source'
-                      : 'Original source text'}
-                  </dd>
-                </div>
-              </dl>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                disabled={!selectedSlot.modifiedFromSource}
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  handleRestoreSelectedSlot();
-                }}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleRestoreSelectedSlot();
-                }}
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold">Inspector</h2>
+            {selectedSlot && selectedQuestion && (
+              <div
+                className="flex rounded-md border bg-secondary p-0.5"
+                aria-label="Inspector mode"
               >
-                <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-                Restore original
-              </Button>
-            </div>
+                <Button
+                  type="button"
+                  variant={inspectorMode === 'info' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setInspectorMode('info')}
+                >
+                  Info
+                </Button>
+                <Button
+                  type="button"
+                  variant={
+                    inspectorMode === 'alternatives' ? 'secondary' : 'ghost'
+                  }
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setInspectorMode('alternatives')}
+                >
+                  Alternatives
+                </Button>
+              </div>
+            )}
+          </div>
+          {selectedSlot && selectedQuestion ? (
+            inspectorMode === 'info' ? (
+              <div className="mt-4 space-y-4 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    Question {selectedSlot.displayNumber}
+                  </p>
+                  <p className="mt-1 font-medium">
+                    {selectedQuestion.rawText}
+                  </p>
+                </div>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Marks</dt>
+                    <dd>{selectedSlot.marksLabel}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Type</dt>
+                    <dd>{formatQuestionType(selectedSlot.questionType)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Chapter</dt>
+                    <dd>
+                      {selectedQuestion.metadata.chapterNames.join(', ') ||
+                        'Not tagged'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Topics</dt>
+                    <dd>
+                      {selectedQuestion.metadata.topicNames?.join(', ') ||
+                        'Not tagged'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">
+                      Difficulty
+                    </dt>
+                    <dd>{selectedQuestion.metadata.difficulty}</dd>
+                  </div>
+                  {formatRelevance(
+                    selectedQuestion.metadata.cbseRelevance,
+                  ) && (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">
+                        CBSE relevance
+                      </dt>
+                      <dd>
+                        {formatRelevance(
+                          selectedQuestion.metadata.cbseRelevance,
+                        )}
+                      </dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Source</dt>
+                    <dd>{selectedQuestion.source.sourceName}</dd>
+                    {sourceDetails(selectedQuestion.source).length > 0 && (
+                      <dd className="text-xs text-muted-foreground">
+                        {sourceDetails(selectedQuestion.source).join(' · ')}
+                      </dd>
+                    )}
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">
+                      Lock state
+                    </dt>
+                    <dd>{selectedSlot.locked ? 'Locked' : 'Unlocked'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">
+                      Modified state
+                    </dt>
+                    <dd>
+                      {selectedSlot.modifiedFromSource
+                        ? 'Modified from source'
+                        : 'Original source text'}
+                    </dd>
+                  </div>
+                </dl>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  disabled={!selectedSlot.modifiedFromSource}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    handleRestoreSelectedSlot();
+                  }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRestoreSelectedSlot();
+                  }}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Restore original
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-3 text-sm">
+                <div>
+                  <p className="font-medium">
+                    {alternativesHeading(alternativesIntent)}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {selectedSlot.locked
+                      ? 'Unlock this question before replacing it.'
+                      : `${selectedSlot.alternateQuestions.length} slot-safe option${selectedSlot.alternateQuestions.length === 1 ? '' : 's'}`}
+                  </p>
+                </div>
+                {selectedSlot.alternateQuestions.length > 0 ? (
+                  <div className="space-y-2">
+                    {selectedSlot.alternateQuestions.map((alternative) => (
+                      <div
+                        key={alternative.questionId}
+                        className="rounded-md border p-3"
+                      >
+                        <p className="font-medium leading-5">
+                          {alternative.questionText}
+                        </p>
+                        <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <dt className="text-muted-foreground">Marks</dt>
+                            <dd>{alternative.marks}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-muted-foreground">
+                              Difficulty
+                            </dt>
+                            <dd>{alternative.difficulty}</dd>
+                          </div>
+                          <div className="col-span-2">
+                            <dt className="text-muted-foreground">Chapter</dt>
+                            <dd>{alternative.chapterNames.join(', ')}</dd>
+                          </div>
+                          <div className="col-span-2">
+                            <dt className="text-muted-foreground">Topics</dt>
+                            <dd>
+                              {alternative.topicNames.join(', ') ||
+                                'Not tagged'}
+                            </dd>
+                          </div>
+                          <div className="col-span-2">
+                            <dt className="text-muted-foreground">Source</dt>
+                            <dd>{alternative.sourceName}</dd>
+                          </div>
+                        </dl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-3 w-full"
+                          disabled={selectedSlot.locked}
+                        >
+                          Use this question
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="rounded-md border p-3 text-muted-foreground">
+                    No slot-safe alternatives are available for this question.
+                  </p>
+                )}
+              </div>
+            )
           ) : (
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Select a question to inspect source, chapter, difficulty, and safe
@@ -719,12 +1085,19 @@ export default function EditorPage() {
             aria-hidden="true"
           />
           <input
+            ref={chatInputRef}
             aria-label="Ask about this paper"
             className={cn(
               'min-w-0 flex-1 bg-transparent px-1 text-sm outline-none',
               'placeholder:text-muted-foreground',
             )}
-            placeholder="Ask about this paper"
+            value={chatValue}
+            placeholder={
+              selectedSlot
+                ? `Ask about question ${selectedSlot.displayNumber}`
+                : 'Ask about this paper'
+            }
+            onChange={(event) => setChatValue(event.target.value)}
           />
           <Button size="sm">Ask</Button>
         </div>

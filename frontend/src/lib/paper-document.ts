@@ -147,6 +147,39 @@ export function restoreSlotSource(
   };
 }
 
+export function setSlotLockState(
+  state: NormalizedPaperDocument,
+  slotId: string,
+  locked: boolean,
+): NormalizedPaperDocument {
+  return {
+    ...state,
+    lockStateBySlotId: {
+      ...state.lockStateBySlotId,
+      [slotId]: locked,
+    },
+    slotsById: {
+      ...state.slotsById,
+      [slotId]: {
+        ...state.slotsById[slotId],
+        locked,
+      },
+    },
+    document: {
+      ...state.document,
+      paper: {
+        ...state.document.paper,
+        sections: state.document.paper.sections.map((section) => ({
+          ...section,
+          slots: section.slots.map((slot) =>
+            slot.slotId === slotId ? { ...slot, locked } : slot,
+          ),
+        })),
+      },
+    },
+  };
+}
+
 export function setPaperChromeText(
   state: NormalizedPaperDocument,
   regionKey: string,

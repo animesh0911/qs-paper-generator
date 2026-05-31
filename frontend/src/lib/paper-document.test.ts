@@ -8,6 +8,7 @@ import {
   parsePaperDocument,
   restoreSlotSource,
   setPaperChromeText,
+  setSlotLockState,
   setSlotRegionOverride,
 } from './paper-document';
 
@@ -144,6 +145,19 @@ describe('PaperDocumentV1 normalization', () => {
       'Edited Biology section directions.',
     );
     expect(editedState.questionsById.q_mcq_heredity_001).toBe(
+      state.questionsById.q_mcq_heredity_001,
+    );
+  });
+
+  it('updates slot lock state in normalized maps and the canonical document', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const lockedState = setSlotLockState(state, 'slot_A_01', true);
+
+    expect(lockedState.lockStateBySlotId.slot_A_01).toBe(true);
+    expect(lockedState.slotsById.slot_A_01.locked).toBe(true);
+    expect(lockedState.document.paper.sections[0].slots[0].locked).toBe(true);
+    expect(lockedState.questionsById.q_mcq_heredity_001).toBe(
       state.questionsById.q_mcq_heredity_001,
     );
   });
