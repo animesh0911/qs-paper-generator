@@ -63,3 +63,14 @@ def test_render_handles_unfilled_slot():
     """Unfilled slot (selectedQuestionId=None) must render without raising."""
     pdf = render_paper_pdf(_doc(slot_question_id=None))
     assert pdf[:4] == b"%PDF"
+
+
+def test_render_escapes_xml_special_chars():
+    """Question/option text feeds reportlab's Paragraph markup parser. A `<x>`
+    run (e.g. an inequality chain `a<b>c`, common in science) is read as a
+    markup tag and raises mid-render unless escaped — losing the whole PDF."""
+    doc = _doc()
+    doc["questions"][0]["rawText"] = "If a<b>c & current I<2A, which holds?"
+    doc["questions"][0]["content"]["options"][0]["content"][0]["text"] = "p<q>r & s"
+    pdf = render_paper_pdf(doc)
+    assert pdf[:4] == b"%PDF"

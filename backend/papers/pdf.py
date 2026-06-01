@@ -7,6 +7,7 @@ The full CBSE-style/branded renderer arrives in Slice 9.
 """
 
 import io
+from xml.sax.saxutils import escape
 
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
@@ -51,14 +52,14 @@ def render_paper_pdf(document: dict) -> bytes:
     )
 
     story = [
-        Paragraph(title, title_style),
+        Paragraph(escape(title), title_style),
         Paragraph("Class 10 — Science", meta_style),
         Paragraph(f"Maximum Marks: {total_marks}", meta_style),
         Spacer(1, 8),
     ]
 
     for section in paper.get("sections", []):
-        story.append(Paragraph(section["title"], section_style))
+        story.append(Paragraph(escape(section["title"]), section_style))
         for slot in section.get("slots", []):
             qid = slot.get("selectedQuestionId")
             question = questions_by_id.get(qid) if qid else None
@@ -76,7 +77,7 @@ def render_paper_pdf(document: dict) -> bytes:
                 continue
             story.append(
                 Paragraph(
-                    f"<b>Q{number}.</b> {question['rawText']} "
+                    f"<b>Q{number}.</b> {escape(question['rawText'])} "
                     f"<i>({marks} mark{'s' if marks != 1 else ''})</i>",
                     q_style,
                 )
@@ -86,7 +87,9 @@ def render_paper_pdf(document: dict) -> bytes:
                 opts = [
                     ListItem(
                         Paragraph(
-                            f"({opt['label']}) {opt['content'][0]['text']}", q_style
+                            f"({escape(opt['label'])}) "
+                            f"{escape(opt['content'][0]['text'])}",
+                            q_style,
                         )
                     )
                     for opt in options
