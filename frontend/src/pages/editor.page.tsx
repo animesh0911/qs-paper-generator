@@ -19,6 +19,22 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  pointerWithin,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type CollisionDetection,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
   CheckCircle2,
   Download,
   FileCheck2,
@@ -32,12 +48,17 @@ import { mockPaperDocumentV1 } from '@/mocks';
 import { buildEditorPaperView } from '@/lib/editor-paper';
 import {
   assertPaperDocument,
+  buildOrderZones,
+  commitStructuredPaperAction,
   normalizePaperDocument,
+  reorderSlotWithinOrderZone,
   restoreSlotSource,
   setPaperChromeText,
   setSlotLockState,
   setSlotSelectedQuestion,
   setSlotRegionOverride,
+  undoStructuredPaperAction,
+  type StructuredPaperUndoEntry,
 } from '@/lib/paper-document';
 import {
   EditorAlternativesOverlay,
@@ -46,6 +67,7 @@ import {
   PaperChromeEditor,
   QuestionActionRail,
   QuestionRegionEditor,
+  SortableQuestionSlot,
   type AlternativesIntent,
   type InspectorMode,
 } from '@/components/editor';
@@ -64,6 +86,9 @@ export default function EditorPage() {
     [document],
   );
   const [paperState, setPaperState] = useState(initialPaperState);
+  const [undoEntry, setUndoEntry] = useState<StructuredPaperUndoEntry | null>(
+    null,
+  );
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [activeRailSlotId, setActiveRailSlotId] = useState<string | null>(null);
   const [selectedChromeBlockId, setSelectedChromeBlockId] = useState<
@@ -77,12 +102,21 @@ export default function EditorPage() {
   const [chatValue, setChatValue] = useState('');
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
-  const [restoreVersionBySlotId, setRestoreVersionBySlotId] = useState<
-    Record<string, number>
-  >({});
+  const [dragNotice, setDragNotice] = useState<string | null>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const alternativesOpenerRef = useRef<HTMLElement | null>(null);
   const inspectorHighlightTimeoutRef = useRef<number | null>(null);
+  const blockedCrossSectionDropRef = useRef(false);
+  const dragSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
   const view = useMemo(
     () =>
       buildEditorPaperView(paperState.document, {
@@ -92,6 +126,42 @@ export default function EditorPage() {
           : undefined,
       }),
     [alternativesIntent, paperState, selectedSlotId],
+  );
+  const orderZones = useMemo(() => buildOrderZones(paperState), [paperState]);
+  const slotZoneById = useMemo(
+    () =>
+      Object.fromEntries(
+        orderZones.flatMap((zone) =>
+          zone.orderedItemIds.map((slotId) => [String(slotId), zone.zoneId]),
+        ),
+      ),
+    [orderZones],
+  );
+  const sameSectionCollisionDetection = useMemo<CollisionDetection>(
+    () => (args) => {
+      const activeZoneId = slotZoneById[String(args.active.id)];
+      if (!activeZoneId) return closestCenter(args);
+
+      const pointerCollision = pointerWithin(args).find(
+        (collision) => collision.id !== args.active.id,
+      );
+      const pointerZoneId = pointerCollision
+        ? slotZoneById[String(pointerCollision.id)]
+        : undefined;
+      if (pointerZoneId && pointerZoneId !== activeZoneId) {
+        blockedCrossSectionDropRef.current = true;
+        return [];
+      }
+
+      blockedCrossSectionDropRef.current = false;
+      return closestCenter({
+        ...args,
+        droppableContainers: args.droppableContainers.filter(
+          (container) => slotZoneById[String(container.id)] === activeZoneId,
+        ),
+      });
+    },
+    [slotZoneById],
   );
 
   const selectedSlot = view.sections
@@ -134,6 +204,24 @@ export default function EditorPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!dragNotice) return undefined;
+    const timeoutId = window.setTimeout(() => setDragNotice(null), 2400);
+    return () => window.clearTimeout(timeoutId);
+  }, [dragNotice]);
+
+  function commitStructuredAction(nextState: typeof paperState) {
+    const result = commitStructuredPaperAction(paperState, nextState);
+    setPaperState(result.state);
+    setUndoEntry(result.undoEntry);
+  }
+
+  function handleUndo() {
+    const result = undoStructuredPaperAction(paperState, undoEntry);
+    setPaperState(result.state);
+    setUndoEntry(result.undoEntry);
+  }
+
   function handleRegionChange(
     slotId: string,
     regionKey: string,
@@ -155,18 +243,14 @@ export default function EditorPage() {
   function handleRestoreSelectedSlot() {
     if (!selectedSlotId) return;
     const slotId = selectedSlotId;
-    setPaperState((currentState) => restoreSlotSource(currentState, slotId));
-    setRestoreVersionBySlotId((currentVersions) => ({
-      ...currentVersions,
-      [slotId]: (currentVersions[slotId] ?? 0) + 1,
-    }));
+    const nextState = restoreSlotSource(paperState, slotId);
+    commitStructuredAction(nextState);
   }
 
-  function handleSelectSlot(slotId: string, mode: InspectorMode = 'info') {
+  function handleSelectSlot(slotId: string) {
     setSelectedChromeBlockId(null);
     setSelectedSlotId(slotId);
     setActiveRailSlotId(slotId);
-    setInspectorMode(mode);
   }
 
   function handleSelectChromeBlock(regionKey: string) {
@@ -176,7 +260,8 @@ export default function EditorPage() {
   }
 
   function handleShowInfo(slotId: string) {
-    handleSelectSlot(slotId, 'info');
+    handleSelectSlot(slotId);
+    setInspectorMode('info');
     setInspectorHighlighted(true);
     if (inspectorHighlightTimeoutRef.current !== null) {
       window.clearTimeout(inspectorHighlightTimeoutRef.current);
@@ -188,16 +273,16 @@ export default function EditorPage() {
   }
 
   function handleShowAlternatives(slotId: string, intent: AlternativesIntent) {
-    handleSelectSlot(slotId, 'alternatives');
+    handleSelectSlot(slotId);
     setAlternativesIntent(intent);
+    setInspectorMode('alternatives');
     openAlternativesOverlay();
   }
 
   function handleToggleLock(slotId: string, locked: boolean) {
     handleSelectSlot(slotId);
-    setPaperState((currentState) =>
-      setSlotLockState(currentState, slotId, !locked),
-    );
+    const nextState = setSlotLockState(paperState, slotId, !locked);
+    commitStructuredAction(nextState);
   }
 
   function handleUseAlternative(slotId: string, questionId: string) {
@@ -206,15 +291,63 @@ export default function EditorPage() {
       .find((candidate) => candidate.slotId === slotId);
     if (!slot) return;
 
+    if (
+      slot.modifiedFromSource &&
+      !window.confirm(
+        'Replacing this question will clear manual edits for this slot. Continue?',
+      )
+    ) {
+      return;
+    }
+
     handleSelectSlot(slotId);
-    setPaperState((currentState) =>
-      setSlotSelectedQuestion(currentState, slotId, questionId),
-    );
+    const nextState = setSlotSelectedQuestion(paperState, slotId, questionId);
+    commitStructuredAction(nextState);
     setAlternativesOverlayOpen(false);
-    setRestoreVersionBySlotId((currentVersions) => ({
-      ...currentVersions,
-      [slotId]: (currentVersions[slotId] ?? 0) + 1,
-    }));
+  }
+
+  function handleDragStart() {
+    blockedCrossSectionDropRef.current = false;
+    setDragNotice(null);
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) {
+      if (blockedCrossSectionDropRef.current) {
+        setDragNotice('Questions can only be reordered within their section.');
+      }
+      blockedCrossSectionDropRef.current = false;
+      return;
+    }
+    if (active.id === over.id) return;
+
+    const slotId = String(active.id);
+    const activePosition = getSlotOrderPosition(slotId);
+    const overPosition = getSlotOrderPosition(String(over.id));
+    if (!activePosition || !overPosition) return;
+
+    const result = reorderSlotWithinOrderZone(paperState, {
+      slotId,
+      fromZoneId: activePosition.zone.zoneId,
+      toZoneId: overPosition.zone.zoneId,
+      toIndex: overPosition.index,
+    });
+    if (result.success) {
+      handleSelectSlot(slotId);
+      commitStructuredAction(result.state);
+    } else {
+      setDragNotice(result.error);
+    }
+    blockedCrossSectionDropRef.current = false;
+  }
+
+  function getSlotOrderPosition(slotId: string) {
+    for (const zone of orderZones) {
+      const index = zone.orderedItemIds.indexOf(slotId);
+      if (index !== -1) return { zone, index };
+    }
+    return undefined;
   }
 
   function handleAskQuestion(slotId: string, displayNumber: string) {
@@ -254,6 +387,8 @@ export default function EditorPage() {
             size="sm"
             className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
             aria-label="Undo last action"
+            disabled={!undoEntry}
+            onClick={handleUndo}
           >
             <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             Undo
@@ -355,207 +490,216 @@ export default function EditorPage() {
               </section>
             )}
 
-            <div className="space-y-6">
-              {view.sections.map((section) => {
-                const subtitleBlock = section.subtitleBlock;
-                const instructionsBlock = section.instructionsBlock;
+            <DndContext
+              sensors={dragSensors}
+              collisionDetection={sameSectionCollisionDetection}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="space-y-6">
+                {view.sections.map((section) => {
+                  const subtitleBlock = section.subtitleBlock;
+                  const instructionsBlock = section.instructionsBlock;
 
-                return (
-                  <section
-                    id={`section-${section.sectionId}`}
-                    key={section.sectionId}
-                    onMouseEnter={() => setHoveredSectionId(section.sectionId)}
-                    onMouseLeave={() => setHoveredSectionId(null)}
-                    className={cn(
-                      'paper-section border transition-colors duration-150 ease-out',
-                      hoveredSectionId === section.sectionId &&
-                        'bg-secondary/20',
-                      section.slots.some(
-                        (slot) => slot.slotId === selectedSlotId,
-                      ) && 'ring-1 ring-inset ring-border',
-                    )}
-                  >
-                    <header
-                      className="border-b px-4 py-3 text-center"
-                      onClick={() =>
-                        handleSelectChromeBlock(section.titleBlock.regionKey)
+                  return (
+                    <section
+                      id={`section-${section.sectionId}`}
+                      key={section.sectionId}
+                      onMouseEnter={() =>
+                        setHoveredSectionId(section.sectionId)
                       }
+                      onMouseLeave={() => setHoveredSectionId(null)}
+                      className={cn(
+                        'paper-section border transition-colors duration-150 ease-out',
+                        hoveredSectionId === section.sectionId &&
+                          'bg-secondary/20',
+                        section.slots.some(
+                          (slot) => slot.slotId === selectedSlotId,
+                        ) && 'ring-1 ring-inset ring-border',
+                      )}
                     >
-                      <PaperChromeEditor
-                        block={section.titleBlock}
-                        editable={
-                          selectedChromeBlockId === section.titleBlock.regionKey
+                      <header
+                        className="border-b px-4 py-3 text-center"
+                        onClick={() =>
+                          handleSelectChromeBlock(section.titleBlock.regionKey)
                         }
-                        className="qpg-section-title"
-                        onCommit={(text) =>
-                          handlePaperChromeChange(
-                            section.titleBlock.regionKey,
-                            text,
-                          )
-                        }
-                      />
-                      {subtitleBlock && (
-                        <div
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleSelectChromeBlock(subtitleBlock.regionKey);
-                          }}
-                        >
-                          <PaperChromeEditor
-                            block={subtitleBlock}
-                            editable={
-                              selectedChromeBlockId === subtitleBlock.regionKey
-                            }
-                            className="qpg-section-subtitle"
-                            onCommit={(text) =>
-                              handlePaperChromeChange(
-                                subtitleBlock.regionKey,
-                                text,
-                              )
-                            }
-                          />
-                        </div>
-                      )}
-                      {instructionsBlock && (
-                        <div
-                          className="mt-2"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleSelectChromeBlock(
-                              instructionsBlock.regionKey,
-                            );
-                          }}
-                        >
-                          <PaperChromeEditor
-                            block={instructionsBlock}
-                            editable={
-                              selectedChromeBlockId ===
-                              instructionsBlock.regionKey
-                            }
-                            className="qpg-section-instructions"
-                            onCommit={(text) =>
-                              handlePaperChromeChange(
-                                instructionsBlock.regionKey,
-                                text,
-                              )
-                            }
-                          />
-                        </div>
-                      )}
-                    </header>
-
-                    <div className="divide-y">
-                      {section.slots.map((slot) => (
-                        <div
-                          key={slot.slotId}
-                          data-question-slot
-                          tabIndex={0}
-                          aria-label={`Question ${slot.displayNumber}`}
-                          onClick={() => handleSelectSlot(slot.slotId)}
-                          onFocus={() => handleSelectSlot(slot.slotId)}
-                          onMouseEnter={() => {
-                            setHoveredSlotId(slot.slotId);
-                            setHoveredSectionId(section.sectionId);
-                          }}
-                          onMouseLeave={() => setHoveredSlotId(null)}
-                          className={cn(
-                            'relative grid cursor-text grid-cols-[2.5rem_minmax(0,1fr)_5rem] gap-3 px-4 py-4 outline-none transition-colors duration-150 ease-out focus-visible:ring-2 focus-visible:ring-ring max-sm:grid-cols-[1.75rem_minmax(0,1fr)_4.25rem] max-sm:px-3',
-                            hoveredSlotId === slot.slotId &&
-                              selectedSlotId !== slot.slotId &&
-                              'bg-secondary/45',
-                            selectedSlotId === slot.slotId &&
-                              'bg-secondary/70 ring-1 ring-inset ring-ring',
-                          )}
-                        >
-                          <div className="font-semibold">
-                            {slot.displayNumber}.
-                          </div>
-                          <div>
-                            <div className="space-y-1">
-                              {slot.questionBlockTree.children.map((region) => (
-                                <div
-                                  key={`${slot.slotId}:${region.regionKey}:${restoreVersionBySlotId[slot.slotId] ?? 0}`}
-                                  className="qpg-question-region flex items-start gap-1"
-                                >
-                                  {region.displayPrefix && (
-                                    <span className="qpg-question-region-prefix select-none font-medium">
-                                      {region.displayPrefix}
-                                    </span>
-                                  )}
-                                  <div className="min-w-0 flex-1">
-                                    <QuestionRegionEditor
-                                      region={region}
-                                      editable={
-                                        selectedSlotId === slot.slotId &&
-                                        region.editable
-                                      }
-                                      onCommit={(content) =>
-                                        handleRegionChange(
-                                          slot.slotId,
-                                          region.regionKey,
-                                          region.content,
-                                          content,
-                                        )
-                                      }
-                                    />
-                                  </div>
-                                  {region.displaySuffix && (
-                                    <span className="qpg-question-region-suffix select-none text-xs text-muted-foreground">
-                                      {region.displaySuffix}
-                                    </span>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                            <div
-                              data-editor-chrome
-                              className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground"
-                            >
-                              <span>
-                                {slot.questionType.replace(/_/g, ' ')}
-                              </span>
-                              {slot.locked && (
-                                <span className="inline-flex items-center gap-1">
-                                  <Lock
-                                    className="h-3 w-3"
-                                    aria-hidden="true"
-                                  />
-                                  Locked
-                                </span>
-                              )}
-                              {slot.modifiedFromSource && (
-                                <span>Modified from source</span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-right text-sm font-medium">
-                            [{slot.marksLabel}]
-                          </div>
-                          {activeRailSlotId === slot.slotId && (
-                            <QuestionActionRail
-                              locked={slot.locked}
-                              onInfo={() => handleShowInfo(slot.slotId)}
-                              onAlternatives={(intent) =>
-                                handleShowAlternatives(slot.slotId, intent)
+                      >
+                        <PaperChromeEditor
+                          block={section.titleBlock}
+                          editable={
+                            selectedChromeBlockId ===
+                            section.titleBlock.regionKey
+                          }
+                          className="qpg-section-title"
+                          onCommit={(text) =>
+                            handlePaperChromeChange(
+                              section.titleBlock.regionKey,
+                              text,
+                            )
+                          }
+                        />
+                        {subtitleBlock && (
+                          <div
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleSelectChromeBlock(subtitleBlock.regionKey);
+                            }}
+                          >
+                            <PaperChromeEditor
+                              block={subtitleBlock}
+                              editable={
+                                selectedChromeBlockId ===
+                                subtitleBlock.regionKey
                               }
-                              onToggleLock={() =>
-                                handleToggleLock(slot.slotId, slot.locked)
-                              }
-                              onAsk={() =>
-                                handleAskQuestion(
-                                  slot.slotId,
-                                  slot.displayNumber,
+                              className="qpg-section-subtitle"
+                              onCommit={(text) =>
+                                handlePaperChromeChange(
+                                  subtitleBlock.regionKey,
+                                  text,
                                 )
                               }
                             />
-                          )}
+                          </div>
+                        )}
+                        {instructionsBlock && (
+                          <div
+                            className="mt-2"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleSelectChromeBlock(
+                                instructionsBlock.regionKey,
+                              );
+                            }}
+                          >
+                            <PaperChromeEditor
+                              block={instructionsBlock}
+                              editable={
+                                selectedChromeBlockId ===
+                                instructionsBlock.regionKey
+                              }
+                              className="qpg-section-instructions"
+                              onCommit={(text) =>
+                                handlePaperChromeChange(
+                                  instructionsBlock.regionKey,
+                                  text,
+                                )
+                              }
+                            />
+                          </div>
+                        )}
+                      </header>
+
+                      <SortableContext
+                        items={section.slots.map((slot) => slot.slotId)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="divide-y">
+                          {section.slots.map((slot) => (
+                            <SortableQuestionSlot
+                              key={slot.slotId}
+                              slotId={slot.slotId}
+                              displayNumber={slot.displayNumber}
+                              orderZoneId={`section:${section.sectionId}`}
+                              selected={selectedSlotId === slot.slotId}
+                              hovered={hoveredSlotId === slot.slotId}
+                              onClick={() => handleSelectSlot(slot.slotId)}
+                              onFocus={() => handleSelectSlot(slot.slotId)}
+                              onMouseEnter={() => {
+                                setHoveredSlotId(slot.slotId);
+                                setHoveredSectionId(section.sectionId);
+                              }}
+                              onMouseLeave={() => setHoveredSlotId(null)}
+                            >
+                              <div>
+                                <div className="space-y-1">
+                                  {slot.questionBlockTree.children.map(
+                                    (region) => (
+                                      <div
+                                        key={`${slot.slotId}:${region.regionKey}:${slot.questionBlockTree.questionId}:${slot.modifiedFromSource}`}
+                                        className="qpg-question-region flex items-start gap-1"
+                                      >
+                                        {region.displayPrefix && (
+                                          <span className="qpg-question-region-prefix select-none font-medium">
+                                            {region.displayPrefix}
+                                          </span>
+                                        )}
+                                        <div className="min-w-0 flex-1">
+                                          <QuestionRegionEditor
+                                            region={region}
+                                            editable={
+                                              selectedSlotId === slot.slotId &&
+                                              region.editable
+                                            }
+                                            onCommit={(content) =>
+                                              handleRegionChange(
+                                                slot.slotId,
+                                                region.regionKey,
+                                                region.content,
+                                                content,
+                                              )
+                                            }
+                                          />
+                                        </div>
+                                        {region.displaySuffix && (
+                                          <span className="qpg-question-region-suffix select-none text-xs text-muted-foreground">
+                                            {region.displaySuffix}
+                                          </span>
+                                        )}
+                                      </div>
+                                    ),
+                                  )}
+                                </div>
+                                <div
+                                  data-editor-chrome
+                                  className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground"
+                                >
+                                  <span>
+                                    {slot.questionType.replace(/_/g, ' ')}
+                                  </span>
+                                  {slot.locked && (
+                                    <span className="inline-flex items-center gap-1">
+                                      <Lock
+                                        className="h-3 w-3"
+                                        aria-hidden="true"
+                                      />
+                                      Locked
+                                    </span>
+                                  )}
+                                  {slot.modifiedFromSource && (
+                                    <span>Modified from source</span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right text-sm font-medium">
+                                [{slot.marksLabel}]
+                              </div>
+                              {activeRailSlotId === slot.slotId && (
+                                <QuestionActionRail
+                                  locked={slot.locked}
+                                  onInfo={() => handleShowInfo(slot.slotId)}
+                                  onAlternatives={(intent) =>
+                                    handleShowAlternatives(slot.slotId, intent)
+                                  }
+                                  onToggleLock={() =>
+                                    handleToggleLock(slot.slotId, slot.locked)
+                                  }
+                                  onAsk={() =>
+                                    handleAskQuestion(
+                                      slot.slotId,
+                                      slot.displayNumber,
+                                    )
+                                  }
+                                />
+                              )}
+                            </SortableQuestionSlot>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
+                      </SortableContext>
+                    </section>
+                  );
+                })}
+              </div>
+            </DndContext>
           </article>
         </main>
 
@@ -587,11 +731,21 @@ export default function EditorPage() {
         </div>
       )}
 
+      {dragNotice && (
+        <div
+          data-editor-chrome
+          role="status"
+          className="fixed right-4 top-16 z-30 max-w-sm rounded-md border bg-background px-3 py-2 text-sm shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+        >
+          {dragNotice}
+        </div>
+      )}
+
       <div
         data-editor-chrome
-        className="editor-chat-footer fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 px-4 py-3 backdrop-blur"
+        className="editor-chat-footer fixed bottom-3 left-1/2 z-30 w-[min(calc(100vw-2rem),48rem)] -translate-x-1/2"
       >
-        <div className="mx-auto flex max-w-3xl items-center gap-3 rounded-lg border bg-background p-2">
+        <div className="flex items-center gap-3 rounded-lg border bg-background/95 p-2 shadow-[0_8px_24px_rgba(15,23,42,0.12)] backdrop-blur">
           <MessageSquareText
             className="h-5 w-5 flex-none text-muted-foreground"
             aria-hidden="true"

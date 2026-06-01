@@ -19,6 +19,11 @@ import {
   setSlotLockState,
   setSlotSelectedQuestion,
   setSlotRegionOverride,
+  buildOrderZones,
+  commitStructuredPaperAction,
+  reorderSlotWithinOrderZone,
+  renumberPaperSlots,
+  undoStructuredPaperAction,
 } from './paper-document';
 
 describe('PaperDocumentV1 validation', () => {
@@ -206,5 +211,125 @@ describe('PaperDocumentV1 normalization', () => {
     expect(replacedState.questionsById.q_mcq_heredity_001.rawText).toBe(
       state.questionsById.q_mcq_heredity_001.rawText,
     );
+  });
+});
+
+describe('PaperDocumentV1 ordering', () => {
+  it('derives same-zone-only Slot ordering zones from the current document structure', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const zones = buildOrderZones(document);
+
+    expect(zones[0]).toEqual({
+      zoneId: 'section:A',
+      label: 'Section A',
+      itemKind: 'slot',
+      orderedItemIds: [
+        'slot_A_01',
+        'slot_A_02',
+        'slot_B_01',
+        'slot_C_01',
+        'slot_D_01',
+      ],
+      reorder: {
+        enabled: true,
+        allowedTargetZoneIds: ['section:A'],
+      },
+    });
+    expect(zones.map((zone) => zone.zoneId)).toEqual([
+      'section:A',
+      'section:B',
+      'section:C',
+    ]);
+  });
+
+  it('renumbers slots continuously across sections', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const renumbered = renumberPaperSlots(document);
+    let expectedIndex = 1;
+    for (const section of renumbered.paper.sections) {
+      for (const slot of section.slots) {
+        expect(slot.displayNumber).toBe(String(expectedIndex));
+        expectedIndex += 1;
+      }
+    }
+  });
+
+  it('reorders slots within the same order zone and updates display numbers', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+
+    const result = reorderSlotWithinOrderZone(state, {
+      slotId: 'slot_A_01',
+      fromZoneId: 'section:A',
+      toZoneId: 'section:A',
+      toIndex: 1,
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    const nextState = result.state;
+
+    expect(nextState.slotOrderBySection.A.slice(0, 2)).toEqual([
+      'slot_A_02',
+      'slot_A_01',
+    ]);
+    expect(nextState.document.paper.sections[0].slots[0]).toMatchObject({
+      slotId: 'slot_A_02',
+      displayNumber: '1',
+    });
+    expect(nextState.document.paper.sections[0].slots[1]).toMatchObject({
+      slotId: 'slot_A_01',
+      displayNumber: '2',
+    });
+  });
+
+  it('rejects moves into a different order zone', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+
+    const result = reorderSlotWithinOrderZone(state, {
+      slotId: 'slot_A_01',
+      fromZoneId: 'section:A',
+      toZoneId: 'section:B',
+      toIndex: 0,
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.state).toBe(state);
+    if (result.success) return;
+    expect(result.error).toContain('not allowed');
+  });
+
+  it('keeps one app-level undo entry for the latest structured paper action', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const initialState = normalizePaperDocument(document);
+    const lockedState = setSlotLockState(initialState, 'slot_A_01', true);
+    const firstCommit = commitStructuredPaperAction(initialState, lockedState);
+    const reordered = reorderSlotWithinOrderZone(firstCommit.state, {
+      slotId: 'slot_A_01',
+      fromZoneId: 'section:A',
+      toZoneId: 'section:A',
+      toIndex: 1,
+    });
+    expect(reordered.success).toBe(true);
+    if (!reordered.success) return;
+
+    const secondCommit = commitStructuredPaperAction(
+      firstCommit.state,
+      reordered.state,
+    );
+    const undone = undoStructuredPaperAction(
+      secondCommit.state,
+      secondCommit.undoEntry,
+    );
+
+    expect(undone.state).toBe(firstCommit.state);
+    expect(undone.undoEntry).toBeNull();
+    expect(undone.state.lockStateBySlotId.slot_A_01).toBe(true);
+    expect(undone.state.slotOrderBySection.A.slice(0, 2)).toEqual([
+      'slot_A_01',
+      'slot_A_02',
+    ]);
   });
 });

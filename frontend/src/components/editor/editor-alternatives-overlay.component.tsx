@@ -15,6 +15,7 @@ import { AlertTriangle, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type {
   EditorQuestionAlternativeView,
+  EditorQuestionContainerBlock,
   EditorPaperSlotView,
 } from '@/lib/editor-paper';
 import type { DocQuestion } from '@/types';
@@ -125,9 +126,10 @@ export function EditorAlternativesOverlay({
                 <p className="text-xs font-medium text-muted-foreground">
                   Current question
                 </p>
-                <p className="mt-1 text-sm font-medium leading-6">
-                  {selectedQuestion.rawText}
-                </p>
+                <QuestionPreview
+                  questionBlockTree={selectedSlot.questionBlockTree}
+                  className="mt-1 text-sm font-medium leading-6"
+                />
               </div>
               <div className="flex flex-wrap gap-1.5 text-xs">
                 <MetadataChip>{selectedSlot.marksLabel}</MetadataChip>
@@ -244,9 +246,10 @@ function AlternativeCard({
 
   return (
     <article className="flex min-h-[18rem] flex-col rounded-lg border bg-background p-4">
-      <p className="text-sm font-medium leading-6">
-        {alternative.questionText}
-      </p>
+      <QuestionPreview
+        questionBlockTree={alternative.questionBlockTree}
+        className="text-sm font-medium leading-6"
+      />
       <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
         <MetadataChip>{`${alternative.marks} marks`}</MetadataChip>
         <MetadataChip>
@@ -342,6 +345,45 @@ function EmptyAlternatives({
         <Button type="button" variant="outline" disabled>
           Find more in question bank
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function QuestionPreview({
+  questionBlockTree,
+  className,
+}: {
+  questionBlockTree: EditorQuestionContainerBlock;
+  className?: string;
+}) {
+  if (questionBlockTree.children.length === 0) {
+    return <p className={className}>No question text available.</p>;
+  }
+
+  return (
+    <div className={className}>
+      <div className="space-y-1.5">
+        {questionBlockTree.children.map((region) => (
+          <div
+            key={region.regionKey}
+            className="flex min-w-0 items-start gap-1.5"
+          >
+            {region.displayPrefix && (
+              <span className="flex-none select-none font-semibold">
+                {region.displayPrefix}
+              </span>
+            )}
+            <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">
+              {region.text}
+            </span>
+            {region.displaySuffix && (
+              <span className="flex-none select-none text-xs text-muted-foreground">
+                {region.displaySuffix}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

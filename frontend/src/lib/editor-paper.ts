@@ -73,6 +73,7 @@ export interface EditorQuestionContainerBlock {
 export interface EditorQuestionAlternativeView {
   questionId: string;
   questionText: string;
+  questionBlockTree: EditorQuestionContainerBlock;
   marks: number;
   questionType: string;
   chapterNames: string[];
@@ -216,7 +217,12 @@ export function buildEditorPaperView(
             return alternateQuestion ? [alternateQuestion] : [];
           }),
           options.alternativesIntentBySlotId?.[slot.slotId] ?? 'swap',
-        ).map(questionToAlternativeView),
+        ).map((alternativeQuestion) =>
+          questionToAlternativeView(
+            alternativeQuestion,
+            document.format.questionRegions,
+          ),
+        ),
         blockNoteBlocks:
           questionBlockTree.children.length > 0
             ? questionBlockTree.children.flatMap(
@@ -364,10 +370,17 @@ function difficultyRank(difficulty: string) {
 
 function questionToAlternativeView(
   question: DocQuestion,
+  questionRegionRules: PaperDocument['format']['questionRegions'],
 ): EditorQuestionAlternativeView {
   return {
     questionId: question.questionId,
     questionText: question.rawText,
+    questionBlockTree: questionToBlockTree(
+      `alternative:${question.questionId}`,
+      question,
+      undefined,
+      questionRegionRules,
+    ),
     marks: question.marks,
     questionType: question.questionType,
     chapterNames: question.metadata.chapterNames,
@@ -551,7 +564,7 @@ function regionBlock(
     displayPrefix: prefix,
     displaySuffix: suffix,
     content,
-    blockNoteBlocks: [paragraphBlock(text)],
+    blockNoteBlocks: contentItemsToBlockNoteBlocks(content),
     editable: true,
     sourceKind: 'source_question_text',
     editTarget: 'slot_override',
@@ -593,11 +606,11 @@ function paperChromeBlock(
   };
 }
 
-function contentItemsToText(items: ContentItem[]): string {
-  return items.map(contentItemToText).filter(Boolean).join(' ');
+export function contentItemsToText(items: ContentItem[]): string {
+  return items.map(contentItemToText).filter(Boolean).join('\n');
 }
 
-function contentItemToText(item: ContentItem): string {
+export function contentItemToText(item: ContentItem): string {
   if (item.text) return item.text;
   if (item.latex) return item.latex;
   if (item.type === 'table' && item.rows) {
@@ -607,6 +620,12 @@ function contentItemToText(item: ContentItem): string {
     return item.caption ? `[Diagram: ${item.caption}]` : '[Diagram]';
   }
   return item.caption ?? '';
+}
+
+function contentItemsToBlockNoteBlocks(items: ContentItem[]): PartialBlock[] {
+  const blocks = items.map((item) => paragraphBlock(contentItemToText(item)));
+
+  return blocks.length > 0 ? blocks : [paragraphBlock('')];
 }
 
 function blockContentToText(content: unknown): string {

@@ -41,6 +41,37 @@ export interface NormalizedPaperDocument {
   formatRules: PaperFormat;
 }
 
+export interface PaperOrderZone {
+  zoneId: string;
+  label: string;
+  itemKind: 'slot';
+  orderedItemIds: string[];
+  reorder: {
+    enabled: boolean;
+    allowedTargetZoneIds: string[];
+  };
+}
+
+export interface SlotOrderZoneReorderParams {
+  slotId: string;
+  fromZoneId: string;
+  toZoneId: string;
+  toIndex: number;
+}
+
+export type SlotOrderZoneReorderResult =
+  | { success: true; state: NormalizedPaperDocument }
+  | { success: false; state: NormalizedPaperDocument; error: string };
+
+export interface StructuredPaperUndoEntry {
+  previousState: NormalizedPaperDocument;
+}
+
+export interface StructuredPaperActionState {
+  state: NormalizedPaperDocument;
+  undoEntry: StructuredPaperUndoEntry | null;
+}
+
 export class PaperDocumentContractError extends Error {
   readonly userMessage =
     'The generated paper did not match the editor contract. Please try again.';
@@ -285,4 +316,172 @@ function updateSectionChromeText(
     return { ...section, instructions: text };
   }
   return section;
+}
+
+export function renumberPaperSlots(document: PaperDocument): PaperDocument {
+  let index = 1;
+  return {
+    ...document,
+    paper: {
+      ...document.paper,
+      sections: document.paper.sections.map((section) => ({
+        ...section,
+        slots: section.slots.map((slot) => {
+          const nextSlot = {
+            ...slot,
+            displayNumber: String(index),
+          };
+          index += 1;
+          return nextSlot;
+        }),
+      })),
+    },
+  };
+}
+
+export function buildOrderZones(
+  input: PaperDocument | NormalizedPaperDocument,
+): PaperOrderZone[] {
+  const document = 'document' in input ? input.document : input;
+
+  return document.paper.sections.map((section) => ({
+    zoneId: `section:${section.sectionId}`,
+    label: section.title,
+    itemKind: 'slot',
+    orderedItemIds: section.slots.map((slot) => slot.slotId),
+    reorder: {
+      enabled: document.format.sections.allowQuestionReorderWithinSection,
+      allowedTargetZoneIds: [`section:${section.sectionId}`],
+    },
+  }));
+}
+
+export function reorderSlotWithinOrderZone(
+  state: NormalizedPaperDocument,
+  params: SlotOrderZoneReorderParams,
+): SlotOrderZoneReorderResult {
+  const zones = buildOrderZones(state);
+  const sourceZone = zones.find((zone) =>
+    zone.orderedItemIds.includes(params.slotId),
+  );
+
+  if (!sourceZone) {
+    return { success: false, state, error: 'Slot not found in any order zone' };
+  }
+  if (sourceZone.zoneId !== params.fromZoneId) {
+    return {
+      success: false,
+      state,
+      error: `Slot belongs to ${sourceZone.zoneId}, not ${params.fromZoneId}`,
+    };
+  }
+
+  const targetZone = zones.find((zone) => zone.zoneId === params.toZoneId);
+  if (!targetZone) {
+    return { success: false, state, error: 'Target order zone not found' };
+  }
+  if (!sourceZone.reorder.enabled) {
+    return {
+      success: false,
+      state,
+      error: 'Reorder is disabled for this zone',
+    };
+  }
+  if (!sourceZone.reorder.allowedTargetZoneIds.includes(targetZone.zoneId)) {
+    return {
+      success: false,
+      state,
+      error: `Move from ${sourceZone.zoneId} to ${targetZone.zoneId} is not allowed`,
+    };
+  }
+  if (
+    params.toIndex < 0 ||
+    params.toIndex >= targetZone.orderedItemIds.length
+  ) {
+    return { success: false, state, error: 'Target index is outside the zone' };
+  }
+
+  const reorderedItemIds = [...sourceZone.orderedItemIds];
+  const fromIndex = reorderedItemIds.indexOf(params.slotId);
+  if (fromIndex === -1) {
+    return { success: false, state, error: 'Slot not found in source zone' };
+  }
+  if (fromIndex === params.toIndex) {
+    return { success: true, state };
+  }
+
+  reorderedItemIds.splice(fromIndex, 1);
+  reorderedItemIds.splice(params.toIndex, 0, params.slotId);
+
+  const nextSections = state.document.paper.sections.map((section) => {
+    if (`section:${section.sectionId}` === sourceZone.zoneId) {
+      return {
+        ...section,
+        slots: reorderedItemIds.map((slotId) =>
+          slotWithCurrentState(state, slotId),
+        ),
+      };
+    }
+    return {
+      ...section,
+      slots: section.slots.map((slot) =>
+        slotWithCurrentState(state, slot.slotId),
+      ),
+    };
+  });
+
+  let nextDocument: PaperDocument = {
+    ...state.document,
+    paper: {
+      ...state.document.paper,
+      sections: nextSections,
+    },
+  };
+
+  nextDocument = renumberPaperSlots(nextDocument);
+  const nextState = normalizePaperDocument(nextDocument);
+
+  return { success: true, state: nextState };
+}
+
+export function commitStructuredPaperAction(
+  currentState: NormalizedPaperDocument,
+  nextState: NormalizedPaperDocument,
+): StructuredPaperActionState {
+  return {
+    state: nextState,
+    undoEntry: {
+      previousState: currentState,
+    },
+  };
+}
+
+export function undoStructuredPaperAction(
+  currentState: NormalizedPaperDocument,
+  undoEntry: StructuredPaperUndoEntry | null,
+): StructuredPaperActionState {
+  if (!undoEntry) {
+    return {
+      state: currentState,
+      undoEntry: null,
+    };
+  }
+
+  return {
+    state: undoEntry.previousState,
+    undoEntry: null,
+  };
+}
+
+function slotWithCurrentState(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): DocSlot {
+  const slot = state.slotsById[slotId];
+
+  return {
+    ...slot,
+    locked: state.lockStateBySlotId[slotId] ?? slot.locked,
+    overrides: state.slotEditsById[slotId] ?? slot.overrides,
+  };
 }

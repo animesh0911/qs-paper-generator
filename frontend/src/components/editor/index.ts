@@ -12,4 +12,5 @@ export { EditorOutlineRail } from './editor-outline-rail.component';
 export { PaperChromeEditor } from './paper-chrome-editor.component';
 export { QuestionActionRail } from './question-action-rail.component';
 export { QuestionRegionEditor } from './question-region-editor.component';
+export { SortableQuestionSlot } from './sortable-question-slot.component';
 export type { AlternativesIntent, InspectorMode } from './editor-types';

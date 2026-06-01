@@ -12,6 +12,7 @@ import { mockPaperDocumentV1 } from '@/mocks';
 import {
   assertPaperDocument,
   normalizePaperDocument,
+  reorderSlotWithinOrderZone,
   setSlotRegionOverride,
 } from './paper-document';
 import { buildEditorPaperView } from './editor-paper';
@@ -194,6 +195,40 @@ describe('editor paper view model', () => {
     });
   });
 
+  it('preserves multi-paragraph manual edits as separate editable blocks', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const nextState = setSlotRegionOverride(state, 'slot_A_01', 'stem', [
+      {
+        type: 'paragraph',
+        text: 'Edited first line.',
+      },
+      {
+        type: 'paragraph',
+        text: 'Added line from Enter key.',
+      },
+    ]);
+
+    const view = buildEditorPaperView(document, {
+      slotEditsById: nextState.slotEditsById,
+    });
+    const stemRegion = view.sections[0].slots[0].questionBlockTree.children[0];
+
+    expect(stemRegion.text).toBe(
+      'Edited first line.\nAdded line from Enter key.',
+    );
+    expect(stemRegion.blockNoteBlocks).toEqual([
+      {
+        type: 'paragraph',
+        content: 'Edited first line.',
+      },
+      {
+        type: 'paragraph',
+        content: 'Added line from Enter key.',
+      },
+    ]);
+  });
+
   it('keeps display prefixes outside editable region content', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const view = buildEditorPaperView(document);
@@ -224,6 +259,31 @@ describe('editor paper view model', () => {
       filledSlots: 9,
       lockedSlots: 1,
       warnings: [],
+    });
+  });
+
+  it('renders recomputed display numbers after slot reorder', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const result = reorderSlotWithinOrderZone(state, {
+      slotId: 'slot_A_01',
+      fromZoneId: 'section:A',
+      toZoneId: 'section:A',
+      toIndex: 1,
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    const view = buildEditorPaperView(result.state.document);
+
+    expect(view.sections[0].slots[0]).toMatchObject({
+      slotId: 'slot_A_02',
+      displayNumber: '1',
+    });
+    expect(view.sections[0].slots[1]).toMatchObject({
+      slotId: 'slot_A_01',
+      displayNumber: '2',
     });
   });
 
@@ -266,6 +326,37 @@ describe('editor paper view model', () => {
     ]);
     expect(lockedSlot.locked).toBe(true);
     expect(lockedSlot.alternateQuestions).toHaveLength(4);
+  });
+
+  it('formats alternatives from structured question regions instead of raw text only', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const alternateQuestion = document.questions.find(
+      (question) => question.questionId === 'q_mcq_heredity_002',
+    );
+    expect(alternateQuestion).toBeDefined();
+    alternateQuestion!.rawText = 'Truncated imported stem.';
+
+    const view = buildEditorPaperView(document);
+    const firstAlternative = findSlot(view, 'slot_A_01').alternateQuestions[0];
+
+    expect(firstAlternative.questionText).toBe('Truncated imported stem.');
+    expect(
+      firstAlternative.questionBlockTree.children.map((region) => ({
+        regionKey: region.regionKey,
+        prefix: region.displayPrefix,
+        text: region.text,
+      })),
+    ).toEqual([
+      {
+        regionKey: 'stem',
+        prefix: '',
+        text: 'Which pair represents contrasting traits studied by Mendel in pea plants?',
+      },
+      { regionKey: 'option:A', prefix: '(A) ', text: 'Tall and dwarf' },
+      { regionKey: 'option:B', prefix: '(B) ', text: 'Red and green blood' },
+      { regionKey: 'option:C', prefix: '(C) ', text: 'Metal and non-metal' },
+      { regionKey: 'option:D', prefix: '(D) ', text: 'Acid and base' },
+    ]);
   });
 
   it('filters alternatives by topic first and falls back to chapter matches', () => {

@@ -74,6 +74,7 @@
     font-size: 15px;
     line-height: 1.65;
     min-height: 24.75px;
+    white-space: pre-wrap;
   }
 
   .qpg-question-blocknote .bn-block-outer {
