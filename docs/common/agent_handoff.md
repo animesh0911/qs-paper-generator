@@ -74,10 +74,11 @@ with required slot fields before editor normalization work proceeds.
 Commit: `db0edda`
 Owner: Varad / Codex
 
-Changed: backend LLM calls now go through `ai_services.llm.LiteLLMClient`;
-`bank.llm` is only a compatibility wrapper for ingestion.
+Changed: backend LLM calls now go through `ai_services.llm.LiteLLMClient`.
+`bank.ingestor` imports the gateway from `ai_services.llm` directly; the old
+`bank.llm` compatibility wrapper has been deleted.
 
-Files: `backend/ai_services/llm.py`, `backend/bank/llm.py`,
+Files: `backend/ai_services/llm.py`, `backend/bank/ingestor.py`,
 `backend/requirements.txt`, `.env.example`
 
 Boundary: no provider SDK calls in React or feature modules; new editor AI

@@ -3,13 +3,13 @@
 Mapping layer between internal domain objects and the frontend contract
 defined in contracts/v1_contract.md. No DB writes; all IDs are derived.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
 
 from bank.models import Question
 
-from .template import Slot
 from .models import Paper
 from .picker import FilledTemplate, PaperOptions
 
@@ -58,9 +58,7 @@ class PaperDocumentBuilder:
             "template": self._build_template(paper, preset),
             "format": self._build_format(),
             "paper": self._build_paper(paper, result),
-            "questions": [
-                self._build_question(q) for q in questions_by_pk.values()
-            ],
+            "questions": [self._build_question(q) for q in questions_by_pk.values()],
         }
 
     # --- internal helpers ---
@@ -70,7 +68,7 @@ class PaperDocumentBuilder:
         for qid in result.question_ids:
             if qid is not None:
                 ids.add(qid)
-        for alts in (result.alternate_ids or []):
+        for alts in result.alternate_ids or []:
             ids.update(alts)
         return list(ids)
 
@@ -208,13 +206,15 @@ class PaperDocumentBuilder:
                 slots_data.append(slot_data)
                 display_counter += 1
 
-            sections.append({
-                "sectionId": section_key,
-                "title": _SECTION_TITLE[section_key],
-                "marks": section_marks,
-                "instructions": _SECTION_INSTRUCTIONS[section_key],
-                "slots": slots_data,
-            })
+            sections.append(
+                {
+                    "sectionId": section_key,
+                    "title": _SECTION_TITLE[section_key],
+                    "marks": section_marks,
+                    "instructions": _SECTION_INSTRUCTIONS[section_key],
+                    "slots": slots_data,
+                }
+            )
 
         return sections
 

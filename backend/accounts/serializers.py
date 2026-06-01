@@ -4,6 +4,7 @@ Lightweight: login / register accept ``{email, password}`` and a serializer
 exposes the current user. Domain-level user concerns live in
 ``accounts.models``.
 """
+
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 
@@ -19,7 +20,9 @@ class RegisterSerializer(serializers.Serializer):
         # always matches; Django's normalize_email only lowercases the domain.
         value = value.lower()
         if User.objects.filter(email__iexact=value).exists():
-            raise serializers.ValidationError("An account with this email already exists.")
+            raise serializers.ValidationError(
+                "An account with this email already exists."
+            )
         return value
 
     def create(self, validated_data):
@@ -33,9 +36,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        user = authenticate(
-            username=attrs["email"].lower(), password=attrs["password"]
-        )
+        user = authenticate(username=attrs["email"].lower(), password=attrs["password"])
         if not user:
             raise serializers.ValidationError("Invalid email or password.")
         attrs["user"] = user

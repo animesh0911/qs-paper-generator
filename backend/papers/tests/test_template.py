@@ -1,11 +1,11 @@
 """Unit tests for TemplateBuilder + PaperTemplate."""
+
 from collections import Counter
 
 import pytest
 
 from bank.models import QuestionType, Section
-from papers.template import PaperTemplate, PRESET_NAMES, Preset, Slot, TemplateBuilder
-
+from papers.template import PRESET_NAMES, PaperTemplate, Preset, Slot, TemplateBuilder
 
 # ---------------------------------------------------------------------------
 # Board preset — acceptance criteria
@@ -24,21 +24,27 @@ def test_board_spec_section_a_20_mcq_1m():
     spec = TemplateBuilder().build("board")
     a = [s for s in spec.slots if s.section == Section.A]
     assert len(a) == 20
-    assert all(s.marks == 1 and s.qtype == QuestionType.MCQ and s.or_group is None for s in a)
+    assert all(
+        s.marks == 1 and s.qtype == QuestionType.MCQ and s.or_group is None for s in a
+    )
 
 
 def test_board_spec_section_b_6_vsa_2m():
     spec = TemplateBuilder().build("board")
     b = [s for s in spec.slots if s.section == Section.B]
     assert len(b) == 6
-    assert all(s.marks == 2 and s.qtype == QuestionType.VSA and s.or_group is None for s in b)
+    assert all(
+        s.marks == 2 and s.qtype == QuestionType.VSA and s.or_group is None for s in b
+    )
 
 
 def test_board_spec_section_c_7_sa_3m():
     spec = TemplateBuilder().build("board")
     c = [s for s in spec.slots if s.section == Section.C]
     assert len(c) == 7
-    assert all(s.marks == 3 and s.qtype == QuestionType.SA and s.or_group is None for s in c)
+    assert all(
+        s.marks == 3 and s.qtype == QuestionType.SA and s.or_group is None for s in c
+    )
 
 
 def test_board_spec_section_d_3_la_5m_with_or():
@@ -99,8 +105,16 @@ def test_all_presets_or_groups_have_exactly_two_slots():
 
 def test_d_and_e_groups_do_not_overlap():
     spec = TemplateBuilder().build("board")
-    d_groups = {s.or_group for s in spec.slots if s.section == Section.D and s.or_group is not None}
-    e_groups = {s.or_group for s in spec.slots if s.section == Section.E and s.or_group is not None}
+    d_groups = {
+        s.or_group
+        for s in spec.slots
+        if s.section == Section.D and s.or_group is not None
+    }
+    e_groups = {
+        s.or_group
+        for s in spec.slots
+        if s.section == Section.E and s.or_group is not None
+    }
     assert d_groups.isdisjoint(e_groups)
 
 

@@ -15,6 +15,7 @@ Where it fits:
   ingestion of ``content/`` PDFs.
 - Exposed to the API via ``bank.serializers`` and ``bank.views``.
 """
+
 from django.db import models
 
 from accounts.models import School
@@ -97,10 +98,18 @@ class Question(models.Model):
     """
 
     school = models.ForeignKey(
-        School, null=True, blank=True, on_delete=models.SET_NULL, related_name="questions"
+        School,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="questions",
     )
     chapter = models.ForeignKey(
-        Chapter, null=True, blank=True, on_delete=models.PROTECT, related_name="questions"
+        Chapter,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="questions",
     )
     section = models.CharField(max_length=4, choices=Section.choices)
     qtype = models.CharField(max_length=20, choices=QuestionType.choices)

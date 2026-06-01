@@ -1,4 +1,5 @@
 """Tests for the shared LiteLLM gateway."""
+
 from __future__ import annotations
 
 from types import SimpleNamespace

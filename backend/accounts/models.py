@@ -7,6 +7,7 @@ without a schema change.
 ``User`` overrides Django's default to use email as the username field and
 to carry an optional ``school`` FK so teachers belong to a school.
 """
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 

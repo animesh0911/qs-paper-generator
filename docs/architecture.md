@@ -63,7 +63,7 @@ Ingestor.ingest(pdf_bytes)
         │           │
         │           └──▶ LLMClient.complete(prompt)         (default: make_llm_client())
         │                       ↓
-        │                   AnthropicClient / OpenAIClient / GeminiClient
+        │                   LiteLLMClient (ai_services.llm)
         │
         └──▶ Question.objects.bulk_create(... verified=False)
         │
@@ -82,7 +82,7 @@ IngestResult{created: N}
 | `CoverageReport` | `papers.picker` | Single source of truth for the coverage report shape. |
 | `PaperDocumentV1` | `papers.document` | Single render-time contract. Frontend and PDF renderer both consume the same dict from `Paper.document`. |
 | `Parser` / `Tagger` | `bank.ingestor` | Two adapter seams of the Ingestor. Tests inject `StubParser` / `StubTagger`. |
-| `LLMClient` | `bank.llm` | Provider-agnostic LLM call (`complete(prompt) → str`). Anthropic / OpenAI / Gemini adapters; lazy SDK imports. Chosen via `LLM_PROVIDER`. |
+| `LLMClient` | `ai_services.llm` | Provider-agnostic LLM call (`complete(prompt) → str`). One `LiteLLMClient` adapter over `litellm.completion` spans OpenAI / Anthropic / Gemini. Model chosen via `LLM_MODEL` (or `LLM_PROVIDER` fallback). |
 | `AssembleRequestSerializer` | `papers.serializers` | Declarative input contract for `POST /papers/assemble`. New fields accrete here. |
 | `useCoverageForm` | `frontend/hooks` | Owns the teacher's form state and builds the assemble payload. |
 

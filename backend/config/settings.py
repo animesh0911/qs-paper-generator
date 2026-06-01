@@ -4,6 +4,7 @@ Django settings for the Question Paper Generator (Slice 1: walking skeleton).
 Configuration is driven by environment variables so the same image runs in
 Docker Compose and (later) in a hosted environment.
 """
+
 import os
 from pathlib import Path
 
@@ -97,8 +98,10 @@ DATABASES = {
 AUTH_USER_MODEL = "accounts.User"
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-     "OPTIONS": {"min_length": 6}},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 6},
+    },
 ]
 
 LANGUAGE_CODE = "en-us"

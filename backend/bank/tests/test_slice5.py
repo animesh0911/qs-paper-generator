@@ -1,4 +1,6 @@
-"""Tests for Slice 5: de-duplication, numerical detection, marking scheme, admin actions."""
+"""Tests for Slice 5: de-duplication, numerical detection, marking scheme,
+admin actions."""
+
 from __future__ import annotations
 
 import pytest
@@ -8,10 +10,8 @@ from bank.ingestor import (
     MarkingSchemeAnswerSource,
     _detect_numerical,
     _fingerprint,
-    segment_questions,
 )
 from bank.models import Question
-
 
 # ---------------------------------------------------------------------------
 # _detect_numerical
@@ -114,7 +114,9 @@ SECTION B
 3. What is the function of the stomata in a leaf?
 """
     parser = _StubParser(text)
-    r = Ingestor(parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()).ingest(b"x")
+    r = Ingestor(
+        parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()
+    ).ingest(b"x")
     assert r.created == 2
     assert r.skipped_duplicates == 1
     assert Question.objects.count() == 2
@@ -135,7 +137,9 @@ SECTION B
     tagger = _StubTagger()
 
     Ingestor(parser=_StubParser(text1), tagger=tagger, extractor=extractor).ingest(b"x")
-    r = Ingestor(parser=_StubParser(text2), tagger=tagger, extractor=extractor).ingest(b"x")
+    r = Ingestor(parser=_StubParser(text2), tagger=tagger, extractor=extractor).ingest(
+        b"x"
+    )
     assert r.created == 1
     assert Question.objects.count() == 2
 
@@ -159,7 +163,9 @@ SECTION C
 def test_ingestor_flags_numerical_question(db):
     extractor = _NullExtractor()
     tagger = _StubTagger()
-    Ingestor(parser=_StubParser(_NUMERICAL_TEXT), tagger=tagger, extractor=extractor).ingest(b"x")
+    Ingestor(
+        parser=_StubParser(_NUMERICAL_TEXT), tagger=tagger, extractor=extractor
+    ).ingest(b"x")
     q = Question.objects.get()
     assert q.is_numerical is True
 
@@ -188,13 +194,14 @@ SECTION B
 
 @pytest.mark.django_db
 def test_ingestor_flags_diagram_keyword_question_via_text_only():
-    """Questions mentioning 'Fig.' get has_diagram=True even when no image is extracted."""
+    """Questions mentioning 'Fig.' get has_diagram=True even when no image is
+    extracted."""
     parser = _StubParser(_DIAGRAM_KEYWORD_TEXT)
-    Ingestor(
-        parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()
-    ).ingest(b"not-a-pdf")
+    Ingestor(parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()).ingest(
+        b"not-a-pdf"
+    )
     qs = Question.objects.order_by("id")
-    assert qs[0].has_diagram is True   # mentions "Fig. 3"
+    assert qs[0].has_diagram is True  # mentions "Fig. 3"
     assert qs[1].has_diagram is False  # plain text
 
 
@@ -235,7 +242,10 @@ def test_marking_scheme_answer_source_extracts_answers(monkeypatch):
     scheme = MarkingSchemeAnswerSource().answers(b"fake")
     assert scheme[1] == "Oxygen (O2)"
     assert scheme[2] == "The SI unit of current is Ampere."
-    assert scheme[3] == "Decomposition is the breakdown of a compound into simpler substances."
+    assert (
+        scheme[3]
+        == "Decomposition is the breakdown of a compound into simpler substances."
+    )
 
 
 def test_marking_scheme_answer_source_empty_pdf(monkeypatch):
@@ -282,7 +292,8 @@ def test_apply_answers_fills_unverified_rows_by_position():
 
 @pytest.mark.django_db
 def test_apply_answers_skips_verified_questions():
-    """Verified questions are excluded from the candidate list, so they are never overwritten."""
+    """Verified questions are excluded from the candidate list, so they are
+    never overwritten."""
     Question.objects.create(
         section="B", qtype="very_short_answer", marks=2, text="Verified?", verified=True, answer="correct"
     )
