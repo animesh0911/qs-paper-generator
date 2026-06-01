@@ -319,3 +319,77 @@ def test_apply_answers_skips_verified_questions():
         answer_source=_StubAnswerSource({1: "Wrong answer"}),
     )
     assert ingestor.apply_answers(b"x") == 0
+
+
+# ---------------------------------------------------------------------------
+# Source provenance + enrichment persistence (the formerly-dead seam)
+# ---------------------------------------------------------------------------
+
+_PROVENANCE_TEXT = """\
+SECTION B
+1. Define decomposition reaction and give one example.
+"""
+
+
+class _EnrichTagger:
+    """Tagger that emits the full documented output, incl. topic_names/primary_form."""
+
+    def tag(self, qs, chapters):
+        return [
+            {
+                **q,
+                "chapter_slug": None,
+                "cognitive_level": "U",
+                "topic_names": ["Decomposition"],
+                "primary_form": "diagram_based",
+            }
+            for q in qs
+        ]
+
+
+@pytest.mark.django_db
+def test_ingest_records_source_provenance_from_filename():
+    """Filename + source_type land on the row; source_name is the filename stem.
+
+    Why this matters: CONTEXT promises ingest records provenance, and
+    PaperDocumentV1.source maps it. Before this, the fields were never written —
+    a doc that lied about behaviour. This pins the seam as live."""
+    ingestor = Ingestor(
+        parser=_StubParser(_PROVENANCE_TEXT),
+        tagger=_StubTagger(),
+        extractor=_NullExtractor(),
+    )
+    ingestor.ingest(b"x", source_file_name="31-2-1.pdf", source_type="sample_paper")
+
+    q = Question.objects.get()
+    assert q.source_file_name == "31-2-1.pdf"
+    assert q.source_name == "31-2-1"  # filename stem
+    assert q.source_type == "sample_paper"
+    # V2 deferral: per-question page/qnum stay blank.
+    assert q.source_page_number is None
+    assert q.source_original_qnum == ""
+
+
+@pytest.mark.django_db
+def test_ingest_defaults_source_type_when_omitted():
+    """No source_type → previous_year_paper (the common case for a PYQ PDF)."""
+    Ingestor(
+        parser=_StubParser(_PROVENANCE_TEXT),
+        tagger=_StubTagger(),
+        extractor=_NullExtractor(),
+    ).ingest(b"x", source_file_name="boards-2025.pdf")
+    assert Question.objects.get().source_type == "previous_year_paper"
+
+
+@pytest.mark.django_db
+def test_ingest_persists_topic_names_and_primary_form():
+    """Tagger enrichment reaches the DB; diagram_based reinforces has_diagram."""
+    Ingestor(
+        parser=_StubParser(_PROVENANCE_TEXT),
+        tagger=_EnrichTagger(),
+        extractor=_NullExtractor(),
+    ).ingest(b"x")
+    q = Question.objects.get()
+    assert q.topic_names == ["Decomposition"]
+    assert q.primary_form == "diagram_based"
+    assert q.has_diagram is True  # diagram_based primary_form flags it

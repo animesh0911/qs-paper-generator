@@ -65,6 +65,18 @@ class ParseQuality(models.TextChoices):
     BROKEN = "broken", "Broken"
 
 
+class PrimaryForm(models.TextChoices):
+    """Dominant non-text form a question depends on, emitted by the Tagger.
+
+    Orthogonal to ``QuestionType`` (which is section/structure driven): a
+    short-answer question can still be ``diagram_based``. ``diagram_based`` also
+    reinforces ``has_diagram`` at ingest. See CONTEXT.md ``primary_form``."""
+
+    NONE = "none", "None"
+    DIAGRAM_BASED = "diagram_based", "Diagram-based"
+    TABLE_BASED = "table_based", "Table-based"
+
+
 class Chapter(models.Model):
     """Canonical CBSE Class 10 Science chapter.
 
@@ -126,6 +138,10 @@ class Question(models.Model):
     content = models.JSONField(default=dict, blank=True)
     # Freeform LLM-emitted topic strings. No Topic model in V1.
     topic_names = models.JSONField(default=list, blank=True)
+    # Tagger-emitted dominant non-text form. Orthogonal to qtype. See PrimaryForm.
+    primary_form = models.CharField(
+        max_length=16, choices=PrimaryForm.choices, default=PrimaryForm.NONE, blank=True
+    )
     answer = models.TextField(blank=True)
     # Set True automatically by Paper.approve for every referenced question.
     # See ADR-0002. NOT a picker gate — parse_quality is.

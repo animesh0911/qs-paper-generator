@@ -30,7 +30,11 @@ _SECTION_INSTRUCTIONS: dict[str, str] = {
     "E": "Source/Case-based. Read the passage and answer the subparts.",
 }
 
-_COG_TO_DIFFICULTY: dict[str, str] = {
+# QuestionDifficulty: the per-question difficulty label in the contract's
+# metadata.difficulty (easy/medium/hard), derived from a Question's CognitiveLevel.
+# Distinct from the paper-level DifficultyLevel (easy/standard/hard) the picker
+# consumes — different grain, different value set. See CONTEXT.md.
+_QUESTION_DIFFICULTY_BY_COG: dict[str, str] = {
     "R": "easy",
     "U": "medium",
     "Ap": "medium",
@@ -249,12 +253,25 @@ class PaperDocumentBuilder:
             "classLevel": "10",
             "subject": "Science",
             "chapterNames": [q.chapter.name] if q.chapter else [],
-            "topicNames": [],
-            "difficulty": _COG_TO_DIFFICULTY.get(q.cognitive_level, "medium"),
+            "topicNames": list(q.topic_names or []),
+            "difficulty": _QUESTION_DIFFICULTY_BY_COG.get(q.cognitive_level, "medium"),
         }
 
     def _build_source(self, q: Question) -> dict:
-        return {
-            "sourceType": "question_bank",
-            "sourceName": "School Science Question Bank",
+        """Map a Question's provenance fields to the contract source object.
+
+        Falls back to the bank's own identity for rows ingested before
+        provenance was captured (blank source fields). Optional fields
+        (fileName/pageNumber/originalQuestionNumber) are emitted only when set.
+        """
+        source: dict = {
+            "sourceType": q.source_type or "question_bank",
+            "sourceName": q.source_name or "School Science Question Bank",
         }
+        if q.source_file_name:
+            source["fileName"] = q.source_file_name
+        if q.source_page_number is not None:
+            source["pageNumber"] = q.source_page_number
+        if q.source_original_qnum:
+            source["originalQuestionNumber"] = q.source_original_qnum
+        return source

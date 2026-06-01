@@ -45,7 +45,9 @@ def chapters(request):
 def ingest(request):
     """Parse a CBSE past-paper PDF and store questions as unverified.
 
-    Request: multipart/form-data with field ``pdf`` (file).
+    Request: multipart/form-data with field ``pdf`` (file), plus optional
+    ``source_type`` (defaults to ``previous_year_paper``). The uploaded
+    filename is recorded as the batch's source provenance.
     Response: ``{"created": N}`` — count of Question rows bulk-created.
     """
     from .ingestor import Ingestor
@@ -54,7 +56,11 @@ def ingest(request):
     if pdf_file is None:
         return Response({"detail": "Field 'pdf' is required."}, status=400)
 
-    result = Ingestor().ingest(pdf_file.read())
+    result = Ingestor().ingest(
+        pdf_file.read(),
+        source_file_name=pdf_file.name or "",
+        source_type=request.data.get("source_type", ""),
+    )
     return Response(
         {"created": result.created, "skipped_duplicates": result.skipped_duplicates}
     )

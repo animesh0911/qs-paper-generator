@@ -218,6 +218,11 @@ class Command(BaseCommand):
                     "options": q.get("options", []),
                     "answer": q.get("answer", ""),
                     "parse_quality": "clean",
+                    # Curated demo rows are bank-origin, not previous-year papers
+                    # (the model default). Set their true provenance so
+                    # PaperDocumentV1.source reports them correctly.
+                    "source_type": "question_bank",
+                    "source_name": "School Science Question Bank",
                 },
             )
             if not was_created:
@@ -229,8 +234,20 @@ class Command(BaseCommand):
                 if obj.cognitive_level != q["level"]:
                     obj.cognitive_level = q["level"]
                     updated = True
+                # Backfill provenance on rows seeded before it was captured.
+                if obj.source_type != "question_bank":
+                    obj.source_type = "question_bank"
+                    obj.source_name = "School Science Question Bank"
+                    updated = True
                 if updated:
-                    obj.save(update_fields=["chapter", "cognitive_level"])
+                    obj.save(
+                        update_fields=[
+                            "chapter",
+                            "cognitive_level",
+                            "source_type",
+                            "source_name",
+                        ]
+                    )
             created += int(was_created)
 
         self.stdout.write(
