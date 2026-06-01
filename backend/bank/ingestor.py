@@ -1,9 +1,12 @@
 """Ingestion pipeline: parse a CBSE past-paper PDF and auto-tag questions via an LLM.
 
 `Ingestor` is the coordinator. It runs the pipeline and persists Question rows
-(verified=False). Four seams are injected as adapters:
+(verified=False). Five seams are injected as adapters:
 
 * `Parser`           — turns PDF bytes into plain text. Default: `PdfplumberParser`.
+* `Segmenter`        — splits cleaned text into raw question dicts. Default:
+                       `LLMSegmenter`, with `RegexSegmenter` as a deterministic
+                       fallback.
 * `Tagger`           — assigns chapter_slug + cognitive_level. Default: `LLMTagger`.
 * `DiagramExtractor` — crops images from the PDF and associates them with questions.
                        Default: `PdfplumberDiagramExtractor`.
@@ -18,9 +21,10 @@ ordered by id. CBSE marking schemes mirror the question paper's numbering so
 the picker doesn't need a more clever key today. Revisit when out-of-order
 schemes appear.
 
-Pure text predicates (`strip_hindi`, `segment_questions`, `_detect_numerical`,
-`_mentions_diagram`) are not configurable and remain module-level. Tests inject
-stub adapters into Ingestor — no module-level patching.
+Pure text predicates (`strip_hindi`, `_detect_numerical`, `_mentions_diagram`)
+are not configurable and remain module-level. `segment_questions` is also
+module-level but reachable through the `Segmenter` seam via `RegexSegmenter`.
+Tests inject stub adapters into Ingestor — no module-level patching.
 """
 
 from __future__ import annotations
@@ -35,7 +39,8 @@ from typing import Protocol
 
 import pdfplumber
 
-from .llm import LLMClient, make_llm_client
+from ai_services.llm import LLMClient, make_llm_client
+
 from .models import Chapter, CognitiveLevel, Question
 
 _DEVANAGARI_RE = re.compile(r"[ऀ-ॿ]+")
