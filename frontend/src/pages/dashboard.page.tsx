@@ -10,6 +10,7 @@
  * @module DashboardPage
  */
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { assemblePaper, downloadPaperPdf } from '@/lib/api';
 import { getPaperDocumentErrorMessage } from '@/lib/paper-document';
 import type { PaperDocument } from '@/types';
@@ -22,6 +23,7 @@ import { CoverageFormView, PaperPreview } from '@/components/coverage';
 export default function Dashboard() {
   const { logout } = useAuth();
   const form = useCoverageForm();
+  const navigate = useNavigate();
 
   const [paper, setPaper] = useState<PaperDocument | null>(null);
   const [busy, setBusy] = useState(false);
@@ -75,12 +77,24 @@ export default function Dashboard() {
               onGenerate={generate}
               trailing={
                 paper && (
-                  <Button
-                    variant="outline"
-                    onClick={() => downloadPaperPdf(paper.paper.paperId)}
-                  >
-                    Download PDF
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        navigate(`/editor/${paper.paper.paperId}`, {
+                          state: { paper },
+                        })
+                      }
+                    >
+                      Open editor
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => downloadPaperPdf(paper.paper.paperId)}
+                    >
+                      Download PDF
+                    </Button>
+                  </div>
                 )
               }
             />

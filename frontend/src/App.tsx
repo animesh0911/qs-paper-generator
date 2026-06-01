@@ -31,7 +31,7 @@ export default function App() {
         }
       />
       <Route
-        path="/editor"
+        path="/editor/:paperId?"
         element={
           <RequireAuth>
             <Suspense

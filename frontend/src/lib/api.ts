@@ -116,6 +116,12 @@ export async function assemblePaper(
   return assertPaperDocument(await res.json());
 }
 
+export async function fetchPaperDocument(paperId: string): Promise<PaperDocument> {
+  const id = paperId.replace(/^paper_/, '');
+  const res = await request(`/papers/${id}/`, { method: 'GET' });
+  return assertPaperDocument(await res.json());
+}
+
 export interface PaperMutationResult {
   paperId: string;
   status: 'draft' | 'approved';

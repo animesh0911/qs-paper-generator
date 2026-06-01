@@ -1,13 +1,13 @@
 /**
- * Mock-backed PaperDocumentV1 editor shell.
+ * PaperDocumentV1 editor shell.
  *
- * This page loads the issue #21 mock, maps it into a print-faithful paper
- * view model, and renders the V1 shell around the paper: top bar, outline
- * rail, inspector, BlockNote-backed question regions, and bottom chat.
+ * This page loads a persisted backend paper when routed with a paper id, then
+ * maps it into a print-faithful paper view model and renders the V1 shell
+ * around the paper.
  *
  * Patterns:
- * - The mocked `PaperDocumentV1` is canonical; BlockNote only renders editable
- *   region surfaces for the shell.
+ * - `PaperDocumentV1` is canonical; BlockNote only renders editable region
+ *   surfaces for the shell.
  * - Editor chrome is marked with `data-editor-chrome` so print/export styling
  *   can remove it without hiding paper content.
  *
@@ -48,6 +48,7 @@ import { mockPaperDocumentV1 } from '@/mocks';
 import {
   approvePaper,
   downloadPaperPdf,
+  fetchPaperDocument,
   savePaperDraft,
 } from '@/lib/api';
 import { buildEditorPaperView } from '@/lib/editor-paper';
@@ -78,19 +79,30 @@ import {
 } from '@/components/editor';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { ContentItem } from '@/types';
+import type { ContentItem, PaperDocument } from '@/types';
+import { useLocation, useParams } from 'react-router-dom';
 
 function contentItemsEqual(left: ContentItem[], right: ContentItem[]) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
 export default function EditorPage() {
-  const document = useMemo(() => assertPaperDocument(mockPaperDocumentV1), []);
+  const { paperId } = useParams();
+  const location = useLocation();
+  const routePaper = (location.state as { paper?: PaperDocument } | null)
+    ?.paper;
+  const document = useMemo(
+    () => routePaper ?? assertPaperDocument(mockPaperDocumentV1),
+    [routePaper],
+  );
   const initialPaperState = useMemo(
     () => normalizePaperDocument(document),
     [document],
   );
   const [paperState, setPaperState] = useState(initialPaperState);
+  const [loadStatus, setLoadStatus] = useState(
+    paperId && !routePaper ? 'Loading saved draft...' : '',
+  );
   const [undoEntry, setUndoEntry] = useState<StructuredPaperUndoEntry | null>(
     null,
   );
@@ -179,6 +191,36 @@ export default function EditorPage() {
   const selectedQuestion = selectedSlot?.questionBlockTree.questionId
     ? paperState.questionsById[selectedSlot.questionBlockTree.questionId]
     : undefined;
+
+  useEffect(() => {
+    setPaperState(initialPaperState);
+  }, [initialPaperState]);
+
+  useEffect(() => {
+    if (!paperId || routePaper) {
+      setLoadStatus('');
+      return undefined;
+    }
+
+    let cancelled = false;
+    setLoadStatus('Loading saved draft...');
+    fetchPaperDocument(paperId)
+      .then((nextDocument) => {
+        if (cancelled) return;
+        setPaperState(normalizePaperDocument(nextDocument));
+        setLoadStatus('');
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setLoadStatus(
+          error instanceof Error ? error.message : 'Could not load paper.',
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [paperId, routePaper]);
 
   useEffect(() => {
     function handleOutsidePointerDown(event: PointerEvent) {
@@ -487,6 +529,15 @@ export default function EditorPage() {
           </Button>
         </div>
       </header>
+      {loadStatus && (
+        <div
+          data-editor-chrome
+          role="status"
+          className="fixed left-4 top-16 z-30 max-w-sm rounded-md border bg-background px-3 py-2 text-sm shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+        >
+          {loadStatus}
+        </div>
+      )}
       {persistenceStatus && (
         <div
           data-editor-chrome

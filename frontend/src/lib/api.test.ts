@@ -12,6 +12,7 @@ import { mockPaperDocumentV1 } from '@/mocks';
 import {
   approvePaper,
   clearToken,
+  fetchPaperDocument,
   getToken,
   login,
   savePaperDraft,
@@ -68,6 +69,21 @@ describe('login', () => {
 });
 
 describe('paper persistence', () => {
+  it('fetches a persisted canonical PaperDocumentV1 draft by paper id', async () => {
+    const fetchMock = vi.fn(
+      async () => new Response(JSON.stringify(mockPaperDocumentV1)),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const document = await fetchPaperDocument('paper_mock_cbse_science_001');
+
+    expect(document.paper.paperId).toBe('paper_mock_cbse_science_001');
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/mock_cbse_science_001/',
+      expect.objectContaining({ method: 'GET' }),
+    );
+  });
+
   it('saves canonical PaperDocumentV1 drafts instead of editor document JSON', async () => {
     const fetchMock = vi.fn(
       async () =>
