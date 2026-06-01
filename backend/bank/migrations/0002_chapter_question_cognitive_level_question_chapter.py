@@ -7,30 +7,53 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bank', '0001_initial'),
+        ("bank", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Chapter',
+            name="Chapter",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('slug', models.SlugField(max_length=80, unique=True)),
-                ('name', models.CharField(max_length=160)),
-                ('order', models.PositiveSmallIntegerField(unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("slug", models.SlugField(max_length=80, unique=True)),
+                ("name", models.CharField(max_length=160)),
+                ("order", models.PositiveSmallIntegerField(unique=True)),
             ],
             options={
-                'ordering': ['order'],
+                "ordering": ["order"],
             },
         ),
         migrations.AddField(
-            model_name='question',
-            name='cognitive_level',
-            field=models.CharField(choices=[('R', 'Remember'), ('U', 'Understand'), ('Ap', 'Apply'), ('An', 'Analyse')], default='R', max_length=2),
+            model_name="question",
+            name="cognitive_level",
+            field=models.CharField(
+                choices=[
+                    ("R", "Remember"),
+                    ("U", "Understand"),
+                    ("Ap", "Apply"),
+                    ("An", "Analyse"),
+                ],
+                default="R",
+                max_length=2,
+            ),
         ),
         migrations.AddField(
-            model_name='question',
-            name='chapter',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='questions', to='bank.chapter'),
+            model_name="question",
+            name="chapter",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="questions",
+                to="bank.chapter",
+            ),
         ),
     ]

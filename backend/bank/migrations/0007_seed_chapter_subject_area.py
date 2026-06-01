@@ -8,8 +8,8 @@ Mapping derived from CBSE Cl.10 Science chapter taxonomy:
 Reversible. Forward sets subject_area on every seeded chapter; reverse clears
 subject_area but leaves the chapters themselves intact (0003_seed_chapters owns them).
 """
-from django.db import migrations
 
+from django.db import migrations
 
 CHAPTER_SUBJECT_AREA = {
     "chemical-reactions-and-equations": "Chemistry",

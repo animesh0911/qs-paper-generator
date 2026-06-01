@@ -6,53 +6,71 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bank', '0005_question_slice5_fields'),
+        ("bank", "0005_question_slice5_fields"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='chapter',
-            name='subject_area',
-            field=models.CharField(blank=True, choices=[('Biology', 'Biology'), ('Chemistry', 'Chemistry'), ('Physics', 'Physics')], max_length=16),
+            model_name="chapter",
+            name="subject_area",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("Biology", "Biology"),
+                    ("Chemistry", "Chemistry"),
+                    ("Physics", "Physics"),
+                ],
+                max_length=16,
+            ),
         ),
         migrations.AddField(
-            model_name='question',
-            name='content',
+            model_name="question",
+            name="content",
             field=models.JSONField(blank=True, default=dict),
         ),
         migrations.AddField(
-            model_name='question',
-            name='parse_quality',
-            field=models.CharField(choices=[('clean', 'Clean'), ('partial', 'Partial'), ('broken', 'Broken')], default='partial', max_length=8),
+            model_name="question",
+            name="parse_quality",
+            field=models.CharField(
+                choices=[
+                    ("clean", "Clean"),
+                    ("partial", "Partial"),
+                    ("broken", "Broken"),
+                ],
+                default="partial",
+                max_length=8,
+            ),
         ),
         migrations.AddField(
-            model_name='question',
-            name='source_file_name',
+            model_name="question",
+            name="source_file_name",
             field=models.CharField(blank=True, max_length=160),
         ),
         migrations.AddField(
-            model_name='question',
-            name='source_name',
+            model_name="question",
+            name="source_name",
             field=models.CharField(blank=True, max_length=160),
         ),
         migrations.AddField(
-            model_name='question',
-            name='source_original_qnum',
+            model_name="question",
+            name="source_original_qnum",
             field=models.CharField(blank=True, max_length=16),
         ),
         migrations.AddField(
-            model_name='question',
-            name='source_page_number',
+            model_name="question",
+            name="source_page_number",
             field=models.PositiveSmallIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='question',
-            name='source_type',
-            field=models.CharField(blank=True, default='previous_year_paper', max_length=32),
+            model_name="question",
+            name="source_type",
+            field=models.CharField(
+                blank=True, default="previous_year_paper", max_length=32
+            ),
         ),
         migrations.AddField(
-            model_name='question',
-            name='topic_names',
+            model_name="question",
+            name="topic_names",
             field=models.JSONField(blank=True, default=list),
         ),
     ]
