@@ -1,4 +1,5 @@
 """Django admin registration for School and User."""
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
@@ -17,11 +18,20 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ("email",)
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser",
-                                     "groups", "user_permissions")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
         ("Tenancy", {"fields": ("school",)}),
     )
     add_fieldsets = (
-        (None, {"classes": ("wide",),
-                "fields": ("email", "password1", "password2")}),
+        (None, {"classes": ("wide",), "fields": ("email", "password1", "password2")}),
     )

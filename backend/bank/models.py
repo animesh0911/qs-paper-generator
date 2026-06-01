@@ -15,6 +15,7 @@ Where it fits:
   ingestion of ``content/`` PDFs.
 - Exposed to the API via ``bank.serializers`` and ``bank.views``.
 """
+
 from django.db import models
 
 from accounts.models import School
@@ -97,10 +98,18 @@ class Question(models.Model):
     """
 
     school = models.ForeignKey(
-        School, null=True, blank=True, on_delete=models.SET_NULL, related_name="questions"
+        School,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="questions",
     )
     chapter = models.ForeignKey(
-        Chapter, null=True, blank=True, on_delete=models.PROTECT, related_name="questions"
+        Chapter,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="questions",
     )
     section = models.CharField(max_length=4, choices=Section.choices)
     qtype = models.CharField(max_length=20, choices=QuestionType.choices)
@@ -115,7 +124,8 @@ class Question(models.Model):
     # choices, options, assets). Empty dict means "no structured content yet";
     # PaperDocumentBuilder falls back to building {stem: [text]} from `text`.
     content = models.JSONField(default=dict, blank=True)
-    # Freeform LLM-emitted topic strings (e.g. ["Monohybrid Cross"]). No Topic model in V1.
+    # Freeform LLM-emitted topic strings (e.g. ["Monohybrid Cross"]).
+    # No Topic model in V1.
     topic_names = models.JSONField(default=list, blank=True)
     answer = models.TextField(blank=True)
     # Set True automatically by Paper.approve for every referenced question.
@@ -133,7 +143,9 @@ class Question(models.Model):
     # MD5 of normalised question text — used for de-duplication on re-ingest.
     source_hash = models.CharField(max_length=32, blank=True, db_index=True)
     # Source provenance — maps to PaperDocumentV1 `source` object.
-    source_type = models.CharField(max_length=32, blank=True, default="previous_year_paper")
+    source_type = models.CharField(
+        max_length=32, blank=True, default="previous_year_paper"
+    )
     source_name = models.CharField(max_length=160, blank=True)
     source_file_name = models.CharField(max_length=160, blank=True)
     source_page_number = models.PositiveSmallIntegerField(null=True, blank=True)

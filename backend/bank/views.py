@@ -1,10 +1,14 @@
 """Bank endpoints.
 
-* ``GET  /api/bank/metadata/``          — canonical labels for Section / QuestionType / CognitiveLevel.
-* ``GET  /api/bank/chapters/``          — full 13-chapter taxonomy.
-* ``POST /api/bank/ingest/``            — admin-only PDF upload; parses + auto-tags + stores questions.
-* ``POST /api/bank/ingest-marking-scheme/`` — admin-only marking-scheme PDF upload; matches answers.
+* ``GET  /api/bank/metadata/`` — canonical labels for Section / QuestionType /
+  CognitiveLevel.
+* ``GET  /api/bank/chapters/`` — full 13-chapter taxonomy.
+* ``POST /api/bank/ingest/`` — admin-only PDF upload; parses + auto-tags +
+  stores questions.
+* ``POST /api/bank/ingest-marking-scheme/`` — admin-only marking-scheme PDF
+  upload; matches answers.
 """
+
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAdminUser
@@ -20,7 +24,9 @@ def metadata(request):
     return Response(
         {
             "sections": [{"code": k, "label": v} for k, v in Section.choices],
-            "question_types": [{"code": k, "label": v} for k, v in QuestionType.choices],
+            "question_types": [
+                {"code": k, "label": v} for k, v in QuestionType.choices
+            ],
             "cognitive_levels": [
                 {"code": k, "label": v} for k, v in CognitiveLevel.choices
             ],
@@ -49,7 +55,9 @@ def ingest(request):
         return Response({"detail": "Field 'pdf' is required."}, status=400)
 
     result = Ingestor().ingest(pdf_file.read())
-    return Response({"created": result.created, "skipped_duplicates": result.skipped_duplicates})
+    return Response(
+        {"created": result.created, "skipped_duplicates": result.skipped_duplicates}
+    )
 
 
 @api_view(["POST"])

@@ -1,4 +1,5 @@
 """Django admin for the question bank — verification workflow for ingested questions."""
+
 from django.contrib import admin, messages
 from django.utils.html import format_html
 
@@ -25,7 +26,15 @@ class QuestionAdmin(admin.ModelAdmin):
         "is_numerical",
         "short_text",
     )
-    list_filter = ("verified", "has_diagram", "is_numerical", "section", "qtype", "chapter", "cognitive_level")
+    list_filter = (
+        "verified",
+        "has_diagram",
+        "is_numerical",
+        "section",
+        "qtype",
+        "chapter",
+        "cognitive_level",
+    )
     search_fields = ("text",)
     readonly_fields = ("source_hash", "diagram_preview")
     fields = (
@@ -65,9 +74,13 @@ class QuestionAdmin(admin.ModelAdmin):
     @admin.action(description="Mark selected questions as verified")
     def mark_verified(self, request, queryset):
         updated = queryset.update(verified=True)
-        self.message_user(request, f"{updated} question(s) marked as verified.", messages.SUCCESS)
+        self.message_user(
+            request, f"{updated} question(s) marked as verified.", messages.SUCCESS
+        )
 
     @admin.action(description="Mark selected questions as unverified")
     def mark_unverified(self, request, queryset):
         updated = queryset.update(verified=False)
-        self.message_user(request, f"{updated} question(s) marked as unverified.", messages.WARNING)
+        self.message_user(
+            request, f"{updated} question(s) marked as unverified.", messages.WARNING
+        )

@@ -4,6 +4,7 @@ The rest of the backend should depend on ``LLMClient.complete`` instead of
 provider SDKs. LiteLLM gives us one call shape for OpenAI, Anthropic, Gemini,
 and future providers while keeping provider keys server-side.
 """
+
 from __future__ import annotations
 
 import os
