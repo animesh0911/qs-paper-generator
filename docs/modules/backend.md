@@ -24,7 +24,7 @@ The question bank: Questions, Chapters, taxonomy endpoints.
 | `views.py` | `metadata` (enums), `chapters` (list), `ingest` (admin-only PDF upload). |
 | `urls.py` | `/api/bank/metadata/`, `/api/bank/chapters/`, `/api/bank/ingest/`. |
 | `ingestor.py` | `Ingestor` coordinator; `Parser` / `Tagger` Protocols; default adapters `PdfplumberParser` + `LLMTagger`; pure helpers `strip_hindi`, `segment_questions`. |
-| `llm.py` | `LLMClient` Protocol + `AnthropicClient` / `OpenAIClient` / `GeminiClient` adapters + `make_llm_client()` factory. |
+| (LLM gateway) | `LLMClient` Protocol + `LiteLLMClient` adapter + `make_llm_client()` factory live in `ai_services/llm.py`; `bank.ingestor` imports them directly. |
 | `policy.py` | `answer_visible(user)` — single rule for who sees answer keys. |
 | `admin.py` | Django admin for Question + Chapter. |
 | `management/commands/seed_questions.py` | Demo seed: school + teacher + ~11 sample questions across chapters and levels. |
@@ -66,4 +66,4 @@ Django project root.
 4. `papers/builder.py` + `document.py` (how the assembly composes).
 5. `papers/views.py` + `serializers.py` (the HTTP surface).
 6. `papers/pdf.py` (rendering directly from `PaperDocumentV1`).
-7. `bank/ingestor.py` + `bank/llm.py` (the ingestion pipeline + LLM seam).
+7. `bank/ingestor.py` + `ai_services/llm.py` (the ingestion pipeline + LLM seam).

@@ -228,18 +228,40 @@ file "paper-$PAPER_ID.pdf"     # -> PDF document, version 1.4
 
 ## Tests
 
-There is no test suite yet (Slice 1 walking skeleton). The intended layout:
+**Always run the backend suite in Docker, never on the host.** The host
+Python may be < 3.10, but the project requires Django ≥ 5.1 (needs py ≥ 3.10),
+and pytest-django (`--reuse-db`) needs the Postgres `db` service. A host
+`pytest` will fail with `ModuleNotFoundError: No module named 'django'` or a
+Django version-resolution error — that is an environment mismatch, not a code
+problem.
 
 ```bash
-# Backend (pytest is not installed yet; add to requirements when adding tests)
+# Backend — full suite. `run --rm web` spins up the db/redis deps (healthcheck
+# gated) then tears the one-off container down. pytest config lives in
+# backend/pyproject.toml (DJANGO_SETTINGS_MODULE=config.settings, --reuse-db).
+docker compose run --rm web pytest
+
+# If the stack is already up, exec into the running web container instead:
 docker compose exec web pytest
 
-# Frontend (vitest is not installed yet)
+# Narrow to one app / file / test:
+docker compose run --rm web pytest bank/tests/test_ingestor.py
+docker compose run --rm web pytest -k segment -q
+
+# Frontend (vitest)
 docker compose exec frontend pnpm test
 ```
 
-Manual verification meanwhile: the curl smoke test above, or the Playwright
-MCP-driven browser flow (see `.mcp.json`).
+Lint/format (also in the `web` image, which has ruff + black from
+`requirements-dev.txt`):
+
+```bash
+docker compose run --rm web ruff check .
+docker compose run --rm web black --check .
+```
+
+Manual verification: the curl smoke test above, or the Playwright MCP-driven
+browser flow (see `.mcp.json`).
 
 ---
 

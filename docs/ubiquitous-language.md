@@ -20,7 +20,7 @@ The machine-readable copy lives in [`CONTEXT.md`](../CONTEXT.md) at the repo roo
 
 **Parser / Tagger** — the two adapter seams of the Ingestor. Default `PdfplumberParser` and `LLMTagger`. Tests inject stubs.
 
-**LLMClient** — provider-agnostic LLM seam. `complete(prompt, max_tokens) → str`. Adapters: `AnthropicClient`, `OpenAIClient`, `GeminiClient`. Chosen via `LLM_PROVIDER` env var.
+**LLMClient** — provider-agnostic LLM seam in `ai_services.llm`. `complete(prompt, max_tokens) → str`. One adapter: `LiteLLMClient` over `litellm.completion`, spanning OpenAI / Anthropic / Gemini. Model chosen via `LLM_MODEL` (provider-prefixed), falling back to `LLM_PROVIDER`.
 
 ## Paper template
 
