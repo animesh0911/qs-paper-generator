@@ -1,4 +1,5 @@
 """URL routes for the papers app — mounted at ``/api/papers/`` by ``config.urls``."""
+
 from django.urls import path
 
 from .views import AssemblePaperView, PaperApproveView, PaperDetailView, PaperPdfView

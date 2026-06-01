@@ -10,6 +10,7 @@ approved) and reconciles PaperQuestion rows from the final document.
 (``papers.picker.CoverageReport.to_dict()``). Its shape is owned in
 one place: see ``papers.picker.CoverageReport``.
 """
+
 from django.conf import settings
 from django.db import models
 

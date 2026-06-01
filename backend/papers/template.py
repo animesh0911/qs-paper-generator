@@ -8,11 +8,12 @@ metadata into PaperDocumentV1).
 
 TemplateBuilder.build(name) → PaperTemplate(preset, slots).
 """
+
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 from bank.models import QuestionType, Section
 
@@ -157,9 +158,7 @@ class TemplateBuilder:
     def build(self, preset: str = "board") -> PaperTemplate:
         spec = _PRESETS.get(preset)
         if spec is None:
-            raise ValueError(
-                f"Unknown preset {preset!r}. Choose from: {PRESET_NAMES}"
-            )
+            raise ValueError(f"Unknown preset {preset!r}. Choose from: {PRESET_NAMES}")
         template = PaperTemplate(preset=spec, slots=spec.build_slots())
         template.validate()
         return template

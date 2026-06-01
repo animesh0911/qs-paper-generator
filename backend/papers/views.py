@@ -7,6 +7,7 @@
 
 Domain rules live in ``papers.builder`` and ``papers.picker``.
 """
+
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -56,7 +57,10 @@ class PaperDetailView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
         document = request.data.get("document")
-        if not isinstance(document, dict) or document.get("schemaVersion") != _SCHEMA_VERSION:
+        if (
+            not isinstance(document, dict)
+            or document.get("schemaVersion") != _SCHEMA_VERSION
+        ):
             return Response(
                 {"error": f"document.schemaVersion must be '{_SCHEMA_VERSION}'."},
                 status=status.HTTP_400_BAD_REQUEST,

@@ -4,6 +4,7 @@ These tests verify that selection honours chapter weighting, the cognitive-mix
 implied by the difficulty level, and the no-duplicate / unfilled-reporting
 contract called out in Slice 3.
 """
+
 from __future__ import annotations
 
 from collections import Counter
@@ -12,7 +13,6 @@ import pytest
 from rest_framework import status
 
 from bank.models import Chapter, CognitiveLevel, Question, QuestionType, Section
-from papers.template import PaperTemplate, Preset, Slot
 from papers.picker import (
     DIFFICULTY_LEVELS,
     CoverageReport,
@@ -20,6 +20,7 @@ from papers.picker import (
     QuestionPicker,
     QuestionPool,
 )
+from papers.template import PaperTemplate, Preset, Slot
 
 
 def _spec(n_mcq: int) -> PaperTemplate:
@@ -166,8 +167,11 @@ def test_assemble_persists_coverage_on_paper(api_client, big_pool):
         for chapter in (ch1, ch2):
             for i in range(20):
                 Question.objects.create(
-                    section=slot_section, qtype=qtype, marks=marks,
-                    chapter=chapter, cognitive_level=CognitiveLevel.REMEMBER,
+                    section=slot_section,
+                    qtype=qtype,
+                    marks=marks,
+                    chapter=chapter,
+                    cognitive_level=CognitiveLevel.REMEMBER,
                     text=f"{qtype}-{chapter.slug}-{i}",
                 )
     resp = api_client.post(
@@ -182,6 +186,7 @@ def test_assemble_persists_coverage_on_paper(api_client, big_pool):
     assert resp.status_code == status.HTTP_201_CREATED
     paper_pk = int(resp.data["paper"]["paperId"].removeprefix("paper_"))
     from papers.models import Paper
+
     report = Paper.objects.get(pk=paper_pk).report
     assert "coverage" in report
     assert "cog_coverage" in report
@@ -237,7 +242,9 @@ def test_coverage_report_round_trips_through_dict():
     r = CoverageReport(
         coverage={"electricity": 2, "life-processes": 3},
         cog_coverage={"R": 2, "U": 3},
-        unfilled=[{"slot_index": 0, "section": "A", "qtype": "mcq", "marks": 1, "reason": "x"}],
+        unfilled=[
+            {"slot_index": 0, "section": "A", "qtype": "mcq", "marks": 1, "reason": "x"}
+        ],
     )
     assert CoverageReport.from_dict(r.to_dict()) == r
 

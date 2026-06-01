@@ -6,6 +6,7 @@ maps the result to PaperDocumentV1, and returns both as an AssemblyResult.
 
 Callers (view, tests) pick `.paper` or `.document` as needed.
 """
+
 from dataclasses import dataclass
 
 from django.db import transaction
