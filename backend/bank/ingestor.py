@@ -714,6 +714,21 @@ class PdfplumberDiagramExtractor:
             return None
 
 
+_PRIMARY_FORMS = ("none", "diagram_based", "table_based")
+
+
+def _coerce_topic_names(value) -> list[str]:
+    """Normalise an LLM ``topic_names`` value to a clean list of non-empty strings."""
+    if not isinstance(value, list):
+        return []
+    return [s.strip() for s in value if isinstance(s, str) and s.strip()]
+
+
+def _coerce_primary_form(value) -> str:
+    """Clamp an LLM ``primary_form`` value to the known set; default ``none``."""
+    return value if value in _PRIMARY_FORMS else "none"
+
+
 class LLMTagger:
     """Default Tagger — batches questions to an LLM for chapter/level tagging.
 
@@ -742,7 +757,11 @@ class LLMTagger:
                 "For each question return a JSON array of objects with:\n"
                 "  index        — same as input\n"
                 "  chapter_slug — closest chapter slug, or null if unclear\n"
-                "  cognitive_level — one of R / U / Ap / An\n\n"
+                "  cognitive_level — one of R / U / Ap / An\n"
+                "  topic_names  — array of short topic strings within the chapter "
+                "(e.g. ['Monohybrid Cross']); [] if none stand out\n"
+                "  primary_form — one of: none, diagram_based, table_based — the "
+                "dominant non-text form the question depends on\n\n"
                 "Questions:\n"
                 + json.dumps(
                     [
@@ -763,6 +782,8 @@ class LLMTagger:
                     **tagged[idx],
                     "chapter_slug": tag.get("chapter_slug"),
                     "cognitive_level": tag.get("cognitive_level", "R"),
+                    "topic_names": _coerce_topic_names(tag.get("topic_names")),
+                    "primary_form": _coerce_primary_form(tag.get("primary_form")),
                 }
 
         return tagged
@@ -820,6 +841,33 @@ class IngestResult:
     skipped_duplicates: int = 0
 
 
+@dataclass
+class _Provenance:
+    """Batch-level source provenance derived once per ingested PDF.
+
+    Maps to the contract ``source`` object's batch-wide fields. The per-question
+    ``pageNumber`` / ``originalQuestionNumber`` are intentionally absent — the
+    Segmenter does not track them yet (V2). See CONTEXT.md ``source provenance``.
+    """
+
+    source_type: str
+    source_name: str
+    source_file_name: str
+
+    @classmethod
+    def from_filename(cls, file_name: str, source_type: str) -> _Provenance:
+        file_name = (file_name or "").strip()
+        # Derive a human-readable source_name from the filename stem.
+        source_name = file_name.rsplit(".", 1)[0].strip() if file_name else ""
+        return cls(
+            # Default matches Question.source_type's model default: an ingested
+            # PDF is a previous-year paper unless the caller says otherwise.
+            source_type=(source_type or "").strip() or "previous_year_paper",
+            source_name=source_name,
+            source_file_name=file_name,
+        )
+
+
 class Ingestor:
     """Pipeline coordinator. All four adapters are injectable.
 
@@ -840,7 +888,22 @@ class Ingestor:
         self.extractor = extractor or PdfplumberDiagramExtractor()
         self.answer_source = answer_source or MarkingSchemeAnswerSource()
 
-    def ingest(self, pdf_bytes: bytes) -> IngestResult:
+    def ingest(
+        self,
+        pdf_bytes: bytes,
+        *,
+        source_file_name: str = "",
+        source_type: str = "",
+    ) -> IngestResult:
+        """Parse a paper PDF and persist Question rows.
+
+        ``source_file_name`` (the uploaded filename) and ``source_type`` (one of
+        the contract's source kinds, e.g. ``previous_year_paper``) record where a
+        batch came from. ``source_name`` is derived from the filename stem. The
+        per-question ``source_page_number`` / ``source_original_qnum`` fields stay
+        a V2 deferral — the Segmenter does not yet track page offsets or original
+        numbering (see CONTEXT.md ``source provenance``).
+        """
         raw_text = self.parser.parse(pdf_bytes)
         clean_text = strip_hindi(raw_text)
         raw_questions = self.segmenter.segment(clean_text)
@@ -877,8 +940,9 @@ class Ingestor:
         chapters = list(Chapter.objects.all())
         tagged = self.tagger.tag(raw_questions, chapters)
         chapter_by_slug = {c.slug: c for c in chapters}
+        provenance = _Provenance.from_filename(source_file_name, source_type)
         created = self._persist(
-            tagged, fingerprints, diagram_bytes_list, chapter_by_slug
+            tagged, fingerprints, diagram_bytes_list, chapter_by_slug, provenance
         )
         return IngestResult(created=created, skipped_duplicates=skipped)
 
@@ -910,13 +974,19 @@ class Ingestor:
         fingerprints: list[str],
         diagram_bytes_list: list[bytes | None],
         chapter_by_slug: dict[str, Chapter],
+        provenance: _Provenance,
     ) -> int:
         from django.core.files.base import ContentFile
 
         rows: list[Question] = []
         for i, q in enumerate(tagged):
             image_bytes = diagram_bytes_list[i] if i < len(diagram_bytes_list) else None
-            has_diagram = image_bytes is not None or _mentions_diagram(q["text"])
+            primary_form = q.get("primary_form", "none")
+            has_diagram = (
+                image_bytes is not None
+                or primary_form == "diagram_based"
+                or _mentions_diagram(q["text"])
+            )
 
             row = Question(
                 chapter=chapter_by_slug.get(q.get("chapter_slug")),
@@ -927,12 +997,17 @@ class Ingestor:
                 text=q["text"],
                 options=q.get("options", []),
                 content=q.get("content", {}),
+                topic_names=q.get("topic_names", []),
+                primary_form=primary_form,
                 parse_quality=q.get("parse_quality", "partial"),
                 answer="",
                 verified=False,
                 has_diagram=has_diagram,
                 is_numerical=_detect_numerical(q["text"]),
                 source_hash=fingerprints[i],
+                source_type=provenance.source_type,
+                source_name=provenance.source_name,
+                source_file_name=provenance.source_file_name,
             )
             if image_bytes:
                 row.diagram.save(

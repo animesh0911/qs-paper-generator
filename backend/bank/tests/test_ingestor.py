@@ -254,7 +254,60 @@ def test_llm_tagger_calls_client_and_attaches_tags():
     assert tagged[0]["cognitive_level"] == "R"
     assert tagged[1]["chapter_slug"] == "life-processes"
     assert tagged[1]["cognitive_level"] == "Ap"
+    # Tagger must always supply topic_names/primary_form (CONTEXT contract),
+    # defaulting safely when the LLM omits them.
+    assert tagged[0]["topic_names"] == []
+    assert tagged[0]["primary_form"] == "none"
     assert len(client.calls) == 1
+
+
+@pytest.mark.django_db
+def test_llm_tagger_attaches_topic_names_and_primary_form():
+    """Tagger carries topic_names + primary_form through to the question dict.
+
+    Why this matters: these are documented Tagger outputs (CONTEXT.md) that the
+    bank and PaperDocumentV1 metadata depend on. A garbage primary_form must be
+    clamped to a known value rather than persisted raw."""
+    raw = [
+        {
+            "section": "B",
+            "qtype": "short_answer",
+            "marks": 3,
+            "text": "Q",
+            "options": [],
+        }
+    ]
+    client = StubLLMClient(
+        tags=[
+            {
+                "index": 0,
+                "chapter_slug": "heredity",
+                "cognitive_level": "U",
+                "topic_names": ["Monohybrid Cross", "  ", 7],
+                "primary_form": "diagram_based",
+            }
+        ]
+    )
+    tagged = LLMTagger(client=client).tag(raw, chapters=[])
+    assert tagged[0]["topic_names"] == ["Monohybrid Cross"]  # blanks/non-str dropped
+    assert tagged[0]["primary_form"] == "diagram_based"
+
+
+@pytest.mark.django_db
+def test_llm_tagger_clamps_unknown_primary_form():
+    raw = [{"section": "A", "qtype": "mcq", "marks": 1, "text": "Q", "options": []}]
+    client = StubLLMClient(
+        tags=[
+            {
+                "index": 0,
+                "chapter_slug": "electricity",
+                "cognitive_level": "R",
+                "primary_form": "interpretive_dance",
+            }
+        ]
+    )
+    tagged = LLMTagger(client=client).tag(raw, chapters=[])
+    assert tagged[0]["primary_form"] == "none"
 
 
 @pytest.mark.django_db
