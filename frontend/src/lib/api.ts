@@ -125,15 +125,28 @@ export async function fetchPaperDocument(paperId: string): Promise<PaperDocument
 export interface PaperMutationResult {
   paperId: string;
   status: 'draft' | 'approved';
+  document?: PaperDocument;
 }
 
 function paperApiId(document: PaperDocument) {
   return document.paper.paperId.replace(/^paper_/, '');
 }
 
+function isPersistedPaperId(document: PaperDocument) {
+  return /^\d+$/.test(paperApiId(document));
+}
+
 export async function savePaperDraft(
   document: PaperDocument,
 ): Promise<PaperMutationResult> {
+  if (!isPersistedPaperId(document)) {
+    const res = await request('/papers/drafts/', {
+      method: 'POST',
+      body: JSON.stringify({ document }),
+    });
+    return res.json();
+  }
+
   const res = await request(`/papers/${paperApiId(document)}/`, {
     method: 'PATCH',
     body: JSON.stringify({ document }),

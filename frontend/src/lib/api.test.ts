@@ -85,6 +85,8 @@ describe('paper persistence', () => {
   });
 
   it('saves canonical PaperDocumentV1 drafts instead of editor document JSON', async () => {
+    const persistedDocument = structuredClone(mockPaperDocumentV1);
+    persistedDocument.paper.paperId = 'paper_123';
     const fetchMock = vi.fn(
       async () =>
         new Response(
@@ -96,12 +98,41 @@ describe('paper persistence', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    await savePaperDraft(mockPaperDocumentV1);
+    await savePaperDraft(persistedDocument);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/papers/mock_cbse_science_001/',
+      '/api/papers/123/',
       expect.objectContaining({
         method: 'PATCH',
+        body: JSON.stringify({ document: persistedDocument }),
+      }),
+    );
+  });
+
+  it('creates a persisted draft before saving standalone mock documents', async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            paperId: 'paper_123',
+            status: 'draft',
+            document: {
+              ...mockPaperDocumentV1,
+              paper: { ...mockPaperDocumentV1.paper, paperId: 'paper_123' },
+            },
+          }),
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await savePaperDraft(mockPaperDocumentV1);
+
+    expect(result.paperId).toBe('paper_123');
+    expect(result.document?.paper.paperId).toBe('paper_123');
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/drafts/',
+      expect.objectContaining({
+        method: 'POST',
         body: JSON.stringify({ document: mockPaperDocumentV1 }),
       }),
     );

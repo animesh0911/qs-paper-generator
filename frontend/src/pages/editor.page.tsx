@@ -408,9 +408,7 @@ export default function EditorPage() {
   }
 
   async function handleSaveDraft() {
-    await runPersistenceAction('Draft saved.', () =>
-      savePaperDraft(paperState.document),
-    );
+    await runPersistenceAction('Draft saved.', () => persistDraft());
   }
 
   async function handleApprovePaper() {
@@ -430,9 +428,22 @@ export default function EditorPage() {
 
   async function handleDownloadPdf() {
     await runPersistenceAction('PDF download started.', async () => {
-      await savePaperDraft(paperState.document);
-      await downloadPaperPdf(paperState.document.paper.paperId);
+      const document = await persistDraft();
+      await downloadPaperPdf(document.paper.paperId);
     });
+  }
+
+  async function persistDraft() {
+    const result = await savePaperDraft(paperState.document);
+    const document = result.document ?? {
+      ...paperState.document,
+      paper: {
+        ...paperState.document.paper,
+        paperId: result.paperId,
+      },
+    };
+    setPaperState(normalizePaperDocument(document));
+    return document;
   }
 
   async function runPersistenceAction(

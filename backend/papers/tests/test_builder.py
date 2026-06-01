@@ -105,6 +105,31 @@ def test_patch_saves_edited_document(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
+def test_create_draft_from_standalone_document_assigns_persisted_paper_id(
+    api_client, seeded_bank
+):
+    """Standalone editor documents become real draft Papers before save/download."""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    standalone_doc = dict(create.data)
+    standalone_doc["paper"] = dict(standalone_doc["paper"])
+    standalone_doc["paper"]["paperId"] = "paper_mock_cbse_science_001"
+
+    resp = api_client.post(
+        "/api/papers/drafts/",
+        {"document": standalone_doc},
+        format="json",
+    )
+
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.data["paperId"].startswith("paper_")
+    assert resp.data["paperId"] != "paper_mock_cbse_science_001"
+    assert resp.data["document"]["paper"]["paperId"] == resp.data["paperId"]
+    paper_pk = resp.data["paperId"].removeprefix("paper_")
+    detail = api_client.get(f"/api/papers/{paper_pk}/")
+    assert detail.data["paper"]["paperId"] == resp.data["paperId"]
+
+
+@pytest.mark.django_db
 def test_patch_rejected_wrong_schema(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")

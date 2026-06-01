@@ -1,6 +1,7 @@
 """HTTP views for paper assembly, detail, edit, approve, and PDF download.
 
 ``AssemblePaperView`` — thin: validate, call PaperBuilder, return document.
+``PaperDraftCreateView`` — POST persists a standalone PaperDocumentV1 draft.
 ``PaperDetailView`` — GET returns stored document; PATCH overwrites it (drafts only).
 ``PaperApproveView`` — POST locks paper to APPROVED.
 ``PaperPdfView`` — GET renders PDF from paper.document (cached 24h after approve).
@@ -40,6 +41,42 @@ class AssemblePaperView(APIView):
         return Response(result.document, status=status.HTTP_201_CREATED)
 
 
+class PaperDraftCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        document = request.data.get("document")
+        if (
+            not isinstance(document, dict)
+            or document.get("schemaVersion") != _SCHEMA_VERSION
+        ):
+            return Response(
+                {"error": f"document.schemaVersion must be '{_SCHEMA_VERSION}'."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        errors = validate_paper_document(document)
+        if errors:
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        paper = Paper.objects.create(
+            created_by=request.user,
+            title=document.get("paper", {}).get("title", "Science — Practice Paper"),
+            total_marks=document.get("paper", {}).get("totalMarks", 0),
+            document={},
+        )
+        document = document_with_paper_id(document, paper.pk)
+        paper.document = document
+        paper.save(update_fields=["document"])
+        return Response(
+            {
+                "paperId": f"paper_{paper.pk}",
+                "status": paper.status,
+                "document": document,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
 class PaperDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -71,7 +108,13 @@ class PaperDetailView(APIView):
         paper.document = document
         paper.save(update_fields=["document"])
         cache.delete(f"paper-pdf:{paper.pk}")
-        return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
+        return Response(
+            {
+                "paperId": f"paper_{paper.pk}",
+                "status": paper.status,
+                "document": document,
+            }
+        )
 
 
 class PaperApproveView(APIView):
@@ -158,6 +201,17 @@ def validate_paper_document(document: dict) -> list[str]:
                         f"{slot.get('slotId')} references incompatible {question_id}."
                     )
     return errors
+
+
+def document_with_paper_id(document: dict, paper_pk: int) -> dict:
+    """Return a PaperDocumentV1 copy addressed to the persisted Paper row."""
+    return {
+        **document,
+        "paper": {
+            **document.get("paper", {}),
+            "paperId": f"paper_{paper_pk}",
+        },
+    }
 
 
 def selected_question_pks(document: dict) -> list[int]:
