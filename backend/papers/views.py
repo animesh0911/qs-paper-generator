@@ -89,11 +89,15 @@ class PaperPdfView(APIView):
 
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        # Only approved papers are frozen, so only they are safe to cache.
+        # Drafts mutate via PATCH and have no cache invalidation, so render fresh.
+        is_frozen = paper.status == PaperStatus.APPROVED
         cache_key = f"paper-pdf:{paper.pk}"
-        pdf = cache.get(cache_key)
+        pdf = cache.get(cache_key) if is_frozen else None
         if pdf is None:
             pdf = render_paper_pdf(paper.document or {})
-            cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
+            if is_frozen:
+                cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = f'inline; filename="paper-{paper.pk}.pdf"'
         return response
