@@ -146,19 +146,22 @@ export function setSlotRegionOverride(
     modifiedFromSource: false,
     regions: {},
   };
+  const nextOverrides = {
+    modifiedFromSource: true,
+    regions: {
+      ...currentEdits.regions,
+      [regionKey]: content,
+    },
+  };
 
   return {
     ...state,
     slotEditsById: {
       ...state.slotEditsById,
-      [slotId]: {
-        modifiedFromSource: true,
-        regions: {
-          ...currentEdits.regions,
-          [regionKey]: content,
-        },
-      },
+      [slotId]: nextOverrides,
     },
+    slotsById: updateSlotMapOverrides(state.slotsById, slotId, nextOverrides),
+    document: updateDocumentSlotOverrides(state.document, slotId, nextOverrides),
   };
 }
 
@@ -166,15 +169,19 @@ export function restoreSlotSource(
   state: NormalizedPaperDocument,
   slotId: string,
 ): NormalizedPaperDocument {
+  const nextOverrides = {
+    modifiedFromSource: false,
+    regions: {},
+  };
+
   return {
     ...state,
     slotEditsById: {
       ...state.slotEditsById,
-      [slotId]: {
-        modifiedFromSource: false,
-        regions: {},
-      },
+      [slotId]: nextOverrides,
     },
+    slotsById: updateSlotMapOverrides(state.slotsById, slotId, nextOverrides),
+    document: updateDocumentSlotOverrides(state.document, slotId, nextOverrides),
   };
 }
 
@@ -483,5 +490,38 @@ function slotWithCurrentState(
     ...slot,
     locked: state.lockStateBySlotId[slotId] ?? slot.locked,
     overrides: state.slotEditsById[slotId] ?? slot.overrides,
+  };
+}
+
+function updateSlotMapOverrides(
+  slotsById: Record<string, DocSlot>,
+  slotId: string,
+  overrides: SlotOverrides,
+) {
+  return {
+    ...slotsById,
+    [slotId]: {
+      ...slotsById[slotId],
+      overrides,
+    },
+  };
+}
+
+function updateDocumentSlotOverrides(
+  document: PaperDocument,
+  slotId: string,
+  overrides: SlotOverrides,
+): PaperDocument {
+  return {
+    ...document,
+    paper: {
+      ...document.paper,
+      sections: document.paper.sections.map((section) => ({
+        ...section,
+        slots: section.slots.map((slot) =>
+          slot.slotId === slotId ? { ...slot, overrides } : slot,
+        ),
+      })),
+    },
   };
 }

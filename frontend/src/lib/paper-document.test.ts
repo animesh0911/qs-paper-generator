@@ -131,6 +131,14 @@ describe('PaperDocumentV1 normalization', () => {
         stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
       },
     });
+    expect(
+      editedState.document.paper.sections[0].slots[0].overrides,
+    ).toEqual({
+      modifiedFromSource: true,
+      regions: {
+        stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
+      },
+    });
     expect(editedState.questionsById.q_mcq_heredity_001).toBe(
       state.questionsById.q_mcq_heredity_001,
     );
@@ -138,6 +146,12 @@ describe('PaperDocumentV1 normalization', () => {
     const restoredState = restoreSlotSource(editedState, 'slot_A_01');
 
     expect(restoredState.slotEditsById.slot_A_01).toEqual({
+      modifiedFromSource: false,
+      regions: {},
+    });
+    expect(
+      restoredState.document.paper.sections[0].slots[0].overrides,
+    ).toEqual({
       modifiedFromSource: false,
       regions: {},
     });

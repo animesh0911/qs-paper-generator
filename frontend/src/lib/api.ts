@@ -116,6 +116,35 @@ export async function assemblePaper(
   return assertPaperDocument(await res.json());
 }
 
+export interface PaperMutationResult {
+  paperId: string;
+  status: 'draft' | 'approved';
+}
+
+function paperApiId(document: PaperDocument) {
+  return document.paper.paperId.replace(/^paper_/, '');
+}
+
+export async function savePaperDraft(
+  document: PaperDocument,
+): Promise<PaperMutationResult> {
+  const res = await request(`/papers/${paperApiId(document)}/`, {
+    method: 'PATCH',
+    body: JSON.stringify({ document }),
+  });
+  return res.json();
+}
+
+export async function approvePaper(
+  document: PaperDocument,
+): Promise<PaperMutationResult> {
+  const res = await request(`/papers/${paperApiId(document)}/approve/`, {
+    method: 'POST',
+    body: JSON.stringify({ document }),
+  });
+  return res.json();
+}
+
 export interface Metadata {
   sections: { code: string; label: string }[];
   question_types: { code: string; label: string }[];

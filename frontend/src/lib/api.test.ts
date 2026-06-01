@@ -8,7 +8,14 @@
  * @module apiTests
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { clearToken, getToken, login } from './api';
+import { mockPaperDocumentV1 } from '@/mocks';
+import {
+  approvePaper,
+  clearToken,
+  getToken,
+  login,
+  savePaperDraft,
+} from './api';
 
 const storage = new Map<string, string>();
 
@@ -57,5 +64,53 @@ describe('login', () => {
     clearToken();
 
     expect(getToken()).toBeNull();
+  });
+});
+
+describe('paper persistence', () => {
+  it('saves canonical PaperDocumentV1 drafts instead of editor document JSON', async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            paperId: 'paper_mock_cbse_science_001',
+            status: 'draft',
+          }),
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await savePaperDraft(mockPaperDocumentV1);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/mock_cbse_science_001/',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ document: mockPaperDocumentV1 }),
+      }),
+    );
+  });
+
+  it('approves the final canonical PaperDocumentV1 so the backend freezes current edits', async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            paperId: 'paper_mock_cbse_science_001',
+            status: 'approved',
+          }),
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await approvePaper(mockPaperDocumentV1);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/mock_cbse_science_001/approve/',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ document: mockPaperDocumentV1 }),
+      }),
+    );
   });
 });

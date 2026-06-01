@@ -4,8 +4,10 @@ These tests verify the interface, not the skeleton implementation. When
 TemplateBuilder + QuestionPicker replace the skeleton in Slices 2/3, these
 tests still pass or fail loudly.
 """
-import pytest
+
 from collections import Counter
+
+import pytest
 from rest_framework import status
 
 from papers.builder import PaperBuilder
@@ -107,7 +109,9 @@ def test_patch_rejected_wrong_schema(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
     bad_doc = {"schemaVersion": "wrong.v1"}
-    resp = api_client.patch(f"/api/papers/{paper_pk}/", {"document": bad_doc}, format="json")
+    resp = api_client.patch(
+        f"/api/papers/{paper_pk}/", {"document": bad_doc}, format="json"
+    )
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
 
 
@@ -125,6 +129,55 @@ def test_approve_locks_paper(api_client, seeded_bank):
         format="json",
     )
     assert resp.status_code == status.HTTP_409_CONFLICT
+
+
+@pytest.mark.django_db
+def test_approve_freezes_submitted_final_document(api_client, seeded_bank):
+    """Approval freezes the teacher's final PaperDocumentV1, not the stale draft."""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    final_doc = dict(create.data)
+    final_doc["paper"] = dict(final_doc["paper"])
+    final_doc["paper"]["title"] = "Final Approved Title"
+
+    approve = api_client.post(
+        f"/api/papers/{paper_pk}/approve/",
+        {"document": final_doc},
+        format="json",
+    )
+
+    assert approve.status_code == status.HTTP_200_OK
+    detail = api_client.get(f"/api/papers/{paper_pk}/")
+    assert detail.data["paper"]["title"] == "Final Approved Title"
+
+
+@pytest.mark.django_db
+def test_approve_rejects_structural_errors(api_client, seeded_bank):
+    """Approval must block documents with missing selected Question references."""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    invalid_doc = dict(create.data)
+    invalid_doc["paper"] = dict(invalid_doc["paper"])
+    invalid_doc["paper"]["sections"] = [
+        dict(section) for section in create.data["paper"]["sections"]
+    ]
+    invalid_doc["paper"]["sections"][0]["slots"] = [
+        dict(slot) for slot in invalid_doc["paper"]["sections"][0]["slots"]
+    ]
+    invalid_doc["paper"]["sections"][0]["slots"][0]["selectedQuestionId"] = "q_missing"
+
+    approve = api_client.post(
+        f"/api/papers/{paper_pk}/approve/",
+        {"document": invalid_doc},
+        format="json",
+    )
+
+    assert approve.status_code == status.HTTP_400_BAD_REQUEST
+    detail = api_client.get(f"/api/papers/{paper_pk}/")
+    assert (
+        detail.data["paper"]["sections"][0]["slots"][0]["selectedQuestionId"]
+        != "q_missing"
+    )
 
 
 @pytest.mark.django_db
@@ -150,14 +203,16 @@ def test_approve_flips_verified_on_referenced_questions(api_client, seeded_bank)
 
     api_client.post(f"/api/papers/{paper_pk}/approve/")
     verified_ids = set(
-        Question.objects.filter(pk__in=selected_ids, verified=True).values_list("pk", flat=True)
+        Question.objects.filter(pk__in=selected_ids, verified=True).values_list(
+            "pk", flat=True
+        )
     )
     assert verified_ids == selected_ids
 
 
 @pytest.mark.django_db
 def test_picker_excludes_broken_parse_quality(api_client, seeded_bank):
-    """Picker must skip parse_quality='broken' rows even if section/qtype/marks match."""
+    """Picker must skip broken rows even if section/qtype/marks match."""
     from bank.models import Question
 
     Question.objects.update(parse_quality="broken")
@@ -212,9 +267,9 @@ def test_every_slot_has_alternate_question_ids(api_client, seeded_bank):
     assert resp.status_code == status.HTTP_201_CREATED
     for section in resp.data["paper"]["sections"]:
         for slot in section["slots"]:
-            assert "alternateQuestionIds" in slot, (
-                f"slot {slot.get('slotId')} missing alternateQuestionIds"
-            )
+            assert (
+                "alternateQuestionIds" in slot
+            ), f"slot {slot.get('slotId')} missing alternateQuestionIds"
             assert isinstance(slot["alternateQuestionIds"], list)
 
 

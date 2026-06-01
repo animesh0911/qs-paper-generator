@@ -45,6 +45,11 @@ import {
 } from 'lucide-react';
 import '@blocknote/mantine/style.css';
 import { mockPaperDocumentV1 } from '@/mocks';
+import {
+  approvePaper,
+  downloadPaperPdf,
+  savePaperDraft,
+} from '@/lib/api';
 import { buildEditorPaperView } from '@/lib/editor-paper';
 import {
   assertPaperDocument,
@@ -103,6 +108,10 @@ export default function EditorPage() {
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
   const [dragNotice, setDragNotice] = useState<string | null>(null);
+  const [persistenceStatus, setPersistenceStatus] = useState<string | null>(
+    null,
+  );
+  const [persistenceBusy, setPersistenceBusy] = useState(false);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const alternativesOpenerRef = useRef<HTMLElement | null>(null);
   const inspectorHighlightTimeoutRef = useRef<number | null>(null);
@@ -356,6 +365,52 @@ export default function EditorPage() {
     window.setTimeout(() => chatInputRef.current?.focus(), 0);
   }
 
+  async function handleSaveDraft() {
+    await runPersistenceAction('Draft saved.', () =>
+      savePaperDraft(paperState.document),
+    );
+  }
+
+  async function handleApprovePaper() {
+    if (
+      view.validationSummary.warnings.length > 0 &&
+      !window.confirm(
+        'This paper still has warnings. Approve the final paper anyway?',
+      )
+    ) {
+      return;
+    }
+
+    await runPersistenceAction('Paper approved.', () =>
+      approvePaper(paperState.document),
+    );
+  }
+
+  async function handleDownloadPdf() {
+    await runPersistenceAction('PDF download started.', async () => {
+      await savePaperDraft(paperState.document);
+      await downloadPaperPdf(paperState.document.paper.paperId);
+    });
+  }
+
+  async function runPersistenceAction(
+    successMessage: string,
+    action: () => Promise<unknown>,
+  ) {
+    setPersistenceBusy(true);
+    setPersistenceStatus(null);
+    try {
+      await action();
+      setPersistenceStatus(successMessage);
+    } catch (error) {
+      setPersistenceStatus(
+        error instanceof Error ? error.message : 'Paper update failed.',
+      );
+    } finally {
+      setPersistenceBusy(false);
+    }
+  }
+
   function openAlternativesOverlay() {
     alternativesOpenerRef.current =
       window.document.activeElement instanceof HTMLElement
@@ -397,6 +452,8 @@ export default function EditorPage() {
             variant="outline"
             size="sm"
             className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
+            disabled={persistenceBusy}
+            onClick={handleSaveDraft}
           >
             <Save className="mr-2 h-4 w-4" aria-hidden="true" />
             Save draft
@@ -413,16 +470,32 @@ export default function EditorPage() {
             variant="outline"
             size="sm"
             className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
+            disabled={persistenceBusy}
+            onClick={handleDownloadPdf}
           >
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Download PDF
           </Button>
-          <Button size="sm" className="max-sm:flex-1 max-sm:basis-full">
+          <Button
+            size="sm"
+            className="max-sm:flex-1 max-sm:basis-full"
+            disabled={persistenceBusy}
+            onClick={handleApprovePaper}
+          >
             <CheckCircle2 className="mr-2 h-4 w-4" aria-hidden="true" />
             Approve
           </Button>
         </div>
       </header>
+      {persistenceStatus && (
+        <div
+          data-editor-chrome
+          role="status"
+          className="fixed right-4 top-16 z-30 max-w-sm rounded-md border bg-background px-3 py-2 text-sm shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+        >
+          {persistenceStatus}
+        </div>
+      )}
 
       <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:hidden max-lg:[&_.editor-left-rail]:static max-sm:px-3">
         <EditorOutlineRail view={view} />
