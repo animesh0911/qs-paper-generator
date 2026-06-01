@@ -10,13 +10,14 @@ Two roles:
   by assemble and detail endpoints. ``PaperQuestionSerializer`` nests
   ``QuestionSerializer``, which omits the answer key.
 """
+
 from rest_framework import serializers
 
 from bank.serializers import QuestionSerializer
 
-from .template import PRESET_NAMES
 from .models import Paper, PaperQuestion
 from .picker import DEFAULT_DIFFICULTY, DIFFICULTY_NAMES
+from .template import PRESET_NAMES
 
 
 class AssembleRequestSerializer(serializers.Serializer):
@@ -67,7 +68,11 @@ class PaperSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paper
         fields = [
-            "id", "title", "total_marks",
-            "status", "report",
-            "created_at", "items",
+            "id",
+            "title",
+            "total_marks",
+            "status",
+            "report",
+            "created_at",
+            "items",
         ]

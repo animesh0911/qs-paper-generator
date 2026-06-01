@@ -4,8 +4,10 @@ These tests verify the interface, not the skeleton implementation. When
 TemplateBuilder + QuestionPicker replace the skeleton in Slices 2/3, these
 tests still pass or fail loudly.
 """
-import pytest
+
 from collections import Counter
+
+import pytest
 from rest_framework import status
 
 from papers.builder import PaperBuilder
@@ -107,7 +109,9 @@ def test_patch_rejected_wrong_schema(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
     bad_doc = {"schemaVersion": "wrong.v1"}
-    resp = api_client.patch(f"/api/papers/{paper_pk}/", {"document": bad_doc}, format="json")
+    resp = api_client.patch(
+        f"/api/papers/{paper_pk}/", {"document": bad_doc}, format="json"
+    )
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
 
 
@@ -150,14 +154,17 @@ def test_approve_flips_verified_on_referenced_questions(api_client, seeded_bank)
 
     api_client.post(f"/api/papers/{paper_pk}/approve/")
     verified_ids = set(
-        Question.objects.filter(pk__in=selected_ids, verified=True).values_list("pk", flat=True)
+        Question.objects.filter(pk__in=selected_ids, verified=True).values_list(
+            "pk", flat=True
+        )
     )
     assert verified_ids == selected_ids
 
 
 @pytest.mark.django_db
 def test_picker_excludes_broken_parse_quality(api_client, seeded_bank):
-    """Picker must skip parse_quality='broken' rows even if section/qtype/marks match."""
+    """Picker must skip parse_quality='broken' rows even when
+    section/qtype/marks match."""
     from bank.models import Question
 
     Question.objects.update(parse_quality="broken")
@@ -212,9 +219,9 @@ def test_every_slot_has_alternate_question_ids(api_client, seeded_bank):
     assert resp.status_code == status.HTTP_201_CREATED
     for section in resp.data["paper"]["sections"]:
         for slot in section["slots"]:
-            assert "alternateQuestionIds" in slot, (
-                f"slot {slot.get('slotId')} missing alternateQuestionIds"
-            )
+            assert (
+                "alternateQuestionIds" in slot
+            ), f"slot {slot.get('slotId')} missing alternateQuestionIds"
             assert isinstance(slot["alternateQuestionIds"], list)
 
 

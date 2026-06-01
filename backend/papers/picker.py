@@ -12,6 +12,7 @@ without touching the database.
 External seam: PaperBuilder calls QuestionPicker().select(PaperOptions)
 and uses the returned ids + report.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -23,9 +24,9 @@ from .template import PaperTemplate
 
 # Cognitive-level mix per difficulty level. Codes match CognitiveLevel.
 DIFFICULTY_LEVELS: dict[str, dict[str, float]] = {
-    "easy":     {"R": 0.50, "U": 0.35, "Ap": 0.10, "An": 0.05},
+    "easy": {"R": 0.50, "U": 0.35, "Ap": 0.10, "An": 0.05},
     "standard": {"R": 0.25, "U": 0.35, "Ap": 0.25, "An": 0.15},
-    "hard":     {"R": 0.10, "U": 0.25, "Ap": 0.35, "An": 0.30},
+    "hard": {"R": 0.10, "U": 0.25, "Ap": 0.35, "An": 0.30},
 }
 DEFAULT_DIFFICULTY = "standard"
 DIFFICULTY_NAMES: list[str] = list(DIFFICULTY_LEVELS)
@@ -51,8 +52,8 @@ class CoverageReport:
     Round-trippable so storage and the picker can never disagree.
     """
 
-    coverage: dict[str, int] = field(default_factory=dict)        # chapter slug -> count
-    cog_coverage: dict[str, int] = field(default_factory=dict)    # level code -> count
+    coverage: dict[str, int] = field(default_factory=dict)  # chapter slug -> count
+    cog_coverage: dict[str, int] = field(default_factory=dict)  # level code -> count
     unfilled: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -63,7 +64,7 @@ class CoverageReport:
         }
 
     @classmethod
-    def from_dict(cls, data: dict | None) -> "CoverageReport":
+    def from_dict(cls, data: dict | None) -> CoverageReport:
         data = data or {}
         return cls(
             coverage=dict(data.get("coverage", {})),
@@ -110,7 +111,8 @@ class QuestionPicker:
     def select(self, opts: PaperOptions) -> FilledTemplate:
         if opts.difficulty not in DIFFICULTY_LEVELS:
             raise ValueError(
-                f"Unknown difficulty {opts.difficulty!r}. Choose from {DIFFICULTY_NAMES}"
+                f"Unknown difficulty {opts.difficulty!r}. "
+                f"Choose from {DIFFICULTY_NAMES}"
             )
         pool = self._fetch_candidates(opts)
         return self._select_from_pool(opts, pool)
@@ -217,18 +219,11 @@ class QuestionPicker:
         if opts.chapter_slugs:
             slugs = list(opts.chapter_slugs)
         else:
-            seen = {
-                slug
-                for rows in pool.values()
-                for _, slug, _ in rows
-                if slug
-            }
+            seen = {slug for rows in pool.values() for _, slug, _ in rows if slug}
             slugs = sorted(seen)
         if not slugs:
             return {}
-        raw = {
-            s: max(0.0, float((opts.weights or {}).get(s, 1.0))) for s in slugs
-        }
+        raw = {s: max(0.0, float((opts.weights or {}).get(s, 1.0))) for s in slugs}
         total = sum(raw.values())
         if total <= 0:
             return {s: 1.0 / len(slugs) for s in slugs}
@@ -242,9 +237,7 @@ class QuestionPicker:
         raw = {k: ratios[k] * n for k in ratios}
         floors = {k: int(v) for k, v in raw.items()}
         leftover = n - sum(floors.values())
-        rema = sorted(
-            ratios.keys(), key=lambda k: (-(raw[k] - floors[k]), k)
-        )
+        rema = sorted(ratios.keys(), key=lambda k: (-(raw[k] - floors[k]), k))
         for k in rema[:leftover]:
             floors[k] += 1
         return floors

@@ -4,7 +4,25 @@ The shared implementation lives in ``ai_services.llm`` so editor AI, ingestion
 tagging, and future paper review use one provider gateway instead of separate
 SDK wrappers.
 """
-from ai_services.llm import LLMClient, LiteLLMClient, make_llm_client, provider_model
+
+from ai_services.llm import (
+    LiteLLMClient,
+    LLMClient,
+    make_llm_client,
+    provider_model,
+)
+
+# Re-exported for callers that still import the gateway from ``bank.llm``
+# (e.g. ``bank.ingestor``). Listed here so the unused-import lint keeps them.
+__all__ = [
+    "LLMClient",
+    "LiteLLMClient",
+    "make_llm_client",
+    "provider_model",
+    "AnthropicClient",
+    "OpenAIClient",
+    "GeminiClient",
+]
 
 
 class AnthropicClient(LiteLLMClient):

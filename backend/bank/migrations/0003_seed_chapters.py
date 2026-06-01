@@ -13,7 +13,11 @@ CHAPTERS = [
     (9, "light-reflection-and-refraction", "Light – Reflection and Refraction"),
     (10, "human-eye-and-the-colourful-world", "The Human Eye and the Colourful World"),
     (11, "electricity", "Electricity"),
-    (12, "magnetic-effects-of-electric-current", "Magnetic Effects of Electric Current"),
+    (
+        12,
+        "magnetic-effects-of-electric-current",
+        "Magnetic Effects of Electric Current",
+    ),
     (13, "our-environment", "Our Environment"),
 ]
 

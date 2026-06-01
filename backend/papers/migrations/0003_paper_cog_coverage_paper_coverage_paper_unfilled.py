@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('papers', '0002_paperquestion_or_group'),
+        ("papers", "0002_paperquestion_or_group"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='paper',
-            name='cog_coverage',
+            model_name="paper",
+            name="cog_coverage",
             field=models.JSONField(blank=True, default=dict),
         ),
         migrations.AddField(
-            model_name='paper',
-            name='coverage',
+            model_name="paper",
+            name="coverage",
             field=models.JSONField(blank=True, default=dict),
         ),
         migrations.AddField(
-            model_name='paper',
-            name='unfilled',
+            model_name="paper",
+            name="unfilled",
             field=models.JSONField(blank=True, default=list),
         ),
     ]

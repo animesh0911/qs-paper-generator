@@ -10,6 +10,7 @@ and nested inside the question shape.
 An answer-revealing serializer + the gating rule that decides who may use it
 will land together when the first answer-key endpoint is built (Slice 9).
 """
+
 from rest_framework import serializers
 
 from .models import Chapter, Question
@@ -29,7 +30,12 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = [
-            "id", "section", "qtype", "marks",
-            "chapter", "cognitive_level",
-            "text", "options",
+            "id",
+            "section",
+            "qtype",
+            "marks",
+            "chapter",
+            "cognitive_level",
+            "text",
+            "options",
         ]

@@ -1,6 +1,7 @@
-import pytest
-import factory
 from collections import Counter
+
+import factory
+import pytest
 from factory.django import DjangoModelFactory
 
 from accounts.models import School, User
@@ -77,7 +78,5 @@ def seeded_bank(db):
     questions = []
     for (section, qtype, marks), count in needs.items():
         for _ in range(count):
-            questions.append(
-                QuestionFactory(section=section, qtype=qtype, marks=marks)
-            )
+            questions.append(QuestionFactory(section=section, qtype=qtype, marks=marks))
     return questions

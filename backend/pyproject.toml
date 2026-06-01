@@ -9,6 +9,11 @@ ignore = ["N818"]
 [tool.ruff.lint.isort]
 known-first-party = ["accounts", "ai_services", "bank", "papers", "config"]
 
+[tool.ruff.lint.per-file-ignores]
+# Migrations are Django-generated; black formats them but long auto-emitted
+# field definitions (choices, help_text, FK paths) are not worth hand-wrapping.
+"*/migrations/*" = ["E501"]
+
 [tool.black]
 line-length = 88
 target-version = ["py312"]

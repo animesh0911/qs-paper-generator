@@ -5,6 +5,7 @@ emits PDF bytes. No model imports — tests construct a document dict directly.
 
 The full CBSE-style/branded renderer arrives in Slice 9.
 """
+
 import io
 
 from reportlab.lib.enums import TA_CENTER
@@ -66,7 +67,8 @@ def render_paper_pdf(document: dict) -> bytes:
             if question is None:
                 story.append(
                     Paragraph(
-                        f"<b>Q{number}.</b> <i>(unfilled, {marks} mark{'s' if marks != 1 else ''})</i>",
+                        f"<b>Q{number}.</b> "
+                        f"<i>(unfilled, {marks} mark{'s' if marks != 1 else ''})</i>",
                         q_style,
                     )
                 )
@@ -90,7 +92,9 @@ def render_paper_pdf(document: dict) -> bytes:
                     for opt in options
                 ]
                 story.append(
-                    ListFlowable(opts, bulletType="bullet", start="circle", leftIndent=18)
+                    ListFlowable(
+                        opts, bulletType="bullet", start="circle", leftIndent=18
+                    )
                 )
             story.append(Spacer(1, 4))
 

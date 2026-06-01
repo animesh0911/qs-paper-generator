@@ -1,4 +1,5 @@
 """URL routes for the accounts app — mounted at ``/api/auth/`` by ``config.urls``."""
+
 from django.urls import path
 
 from .views import LoginView, MeView, RegisterView

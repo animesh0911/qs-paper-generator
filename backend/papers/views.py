@@ -7,6 +7,7 @@
 
 Domain rules live in ``papers.builder`` and ``papers.picker``.
 """
+
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -56,7 +57,10 @@ class PaperDetailView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
         document = request.data.get("document")
-        if not isinstance(document, dict) or document.get("schemaVersion") != _SCHEMA_VERSION:
+        if (
+            not isinstance(document, dict)
+            or document.get("schemaVersion") != _SCHEMA_VERSION
+        ):
             return Response(
                 {"error": f"document.schemaVersion must be '{_SCHEMA_VERSION}'."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -89,11 +93,15 @@ class PaperPdfView(APIView):
 
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        # Only approved papers are frozen, so only they are safe to cache.
+        # Drafts mutate via PATCH and have no cache invalidation, so render fresh.
+        is_frozen = paper.status == PaperStatus.APPROVED
         cache_key = f"paper-pdf:{paper.pk}"
-        pdf = cache.get(cache_key)
+        pdf = cache.get(cache_key) if is_frozen else None
         if pdf is None:
             pdf = render_paper_pdf(paper.document or {})
-            cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
+            if is_frozen:
+                cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = f'inline; filename="paper-{paper.pk}.pdf"'
         return response

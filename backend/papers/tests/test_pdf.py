@@ -3,6 +3,7 @@
 The renderer consumes a PaperDocumentV1 dict directly — these tests build
 a minimal document fixture and verify the bytes back without touching the DB.
 """
+
 from papers.pdf import render_paper_pdf
 
 
@@ -38,8 +39,14 @@ def _doc(slot_question_id: str | None = "q_1") -> dict:
                 "content": {
                     "stem": [{"type": "paragraph", "text": "What is water?"}],
                     "options": [
-                        {"label": "A", "content": [{"type": "paragraph", "text": "H2O"}]},
-                        {"label": "B", "content": [{"type": "paragraph", "text": "CO2"}]},
+                        {
+                            "label": "A",
+                            "content": [{"type": "paragraph", "text": "H2O"}],
+                        },
+                        {
+                            "label": "B",
+                            "content": [{"type": "paragraph", "text": "CO2"}],
+                        },
                     ],
                 },
             }

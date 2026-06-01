@@ -1,4 +1,5 @@
 """URL routes for the bank app — mounted at ``/api/bank/`` by ``config.urls``."""
+
 from django.urls import path
 
 from .views import chapters, ingest, ingest_marking_scheme, metadata

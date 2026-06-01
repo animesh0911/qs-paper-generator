@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('papers', '0004_consolidate_paper_report'),
+        ("papers", "0004_consolidate_paper_report"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='paper',
-            name='document',
+            model_name="paper",
+            name="document",
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='paper',
-            name='status',
-            field=models.CharField(choices=[('draft', 'Draft'), ('approved', 'Approved')], default='draft', max_length=10),
+            model_name="paper",
+            name="status",
+            field=models.CharField(
+                choices=[("draft", "Draft"), ("approved", "Approved")],
+                default="draft",
+                max_length=10,
+            ),
         ),
     ]
