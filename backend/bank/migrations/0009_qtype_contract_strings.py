@@ -6,13 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bank', '0008_clean_existing_questions'),
+        ("bank", "0008_clean_existing_questions"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='question',
-            name='qtype',
-            field=models.CharField(choices=[('mcq', 'Multiple Choice'), ('assertion_reason', 'Assertion-Reason'), ('very_short_answer', 'Very Short Answer'), ('short_answer', 'Short Answer'), ('long_answer', 'Long Answer'), ('case_based', 'Case-based'), ('internal_choice', 'Internal Choice'), ('diagram_based', 'Diagram-based'), ('table_based', 'Table-based'), ('custom', 'Custom')], max_length=20),
+            model_name="question",
+            name="qtype",
+            field=models.CharField(
+                choices=[
+                    ("mcq", "Multiple Choice"),
+                    ("assertion_reason", "Assertion-Reason"),
+                    ("very_short_answer", "Very Short Answer"),
+                    ("short_answer", "Short Answer"),
+                    ("long_answer", "Long Answer"),
+                    ("case_based", "Case-based"),
+                    ("internal_choice", "Internal Choice"),
+                    ("diagram_based", "Diagram-based"),
+                    ("table_based", "Table-based"),
+                    ("custom", "Custom"),
+                ],
+                max_length=20,
+            ),
         ),
     ]

@@ -8,6 +8,7 @@ here so the existing test/dev workflow doesn't degrade.
 
 New ingested rows will be tagged by the parser at write time.
 """
+
 from django.db import migrations
 
 

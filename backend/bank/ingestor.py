@@ -320,7 +320,6 @@ def segment_questions(text: str) -> list[dict]:
 
     for section_code, block in section_blocks:
         default_marks = SECTION_DEFAULT_MARKS.get(section_code, 1)
-        default_qtype = SECTION_DEFAULT_QTYPE.get(section_code, "short_answer")
 
         splits = list(_QNUM_RE.finditer(block))
         for i, match in enumerate(splits):

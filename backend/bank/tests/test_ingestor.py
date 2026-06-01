@@ -234,7 +234,13 @@ def test_llm_tagger_calls_client_and_attaches_tags():
     """
     raw = [
         {"section": "A", "qtype": "mcq", "marks": 1, "text": "Q one", "options": []},
-        {"section": "B", "qtype": "very_short_answer", "marks": 2, "text": "Q two", "options": []},
+        {
+            "section": "B",
+            "qtype": "very_short_answer",
+            "marks": 2,
+            "text": "Q two",
+            "options": [],
+        },
     ]
     client = StubLLMClient(
         tags=[

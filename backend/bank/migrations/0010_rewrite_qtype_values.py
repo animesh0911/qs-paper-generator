@@ -8,8 +8,8 @@ Reversible: the reverse migration restores the old short codes. Existing rows
 in dev DBs (~11 seeded) are updated; in CI this is a no-op since fresh DBs
 start from the new seed_questions which already uses the new values.
 """
-from django.db import migrations
 
+from django.db import migrations
 
 FORWARD = {
     "MCQ": "mcq",

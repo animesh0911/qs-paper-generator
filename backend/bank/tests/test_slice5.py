@@ -270,10 +270,20 @@ class _StubAnswerSource:
 def test_apply_answers_fills_unverified_rows_by_position():
     """n-th answer in the scheme maps to the n-th unverified Question by id."""
     q1 = Question.objects.create(
-        section="B", qtype="very_short_answer", marks=2, text="Q1?", verified=False, answer=""
+        section="B",
+        qtype="very_short_answer",
+        marks=2,
+        text="Q1?",
+        verified=False,
+        answer="",
     )
     q2 = Question.objects.create(
-        section="B", qtype="very_short_answer", marks=2, text="Q2?", verified=False, answer=""
+        section="B",
+        qtype="very_short_answer",
+        marks=2,
+        text="Q2?",
+        verified=False,
+        answer="",
     )
 
     ingestor = Ingestor(
@@ -295,7 +305,12 @@ def test_apply_answers_skips_verified_questions():
     """Verified questions are excluded from the candidate list, so they are
     never overwritten."""
     Question.objects.create(
-        section="B", qtype="very_short_answer", marks=2, text="Verified?", verified=True, answer="correct"
+        section="B",
+        qtype="very_short_answer",
+        marks=2,
+        text="Verified?",
+        verified=True,
+        answer="correct",
     )
     ingestor = Ingestor(
         parser=_StubParser(""),

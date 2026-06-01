@@ -12,7 +12,7 @@ from bank.models import Question
 
 from .models import Paper
 from .picker import FilledTemplate, PaperOptions
-
+from .template import Slot
 
 _SECTION_TITLE: dict[str, str] = {
     "A": "Section A",

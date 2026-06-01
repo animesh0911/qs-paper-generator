@@ -242,7 +242,15 @@ def test_coverage_report_round_trips_through_dict():
     r = CoverageReport(
         coverage={"electricity": 2, "life-processes": 3},
         cog_coverage={"R": 2, "U": 3},
-        unfilled=[{"slot_index": 0, "section": "A", "qtype": "mcq", "marks": 1, "reason": "x"}],
+        unfilled=[
+            {
+                "slot_index": 0,
+                "section": "A",
+                "qtype": "mcq",
+                "marks": 1,
+                "reason": "x",
+            }
+        ],
     )
     assert CoverageReport.from_dict(r.to_dict()) == r
 
