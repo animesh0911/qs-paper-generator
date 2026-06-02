@@ -52,6 +52,11 @@ def _render_browser_pdf(print_url: str) -> bytes:
         return pdf
 
 
+def _blocks_text(blocks: list) -> str:
+    """Join a region's ContentItem blocks into a single display string."""
+    return " ".join(b.get("text", "") for b in blocks if b.get("text")).strip()
+
+
 def _render_reportlab_pdf(document: dict) -> bytes:
     """Fallback PDF renderer for non-browser environments."""
     paper = document["paper"]
@@ -105,14 +110,23 @@ def _render_reportlab_pdf(document: dict) -> bytes:
                 )
                 story.append(Spacer(1, 4))
                 continue
+            # Slot overrides are the teacher's post-assembly edits; the contract
+            # makes them canonical, so they win over the stored question content
+            # region-by-region (v1_contract.md §7/§9).
+            regions = (slot.get("overrides") or {}).get("regions") or {}
+            stem_text = _blocks_text(regions["stem"]) if "stem" in regions else None
             story.append(
                 Paragraph(
-                    f"<b>Q{number}.</b> {question['rawText']} "
+                    f"<b>Q{number}.</b> {stem_text or question['rawText']} "
                     f"<i>({marks} mark{'s' if marks != 1 else ''})</i>",
                     q_style,
                 )
             )
-            options = question.get("content", {}).get("options") or []
+            options = (
+                regions.get("options")
+                or question.get("content", {}).get("options")
+                or []
+            )
             if options:
                 opts = [
                     ListItem(
