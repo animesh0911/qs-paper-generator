@@ -365,8 +365,8 @@ def test_ingest_records_source_provenance_from_filename():
     assert q.source_file_name == "31-2-1.pdf"
     assert q.source_name == "31-2-1"  # filename stem
     assert q.source_type == "sample_paper"
-    # V2 deferral: per-question page/qnum stay blank.
-    assert q.source_page_number is None
+    # V2 deferral: per-question qnum stays blank, but page tracking is resolved.
+    assert q.source_page_number == 1
     assert q.source_original_qnum == ""
 
 
