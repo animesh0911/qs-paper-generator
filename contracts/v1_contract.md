@@ -272,6 +272,40 @@ Question content should be structured but simple.
 }
 ```
 
+A content item is `{ type, text?, latex?, assetId?, caption?, rows? }`. Images reference an asset by `assetId` with an optional `caption`; there is no inline image URL in V1.
+
+### Content container
+
+`question.content` is an object keyed by semantic region, not a flat array. Each region holds content items (or option/subpart objects). Regions are optional; include only those the question type uses. A type the frontend does not model still renders from `rawText`.
+
+| Region | Shape | Used by |
+| --- | --- | --- |
+| `stem` | `ContentItem[]` | all types |
+| `assertion` | `ContentItem[]` | `assertion_reason` |
+| `reason` | `ContentItem[]` | `assertion_reason` |
+| `passage` | `ContentItem[]` | `case_based` |
+| `options` | `ChoiceOption[]` | `mcq`, `assertion_reason` |
+| `subparts` | `SubQuestion[]` | `case_based`, multi-part answers |
+| `choices` | `ChoiceGroup[]` | `internal_choice` |
+
+```text
+ChoiceOption = { label, marks?, content: ContentItem[] }
+SubQuestion  = { label, marks?, content: ContentItem[] }
+ChoiceGroup  = { displayStyle: "or" | "choose_any", chooseCount, options: ChoiceOption[] }
+```
+
+Example `mcq` content:
+
+```json
+{
+  "stem": [{ "type": "paragraph", "text": "What is the ratio of GG, Gg and gg in F2 progeny?" }],
+  "options": [
+    { "label": "A", "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }] },
+    { "label": "B", "content": [{ "type": "paragraph", "text": "3 : 1 : 0" }] }
+  ]
+}
+```
+
 ## 10. Question Source
 
 ```json
