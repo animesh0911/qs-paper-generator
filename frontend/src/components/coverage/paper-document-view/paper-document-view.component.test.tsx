@@ -41,7 +41,9 @@ describe('PaperDocumentView', () => {
     );
 
     expect(html).toContain('Edited second choice group option.');
-    expect(html).toContain('Explain the mechanism of breathing in human beings.');
+    expect(html).toContain(
+      'Explain the mechanism of breathing in human beings.',
+    );
   });
 
   it('renders structured content tables as paper tables', () => {
