@@ -35,6 +35,7 @@ import io
 import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Protocol
 
 import pdfplumber
@@ -110,6 +111,61 @@ def strip_hindi(text: str) -> str:
     cleaned = _DEVANAGARI_RE.sub(" ", text)
     cleaned = re.sub(r" {2,}", " ", cleaned)
     return cleaned.strip()
+
+
+_CBSE_TOKEN_RE = re.compile(r"[_\-]")
+_YEAR_RE = re.compile(r"(\d{4})$")
+
+
+def _parse_source_filename(path: Path) -> dict:
+    """Parse a CBSE paper PDF path into source provenance fields.
+
+    Derives year from the parent directory name (e.g. ``science_2024`` → 2024).
+    Stem tokens are split on ``_`` and ``-``; numeric tokens are joined with
+    ``-``, the trailing alphabetic token (subject label) is appended with a
+    space, and the year is appended last.
+
+    Examples::
+
+        science_2024/31_1_1_Science.pdf → source_name "31-1-1 Science 2024"
+        science_2025/31-2-1.pdf         → source_name "31-2-1 2025"
+    """
+    file_name = path.name
+    stem = path.stem
+
+    year_match = _YEAR_RE.search(path.parent.name)
+    year = year_match.group(1) if year_match else ""
+
+    tokens = _CBSE_TOKEN_RE.split(stem)
+    numeric_tokens = [t for t in tokens if t.isdigit()]
+    alpha_tokens = [t for t in tokens if not t.isdigit() and t]
+
+    parts = ["-".join(numeric_tokens)] if numeric_tokens else []
+    parts += alpha_tokens
+    if year:
+        parts.append(year)
+    source_name = " ".join(parts)
+
+    return {
+        "source_type": "previous_year_paper",
+        "source_name": source_name,
+        "source_file_name": file_name,
+    }
+
+
+def _assign_page_numbers(questions: list[dict], page_texts: list[str]) -> None:
+    """Set ``source_page_number`` on each question dict (1-based).
+
+    Matches via the first 60 chars of question text against per-page text.
+    Sets ``None`` when no page match is found.  Mutates in place.
+    """
+    for q in questions:
+        snippet = q["text"][:60]
+        page_num = next(
+            (i + 1 for i, pt in enumerate(page_texts) if snippet in pt),
+            None,
+        )
+        q["source_page_number"] = page_num
 
 
 def _parse_options(text: str) -> tuple[list[dict], str]:
@@ -845,9 +901,9 @@ class IngestResult:
 class _Provenance:
     """Batch-level source provenance derived once per ingested PDF.
 
-    Maps to the contract ``source`` object's batch-wide fields. The per-question
-    ``pageNumber`` / ``originalQuestionNumber`` are intentionally absent — the
-    Segmenter does not track them yet (V2). See CONTEXT.md ``source provenance``.
+    Maps to the contract ``source`` object's batch-wide fields.
+    Per-question ``source_page_number`` is set separately via
+    ``_assign_page_numbers`` after segmentation.
     """
 
     source_type: str
@@ -899,12 +955,11 @@ class Ingestor:
 
         ``source_file_name`` (the uploaded filename) and ``source_type`` (one of
         the contract's source kinds, e.g. ``previous_year_paper``) record where a
-        batch came from. ``source_name`` is derived from the filename stem. The
-        per-question ``source_page_number`` / ``source_original_qnum`` fields stay
-        a V2 deferral — the Segmenter does not yet track page offsets or original
-        numbering (see CONTEXT.md ``source provenance``).
+        batch came from. ``source_name`` is derived from the filename stem.
+        ``source_page_number`` is set per-question via ``_assign_page_numbers``.
         """
-        raw_text = self.parser.parse(pdf_bytes)
+        page_texts = self.parser.parse_pages(pdf_bytes)
+        raw_text = "\n".join(page_texts)
         clean_text = strip_hindi(raw_text)
         raw_questions = self.segmenter.segment(clean_text)
         if not raw_questions:
@@ -912,6 +967,7 @@ class Ingestor:
 
         # Guardrail: score LLM output against the source text before trusting it.
         raw_questions = _verify(raw_questions, clean_text)
+        _assign_page_numbers(raw_questions, page_texts)
 
         # De-duplication: skip questions already in the bank AND repeats
         # within this PDF.
@@ -1008,6 +1064,7 @@ class Ingestor:
                 source_type=provenance.source_type,
                 source_name=provenance.source_name,
                 source_file_name=provenance.source_file_name,
+                source_page_number=q.get("source_page_number"),
             )
             if image_bytes:
                 row.diagram.save(

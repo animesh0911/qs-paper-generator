@@ -7,6 +7,8 @@ no mock.patch on module globals.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from bank.ingestor import (
@@ -14,12 +16,14 @@ from bank.ingestor import (
     LLMSegmenter,
     LLMTagger,
     RegexSegmenter,
+    _assign_page_numbers,
     _classify_qtype,
     _compute_parse_quality,
     _parse_assertion_reason,
     _parse_case_based,
     _parse_internal_choice,
     _parse_long_answer_subparts,
+    _parse_source_filename,
     _verify,
     segment_questions,
     strip_hindi,
@@ -734,3 +738,112 @@ def test_ingestor_verification_marks_hallucinated_row_broken():
     assert hallucination.parse_quality == "broken"
     real = Question.objects.get(text__icontains="photosynthesis")
     assert real.parse_quality != "broken"
+
+
+# ---------------------------------------------------------------------------
+# _parse_source_filename
+# ---------------------------------------------------------------------------
+
+
+def test_parse_source_filename_underscore_science():
+    """Underscore-separated CBSE code with subject label and year from parent dir."""
+    path = Path("content/science_2024/31_1_1_Science.pdf")
+    result = _parse_source_filename(path)
+    assert result == {
+        "source_type": "previous_year_paper",
+        "source_name": "31-1-1 Science 2024",
+        "source_file_name": "31_1_1_Science.pdf",
+    }
+
+
+def test_parse_source_filename_dash_only():
+    """Dash-separated code, no subject label."""
+    path = Path("content/science_2025/31-2-1.pdf")
+    result = _parse_source_filename(path)
+    assert result == {
+        "source_type": "previous_year_paper",
+        "source_name": "31-2-1 2025",
+        "source_file_name": "31-2-1.pdf",
+    }
+
+
+def test_parse_source_filename_prefixed():
+    """Prefixed CBSE filename with embedded paper code."""
+    path = Path("content/science_2026/1190-1_31-4-1_Science.pdf")
+    result = _parse_source_filename(path)
+    assert result["source_type"] == "previous_year_paper"
+    assert result["source_file_name"] == "1190-1_31-4-1_Science.pdf"
+    assert "2026" in result["source_name"]
+    assert "Science" in result["source_name"]
+
+
+def test_parse_source_filename_no_year_in_parent():
+    """No year in parent dir: year part omitted from source_name."""
+    path = Path("uploads/31_1_1_Science.pdf")
+    result = _parse_source_filename(path)
+    assert "previous_year_paper" == result["source_type"]
+    assert "31-1-1 Science" == result["source_name"]
+
+
+# ---------------------------------------------------------------------------
+# _assign_page_numbers
+# ---------------------------------------------------------------------------
+
+
+def test_assign_page_numbers_matches_correct_page():
+    """Question text found on page 2 → source_page_number = 2 (1-based)."""
+    page_texts = [
+        "SECTION A\n1. What is photosynthesis?",
+        "SECTION B\n5. Explain refraction of light.",
+    ]
+    questions = [
+        {"text": "Explain refraction of light.", "section": "B"},
+        {"text": "What is photosynthesis?", "section": "A"},
+    ]
+    _assign_page_numbers(questions, page_texts)
+    assert questions[0]["source_page_number"] == 2
+    assert questions[1]["source_page_number"] == 1
+
+
+def test_assign_page_numbers_missing_sets_none():
+    """Question text not on any page → source_page_number = None."""
+    page_texts = ["SECTION A\n1. Different question text."]
+    questions = [{"text": "Completely unrelated question.", "section": "A"}]
+    _assign_page_numbers(questions, page_texts)
+    assert questions[0]["source_page_number"] is None
+
+
+# ---------------------------------------------------------------------------
+# Ingestor persists source_page_number
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_ingestor_persists_source_page_number():
+    """source_page_number set by _assign_page_numbers reaches the Question row.
+
+    Why this matters: page provenance is required by the V1 contract source
+    object; without wiring it through _persist, the DB field stays null even
+    when the parser can resolve it."""
+    source_text = "SECTION A\n1. Which gas is released during photosynthesis?\n"
+    result = Ingestor(
+        parser=StubParser(source_text),
+        segmenter=StubSegmenter(
+            [
+                {
+                    "section": "A",
+                    "qtype": "short_answer",
+                    "marks": 1,
+                    "text": "Which gas is released during photosynthesis?",
+                    "options": [],
+                    "content": {},
+                }
+            ]
+        ),
+        tagger=StubTagger(chapter_slug="life-processes"),
+    ).ingest(b"x")
+
+    assert result.created == 1
+    q = Question.objects.get(text__icontains="photosynthesis")
+    # StubParser returns the entire text as a single page, so page 1.
+    assert q.source_page_number == 1
