@@ -216,6 +216,13 @@ export function setSlotSelectedQuestion(
   slotId: string,
   selectedQuestionId: string,
 ): NormalizedPaperDocument {
+  const currentSlot = state.slotsById[slotId];
+  if (!currentSlot) return state;
+
+  const alternateQuestionIds = rotateSlotAlternativeQuestionIds(
+    currentSlot,
+    selectedQuestionId,
+  );
   const resetOverrides: SlotOverrides = {
     modified: false,
     regions: {},
@@ -230,8 +237,9 @@ export function setSlotSelectedQuestion(
     slotsById: {
       ...state.slotsById,
       [slotId]: {
-        ...state.slotsById[slotId],
+        ...currentSlot,
         selectedQuestionId,
+        alternateQuestionIds,
         overrides: resetOverrides,
       },
     },
@@ -246,6 +254,7 @@ export function setSlotSelectedQuestion(
               ? {
                   ...slot,
                   selectedQuestionId,
+                  alternateQuestionIds,
                   overrides: resetOverrides,
                 }
               : slot,
@@ -254,6 +263,26 @@ export function setSlotSelectedQuestion(
       },
     },
   };
+}
+
+function rotateSlotAlternativeQuestionIds(
+  slot: DocSlot,
+  nextSelectedQuestionId: string,
+) {
+  const previousSelectedQuestionId = slot.selectedQuestionId;
+  const nextAlternateQuestionIds = slot.alternateQuestionIds.filter(
+    (questionId) => questionId !== nextSelectedQuestionId,
+  );
+
+  if (
+    previousSelectedQuestionId &&
+    previousSelectedQuestionId !== nextSelectedQuestionId &&
+    !nextAlternateQuestionIds.includes(previousSelectedQuestionId)
+  ) {
+    nextAlternateQuestionIds.unshift(previousSelectedQuestionId);
+  }
+
+  return nextAlternateQuestionIds;
 }
 
 export function setPaperChromeText(

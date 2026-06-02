@@ -13,6 +13,7 @@ import {
   assertPaperDocument,
   normalizePaperDocument,
   reorderSlotWithinOrderZone,
+  setSlotSelectedQuestion,
   setSlotRegionOverride,
 } from './paper-document';
 import { buildEditorPaperView } from './editor-paper';
@@ -387,6 +388,56 @@ describe('editor paper view model', () => {
     ]);
     expect(lockedSlot.locked).toBe(true);
     expect(lockedSlot.alternateQuestions).toHaveLength(4);
+  });
+
+  it('keeps the previous selected Question visible as an alternative after swap', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const replacedState = setSlotSelectedQuestion(
+      state,
+      'slot_E_02',
+      'q_table_metals_002',
+    );
+
+    const view = buildEditorPaperView(replacedState.document);
+    const swappedSlot = findSlot(view, 'slot_E_02');
+
+    expect(swappedSlot.questionText).toBe(
+      'Compare the properties of metals and non-metals in tabular form.',
+    );
+    expect(
+      swappedSlot.alternateQuestions.map((question) => question.questionId),
+    ).toEqual(['q_table_metals_001']);
+  });
+
+  it('shows all rotated alternatives after swap when filtered modes would hide them', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+    const replacedState = setSlotSelectedQuestion(
+      state,
+      'slot_E_02',
+      'q_table_metals_002',
+    );
+
+    const easierView = buildEditorPaperView(replacedState.document, {
+      alternativesIntentBySlotId: {
+        slot_E_02: 'easier',
+      },
+    });
+    const swapView = buildEditorPaperView(replacedState.document, {
+      alternativesIntentBySlotId: {
+        slot_E_02: 'swap',
+      },
+    });
+
+    expect(findSlot(easierView, 'slot_E_02').alternateQuestions).toHaveLength(
+      0,
+    );
+    expect(
+      findSlot(swapView, 'slot_E_02').alternateQuestions.map(
+        (question) => question.questionId,
+      ),
+    ).toEqual(['q_table_metals_001']);
   });
 
   it('formats alternatives from structured question regions instead of raw text only', () => {

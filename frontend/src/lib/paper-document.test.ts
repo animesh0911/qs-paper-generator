@@ -197,6 +197,13 @@ describe('PaperDocumentV1 normalization', () => {
     expect(replacedSlot).toEqual({
       ...state.slotsById.slot_A_01,
       selectedQuestionId: 'q_mcq_heredity_002',
+      alternateQuestionIds: [
+        'q_mcq_heredity_001',
+        'q_mcq_electricity_001',
+        'q_mcq_chemotropism_001',
+        'q_mcq_spirogyra_001',
+        'q_mcq_photosynthesis_001',
+      ],
       overrides: {
         modified: false,
         regions: {},
@@ -211,6 +218,64 @@ describe('PaperDocumentV1 normalization', () => {
     expect(replacedState.questionsById.q_mcq_heredity_001.rawText).toBe(
       state.questionsById.q_mcq_heredity_001.rawText,
     );
+  });
+
+  it('keeps the previous selected Question available after a Slot swap', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+
+    const replacedState = setSlotSelectedQuestion(
+      state,
+      'slot_E_02',
+      'q_table_metals_002',
+    );
+    const replacedSlot = replacedState.slotsById.slot_E_02;
+    const canonicalSlot = replacedState.document.paper.sections[1].slots[0];
+
+    expect(state.slotsById.slot_E_02.alternateQuestionIds).toEqual([
+      'q_table_metals_002',
+    ]);
+    expect(replacedSlot.selectedQuestionId).toBe('q_table_metals_002');
+    expect(replacedSlot.alternateQuestionIds).toEqual(['q_table_metals_001']);
+    expect(canonicalSlot.alternateQuestionIds).toEqual([
+      'q_table_metals_001',
+    ]);
+  });
+
+  it('cycles swapped Questions without duplicating alternative ids', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+
+    const firstSwap = setSlotSelectedQuestion(
+      state,
+      'slot_E_02',
+      'q_table_metals_002',
+    );
+    const secondSwap = setSlotSelectedQuestion(
+      firstSwap,
+      'slot_E_02',
+      'q_table_metals_001',
+    );
+
+    expect(secondSwap.slotsById.slot_E_02.selectedQuestionId).toBe(
+      'q_table_metals_001',
+    );
+    expect(secondSwap.slotsById.slot_E_02.alternateQuestionIds).toEqual([
+      'q_table_metals_002',
+    ]);
+  });
+
+  it('ignores selected Question changes for missing Slots', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+
+    const nextState = setSlotSelectedQuestion(
+      state,
+      'slot_missing',
+      'q_table_metals_002',
+    );
+
+    expect(nextState).toBe(state);
   });
 });
 

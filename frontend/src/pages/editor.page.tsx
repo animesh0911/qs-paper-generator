@@ -330,6 +330,7 @@ export default function EditorPage() {
     handleSelectSlot(slotId);
     const nextState = setSlotSelectedQuestion(paperState, slotId, questionId);
     commitStructuredAction(nextState);
+    setAlternativesIntent('swap');
     setAlternativesOverlayOpen(false);
   }
 

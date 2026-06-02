@@ -375,11 +375,9 @@ function PrintOption({
   return (
     <li>
       <span>({option.label})</span>
-      <p>
-        {contentItemsToText(
-          overrides[`option:${option.label}`] ?? option.content,
-        )}
-      </p>
+      <PaperContentItems
+        items={overrides[`option:${option.label}`] ?? option.content}
+      />
     </li>
   );
 }
@@ -394,11 +392,9 @@ function PrintSubQuestion({
   return (
     <div className="paper-subquestion">
       <span>{subpart.label}.</span>
-      <p>
-        {contentItemsToText(
-          overrides[`subquestion:${subpart.label}`] ?? subpart.content,
-        )}
-      </p>
+      <PaperContentItems
+        items={overrides[`subquestion:${subpart.label}`] ?? subpart.content}
+      />
       {subpart.marks && <b>{subpart.marks}</b>}
     </div>
   );
@@ -418,12 +414,12 @@ function PrintChoiceGroup({
       {choice.options.map((option, index) => (
         <div key={option.label}>
           {index > 0 && <strong>OR</strong>}
-          <p>
-            {contentItemsToText(
+          <PaperContentItems
+            items={
               overrides[`choice:${groupIndex}:${option.label}`] ??
-                option.content,
-            )}
-          </p>
+              option.content
+            }
+          />
         </div>
       ))}
     </div>
@@ -438,19 +434,42 @@ function renderRegion(
   const content = overrides[regionKey] ?? items;
   if (!content?.length) return null;
 
-  return <p>{contentItemsToText(content)}</p>;
+  return <PaperContentItems items={content} />;
 }
 
-function contentItemsToText(items: ContentItem[]) {
-  return items.map(contentItemToText).filter(Boolean).join('\n');
+function PaperContentItems({ items }: { items: ContentItem[] }) {
+  return (
+    <>
+      {items.map((item, index) => (
+        <PaperContentItem key={index} item={item} />
+      ))}
+    </>
+  );
+}
+
+function PaperContentItem({ item }: { item: ContentItem }) {
+  if (item.type === 'table' && item.rows) {
+    return (
+      <table className="paper-content-table">
+        <tbody>
+          {item.rows.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, cellIndex) => (
+                <td key={cellIndex}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+
+  return <p>{contentItemToText(item)}</p>;
 }
 
 function contentItemToText(item: ContentItem) {
   if (item.text) return item.text;
   if (item.latex) return item.latex;
-  if (item.type === 'table' && item.rows) {
-    return item.rows.map((row) => row.join('     ')).join('\n');
-  }
   if (item.type === 'image_placeholder') {
     return item.caption ? `[Diagram: ${item.caption}]` : '[Diagram]';
   }
