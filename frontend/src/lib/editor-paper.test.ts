@@ -231,6 +231,42 @@ describe('editor paper view model', () => {
     ]);
   });
 
+  it('maps structured tables into editable BlockNote table blocks', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const firstQuestion = document.questions[0];
+
+    firstQuestion.content.stem = [
+      { type: 'paragraph', text: 'Use the observations below.' },
+      {
+        type: 'table',
+        rows: [
+          ['I (A)', '0.4', '0.8'],
+          ['V (V)', '1.2', '2.4'],
+        ],
+      },
+    ];
+
+    const view = buildEditorPaperView(document);
+    const stemRegion = view.sections[0].slots[0].questionBlockTree.children[0];
+
+    expect(stemRegion.blockNoteBlocks).toEqual([
+      {
+        type: 'paragraph',
+        content: 'Use the observations below.',
+      },
+      {
+        type: 'table',
+        content: {
+          type: 'tableContent',
+          rows: [
+            { cells: ['I (A)', '0.4', '0.8'] },
+            { cells: ['V (V)', '1.2', '2.4'] },
+          ],
+        },
+      },
+    ]);
+  });
+
   it('keeps display prefixes outside editable region content', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const view = buildEditorPaperView(document);

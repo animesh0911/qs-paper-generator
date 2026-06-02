@@ -751,9 +751,23 @@ export function contentItemToText(item: ContentItem): string {
 }
 
 function contentItemsToBlockNoteBlocks(items: ContentItem[]): PartialBlock[] {
-  const blocks = items.map((item) => paragraphBlock(contentItemToText(item)));
+  const blocks = items.map(contentItemToBlockNoteBlock);
 
   return blocks.length > 0 ? blocks : [paragraphBlock('')];
+}
+
+function contentItemToBlockNoteBlock(item: ContentItem): PartialBlock {
+  if (item.type === 'table' && item.rows) {
+    return {
+      type: 'table',
+      content: {
+        type: 'tableContent',
+        rows: item.rows.map((row) => ({ cells: row })),
+      },
+    };
+  }
+
+  return paragraphBlock(contentItemToText(item));
 }
 
 function blockContentToText(content: unknown): string {
