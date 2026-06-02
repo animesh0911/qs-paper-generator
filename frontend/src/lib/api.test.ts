@@ -10,12 +10,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockPaperDocumentV1 } from '@/mocks';
 import {
-  approvePaper,
   clearToken,
   fetchPaperDocument,
   getToken,
   login,
-  savePaperDraft,
+  persistDraft,
 } from './api';
 
 const storage = new Map<string, string>();
@@ -31,18 +30,6 @@ beforeEach(() => {
 });
 
 describe('login', () => {
-  it('uses a dev-only seeded teacher fallback when the local proxy is unavailable', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('proxy error', { status: 500 })),
-    );
-
-    const result = await login('teacher@example.com', 'teacher123');
-
-    expect(result.user.email).toBe('teacher@example.com');
-    expect(getToken()).toBe('dev-demo-token');
-  });
-
   it('does not use the dev fallback for other credentials', async () => {
     vi.stubGlobal(
       'fetch',
@@ -55,13 +42,23 @@ describe('login', () => {
     expect(getToken()).toBeNull();
   });
 
-  it('clears the fallback token through the normal auth storage seam', async () => {
+  it('stores and clears backend auth tokens through the normal storage seam', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response('proxy error', { status: 500 })),
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              token: 'backend-token',
+              user: { email: 'teacher@example.com' },
+            }),
+          ),
+      ),
     );
 
     await login('teacher@example.com', 'teacher123');
+    expect(getToken()).toBe('backend-token');
+
     clearToken();
 
     expect(getToken()).toBeNull();
@@ -77,86 +74,26 @@ describe('paper persistence', () => {
 
     const document = await fetchPaperDocument('paper_mock_cbse_science_001');
 
-    expect(document.paper.paperId).toBe('paper_mock_cbse_science_001');
+    expect(document.paper.id).toBe('paper_mock_cbse_science_001');
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/papers/mock_cbse_science_001/',
       expect.objectContaining({ method: 'GET' }),
     );
   });
 
-  it('saves canonical PaperDocumentV1 drafts instead of editor document JSON', async () => {
+  it('persists canonical PaperDocument drafts instead of editor document JSON', async () => {
     const persistedDocument = structuredClone(mockPaperDocumentV1);
-    persistedDocument.paper.paperId = 'paper_123';
-    const fetchMock = vi.fn(
-      async () =>
-        new Response(
-          JSON.stringify({
-            paperId: 'paper_mock_cbse_science_001',
-            status: 'draft',
-          }),
-        ),
-    );
+    persistedDocument.paper.id = 'paper_123';
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({})));
     vi.stubGlobal('fetch', fetchMock);
 
-    await savePaperDraft(persistedDocument);
+    await persistDraft(persistedDocument);
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/papers/123/',
       expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify({ document: persistedDocument }),
-      }),
-    );
-  });
-
-  it('creates a persisted draft before saving standalone mock documents', async () => {
-    const fetchMock = vi.fn(
-      async () =>
-        new Response(
-          JSON.stringify({
-            paperId: 'paper_123',
-            status: 'draft',
-            document: {
-              ...mockPaperDocumentV1,
-              paper: { ...mockPaperDocumentV1.paper, paperId: 'paper_123' },
-            },
-          }),
-        ),
-    );
-    vi.stubGlobal('fetch', fetchMock);
-
-    const result = await savePaperDraft(mockPaperDocumentV1);
-
-    expect(result.paperId).toBe('paper_123');
-    expect(result.document?.paper.paperId).toBe('paper_123');
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/papers/drafts/',
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ document: mockPaperDocumentV1 }),
-      }),
-    );
-  });
-
-  it('approves the final canonical PaperDocumentV1 so the backend freezes current edits', async () => {
-    const fetchMock = vi.fn(
-      async () =>
-        new Response(
-          JSON.stringify({
-            paperId: 'paper_mock_cbse_science_001',
-            status: 'approved',
-          }),
-        ),
-    );
-    vi.stubGlobal('fetch', fetchMock);
-
-    await approvePaper(mockPaperDocumentV1);
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/papers/mock_cbse_science_001/approve/',
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ document: mockPaperDocumentV1 }),
       }),
     );
   });

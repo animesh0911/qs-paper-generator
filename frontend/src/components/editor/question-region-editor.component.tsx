@@ -15,6 +15,7 @@ import { useEffect, useRef } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
 import { blockNoteBlocksToContentItems } from '@/lib/editor-paper';
+import { shouldCommitQuestionRegionDraft } from '@/lib/question-region-commit';
 import type { EditorQuestionRegionBlock } from '@/lib/editor-paper';
 import type { ContentItem } from '@/types';
 
@@ -72,7 +73,6 @@ function ActiveQuestionRegionEditor({
     }, 0);
 
     return () => {
-      commitLatestContent();
       mountedRef.current = false;
       window.clearTimeout(timeoutId);
     };
@@ -80,8 +80,11 @@ function ActiveQuestionRegionEditor({
 
   function commitLatestContent() {
     if (
-      JSON.stringify(latestContentRef.current) ===
-      JSON.stringify(committedContentRef.current)
+      !shouldCommitQuestionRegionDraft({
+        latestContent: latestContentRef.current,
+        committedContent: committedContentRef.current,
+        trigger: 'blur',
+      })
     ) {
       return;
     }

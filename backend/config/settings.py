@@ -142,6 +142,10 @@ REST_FRAMEWORK = {
 # without ceremony; in prod set CORS_ALLOWED_ORIGINS explicitly.
 CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", DEBUG)
 
+# Browser PDF renderer. In Docker this points at the Vite service; local
+# non-Docker runs can override to http://localhost:5173.
+PAPER_PRINT_BASE_URL = env("PAPER_PRINT_BASE_URL", "http://frontend:5173")
+
 # Celery / Redis
 REDIS_URL = env("REDIS_URL", "redis://redis:6379/0")
 CELERY_BROKER_URL = REDIS_URL

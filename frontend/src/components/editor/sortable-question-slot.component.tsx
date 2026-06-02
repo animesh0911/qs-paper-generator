@@ -20,6 +20,7 @@ export function SortableQuestionSlot({
   slotId,
   displayNumber,
   orderZoneId,
+  reorderEnabled = true,
   selected,
   hovered,
   children,
@@ -31,6 +32,7 @@ export function SortableQuestionSlot({
   slotId: string;
   displayNumber: string;
   orderZoneId: string;
+  reorderEnabled?: boolean;
   selected: boolean;
   hovered: boolean;
   children: ReactNode;
@@ -47,7 +49,11 @@ export function SortableQuestionSlot({
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: slotId, data: { orderZoneId } });
+  } = useSortable({
+    id: slotId,
+    data: { orderZoneId },
+    disabled: !reorderEnabled,
+  });
 
   return (
     <div
@@ -78,7 +84,12 @@ export function SortableQuestionSlot({
           data-editor-chrome
           className="mt-1 inline-flex h-5 w-5 flex-none cursor-grab items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
           aria-label={`Drag question ${displayNumber}`}
-          title="Drag to reorder within this section"
+          title={
+            reorderEnabled
+              ? 'Drag to reorder within this section'
+              : 'Reorder is disabled for this slot'
+          }
+          disabled={!reorderEnabled}
           onClick={(event) => event.stopPropagation()}
           {...attributes}
           {...listeners}

@@ -2,7 +2,7 @@
  * Zod runtime schema for `PaperDocumentV1` — the response shape of
  * `POST /api/papers/assemble`.
  *
- * Mirrors `docs/Varad/v1_contract.md`. Parsed at the API boundary so a
+ * Mirrors `contracts/v1_contract.md`. Parsed at the API boundary so a
  * backend/frontend contract drift surfaces as a loud error at first call
  * instead of a blank screen downstream.
  *
@@ -53,10 +53,16 @@ const choiceGroupSchema = z
 
 const editableTextBlockSchema = z
   .object({
-    blockId: z.string(),
-    blockType: z.string(),
+    id: z.string(),
+    role: z.string(),
     text: z.string(),
-    editable: z.boolean().optional(),
+    can: z
+      .object({
+        editText: z.boolean().optional(),
+        delete: z.boolean().optional(),
+        reorder: z.boolean().optional(),
+      })
+      .optional(),
   })
   .passthrough();
 
@@ -109,8 +115,8 @@ const questionMetadataSchema = z
 
 const questionSourceSchema = z
   .object({
-    sourceType: z.string(),
-    sourceName: z.string(),
+    type: z.string(),
+    name: z.string(),
     fileName: z.string().optional(),
     pageNumber: z.number().optional(),
     originalQuestionNumber: z.string().optional(),
@@ -119,17 +125,17 @@ const questionSourceSchema = z
 
 const slotOverridesSchema = z
   .object({
-    modifiedFromSource: z.boolean(),
+    modified: z.boolean(),
     regions: z.record(z.string(), contentItemArraySchema),
   })
   .passthrough();
 
 const docQuestionSchema = z
   .object({
-    questionId: z.string(),
+    id: z.string(),
     language: z.string(),
-    marks: z.number(),
-    questionType: questionTypeSchema,
+    defaultMarks: z.number(),
+    type: questionTypeSchema,
     rawText: z.string(),
     content: docQuestionContentSchema,
     metadata: questionMetadataSchema,
@@ -139,21 +145,30 @@ const docQuestionSchema = z
 
 const docSlotSchema = z
   .object({
-    slotId: z.string(),
-    displayNumber: z.string(),
+    id: z.string(),
+    number: z.string(),
     marks: z.number(),
-    questionType: questionTypeSchema,
+    type: questionTypeSchema,
     selectedQuestionId: z.string().nullable(),
     locked: z.boolean(),
     alternateQuestionIds: z.array(z.string()),
     orGroup: z.number().optional(),
     overrides: slotOverridesSchema.optional(),
+    can: z
+      .object({
+        editText: z.boolean().optional(),
+        editMarks: z.boolean().optional(),
+        swap: z.boolean().optional(),
+        lock: z.boolean().optional(),
+        reorder: z.boolean().optional(),
+      })
+      .optional(),
   })
   .passthrough();
 
 const docSectionSchema = z
   .object({
-    sectionId: z.string(),
+    id: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
     marks: z.number(),
@@ -164,13 +179,13 @@ const docSectionSchema = z
 
 const docPaperSchema = z
   .object({
-    paperId: z.string(),
+    id: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
     totalMarks: z.number(),
     durationMinutes: z.number(),
     language: z.string(),
-    headerBlocks: z.array(editableTextBlockSchema).optional(),
+    chromeBlocks: z.array(editableTextBlockSchema).optional(),
     instructionBlocks: z.array(editableTextBlockSchema).optional(),
     sections: z.array(docSectionSchema),
   })
@@ -178,7 +193,7 @@ const docPaperSchema = z
 
 const paperRequestSchema = z
   .object({
-    requestId: z.string(),
+    id: z.string(),
     language: z.string(),
     classLevel: z.string(),
     subject: z.string(),
@@ -196,8 +211,8 @@ const paperRequestSchema = z
 
 const paperTemplateSchema = z
   .object({
-    templateId: z.string(),
-    templateName: z.string(),
+    id: z.string(),
+    name: z.string(),
     board: z.string().optional(),
     classLevel: z.string(),
     subject: z.string(),
@@ -210,42 +225,21 @@ const paperTemplateSchema = z
 
 const paperFormatSchema = z
   .object({
-    formatId: z.string(),
+    id: z.string(),
     page: z
       .object({
         size: z.string(),
         orientation: z.string(),
       })
       .passthrough(),
-    paperChrome: z
+    layout: z
       .object({
-        showOuterBorder: z.boolean(),
-        sectionStyle: z.string(),
-        marksPlacement: z.string(),
-      })
-      .passthrough(),
-    numbering: z
-      .object({
-        scope: z.string(),
-        style: z.string(),
-        recomputeOnSectionReorder: z.boolean(),
-      })
-      .passthrough(),
-    sections: z
-      .object({
-        allowQuestionReorderWithinSection: z.boolean(),
-        allowCrossSectionMove: z.boolean(),
-      })
-      .passthrough(),
-    questionRegions: z
-      .object({
-        allowRegionReorder: z.boolean(),
-        allowRegionDelete: z.boolean(),
-      })
-      .passthrough(),
-    mcqOptions: z
-      .object({
-        layout: z.string(),
+        marks: z.string(),
+        questionNumbers: z.string(),
+        mcqOptions: z.string(),
+        instructions: z.string(),
+        masthead: z.string(),
+        footer: z.string(),
       })
       .passthrough(),
   })
@@ -263,7 +257,7 @@ export const paperDocumentSchema = z
   .passthrough()
   .superRefine((document, ctx) => {
     const questionsById = new Map(
-      document.questions.map((question) => [question.questionId, question]),
+      document.questions.map((question) => [question.id, question]),
     );
 
     document.paper.sections.forEach((section, sectionIndex) => {
@@ -316,8 +310,8 @@ export const paperDocumentSchema = z
             const question = questionsById.get(questionId);
             return (
               question &&
-              (question.marks !== slot.marks ||
-                question.questionType !== slot.questionType ||
+              (question.defaultMarks !== slot.marks ||
+                question.type !== slot.type ||
                 question.language !== document.paper.language)
             );
           },
@@ -327,7 +321,7 @@ export const paperDocumentSchema = z
           ctx.addIssue({
             code: 'custom',
             message:
-              'referenced questions must match slot marks, questionType, and paper language',
+              'referenced questions must match slot marks, type, and paper language',
             path: ['paper', 'sections', sectionIndex, 'slots', slotIndex],
           });
         }

@@ -7,42 +7,34 @@ describe('PaperDocumentV1 mock contract', () => {
     const parsed = paperDocumentSchema.parse(mockPaperDocumentV1);
 
     expect(parsed.schemaVersion).toBe('paper_document.v1');
-    expect(parsed.format.formatId).toBe('cbse_science_class_10_v1');
+    expect(parsed.format.id).toBe(
+      'cbse_science_class_10_board_compact_2026_v1',
+    );
   });
 
-  it('carries editor format rules instead of requiring CBSE hardcoding in React', () => {
+  it('carries renderer selection and semantic layout roles', () => {
     expect(mockPaperDocumentV1.format).toMatchObject({
+      id: 'cbse_science_class_10_board_compact_2026_v1',
       page: {
-        size: 'A4',
+        size: 'CBSE_COMPACT',
         orientation: 'portrait',
+        widthPt: 523.44,
+        heightPt: 693.36,
       },
-      paperChrome: {
-        showOuterBorder: true,
-        sectionStyle: 'boxed',
-        marksPlacement: 'right',
-      },
-      numbering: {
-        scope: 'paper',
-        style: 'decimal',
-        recomputeOnSectionReorder: true,
-      },
-      sections: {
-        allowQuestionReorderWithinSection: true,
-        allowCrossSectionMove: false,
-      },
-      questionRegions: {
-        allowRegionReorder: false,
-        allowRegionDelete: false,
-      },
-      mcqOptions: {
-        layout: 'vertical',
+      layout: {
+        marks: 'right_column',
+        questionNumbers: 'left_column',
+        mcqOptions: 'two_column',
+        instructions: 'note_table_then_general',
+        masthead: 'cbse_compact',
+        footer: 'code_page_pto',
       },
     });
   });
 
   it('references only questions included in the document', () => {
     const questionIds = new Set(
-      mockPaperDocumentV1.questions.map((question) => question.questionId),
+      mockPaperDocumentV1.questions.map((question) => question.id),
     );
 
     const referencedQuestionIds = mockPaperDocumentV1.paper.sections.flatMap(
@@ -63,27 +55,27 @@ describe('PaperDocumentV1 mock contract', () => {
   it('covers representative CBSE question shapes needed by the editor', () => {
     const questions = mockPaperDocumentV1.questions;
     const questionTypes = new Set(
-      questions.map((question) => question.questionType),
+      questions.map((question) => question.type),
     );
 
     const assertionReason = questions.find(
-      (question) => question.questionType === 'assertion_reason',
+      (question) => question.type === 'assertion_reason',
     );
     const longWithSubparts = questions.find(
       (question) =>
-        question.content.subparts && question.questionType === 'long_answer',
+        question.content.subparts && question.type === 'long_answer',
     );
     const caseBased = questions.find(
-      (question) => question.questionType === 'case_based',
+      (question) => question.type === 'case_based',
     );
     const internalChoice = questions.find((question) =>
       Boolean(question.content.choices?.length),
     );
     const diagramBased = questions.find(
-      (question) => question.questionType === 'diagram_based',
+      (question) => question.type === 'diagram_based',
     );
     const tableBased = questions.find(
-      (question) => question.questionType === 'table_based',
+      (question) => question.type === 'table_based',
     );
 
     expect(questionTypes.has('mcq')).toBe(true);
@@ -112,7 +104,7 @@ describe('PaperDocumentV1 mock contract', () => {
   it('keeps selected and alternate questions compatible with their slots', () => {
     const questionById = new Map(
       mockPaperDocumentV1.questions.map((question) => [
-        question.questionId,
+        question.id,
         question,
       ]),
     );
@@ -129,8 +121,8 @@ describe('PaperDocumentV1 mock contract', () => {
           .filter(
             (question) =>
               !question ||
-              question.marks !== slot.marks ||
-              question.questionType !== slot.questionType ||
+              question.defaultMarks !== slot.marks ||
+              question.type !== slot.type ||
               question.language !== mockPaperDocumentV1.paper.language,
           );
       }),
@@ -142,7 +134,7 @@ describe('PaperDocumentV1 mock contract', () => {
   it('gives every slot and alternate the metadata needed by the action tray', () => {
     const questionById = new Map(
       mockPaperDocumentV1.questions.map((question) => [
-        question.questionId,
+        question.id,
         question,
       ]),
     );
@@ -150,9 +142,9 @@ describe('PaperDocumentV1 mock contract', () => {
     const invalidSlots = mockPaperDocumentV1.paper.sections.flatMap((section) =>
       section.slots.filter(
         (slot) =>
-          !slot.slotId ||
-          !slot.displayNumber ||
-          !slot.questionType ||
+          !slot.id ||
+          !slot.number ||
+          !slot.type ||
           typeof slot.marks !== 'number' ||
           typeof slot.locked !== 'boolean' ||
           !Array.isArray(slot.alternateQuestionIds),
@@ -170,10 +162,10 @@ describe('PaperDocumentV1 mock contract', () => {
                 question.metadata.chapterNames.length === 0 ||
                 !question.metadata.topicNames?.length ||
                 !question.metadata.difficulty ||
-                !question.source.sourceName ||
+                !question.source.name ||
                 !question.language ||
-                typeof question.marks !== 'number' ||
-                !question.questionType,
+                typeof question.defaultMarks !== 'number' ||
+                !question.type,
             ),
         ),
     );

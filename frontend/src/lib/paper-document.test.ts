@@ -31,8 +31,8 @@ describe('PaperDocumentV1 validation', () => {
     const invalidDocument = structuredClone(mockPaperDocumentV1);
     const firstSlot = invalidDocument.paper.sections[0].slots[0];
     firstSlot.selectedQuestionId = 'q_missing';
-    firstSlot.alternateQuestionIds = [invalidDocument.questions[0].questionId];
-    invalidDocument.questions[0].marks = firstSlot.marks + 1;
+    firstSlot.alternateQuestionIds = [invalidDocument.questions[0].id];
+    invalidDocument.questions[0].defaultMarks = firstSlot.marks + 1;
 
     const result = parsePaperDocument(invalidDocument);
 
@@ -41,7 +41,7 @@ describe('PaperDocumentV1 validation', () => {
       expect(result.error.issues.map((issue) => issue.message)).toEqual(
         expect.arrayContaining([
           'selectedQuestionId must reference a question in questions[]',
-          'referenced questions must match slot marks, questionType, and paper language',
+          'referenced questions must match slot marks, type, and paper language',
         ]),
       );
     }
@@ -98,20 +98,20 @@ describe('PaperDocumentV1 normalization', () => {
 
     expect(state.questionsById[firstSlot.selectedQuestionId ?? '']).toBe(
       parsed.data.questions.find(
-        (question) => question.questionId === firstSlot.selectedQuestionId,
+        (question) => question.id === firstSlot.selectedQuestionId,
       ),
     );
-    expect(state.slotsById[firstSlot.slotId]).toEqual(firstSlot);
+    expect(state.slotsById[firstSlot.id]).toEqual(firstSlot);
     expect(state.sectionOrder).toEqual(
-      parsed.data.paper.sections.map((section) => section.sectionId),
+      parsed.data.paper.sections.map((section) => section.id),
     );
-    expect(state.slotOrderBySection[firstSection.sectionId]).toEqual(
-      firstSection.slots.map((slot) => slot.slotId),
+    expect(state.slotOrderBySection[firstSection.id]).toEqual(
+      firstSection.slots.map((slot) => slot.id),
     );
-    expect(state.slotEditsById[firstSlot.slotId]).toEqual(
-      firstSlot.overrides ?? { modifiedFromSource: false, regions: {} },
+    expect(state.slotEditsById[firstSlot.id]).toEqual(
+      firstSlot.overrides ?? { modified: false, regions: {} },
     );
-    expect(state.lockStateBySlotId[firstSlot.slotId]).toBe(firstSlot.locked);
+    expect(state.lockStateBySlotId[firstSlot.id]).toBe(firstSlot.locked);
     expect(state.formatRules).toBe(parsed.data.format);
   });
 
@@ -126,15 +126,7 @@ describe('PaperDocumentV1 normalization', () => {
     ]);
 
     expect(editedState.slotEditsById.slot_A_01).toEqual({
-      modifiedFromSource: true,
-      regions: {
-        stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
-      },
-    });
-    expect(
-      editedState.document.paper.sections[0].slots[0].overrides,
-    ).toEqual({
-      modifiedFromSource: true,
+      modified: true,
       regions: {
         stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
       },
@@ -146,13 +138,7 @@ describe('PaperDocumentV1 normalization', () => {
     const restoredState = restoreSlotSource(editedState, 'slot_A_01');
 
     expect(restoredState.slotEditsById.slot_A_01).toEqual({
-      modifiedFromSource: false,
-      regions: {},
-    });
-    expect(
-      restoredState.document.paper.sections[0].slots[0].overrides,
-    ).toEqual({
-      modifiedFromSource: false,
+      modified: false,
       regions: {},
     });
     expect(restoredState.questionsById.q_mcq_heredity_001.rawText).toBe(
@@ -212,13 +198,13 @@ describe('PaperDocumentV1 normalization', () => {
       ...state.slotsById.slot_A_01,
       selectedQuestionId: 'q_mcq_heredity_002',
       overrides: {
-        modifiedFromSource: false,
+        modified: false,
         regions: {},
       },
     });
     expect(canonicalSlot).toEqual(replacedSlot);
     expect(replacedState.slotEditsById.slot_A_01).toEqual({
-      modifiedFromSource: false,
+      modified: false,
       regions: {},
     });
     expect(replacedState.questionsById).toBe(editedState.questionsById);
@@ -262,7 +248,7 @@ describe('PaperDocumentV1 ordering', () => {
     let expectedIndex = 1;
     for (const section of renumbered.paper.sections) {
       for (const slot of section.slots) {
-        expect(slot.displayNumber).toBe(String(expectedIndex));
+        expect(slot.number).toBe(String(expectedIndex));
         expectedIndex += 1;
       }
     }
@@ -289,12 +275,12 @@ describe('PaperDocumentV1 ordering', () => {
       'slot_A_01',
     ]);
     expect(nextState.document.paper.sections[0].slots[0]).toMatchObject({
-      slotId: 'slot_A_02',
-      displayNumber: '1',
+      id: 'slot_A_02',
+      number: '1',
     });
     expect(nextState.document.paper.sections[0].slots[1]).toMatchObject({
-      slotId: 'slot_A_01',
-      displayNumber: '2',
+      id: 'slot_A_01',
+      number: '2',
     });
   });
 
@@ -345,5 +331,53 @@ describe('PaperDocumentV1 ordering', () => {
       'slot_A_01',
       'slot_A_02',
     ]);
+  });
+
+  it('undoes manual slot region edits committed as structured actions', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const initialState = normalizePaperDocument(document);
+    const editedState = setSlotRegionOverride(initialState, 'slot_A_01', 'stem', [
+      {
+        type: 'paragraph',
+        text: 'Manual question text that should be undoable.',
+      },
+    ]);
+
+    const committed = commitStructuredPaperAction(initialState, editedState);
+    const undone = undoStructuredPaperAction(
+      committed.state,
+      committed.undoEntry,
+    );
+
+    expect(committed.state.slotEditsById.slot_A_01).toMatchObject({
+      modified: true,
+    });
+    expect(undone.state).toBe(initialState);
+    expect(undone.undoEntry).toBeNull();
+    expect(undone.state.slotEditsById.slot_A_01).toEqual({
+      modified: false,
+      regions: {},
+    });
+  });
+
+  it('undoes manual paper chrome edits committed as structured actions', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const initialState = normalizePaperDocument(document);
+    const editedState = setPaperChromeText(
+      initialState,
+      'paper:title',
+      'Edited Science Title',
+    );
+
+    const committed = commitStructuredPaperAction(initialState, editedState);
+    const undone = undoStructuredPaperAction(
+      committed.state,
+      committed.undoEntry,
+    );
+
+    expect(committed.state.document.paper.title).toBe('Edited Science Title');
+    expect(undone.state).toBe(initialState);
+    expect(undone.undoEntry).toBeNull();
+    expect(undone.state.document.paper.title).toBe('Science');
   });
 });

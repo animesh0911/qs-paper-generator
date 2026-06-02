@@ -176,9 +176,11 @@ export function EditorAlternativesOverlay({
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
-                {selectedSlot.locked
-                  ? 'Unlock this question before replacing it.'
-                  : `${alternatives.length} slot-safe option${alternatives.length === 1 ? '' : 's'}`}
+                {!selectedSlot.editCapabilities.swap
+                  ? 'Swapping is disabled for this slot.'
+                  : selectedSlot.locked
+                    ? 'Unlock this question before replacing it.'
+                    : `${alternatives.length} slot-safe option${alternatives.length === 1 ? '' : 's'}`}
               </p>
             </div>
 
@@ -189,7 +191,10 @@ export function EditorAlternativesOverlay({
                     <AlternativeCard
                       key={alternative.questionId}
                       alternative={alternative}
-                      disabled={selectedSlot.locked}
+                      disabled={
+                        selectedSlot.locked ||
+                        !selectedSlot.editCapabilities.swap
+                      }
                       requiresEditClearance={selectedSlot.modifiedFromSource}
                       confirming={
                         confirmingQuestionId === alternative.questionId

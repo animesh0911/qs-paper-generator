@@ -44,6 +44,7 @@ describe('editor paper view model', () => {
     expect(view.sections[0].slots[0]).toMatchObject({
       displayNumber: '1',
       marksLabel: '1 mark',
+      showMarksLabel: true,
       questionText:
         'What is the phenotypic ratio in the F2 generation of a monohybrid cross?',
       locked: false,
@@ -245,6 +246,43 @@ describe('editor paper view model', () => {
     ]);
   });
 
+  it('does not duplicate slot marks when imported question text carries them', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const question = document.questions.find(
+      (candidate) => candidate.id === 'q_short_electricity_001',
+    );
+    expect(question).toBeDefined();
+    question!.rawText =
+      'State Ohm law and write its mathematical form. (2 marks)';
+    question!.content.stem = [
+      {
+        type: 'paragraph',
+        text: 'State Ohm law and write its mathematical form. (2 marks)',
+      },
+      { type: 'equation', latex: 'V = IR', text: 'V = IR' },
+    ];
+
+    const view = buildEditorPaperView(document);
+    const slot = findSlot(view, 'slot_B_02');
+
+    expect(slot.marksLabel).toBe('2 marks');
+    expect(slot.showMarksLabel).toBe(false);
+  });
+
+  it('keeps subpart marks without adding a duplicate total marks column', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const view = buildEditorPaperView(document);
+    const slot = findSlot(view, 'slot_C_01');
+
+    expect(slot.marksLabel).toBe('5 marks');
+    expect(slot.showMarksLabel).toBe(false);
+    expect(
+      slot.questionBlockTree.children
+        .filter((region) => region.displaySuffix)
+        .map((region) => region.displaySuffix),
+    ).toEqual([' (2 marks)', ' (2 marks)', ' (1 mark)']);
+  });
+
   it('derives the left rail outline and validation summary from the contract', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const view = buildEditorPaperView(document);
@@ -258,8 +296,31 @@ describe('editor paper view model', () => {
       totalSlots: 9,
       filledSlots: 9,
       lockedSlots: 1,
-      warnings: [],
+      warnings: [
+        'Paper total is 80 marks, but Slot marks total 30.',
+        'Section A is labelled 30 marks, but its Slots total 13.',
+        'Section B is labelled 25 marks, but its Slots total 10.',
+        'Section C is labelled 25 marks, but its Slots total 7.',
+      ],
     });
+  });
+
+  it('warns when inline mark edits make paper totals mathematically inconsistent', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const section = document.paper.sections[0];
+
+    document.paper.totalMarks = 30;
+    section.marks = 13;
+    section.slots[0].marks = 2;
+
+    const view = buildEditorPaperView(document);
+
+    expect(view.validationSummary.warnings).toEqual(
+      expect.arrayContaining([
+        'Paper total is 30 marks, but Slot marks total 31.',
+        'Section A is labelled 13 marks, but its Slots total 14.',
+      ]),
+    );
   });
 
   it('renders recomputed display numbers after slot reorder', () => {
@@ -331,7 +392,7 @@ describe('editor paper view model', () => {
   it('formats alternatives from structured question regions instead of raw text only', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const alternateQuestion = document.questions.find(
-      (question) => question.questionId === 'q_mcq_heredity_002',
+      (question) => question.id === 'q_mcq_heredity_002',
     );
     expect(alternateQuestion).toBeDefined();
     alternateQuestion!.rawText = 'Truncated imported stem.';

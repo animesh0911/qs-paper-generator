@@ -152,7 +152,7 @@ function QuestionInfoPanel({
         )}
         <div>
           <dt className="text-xs text-muted-foreground">Source</dt>
-          <dd>{selectedQuestion.source.sourceName}</dd>
+          <dd>{selectedQuestion.source.name}</dd>
           {sourceDetails(selectedQuestion.source).length > 0 && (
             <dd className="text-xs text-muted-foreground">
               {sourceDetails(selectedQuestion.source).join(' · ')}
@@ -180,7 +180,6 @@ function QuestionInfoPanel({
         onMouseDown={(event) => {
           event.preventDefault();
           event.stopPropagation();
-          onRestoreSelectedSlot();
         }}
         onClick={(event) => {
           event.stopPropagation();

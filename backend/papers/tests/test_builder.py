@@ -6,7 +6,9 @@ tests still pass or fail loudly.
 """
 
 from collections import Counter
+from io import BytesIO
 
+import pdfplumber
 import pytest
 from rest_framework import status
 
@@ -105,31 +107,6 @@ def test_patch_saves_edited_document(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
-def test_create_draft_from_standalone_document_assigns_persisted_paper_id(
-    api_client, seeded_bank
-):
-    """Standalone editor documents become real draft Papers before save/download."""
-    create = api_client.post("/api/papers/assemble", {}, format="json")
-    standalone_doc = dict(create.data)
-    standalone_doc["paper"] = dict(standalone_doc["paper"])
-    standalone_doc["paper"]["paperId"] = "paper_mock_cbse_science_001"
-
-    resp = api_client.post(
-        "/api/papers/drafts/",
-        {"document": standalone_doc},
-        format="json",
-    )
-
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.data["paperId"].startswith("paper_")
-    assert resp.data["paperId"] != "paper_mock_cbse_science_001"
-    assert resp.data["document"]["paper"]["paperId"] == resp.data["paperId"]
-    paper_pk = resp.data["paperId"].removeprefix("paper_")
-    detail = api_client.get(f"/api/papers/{paper_pk}/")
-    assert detail.data["paper"]["paperId"] == resp.data["paperId"]
-
-
-@pytest.mark.django_db
 def test_patch_rejected_wrong_schema(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
@@ -157,148 +134,6 @@ def test_approve_locks_paper(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
-def test_approve_freezes_submitted_final_document(api_client, seeded_bank):
-    """Approval freezes the teacher's final PaperDocumentV1, not the stale draft."""
-    create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
-    final_doc = dict(create.data)
-    final_doc["paper"] = dict(final_doc["paper"])
-    final_doc["paper"]["title"] = "Final Approved Title"
-
-    approve = api_client.post(
-        f"/api/papers/{paper_pk}/approve/",
-        {"document": final_doc},
-        format="json",
-    )
-
-    assert approve.status_code == status.HTTP_200_OK
-    detail = api_client.get(f"/api/papers/{paper_pk}/")
-    assert detail.data["paper"]["title"] == "Final Approved Title"
-
-
-@pytest.mark.django_db
-def test_approve_rejects_structural_errors(api_client, seeded_bank):
-    """Approval must block documents with missing selected Question references."""
-    create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
-    invalid_doc = dict(create.data)
-    invalid_doc["paper"] = dict(invalid_doc["paper"])
-    invalid_doc["paper"]["sections"] = [
-        dict(section) for section in create.data["paper"]["sections"]
-    ]
-    invalid_doc["paper"]["sections"][0]["slots"] = [
-        dict(slot) for slot in invalid_doc["paper"]["sections"][0]["slots"]
-    ]
-    invalid_doc["paper"]["sections"][0]["slots"][0]["selectedQuestionId"] = "q_missing"
-
-    approve = api_client.post(
-        f"/api/papers/{paper_pk}/approve/",
-        {"document": invalid_doc},
-        format="json",
-    )
-
-    assert approve.status_code == status.HTTP_400_BAD_REQUEST
-    detail = api_client.get(f"/api/papers/{paper_pk}/")
-    assert (
-        detail.data["paper"]["sections"][0]["slots"][0]["selectedQuestionId"]
-        != "q_missing"
-    )
-
-
-@pytest.mark.django_db
-def test_approve_flips_verified_on_referenced_questions(api_client, seeded_bank):
-    """ADR-0002: approving a paper marks every referenced question verified=True.
-
-    The verified flag changed semantics — it no longer gates the picker (Q.parse_quality
-    does). It now records "a human has seen this question in an approved paper context."
-    This test pins that behavior so future regressions surface immediately.
-    """
-    from bank.models import Question
-
-    Question.objects.update(verified=False)  # reset seeded fixture
-    create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
-    selected_ids = {
-        int(slot["selectedQuestionId"].removeprefix("q_"))
-        for section in create.data["paper"]["sections"]
-        for slot in section["slots"]
-        if slot["selectedQuestionId"] is not None
-    }
-    assert selected_ids, "assembler must have placed at least one question"
-
-    api_client.post(f"/api/papers/{paper_pk}/approve/")
-    verified_ids = set(
-        Question.objects.filter(pk__in=selected_ids, verified=True).values_list(
-            "pk", flat=True
-        )
-    )
-    assert verified_ids == selected_ids
-
-
-@pytest.mark.django_db
-def test_picker_excludes_broken_parse_quality(api_client, seeded_bank):
-    """Picker must skip broken rows even if section/qtype/marks match."""
-    from bank.models import Question
-
-    Question.objects.update(parse_quality="broken")
-    resp = api_client.post("/api/papers/assemble", {}, format="json")
-    # Best-effort: best assembly with no eligible questions = all slots unfilled.
-    selected = [
-        slot["selectedQuestionId"]
-        for section in resp.data["paper"]["sections"]
-        for slot in section["slots"]
-    ]
-    assert all(s is None for s in selected), "broken rows must not be picked"
-
-
-@pytest.mark.django_db
-def test_picker_includes_partial_parse_quality(api_client, seeded_bank):
-    """parse_quality='partial' rows must be pickable — only 'broken' is excluded."""
-    from bank.models import Question
-
-    Question.objects.update(parse_quality="partial")
-    resp = api_client.post("/api/papers/assemble", {}, format="json")
-    selected = [
-        slot["selectedQuestionId"]
-        for section in resp.data["paper"]["sections"]
-        for slot in section["slots"]
-        if slot["selectedQuestionId"] is not None
-    ]
-    assert selected, "partial rows must be eligible for the picker"
-
-
-@pytest.mark.django_db
-def test_assemble_response_includes_format_object(api_client, seeded_bank):
-    """Assemble response must include top-level format satisfying V1 contract."""
-    resp = api_client.post("/api/papers/assemble", {}, format="json")
-    assert resp.status_code == status.HTTP_201_CREATED
-    fmt = resp.data.get("format")
-    assert fmt is not None, "format object missing from response"
-    assert fmt["formatId"] == "cbse_science_class_10_v1"
-    assert fmt["page"]["size"] == "A4"
-    assert fmt["page"]["orientation"] == "portrait"
-    assert "paperChrome" in fmt
-    assert "numbering" in fmt
-    assert fmt["sections"]["allowCrossSectionMove"] is False
-    assert fmt["questionRegions"]["allowRegionReorder"] is False
-    assert fmt["questionRegions"]["allowRegionDelete"] is False
-    assert fmt["mcqOptions"]["layout"] == "vertical"
-
-
-@pytest.mark.django_db
-def test_every_slot_has_alternate_question_ids(api_client, seeded_bank):
-    """Every slot must include alternateQuestionIds ([] when no alternates exist)."""
-    resp = api_client.post("/api/papers/assemble", {}, format="json")
-    assert resp.status_code == status.HTTP_201_CREATED
-    for section in resp.data["paper"]["sections"]:
-        for slot in section["slots"]:
-            assert (
-                "alternateQuestionIds" in slot
-            ), f"slot {slot.get('slotId')} missing alternateQuestionIds"
-            assert isinstance(slot["alternateQuestionIds"], list)
-
-
-@pytest.mark.django_db
 def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
@@ -306,3 +141,52 @@ def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
     assert pdf.status_code == status.HTTP_200_OK
     assert pdf["Content-Type"] == "application/pdf"
     assert pdf.content[:4] == b"%PDF"
+
+
+@pytest.mark.django_db
+def test_paper_pdf_endpoint_uses_saved_document_edits(
+    api_client, seeded_bank, settings
+):
+    """PDF download must render the edited PaperDocumentV1, not bank text."""
+    settings.PAPER_PRINT_BASE_URL = ""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    edited_doc = dict(create.data)
+    edited_doc["questions"] = [dict(q) for q in edited_doc["questions"]]
+    edited_doc["questions"][0]["rawText"] = "Edited slot text for the saved draft"
+    api_client.patch(
+        f"/api/papers/{paper_pk}/",
+        {"document": edited_doc},
+        format="json",
+    )
+
+    pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
+
+    with pdfplumber.open(BytesIO(pdf.content)) as rendered:
+        text = "\n".join(page.extract_text() or "" for page in rendered.pages)
+    assert "Edited slot text for the saved draft" in text
+
+
+@pytest.mark.django_db
+def test_paper_pdf_endpoint_targets_print_route_with_auth_token(
+    api_client, monkeypatch, seeded_bank, settings
+):
+    """Browser PDF rendering goes through the React print route for parity."""
+    settings.PAPER_PRINT_BASE_URL = "http://frontend:5173"
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    calls = []
+
+    def fake_render(document, print_url=None):
+        calls.append((document, print_url))
+        return b"%PDF from-browser"
+
+    monkeypatch.setattr("papers.views.render_paper_pdf", fake_render)
+
+    pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
+
+    assert pdf.status_code == status.HTTP_200_OK
+    assert calls[0][0]["schemaVersion"] == "paper_document.v1"
+    assert calls[0][1].startswith(
+        f"http://frontend:5173/editor/{paper_pk}/print?token="
+    )

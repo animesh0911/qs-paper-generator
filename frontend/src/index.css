@@ -35,19 +35,142 @@
 @layer components {
   .paper-canvas {
     min-height: 70rem;
-    border: 1px solid hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
   }
 
+  .editor-paper-sheet {
+    max-width: 760px;
+    padding: 28pt 32pt 34pt;
+    color: #050505;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    line-height: 1.22;
+  }
+
+  .editor-paper-masthead {
+    margin-bottom: 16pt;
+  }
+
+  .editor-paper-title .bn-editor,
+  .editor-paper-title.qpg-paper-chrome-text {
+    font-size: 21pt;
+    line-height: 1.1;
+  }
+
+  .editor-paper-subtitle .bn-editor,
+  .editor-paper-subtitle.qpg-paper-chrome-text {
+    margin-top: 2pt;
+    font-size: 12pt;
+  }
+
+  .editor-paper-meta-text .bn-editor,
+  .editor-paper-meta-text.qpg-paper-chrome-text {
+    font-size: 13.5pt;
+    font-style: italic;
+    line-height: 1.22;
+  }
+
+  .editor-paper-instructions {
+    margin-bottom: 20pt;
+  }
+
+  .editor-paper-section {
+    break-inside: auto;
+    border: 1px solid #edf1f6;
+    border-radius: 3px;
+    background: #fff;
+    padding: 0;
+  }
+
+  .editor-paper-section + .editor-paper-section {
+    margin-top: 18pt;
+  }
+
+  .editor-paper-section-header {
+    margin: 0;
+    padding: 7pt 8pt 8pt;
+    border-bottom: 1px solid #edf1f6;
+    background: #fff;
+    text-align: center;
+  }
+
+  .editor-paper-section .divide-y > :not([hidden]) ~ :not([hidden]) {
+    border-top-width: 1px;
+    border-color: #f3f5f8;
+  }
+
+  .editor-paper-section [data-question-slot] {
+    grid-template-columns: 24pt minmax(0, 1fr) 42pt;
+    gap: 9pt;
+    padding: 8pt 8pt;
+    font-size: 12pt;
+    line-height: 1.34;
+  }
+
+  .editor-paper-section [data-question-slot] + [data-question-slot] {
+    padding-top: 8pt;
+  }
+
+  .editor-paper-section [data-question-slot] > div:first-child {
+    gap: 3pt;
+  }
+
+  .editor-paper-section .qpg-question-mark-cell {
+    justify-self: end;
+    min-width: 42pt;
+    text-align: right;
+    background: transparent;
+    border: 0;
+  }
+
+  .qpg-question-mark-label {
+    display: block;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #333;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11pt;
+    font-style: italic;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 0.08em 0 0;
+    white-space: nowrap;
+  }
+
+  .editor-paper-section .qpg-question-region {
+    gap: 6pt;
+  }
+
+  .qpg-question-region-prefix {
+    color: #111;
+    font-weight: 600;
+  }
+
+  .qpg-question-region-suffix {
+    align-self: baseline;
+    color: #333;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11pt;
+    font-style: italic;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .qpg-question-blocknote,
   .qpg-question-blocknote .bn-container,
   .qpg-question-blocknote .bn-editor {
     background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
   }
 
   .qpg-question-blocknote .bn-editor {
     padding: 0;
-    color: hsl(var(--foreground));
-    font-size: 15px;
-    line-height: 1.65;
     opacity: 1;
   }
 
@@ -58,7 +181,8 @@
   }
 
   .qpg-question-blocknote .bn-block-content {
-    color: hsl(var(--foreground));
+    color: inherit;
+    font-family: inherit;
     line-height: inherit;
     margin: 0;
     padding: 0;
@@ -70,10 +194,11 @@
   }
 
   .qpg-question-region-text {
-    color: hsl(var(--foreground));
-    font-size: 15px;
-    line-height: 1.65;
-    min-height: 24.75px;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    min-height: 1.22em;
     white-space: pre-wrap;
   }
 
@@ -99,6 +224,27 @@
     margin: 0;
   }
 
+  .qpg-paper-inline-chrome,
+  .qpg-paper-inline-chrome .bn-editor {
+    display: inline;
+    font: inherit;
+    line-height: inherit;
+  }
+
+  .qpg-paper-code-value,
+  .qpg-paper-code-value .bn-editor {
+    font-size: 25pt;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .qpg-paper-roll-editor,
+  .qpg-paper-roll-editor .bn-editor {
+    min-width: 140pt;
+    font-size: 13.5pt;
+    line-height: 1.3;
+  }
+
   .qpg-paper-title .bn-editor,
   .qpg-paper-title.qpg-paper-chrome-text {
     font-size: 18px;
@@ -122,7 +268,7 @@
   .qpg-section-title.qpg-paper-chrome-text {
     font-size: 16px;
     font-weight: 700;
-    line-height: 1.55;
+    line-height: 1.45;
     text-align: center;
     text-transform: uppercase;
   }
@@ -139,11 +285,12 @@
   .qpg-section-instructions .bn-editor,
   .qpg-section-instructions.qpg-paper-chrome-text {
     font-size: 14px;
+    font-style: italic;
     line-height: 1.7;
   }
 
   .qpg-section-instructions.qpg-paper-chrome-text {
-    margin-top: 0.375rem;
+    margin-top: 0.25rem;
     text-align: center;
   }
 
@@ -154,6 +301,301 @@
   .qpg-section-instructions .bn-block-content {
     justify-content: center;
     text-align: center;
+  }
+
+  .print-page {
+    min-height: 100vh;
+    background: #e5e7eb;
+    padding: 24px;
+  }
+
+  .paper-sheet {
+    position: relative;
+    width: 523.44pt;
+    min-height: 693.36pt;
+    margin: 0 auto;
+    padding: 30pt 36pt 38pt;
+    background: #fff;
+    color: #050505;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13.5pt;
+    line-height: 1.22;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+  }
+
+  .paper-sheet p,
+  .paper-sheet h1,
+  .paper-sheet h2 {
+    margin: 0;
+  }
+
+  .paper-masthead {
+    margin-bottom: 16pt;
+  }
+
+  .paper-topline,
+  .paper-identity-row,
+  .paper-meta-grid {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18pt;
+  }
+
+  .paper-series,
+  .paper-set {
+    border: 1.2pt solid #111;
+    border-radius: 4pt;
+    padding: 2pt 6pt;
+    font-size: 19pt;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .paper-code-stack {
+    display: flex;
+    align-items: center;
+    gap: 16pt;
+  }
+
+  .paper-barcode {
+    width: 92pt;
+    height: 22pt;
+    background: repeating-linear-gradient(
+      90deg,
+      #111 0 1.5pt,
+      transparent 1.5pt 3pt,
+      #111 3pt 4pt,
+      transparent 4pt 7pt
+    );
+  }
+
+  .paper-identity-row {
+    margin-top: 12pt;
+  }
+
+  .paper-roll {
+    font-size: 13.5pt;
+    line-height: 1.3;
+  }
+
+  .paper-roll-blank {
+    width: 170pt;
+    min-height: 18pt;
+    margin-top: 3pt;
+    border-bottom: 1pt solid #111;
+  }
+
+  .paper-code-box {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-template-rows: auto auto;
+    column-gap: 16pt;
+    align-items: center;
+    text-align: right;
+  }
+
+  .paper-code-box span,
+  .paper-code-box strong {
+    grid-column: 1;
+    font-size: 13pt;
+  }
+
+  .paper-code-box b {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 25pt;
+    line-height: 1;
+  }
+
+  .paper-code-box .qpg-paper-chrome-text {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .paper-title-block {
+    margin-top: 28pt;
+    text-align: center;
+  }
+
+  .paper-title-local {
+    font-size: 18pt;
+    font-weight: 700;
+  }
+
+  .paper-title {
+    margin-top: 5pt;
+    font-size: 21pt;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .paper-meta-grid {
+    margin-top: 10pt;
+    font-size: 13.5pt;
+    font-style: italic;
+  }
+
+  .paper-note-table {
+    border: 1pt solid #111;
+    margin-bottom: 18pt;
+  }
+
+  .paper-note-table h2 {
+    border-bottom: 1pt dashed #111;
+    padding: 2pt 4pt;
+    font-size: 14.5pt;
+    font-weight: 700;
+  }
+
+  .paper-note-row {
+    display: grid;
+    grid-template-columns: 28pt 1fr;
+    gap: 6pt;
+    padding: 4pt 6pt;
+    border-bottom: 1pt dashed #111;
+  }
+
+  .paper-note-row:last-child {
+    border-bottom: 0;
+  }
+
+  .paper-general-instructions {
+    margin-bottom: 20pt;
+    font-size: 13.5pt;
+    font-style: italic;
+  }
+
+  .paper-general-instructions h2 {
+    margin-bottom: 8pt;
+    font-size: 14pt;
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .paper-general-instructions > p {
+    margin-bottom: 4pt;
+  }
+
+  .paper-general-row {
+    display: grid;
+    grid-template-columns: 28pt 1fr;
+    gap: 8pt;
+    margin-top: 3pt;
+  }
+
+  .paper-section {
+    break-inside: auto;
+  }
+
+  .paper-section-header {
+    margin: 18pt 0 13pt;
+    text-align: center;
+  }
+
+  .paper-section-title,
+  .paper-section-subtitle {
+    font-size: 15pt;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .paper-instructions {
+    margin-top: 5pt;
+    font-size: 11.5pt;
+    font-style: italic;
+  }
+
+  .paper-questions {
+    display: grid;
+    gap: 14pt;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .paper-question {
+    display: grid;
+    grid-template-columns: 26pt minmax(0, 1fr) 42pt;
+    gap: 10pt;
+    align-items: start;
+    break-inside: avoid;
+    line-height: 1.3;
+  }
+
+  .paper-question-number {
+    font-weight: 700;
+  }
+
+  .paper-question-body {
+    min-width: 0;
+  }
+
+  .paper-question-body p + p {
+    margin-top: 4pt;
+  }
+
+  .paper-marks {
+    justify-self: end;
+    padding-top: 0.15em;
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .paper-options {
+    display: grid;
+    gap: 5pt 24pt;
+    margin: 8pt 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .paper-options-two-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .paper-options li {
+    display: grid;
+    grid-template-columns: 28pt 1fr;
+    gap: 7pt;
+  }
+
+  .paper-subquestion {
+    display: grid;
+    grid-template-columns: 22pt 1fr 16pt;
+    gap: 7pt;
+    margin-top: 7pt;
+  }
+
+  .paper-choice-group {
+    display: grid;
+    gap: 8pt;
+    margin-top: 7pt;
+  }
+
+  .paper-choice-group strong {
+    display: block;
+    margin: 2pt 0;
+    text-align: center;
+  }
+
+  .paper-unfilled {
+    color: #555;
+    font-style: italic;
+  }
+
+  .paper-footer {
+    position: absolute;
+    right: 36pt;
+    bottom: 16pt;
+    left: 36pt;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5pt;
+    font-style: italic;
+    font-weight: 700;
   }
 }
 
@@ -166,8 +608,8 @@
 
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 14mm;
+    size: 523.44pt 693.36pt;
+    margin: 0;
   }
 
   [data-editor-chrome] {
@@ -177,6 +619,23 @@
   body,
   .editor-shell {
     background: white !important;
+  }
+
+  .print-page {
+    min-height: auto;
+    padding: 0;
+    background: white !important;
+  }
+
+  .paper-sheet {
+    width: auto;
+    min-height: 693.36pt;
+    margin: 0;
+    box-shadow: none;
+  }
+
+  .paper-footer {
+    position: fixed;
   }
 
   .editor-shell {

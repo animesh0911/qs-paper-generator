@@ -105,7 +105,7 @@ export function normalizePaperDocument(
   document: PaperDocument,
 ): NormalizedPaperDocument {
   const questionsById = Object.fromEntries(
-    document.questions.map((question) => [question.questionId, question]),
+    document.questions.map((question) => [question.id, question]),
   );
   const slotsById: Record<string, DocSlot> = {};
   const slotOrderBySection: Record<string, string[]> = {};
@@ -113,14 +113,14 @@ export function normalizePaperDocument(
   const lockStateBySlotId: Record<string, boolean> = {};
 
   for (const section of document.paper.sections) {
-    slotOrderBySection[section.sectionId] = section.slots.map((slot) => {
-      slotsById[slot.slotId] = slot;
-      slotEditsById[slot.slotId] = slot.overrides ?? {
-        modifiedFromSource: false,
+    slotOrderBySection[section.id] = section.slots.map((slot) => {
+      slotsById[slot.id] = slot;
+      slotEditsById[slot.id] = slot.overrides ?? {
+        modified: false,
         regions: {},
       };
-      lockStateBySlotId[slot.slotId] = slot.locked;
-      return slot.slotId;
+      lockStateBySlotId[slot.id] = slot.locked;
+      return slot.id;
     });
   }
 
@@ -128,7 +128,7 @@ export function normalizePaperDocument(
     document,
     questionsById,
     slotsById,
-    sectionOrder: document.paper.sections.map((section) => section.sectionId),
+    sectionOrder: document.paper.sections.map((section) => section.id),
     slotOrderBySection,
     slotEditsById,
     lockStateBySlotId,
@@ -143,25 +143,22 @@ export function setSlotRegionOverride(
   content: ContentItem[],
 ): NormalizedPaperDocument {
   const currentEdits = state.slotEditsById[slotId] ?? {
-    modifiedFromSource: false,
+    modified: false,
     regions: {},
-  };
-  const nextOverrides = {
-    modifiedFromSource: true,
-    regions: {
-      ...currentEdits.regions,
-      [regionKey]: content,
-    },
   };
 
   return {
     ...state,
     slotEditsById: {
       ...state.slotEditsById,
-      [slotId]: nextOverrides,
+      [slotId]: {
+        modified: true,
+        regions: {
+          ...currentEdits.regions,
+          [regionKey]: content,
+        },
+      },
     },
-    slotsById: updateSlotMapOverrides(state.slotsById, slotId, nextOverrides),
-    document: updateDocumentSlotOverrides(state.document, slotId, nextOverrides),
   };
 }
 
@@ -169,19 +166,15 @@ export function restoreSlotSource(
   state: NormalizedPaperDocument,
   slotId: string,
 ): NormalizedPaperDocument {
-  const nextOverrides = {
-    modifiedFromSource: false,
-    regions: {},
-  };
-
   return {
     ...state,
     slotEditsById: {
       ...state.slotEditsById,
-      [slotId]: nextOverrides,
+      [slotId]: {
+        modified: false,
+        regions: {},
+      },
     },
-    slotsById: updateSlotMapOverrides(state.slotsById, slotId, nextOverrides),
-    document: updateDocumentSlotOverrides(state.document, slotId, nextOverrides),
   };
 }
 
@@ -210,7 +203,7 @@ export function setSlotLockState(
         sections: state.document.paper.sections.map((section) => ({
           ...section,
           slots: section.slots.map((slot) =>
-            slot.slotId === slotId ? { ...slot, locked } : slot,
+            slot.id === slotId ? { ...slot, locked } : slot,
           ),
         })),
       },
@@ -224,7 +217,7 @@ export function setSlotSelectedQuestion(
   selectedQuestionId: string,
 ): NormalizedPaperDocument {
   const resetOverrides: SlotOverrides = {
-    modifiedFromSource: false,
+    modified: false,
     regions: {},
   };
 
@@ -249,7 +242,7 @@ export function setSlotSelectedQuestion(
         sections: state.document.paper.sections.map((section) => ({
           ...section,
           slots: section.slots.map((slot) =>
-            slot.slotId === slotId
+            slot.id === slotId
               ? {
                   ...slot,
                   selectedQuestionId,
@@ -277,9 +270,9 @@ export function setPaperChromeText(
         title: regionKey === 'paper:title' ? text : state.document.paper.title,
         subtitle:
           regionKey === 'paper:subtitle' ? text : state.document.paper.subtitle,
-        headerBlocks: updateEditableTextBlocks(
-          state.document.paper.headerBlocks,
-          'header',
+        chromeBlocks: updateEditableTextBlocks(
+          state.document.paper.chromeBlocks,
+          'chrome',
           regionKey,
           text,
         ),
@@ -304,7 +297,7 @@ function updateEditableTextBlocks(
   text: string,
 ) {
   return blocks?.map((block) =>
-    regionKey === `${prefix}:${block.blockId}` ? { ...block, text } : block,
+    regionKey === `${prefix}:${block.id}` ? { ...block, text } : block,
   );
 }
 
@@ -313,13 +306,13 @@ function updateSectionChromeText(
   regionKey: string,
   text: string,
 ): DocSection {
-  if (regionKey === `section:${section.sectionId}:title`) {
+  if (regionKey === `section:${section.id}:title`) {
     return { ...section, title: text };
   }
-  if (regionKey === `section:${section.sectionId}:subtitle`) {
+  if (regionKey === `section:${section.id}:subtitle`) {
     return { ...section, subtitle: text };
   }
-  if (regionKey === `section:${section.sectionId}:instructions`) {
+  if (regionKey === `section:${section.id}:instructions`) {
     return { ...section, instructions: text };
   }
   return section;
@@ -336,11 +329,28 @@ export function renumberPaperSlots(document: PaperDocument): PaperDocument {
         slots: section.slots.map((slot) => {
           const nextSlot = {
             ...slot,
-            displayNumber: String(index),
+            number: String(index),
           };
           index += 1;
           return nextSlot;
         }),
+      })),
+    },
+  };
+}
+
+export function materializePaperDocument(
+  state: NormalizedPaperDocument,
+): PaperDocument {
+  return {
+    ...state.document,
+    paper: {
+      ...state.document.paper,
+      sections: state.document.paper.sections.map((section) => ({
+        ...section,
+        slots: section.slots.map((slot) =>
+          slotWithCurrentState(state, slot.id),
+        ),
       })),
     },
   };
@@ -352,13 +362,13 @@ export function buildOrderZones(
   const document = 'document' in input ? input.document : input;
 
   return document.paper.sections.map((section) => ({
-    zoneId: `section:${section.sectionId}`,
+    zoneId: `section:${section.id}`,
     label: section.title,
     itemKind: 'slot',
-    orderedItemIds: section.slots.map((slot) => slot.slotId),
+    orderedItemIds: section.slots.map((slot) => slot.id),
     reorder: {
-      enabled: document.format.sections.allowQuestionReorderWithinSection,
-      allowedTargetZoneIds: [`section:${section.sectionId}`],
+      enabled: true,
+      allowedTargetZoneIds: [`section:${section.id}`],
     },
   }));
 }
@@ -394,6 +404,13 @@ export function reorderSlotWithinOrderZone(
       error: 'Reorder is disabled for this zone',
     };
   }
+  if ((state.slotsById[params.slotId]?.can?.reorder ?? true) === false) {
+    return {
+      success: false,
+      state,
+      error: 'Reorder is disabled for this slot',
+    };
+  }
   if (!sourceZone.reorder.allowedTargetZoneIds.includes(targetZone.zoneId)) {
     return {
       success: false,
@@ -421,7 +438,7 @@ export function reorderSlotWithinOrderZone(
   reorderedItemIds.splice(params.toIndex, 0, params.slotId);
 
   const nextSections = state.document.paper.sections.map((section) => {
-    if (`section:${section.sectionId}` === sourceZone.zoneId) {
+    if (`section:${section.id}` === sourceZone.zoneId) {
       return {
         ...section,
         slots: reorderedItemIds.map((slotId) =>
@@ -432,7 +449,7 @@ export function reorderSlotWithinOrderZone(
     return {
       ...section,
       slots: section.slots.map((slot) =>
-        slotWithCurrentState(state, slot.slotId),
+        slotWithCurrentState(state, slot.id),
       ),
     };
   });
@@ -490,38 +507,5 @@ function slotWithCurrentState(
     ...slot,
     locked: state.lockStateBySlotId[slotId] ?? slot.locked,
     overrides: state.slotEditsById[slotId] ?? slot.overrides,
-  };
-}
-
-function updateSlotMapOverrides(
-  slotsById: Record<string, DocSlot>,
-  slotId: string,
-  overrides: SlotOverrides,
-) {
-  return {
-    ...slotsById,
-    [slotId]: {
-      ...slotsById[slotId],
-      overrides,
-    },
-  };
-}
-
-function updateDocumentSlotOverrides(
-  document: PaperDocument,
-  slotId: string,
-  overrides: SlotOverrides,
-): PaperDocument {
-  return {
-    ...document,
-    paper: {
-      ...document.paper,
-      sections: document.paper.sections.map((section) => ({
-        ...section,
-        slots: section.slots.map((slot) =>
-          slot.slotId === slotId ? { ...slot, overrides } : slot,
-        ),
-      })),
-    },
   };
 }

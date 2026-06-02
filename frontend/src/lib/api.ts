@@ -14,12 +14,9 @@
  * @module api
  */
 import type { AssembleRequest, Chapter, PaperDocument } from '@/types';
-import { assertPaperDocument } from './paper-document';
+import { paperDocumentSchema } from '@/types/paper-document.schema';
 
 const TOKEN_KEY = 'qpg_token';
-const SEEDED_DEMO_EMAIL = 'teacher@example.com';
-const SEEDED_DEMO_PASSWORD = 'teacher123';
-const DEV_DEMO_TOKEN = 'dev-demo-token';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -34,12 +31,13 @@ export function clearToken() {
 async function request(
   path: string,
   options: RequestInit = {},
+  tokenOverride?: string | null,
 ): Promise<Response> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
-  const token = getToken();
+  const token = tokenOverride ?? getToken();
   if (token) headers['Authorization'] = `Token ${token}`;
 
   const res = await fetch(`/api${path}`, { ...options, headers });
@@ -57,47 +55,13 @@ async function request(
 }
 
 async function authResult(path: string, email: string, password: string) {
-  try {
-    const res = await request(path, {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    setToken(data.token);
-    return data;
-  } catch (error) {
-    if (canUseDevDemoAuth(path, email, password, error)) {
-      const data = {
-        token: DEV_DEMO_TOKEN,
-        user: {
-          email: SEEDED_DEMO_EMAIL,
-        },
-      };
-      setToken(data.token);
-      return data;
-    }
-    throw error;
-  }
-}
-
-function canUseDevDemoAuth(
-  path: string,
-  email: string,
-  password: string,
-  error: unknown,
-) {
-  if (!import.meta.env.DEV || path !== '/auth/login') return false;
-  if (
-    email.toLowerCase() !== SEEDED_DEMO_EMAIL ||
-    password !== SEEDED_DEMO_PASSWORD
-  ) {
-    return false;
-  }
-  if (!(error instanceof Error)) return false;
-  return (
-    error.message === 'Failed to fetch' ||
-    error.message.startsWith('Request failed (500)')
-  );
+  const res = await request(path, {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await res.json();
+  setToken(data.token);
+  return data;
 }
 
 export const login = (email: string, password: string) =>
@@ -113,55 +77,37 @@ export async function assemblePaper(
     method: 'POST',
     body: JSON.stringify(body),
   });
-  return assertPaperDocument(await res.json());
-}
-
-export async function fetchPaperDocument(paperId: string): Promise<PaperDocument> {
-  const id = paperId.replace(/^paper_/, '');
-  const res = await request(`/papers/${id}/`, { method: 'GET' });
-  return assertPaperDocument(await res.json());
-}
-
-export interface PaperMutationResult {
-  paperId: string;
-  status: 'draft' | 'approved';
-  document?: PaperDocument;
-}
-
-function paperApiId(document: PaperDocument) {
-  return document.paper.paperId.replace(/^paper_/, '');
-}
-
-function isPersistedPaperId(document: PaperDocument) {
-  return /^\d+$/.test(paperApiId(document));
-}
-
-export async function savePaperDraft(
-  document: PaperDocument,
-): Promise<PaperMutationResult> {
-  if (!isPersistedPaperId(document)) {
-    const res = await request('/papers/drafts/', {
-      method: 'POST',
-      body: JSON.stringify({ document }),
-    });
-    return res.json();
+  // Runtime contract check — see paper-document.schema.ts for rationale.
+  const parsed = paperDocumentSchema.safeParse(await res.json());
+  if (!parsed.success) {
+    throw new Error(
+      `Backend returned an unexpected PaperDocument shape: ${parsed.error.message}`,
+    );
   }
-
-  const res = await request(`/papers/${paperApiId(document)}/`, {
-    method: 'PATCH',
-    body: JSON.stringify({ document }),
-  });
-  return res.json();
+  return parsed.data as PaperDocument;
 }
 
-export async function approvePaper(
-  document: PaperDocument,
-): Promise<PaperMutationResult> {
-  const res = await request(`/papers/${paperApiId(document)}/approve/`, {
-    method: 'POST',
-    body: JSON.stringify({ document }),
+export async function fetchPaperDocument(
+  paperId: string,
+  token?: string | null,
+): Promise<PaperDocument> {
+  const id = paperId.replace(/^paper_/, '');
+  const res = await request(`/papers/${id}/`, { method: 'GET' }, token);
+  const parsed = paperDocumentSchema.safeParse(await res.json());
+  if (!parsed.success) {
+    throw new Error(
+      `Backend returned an unexpected PaperDocument shape: ${parsed.error.message}`,
+    );
+  }
+  return parsed.data as PaperDocument;
+}
+
+export async function persistDraft(paper: PaperDocument): Promise<void> {
+  const id = paper.paper.id.replace(/^paper_/, '');
+  await request(`/papers/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify({ document: paper }),
   });
-  return res.json();
 }
 
 export interface Metadata {
@@ -180,7 +126,9 @@ export async function fetchChapters(): Promise<Chapter[]> {
   return res.json();
 }
 
-export async function downloadPaperPdf(paperId: string) {
+export async function downloadPaperPdf(paper: PaperDocument) {
+  await persistDraft(paper);
+  const paperId = paper.paper.id;
   const id = paperId.replace(/^paper_/, '');
   const res = await request(`/papers/${id}/pdf/`, { method: 'GET' });
   const blob = await res.blob();

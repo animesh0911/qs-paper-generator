@@ -3,7 +3,7 @@ import type { PaperDocument } from '@/types';
 export const mockPaperDocumentV1 = {
   schemaVersion: 'paper_document.v1',
   request: {
-    requestId: 'req_mock_cbse_science_001',
+    id: 'req_mock_cbse_science_001',
     language: 'en',
     classLevel: '10',
     subject: 'Science',
@@ -25,8 +25,8 @@ export const mockPaperDocumentV1 = {
     },
   },
   template: {
-    templateId: 'cbse_science_class_10_full_term_v1',
-    templateName: 'CBSE Class 10 Science Full Term',
+    id: 'cbse_science_class_10_full_term_v1',
+    name: 'CBSE Class 10 Science Full Term',
     board: 'CBSE',
     classLevel: '10',
     subject: 'Science',
@@ -36,125 +36,168 @@ export const mockPaperDocumentV1 = {
     language: 'en',
   },
   format: {
-    formatId: 'cbse_science_class_10_v1',
+    id: 'cbse_science_class_10_board_compact_2026_v1',
     page: {
-      size: 'A4',
+      size: 'CBSE_COMPACT',
       orientation: 'portrait',
+      widthPt: 523.44,
+      heightPt: 693.36,
+      marginPt: {
+        top: 28,
+        right: 36,
+        bottom: 34,
+        left: 36,
+      },
     },
-    paperChrome: {
-      showOuterBorder: true,
-      sectionStyle: 'boxed',
-      marksPlacement: 'right',
-    },
-    numbering: {
-      scope: 'paper',
-      style: 'decimal',
-      recomputeOnSectionReorder: true,
-    },
-    sections: {
-      allowQuestionReorderWithinSection: true,
-      allowCrossSectionMove: false,
-    },
-    questionRegions: {
-      allowRegionReorder: false,
-      allowRegionDelete: false,
-    },
-    mcqOptions: {
-      layout: 'vertical',
+    layout: {
+      marks: 'right_column',
+      questionNumbers: 'left_column',
+      mcqOptions: 'two_column',
+      instructions: 'note_table_then_general',
+      masthead: 'cbse_compact',
+      footer: 'code_page_pto',
     },
   },
   paper: {
-    paperId: 'paper_mock_cbse_science_001',
+    id: 'paper_mock_cbse_science_001',
     title: 'Science',
     subtitle: 'Class X',
     totalMarks: 80,
     durationMinutes: 180,
     language: 'en',
-    headerBlocks: [
+    chromeBlocks: [
       {
-        blockId: 'header_mock_001',
-        blockType: 'paper_header',
-        text: 'Science - Class X',
-        editable: true,
+        id: 'series',
+        role: 'series',
+        text: 'LMNK2',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'set',
+        role: 'set',
+        text: 'SET ~ 1',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'paper_code',
+        role: 'paper_code',
+        text: '31/2/1',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'subject_label',
+        role: 'subject_label',
+        text: 'विज्ञान',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'roll_number',
+        role: 'roll_number',
+        text: '',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'time_allowed',
+        role: 'paper_meta_left',
+        text: 'Time allowed : 3 hours',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'maximum_marks',
+        role: 'paper_meta_right',
+        text: 'Maximum Marks : 80',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'footer_left',
+        role: 'footer_left',
+        text: '31/2/1',
+        can: { editText: true, delete: true, reorder: false },
+      },
+      {
+        id: 'footer_right',
+        role: 'footer_right',
+        text: 'P.T.O.',
+        can: { editText: true, delete: true, reorder: false },
       },
     ],
     instructionBlocks: [
       {
-        blockId: 'note_heading',
-        blockType: 'note_heading',
+        id: 'note_heading',
+        role: 'note_heading',
         text: 'NOTE',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'note_printed_pages',
-        blockType: 'note',
+        id: 'note_printed_pages',
+        role: 'note',
         text: 'Please check that this question paper contains 31 printed pages.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'note_question_count',
-        blockType: 'note',
+        id: 'note_question_count',
+        role: 'note',
         text: 'Please check that this question paper contains 39 questions.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'note_serial_number',
-        blockType: 'note',
+        id: 'note_serial_number',
+        role: 'note',
         text: 'Please write down the Serial Number of the question in the answer-book at the given place before attempting it.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'note_reading_time',
-        blockType: 'note',
+        id: 'note_reading_time',
+        role: 'note',
         text: '15 minute time has been allotted to read this question paper. The question paper will be distributed at 10.15 a.m. From 10.15 a.m. to 10.30 a.m., the candidates will read the question paper only and will not write any answer on the answer-book during this period.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'general_instructions_heading',
-        blockType: 'general_instructions_heading',
+        id: 'general_instructions_heading',
+        role: 'general_instructions_heading',
         text: 'General Instructions',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'general_instruction_count',
-        blockType: 'general_instruction',
+        id: 'general_instruction_count',
+        role: 'general_instruction',
         text: 'This question paper contain 39 questions. All questions are compulsory.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'general_instruction_sections',
-        blockType: 'general_instruction',
+        id: 'general_instruction_sections',
+        role: 'general_instruction',
         text: 'The question paper is divided into three sections — A, B and C. Section A: Biology (30 marks), Section B: Chemistry (25 marks), Section C: Physics (25 marks).',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'general_instruction_types',
-        blockType: 'general_instruction',
+        id: 'general_instruction_types',
+        role: 'general_instruction',
         text: 'The question paper has MCQs, VSAs, SAs, LAs and CBQs. Marks are given against each question.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'general_instruction_cbq',
-        blockType: 'general_instruction',
+        id: 'general_instruction_cbq',
+        role: 'general_instruction',
         text: 'There are case based questions (CBQs) with three sub-questions and are of 4 marks each.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'general_instruction_answer_sections',
-        blockType: 'general_instruction',
+        id: 'general_instruction_answer_sections',
+        role: 'general_instruction',
         text: 'Divide your answer sheet into three sections as per the question paper — Section A (Biology), Section B (Chemistry) and Section C (Physics). It is compulsory to answer each question in its respective section.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
       {
-        blockId: 'general_instruction_choice',
-        blockType: 'general_instruction',
+        id: 'general_instruction_choice',
+        role: 'general_instruction',
         text: 'There is no overall choice in the question paper. However, an internal choice has been provided in few questions. Only one of the choices in such questions must be attempted.',
-        editable: true,
+        can: { editText: true, delete: false, reorder: false },
       },
     ],
     sections: [
       {
-        sectionId: 'A',
+        id: 'A',
         title: 'Section A',
         subtitle: 'Biology',
         marks: 30,
@@ -162,10 +205,10 @@ export const mockPaperDocumentV1 = {
           'Answer the Biology questions in this section. Instructions are given with each question, wherever necessary.',
         slots: [
           {
-            slotId: 'slot_A_01',
-            displayNumber: '1',
+            id: 'slot_A_01',
+            number: '1',
             marks: 1,
-            questionType: 'mcq',
+            type: 'mcq',
             selectedQuestionId: 'q_mcq_heredity_001',
             locked: false,
             alternateQuestionIds: [
@@ -176,15 +219,15 @@ export const mockPaperDocumentV1 = {
               'q_mcq_photosynthesis_001',
             ],
             overrides: {
-              modifiedFromSource: false,
+              modified: false,
               regions: {},
             },
           },
           {
-            slotId: 'slot_A_02',
-            displayNumber: '2',
+            id: 'slot_A_02',
+            number: '2',
             marks: 1,
-            questionType: 'assertion_reason',
+            type: 'assertion_reason',
             selectedQuestionId: 'q_ar_life_processes_001',
             locked: false,
             alternateQuestionIds: [
@@ -193,10 +236,10 @@ export const mockPaperDocumentV1 = {
             ],
           },
           {
-            slotId: 'slot_B_01',
-            displayNumber: '3',
+            id: 'slot_B_01',
+            number: '3',
             marks: 2,
-            questionType: 'short_answer',
+            type: 'short_answer',
             selectedQuestionId: 'q_short_stomata_001',
             locked: true,
             alternateQuestionIds: [
@@ -207,10 +250,10 @@ export const mockPaperDocumentV1 = {
             ],
           },
           {
-            slotId: 'slot_C_01',
-            displayNumber: '4',
+            id: 'slot_C_01',
+            number: '4',
             marks: 5,
-            questionType: 'long_answer',
+            type: 'long_answer',
             selectedQuestionId: 'q_long_life_processes_001',
             locked: false,
             alternateQuestionIds: [
@@ -220,10 +263,10 @@ export const mockPaperDocumentV1 = {
             ],
           },
           {
-            slotId: 'slot_D_01',
-            displayNumber: '5',
+            id: 'slot_D_01',
+            number: '5',
             marks: 4,
-            questionType: 'case_based',
+            type: 'case_based',
             selectedQuestionId: 'q_case_brain_001',
             locked: false,
             alternateQuestionIds: ['q_case_brain_002'],
@@ -231,7 +274,7 @@ export const mockPaperDocumentV1 = {
         ],
       },
       {
-        sectionId: 'B',
+        id: 'B',
         title: 'Section B',
         subtitle: 'Chemistry',
         marks: 25,
@@ -239,19 +282,19 @@ export const mockPaperDocumentV1 = {
           'Answer the Chemistry questions in this section. Marks are given against each question.',
         slots: [
           {
-            slotId: 'slot_E_02',
-            displayNumber: '6',
+            id: 'slot_E_02',
+            number: '6',
             marks: 5,
-            questionType: 'table_based',
+            type: 'table_based',
             selectedQuestionId: 'q_table_metals_001',
             locked: false,
             alternateQuestionIds: ['q_table_metals_002'],
           },
           {
-            slotId: 'slot_C_02',
-            displayNumber: '7',
+            id: 'slot_C_02',
+            number: '7',
             marks: 5,
-            questionType: 'long_answer',
+            type: 'long_answer',
             selectedQuestionId: 'q_long_internal_choice_001',
             locked: false,
             alternateQuestionIds: ['q_long_internal_choice_002'],
@@ -260,7 +303,7 @@ export const mockPaperDocumentV1 = {
         ],
       },
       {
-        sectionId: 'C',
+        id: 'C',
         title: 'Section C',
         subtitle: 'Physics',
         marks: 25,
@@ -268,10 +311,10 @@ export const mockPaperDocumentV1 = {
           'Answer the Physics questions in this section. Internal choice, if any, must be attempted only once.',
         slots: [
           {
-            slotId: 'slot_B_02',
-            displayNumber: '8',
+            id: 'slot_B_02',
+            number: '8',
             marks: 2,
-            questionType: 'short_answer',
+            type: 'short_answer',
             selectedQuestionId: 'q_short_electricity_001',
             locked: false,
             alternateQuestionIds: [
@@ -282,10 +325,10 @@ export const mockPaperDocumentV1 = {
             ],
           },
           {
-            slotId: 'slot_E_01',
-            displayNumber: '9',
+            id: 'slot_E_01',
+            number: '9',
             marks: 5,
-            questionType: 'diagram_based',
+            type: 'diagram_based',
             selectedQuestionId: 'q_diagram_electricity_001',
             locked: false,
             alternateQuestionIds: [
@@ -300,10 +343,10 @@ export const mockPaperDocumentV1 = {
   },
   questions: [
     {
-      questionId: 'q_mcq_heredity_001',
+      id: 'q_mcq_heredity_001',
       language: 'en',
-      marks: 1,
-      questionType: 'mcq',
+      defaultMarks: 1,
+      type: 'mcq',
       rawText:
         'What is the phenotypic ratio in the F2 generation of a monohybrid cross?',
       content: {
@@ -334,18 +377,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2024 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2024 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 3,
         originalQuestionNumber: '1',
       },
     },
     {
-      questionId: 'q_mcq_heredity_002',
+      id: 'q_mcq_heredity_002',
       language: 'en',
-      marks: 1,
-      questionType: 'mcq',
+      defaultMarks: 1,
+      type: 'mcq',
       rawText:
         'Which pair represents contrasting traits studied by Mendel in pea plants?',
       content: {
@@ -384,15 +427,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_mcq_electricity_001',
+      id: 'q_mcq_electricity_001',
       language: 'en',
-      marks: 1,
-      questionType: 'mcq',
+      defaultMarks: 1,
+      type: 'mcq',
       rawText: 'Which quantity is measured in ohm?',
       content: {
         stem: [
@@ -418,15 +461,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_ar_life_processes_001',
+      id: 'q_ar_life_processes_001',
       language: 'en',
-      marks: 1,
-      questionType: 'assertion_reason',
+      defaultMarks: 1,
+      type: 'assertion_reason',
       rawText:
         'Assertion (A): Blood plasma transports carbon dioxide. Reason (R): Carbon dioxide is more soluble in water than oxygen.',
       content: {
@@ -482,15 +525,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2024 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2024 Set 31/2/1',
       },
     },
     {
-      questionId: 'q_ar_life_processes_002',
+      id: 'q_ar_life_processes_002',
       language: 'en',
-      marks: 1,
-      questionType: 'assertion_reason',
+      defaultMarks: 1,
+      type: 'assertion_reason',
       rawText:
         'Assertion (A): Arteries have thick elastic walls. Reason (R): Blood flows in arteries under high pressure.',
       content: {
@@ -545,15 +588,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_short_stomata_001',
+      id: 'q_short_stomata_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText: 'State two functions of stomata.',
       content: {
         stem: [{ type: 'paragraph', text: 'State two functions of stomata.' }],
@@ -568,16 +611,16 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science Sample Paper 2023',
+        type: 'previous_year_paper',
+        name: 'CBSE Science Sample Paper 2023',
         originalQuestionNumber: '6',
       },
     },
     {
-      questionId: 'q_short_stomata_002',
+      id: 'q_short_stomata_002',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText:
         'Why does transpiration help in upward movement of water in plants?',
       content: {
@@ -598,15 +641,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_short_electricity_001',
+      id: 'q_short_electricity_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText: 'State Ohm law and write its mathematical form.',
       content: {
         stem: [
@@ -627,15 +670,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2022 Set 31/1/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2022 Set 31/1/1',
       },
     },
     {
-      questionId: 'q_short_electricity_002',
+      id: 'q_short_electricity_002',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText:
         'A conductor has resistance 5 ohm. Find current when 10 V is applied.',
       content: {
@@ -656,15 +699,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_long_life_processes_001',
+      id: 'q_long_life_processes_001',
       language: 'en',
-      marks: 5,
-      questionType: 'long_answer',
+      defaultMarks: 5,
+      type: 'long_answer',
       rawText:
         'Describe the pathway of blood through the human heart with labelled chambers.',
       content: {
@@ -714,15 +757,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2024 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2024 Set 31/2/1',
       },
     },
     {
-      questionId: 'q_long_life_processes_002',
+      id: 'q_long_life_processes_002',
       language: 'en',
-      marks: 5,
-      questionType: 'long_answer',
+      defaultMarks: 5,
+      type: 'long_answer',
       rawText: 'Explain digestion in human beings with the role of enzymes.',
       content: {
         stem: [
@@ -742,15 +785,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_long_internal_choice_001',
+      id: 'q_long_internal_choice_001',
       language: 'en',
-      marks: 5,
-      questionType: 'long_answer',
+      defaultMarks: 5,
+      type: 'long_answer',
       rawText: 'Attempt either option A or B from Life Processes.',
       content: {
         choices: [
@@ -792,15 +835,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2023 Set 31/3/2',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2023 Set 31/3/2',
       },
     },
     {
-      questionId: 'q_long_internal_choice_002',
+      id: 'q_long_internal_choice_002',
       language: 'en',
-      marks: 5,
-      questionType: 'long_answer',
+      defaultMarks: 5,
+      type: 'long_answer',
       rawText: 'Explain double circulation in human beings.',
       content: {
         stem: [
@@ -820,15 +863,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_case_brain_001',
+      id: 'q_case_brain_001',
       language: 'en',
-      marks: 4,
-      questionType: 'case_based',
+      defaultMarks: 4,
+      type: 'case_based',
       rawText:
         'Read the passage on human brain functions and answer the subparts.',
       content: {
@@ -873,15 +916,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2024 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2024 Set 31/2/1',
       },
     },
     {
-      questionId: 'q_case_brain_002',
+      id: 'q_case_brain_002',
       language: 'en',
-      marks: 4,
-      questionType: 'case_based',
+      defaultMarks: 4,
+      type: 'case_based',
       rawText: 'Read the passage on reflex actions and answer the subparts.',
       content: {
         passage: [
@@ -923,15 +966,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_diagram_electricity_001',
+      id: 'q_diagram_electricity_001',
       language: 'en',
-      marks: 5,
-      questionType: 'diagram_based',
+      defaultMarks: 5,
+      type: 'diagram_based',
       rawText: 'Observe the circuit diagram and answer the questions.',
       content: {
         stem: [
@@ -976,16 +1019,16 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2022 Set 31/1/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2022 Set 31/1/1',
         pageNumber: 7,
       },
     },
     {
-      questionId: 'q_diagram_electricity_002',
+      id: 'q_diagram_electricity_002',
       language: 'en',
-      marks: 5,
-      questionType: 'diagram_based',
+      defaultMarks: 5,
+      type: 'diagram_based',
       rawText: 'Draw a labelled circuit diagram to verify Ohm law.',
       content: {
         stem: [
@@ -1006,15 +1049,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_table_metals_001',
+      id: 'q_table_metals_001',
       language: 'en',
-      marks: 5,
-      questionType: 'table_based',
+      defaultMarks: 5,
+      type: 'table_based',
       rawText: 'Study the table of metals and answer the questions.',
       content: {
         stem: [
@@ -1043,15 +1086,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'sample_paper',
-        sourceName: 'CBSE Science Sample Paper 2024',
+        type: 'sample_paper',
+        name: 'CBSE Science Sample Paper 2024',
       },
     },
     {
-      questionId: 'q_table_metals_002',
+      id: 'q_table_metals_002',
       language: 'en',
-      marks: 5,
-      questionType: 'table_based',
+      defaultMarks: 5,
+      type: 'table_based',
       rawText:
         'Compare the properties of metals and non-metals in tabular form.',
       content: {
@@ -1073,15 +1116,15 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'question_bank',
-        sourceName: 'School Science Question Bank',
+        type: 'question_bank',
+        name: 'School Science Question Bank',
       },
     },
     {
-      questionId: 'q_mcq_chemotropism_001',
+      id: 'q_mcq_chemotropism_001',
       language: 'en',
-      marks: 1,
-      questionType: 'mcq',
+      defaultMarks: 1,
+      type: 'mcq',
       rawText:
         'Identify the type of tropic movement that is responsible for the movement of the pollen tube towards an ovule from the following options. (A) Hydrotropism (B) Geotropism (C) Chemotropism (D) Phototropism',
       content: {
@@ -1092,10 +1135,19 @@ export const mockPaperDocumentV1 = {
           },
         ],
         options: [
-          { label: 'A', content: [{ type: 'paragraph', text: 'Hydrotropism' }] },
+          {
+            label: 'A',
+            content: [{ type: 'paragraph', text: 'Hydrotropism' }],
+          },
           { label: 'B', content: [{ type: 'paragraph', text: 'Geotropism' }] },
-          { label: 'C', content: [{ type: 'paragraph', text: 'Chemotropism' }] },
-          { label: 'D', content: [{ type: 'paragraph', text: 'Phototropism' }] },
+          {
+            label: 'C',
+            content: [{ type: 'paragraph', text: 'Chemotropism' }],
+          },
+          {
+            label: 'D',
+            content: [{ type: 'paragraph', text: 'Phototropism' }],
+          },
         ],
       },
       metadata: {
@@ -1108,18 +1160,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 3,
         originalQuestionNumber: '2',
       },
     },
     {
-      questionId: 'q_mcq_spirogyra_001',
+      id: 'q_mcq_spirogyra_001',
       language: 'en',
-      marks: 1,
-      questionType: 'mcq',
+      defaultMarks: 1,
+      type: 'mcq',
       rawText:
         'Spirogyra, despite being a multi-cellular organism, still shows a simple reproductive method. Select the correct option with regard to reproduction in Spirogyra : (A) Asexual reproduction by division of cells into two cells (B) Sexual reproduction by division of cells into many cells (C) Asexual reproduction by breaking up of Spirogyra filaments into smaller parts (D) Sexual reproduction by the formation of gametes after meiosis of cells of filaments followed by fusion of male and female gametes',
       content: {
@@ -1132,11 +1184,21 @@ export const mockPaperDocumentV1 = {
         options: [
           {
             label: 'A',
-            content: [{ type: 'paragraph', text: 'Asexual reproduction by division of cells into two cells' }],
+            content: [
+              {
+                type: 'paragraph',
+                text: 'Asexual reproduction by division of cells into two cells',
+              },
+            ],
           },
           {
             label: 'B',
-            content: [{ type: 'paragraph', text: 'Sexual reproduction by division of cells into many cells' }],
+            content: [
+              {
+                type: 'paragraph',
+                text: 'Sexual reproduction by division of cells into many cells',
+              },
+            ],
           },
           {
             label: 'C',
@@ -1168,18 +1230,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 5,
         originalQuestionNumber: '3',
       },
     },
     {
-      questionId: 'q_mcq_photosynthesis_001',
+      id: 'q_mcq_photosynthesis_001',
       language: 'en',
-      marks: 1,
-      questionType: 'mcq',
+      defaultMarks: 1,
+      type: 'mcq',
       rawText:
         'The following events occur during the process of photosynthesis. Choose the option that indicates the correct events. (i) Oxidation of carbon dioxide to carbohydrates (ii) Conversion of light energy into chemical energy (iii) Absorption of light energy by chlorophyll (iv) Conversion of hydrogen and oxygen into water. Options: (A) (i) and (ii) (B) (ii) and (iii) (C) (iii) and (iv) (D) (i) and (iv)',
       content: {
@@ -1194,10 +1256,22 @@ export const mockPaperDocumentV1 = {
           },
         ],
         options: [
-          { label: 'A', content: [{ type: 'paragraph', text: '(i) and (ii)' }] },
-          { label: 'B', content: [{ type: 'paragraph', text: '(ii) and (iii)' }] },
-          { label: 'C', content: [{ type: 'paragraph', text: '(iii) and (iv)' }] },
-          { label: 'D', content: [{ type: 'paragraph', text: '(i) and (iv)' }] },
+          {
+            label: 'A',
+            content: [{ type: 'paragraph', text: '(i) and (ii)' }],
+          },
+          {
+            label: 'B',
+            content: [{ type: 'paragraph', text: '(ii) and (iii)' }],
+          },
+          {
+            label: 'C',
+            content: [{ type: 'paragraph', text: '(iii) and (iv)' }],
+          },
+          {
+            label: 'D',
+            content: [{ type: 'paragraph', text: '(i) and (iv)' }],
+          },
         ],
       },
       metadata: {
@@ -1210,18 +1284,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 5,
         originalQuestionNumber: '5',
       },
     },
     {
-      questionId: 'q_ar_trophic_levels_001',
+      id: 'q_ar_trophic_levels_001',
       language: 'en',
-      marks: 1,
-      questionType: 'assertion_reason',
+      defaultMarks: 1,
+      type: 'assertion_reason',
       rawText:
         'Assertion (A) : There are generally a greater number of individuals at the lower trophic levels of an ecosystem. Reason (R) : The greatest number is of the producers.',
       content: {
@@ -1276,18 +1350,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 9,
         originalQuestionNumber: '9',
       },
     },
     {
-      questionId: 'q_short_hormones_001',
+      id: 'q_short_hormones_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText:
         '"The timing and the amount of hormone secreted by a gland are regulated in the human body." Justify this statement with the help of an example.',
       content: {
@@ -1308,18 +1382,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 9,
         originalQuestionNumber: '10(a)',
       },
     },
     {
-      questionId: 'q_short_electrical_impulse_001',
+      id: 'q_short_electrical_impulse_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText:
         'Electrical impulse is an excellent means to transmit information in the animal body, but there are some limitations to the use of electrical impulses. State any two limitations.',
       content: {
@@ -1340,18 +1414,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 9,
         originalQuestionNumber: '10(b)',
       },
     },
     {
-      questionId: 'q_short_variation_001',
+      id: 'q_short_variation_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText:
         '"Variation is useful for the survival of species over time." Explain this statement with the help of an example.',
       content: {
@@ -1372,18 +1446,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 9,
         originalQuestionNumber: '11',
       },
     },
     {
-      questionId: 'q_long_reproduction_001',
+      id: 'q_long_reproduction_001',
       language: 'en',
-      marks: 5,
-      questionType: 'long_answer',
+      defaultMarks: 5,
+      type: 'long_answer',
       rawText:
         'Attempt the following parts regarding male reproduction: (i) Name an organ that helps in the formation of male germ cells in humans and also mention the condition that favours the formation of male germ cells. (ii) In male reproductive system, write the pathway followed to deliver male germ cells to the site of fertilisation. (iii) Mention the main physical feature of the male germ cell that helps it move towards the female germ cell.',
       content: {
@@ -1431,18 +1505,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 11,
         originalQuestionNumber: '16(a)',
       },
     },
     {
-      questionId: 'q_long_reproduction_002',
+      id: 'q_long_reproduction_002',
       language: 'en',
-      marks: 5,
-      questionType: 'long_answer',
+      defaultMarks: 5,
+      type: 'long_answer',
       rawText:
         'Answer the following questions about pregnancy prevention: (i) Mention the name of any two ways other than the surgical methods, following which Radha can avoid unwanted pregnancies. (ii) Name the surgical methods to prevent pregnancy. (iii) Give one example each of sexually transmitted diseases caused by bacteria and virus.',
       content: {
@@ -1490,18 +1564,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 13,
         originalQuestionNumber: '16(b)',
       },
     },
     {
-      questionId: 'q_short_refractive_index_001',
+      id: 'q_short_refractive_index_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText:
         'With the help of the given ray diagram, calculate the refractive index of Medium 2 with respect to Medium 1. (Given that sin(i)/sin(r) = sqrt(3) = 1.732)',
       content: {
@@ -1522,18 +1596,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 27,
         originalQuestionNumber: '33',
       },
     },
     {
-      questionId: 'q_short_eye_lens_001',
+      id: 'q_short_eye_lens_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
+      defaultMarks: 2,
+      type: 'short_answer',
       rawText:
         'How does the focal length of eye lens change as the distance of the object from the eyes is altered ? Explain.',
       content: {
@@ -1554,19 +1628,20 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 27,
         originalQuestionNumber: '34(a)',
       },
     },
     {
-      questionId: 'q_short_myopia_001',
+      id: 'q_short_myopia_001',
       language: 'en',
-      marks: 2,
-      questionType: 'short_answer',
-      rawText: 'Why is the concave lens used as a corrective lens for a myopic eye ?',
+      defaultMarks: 2,
+      type: 'short_answer',
+      rawText:
+        'Why is the concave lens used as a corrective lens for a myopic eye ?',
       content: {
         stem: [
           {
@@ -1585,18 +1660,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'medium',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 27,
         originalQuestionNumber: '34(b)',
       },
     },
     {
-      questionId: 'q_diagram_magnetic_field_001',
+      id: 'q_diagram_magnetic_field_001',
       language: 'en',
-      marks: 5,
-      questionType: 'diagram_based',
+      defaultMarks: 5,
+      type: 'diagram_based',
       rawText:
         'State the rule which gives the direction of force acting on a current-carrying conductor placed in a magnetic field. What is a fuse ? Why is it called a safety device ? Why are electrical appliances with metallic bodies connected to the mains through a three-pin plug ? What will be the direction of force experienced by the conductor AB due to the magnetic field?',
       content: {
@@ -1655,18 +1730,18 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 29,
         originalQuestionNumber: '39(a)',
       },
     },
     {
-      questionId: 'q_diagram_circular_loop_001',
+      id: 'q_diagram_circular_loop_001',
       language: 'en',
-      marks: 5,
-      questionType: 'diagram_based',
+      defaultMarks: 5,
+      type: 'diagram_based',
       rawText:
         'Draw the pattern of magnetic field lines through and around a current-carrying circular loop. State the rule to find out the direction of the magnetic field. Give reasons why a burnt-out fuse should be replaced by identical rating, and why soft iron-core is used in electromagnet.',
       content: {
@@ -1715,8 +1790,8 @@ export const mockPaperDocumentV1 = {
         cbseRelevance: 'high',
       },
       source: {
-        sourceType: 'previous_year_paper',
-        sourceName: 'CBSE Science 2026 Set 31/2/1',
+        type: 'previous_year_paper',
+        name: 'CBSE Science 2026 Set 31/2/1',
         fileName: '31-2-1.pdf',
         pageNumber: 31,
         originalQuestionNumber: '39(b)',

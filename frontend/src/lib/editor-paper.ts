@@ -23,6 +23,7 @@ import type {
   DocQuestion,
   EditableTextBlock,
   PaperDocument,
+  SlotEditCapabilities,
   SlotOverrides,
   SubQuestion,
 } from '@/types';
@@ -41,6 +42,11 @@ export interface EditorPaperChromeBlock {
   text: string;
   blockNoteBlocks: PartialBlock[];
   editable: boolean;
+  editCapabilities: {
+    text: boolean;
+    delete: boolean;
+    reorder: boolean;
+  };
   sourceKind: 'paper_chrome';
   editTarget: 'paper_document';
   sourceLocked: false;
@@ -83,13 +89,23 @@ export interface EditorQuestionAlternativeView {
   sourceName: string;
 }
 
+interface EditorSlotCapabilities {
+  editText: boolean;
+  editMarks: boolean;
+  swap: boolean;
+  lock: boolean;
+  reorder: boolean;
+}
+
 export interface EditorPaperSlotView {
   slotId: string;
   displayNumber: string;
   marksLabel: string;
+  showMarksLabel: boolean;
   questionText: string;
   questionType: string;
   locked: boolean;
+  editCapabilities: EditorSlotCapabilities;
   modifiedFromSource: boolean;
   questionBlockTree: EditorQuestionContainerBlock;
   alternateQuestions: EditorQuestionAlternativeView[];
@@ -127,7 +143,7 @@ export interface EditorPaperView {
   subtitle?: string;
   paperMeta: string[];
   paperChromeBlocks: EditorPaperChromeBlock[];
-  headerBlocks: EditorPaperChromeBlock[];
+  chromeBlocks: EditorPaperChromeBlock[];
   instructionBlocks: EditorPaperChromeBlock[];
   instructions: string[];
   sections: EditorPaperSectionView[];
@@ -142,12 +158,22 @@ export interface BuildEditorPaperViewOptions {
 
 export type EditorAlternativesIntent = 'swap' | 'topic' | 'easier' | 'harder';
 
+interface QuestionRegionRules {
+  allowRegionReorder: boolean;
+  allowRegionDelete: boolean;
+}
+
+const defaultQuestionRegionRules: QuestionRegionRules = {
+  allowRegionReorder: false,
+  allowRegionDelete: false,
+};
+
 export function buildEditorPaperView(
   document: PaperDocument,
   options: BuildEditorPaperViewOptions = {},
 ): EditorPaperView {
   const questionsById = new Map(
-    document.questions.map((question) => [question.questionId, question]),
+    document.questions.map((question) => [question.id, question]),
   );
   const warnings: string[] = [];
   let totalSlots = 0;
@@ -156,20 +182,20 @@ export function buildEditorPaperView(
 
   const sections = document.paper.sections.map((section) => {
     const titleBlock = paperChromeBlock(
-      `section:${section.sectionId}:title`,
+      `section:${section.id}:title`,
       'section_heading',
       section.title,
     );
     const subtitleBlock = section.subtitle
       ? paperChromeBlock(
-          `section:${section.sectionId}:subtitle`,
+          `section:${section.id}:subtitle`,
           'section_subtitle',
           section.subtitle,
         )
       : undefined;
     const instructionsBlock = section.instructions
       ? paperChromeBlock(
-          `section:${section.sectionId}:instructions`,
+          `section:${section.id}:instructions`,
           'section_instructions',
           section.instructions,
         )
@@ -185,30 +211,34 @@ export function buildEditorPaperView(
       if (question) {
         filledSlots += 1;
       } else {
-        warnings.push(`Slot ${slot.displayNumber} has no selected question.`);
+        warnings.push(`Slot ${slot.number} has no selected question.`);
       }
 
-      const slotOverrides =
-        options.slotEditsById?.[slot.slotId] ?? slot.overrides;
+      const slotOverrides = options.slotEditsById?.[slot.id] ?? slot.overrides;
+      const editCapabilities = slotEditCapabilities(slot.can);
       const questionBlockTree = question
         ? questionToBlockTree(
-            slot.slotId,
+            slot.id,
             question,
             slotOverrides,
-            document.format.questionRegions,
+            defaultQuestionRegionRules,
           )
-        : emptyQuestionBlockTree(slot.slotId);
+        : emptyQuestionBlockTree(slot.id);
       const firstRegionText = questionBlockTree.children[0]?.text;
 
       return {
-        slotId: slot.slotId,
-        displayNumber: slot.displayNumber,
+        slotId: slot.id,
+        displayNumber: slot.number,
         marksLabel: marksLabel(slot.marks),
+        showMarksLabel: question
+          ? !questionCarriesMarks(question, questionBlockTree, slot.marks)
+          : true,
         questionText:
           firstRegionText ?? question?.rawText ?? 'No question selected.',
-        questionType: slot.questionType,
+        questionType: slot.type,
         locked: slot.locked,
-        modifiedFromSource: slotOverrides?.modifiedFromSource ?? false,
+        editCapabilities,
+        modifiedFromSource: slotOverrides?.modified ?? false,
         questionBlockTree,
         alternateQuestions: filterAlternatives(
           question,
@@ -216,11 +246,11 @@ export function buildEditorPaperView(
             const alternateQuestion = questionsById.get(questionId);
             return alternateQuestion ? [alternateQuestion] : [];
           }),
-          options.alternativesIntentBySlotId?.[slot.slotId] ?? 'swap',
+          options.alternativesIntentBySlotId?.[slot.id] ?? 'swap',
         ).map((alternativeQuestion) =>
           questionToAlternativeView(
             alternativeQuestion,
-            document.format.questionRegions,
+            defaultQuestionRegionRules,
           ),
         ),
         blockNoteBlocks:
@@ -233,7 +263,7 @@ export function buildEditorPaperView(
     });
 
     return {
-      sectionId: section.sectionId,
+      sectionId: section.id,
       title: section.title,
       titleBlock,
       subtitle: section.subtitle,
@@ -244,11 +274,12 @@ export function buildEditorPaperView(
       slots,
     };
   });
-  const headerBlocks = paperChromeBlocks(document.paper.headerBlocks, 'header');
+  const chromeBlocks = paperChromeBlocks(document.paper.chromeBlocks, 'chrome');
   const instructionBlocks = paperChromeBlocks(
     document.paper.instructionBlocks,
     'instruction',
   );
+  warnings.push(...markTotalWarnings(document));
 
   return {
     title: document.paper.title,
@@ -274,7 +305,7 @@ export function buildEditorPaperView(
         'paper_marks',
         String(document.paper.totalMarks),
       ),
-      ...headerBlocks,
+      ...chromeBlocks,
       ...instructionBlocks,
       ...sections.flatMap((section) => [
         section.titleBlock,
@@ -287,7 +318,7 @@ export function buildEditorPaperView(
         ...(section.instructionsBlock ? [section.instructionsBlock] : []),
       ]),
     ],
-    headerBlocks,
+    chromeBlocks,
     instructionBlocks,
     instructions:
       document.paper.instructionBlocks?.map((block) => block.text) ?? [],
@@ -307,15 +338,63 @@ export function buildEditorPaperView(
   };
 }
 
+function markTotalWarnings(document: PaperDocument) {
+  const warnings: string[] = [];
+  const paperSlotMarks = document.paper.sections.reduce(
+    (sum, section) => sum + effectiveSectionSlotMarks(section.slots),
+    0,
+  );
+
+  if (paperSlotMarks !== document.paper.totalMarks) {
+    warnings.push(
+      `Paper total is ${document.paper.totalMarks} marks, but Slot marks total ${paperSlotMarks}.`,
+    );
+  }
+
+  for (const section of document.paper.sections) {
+    const sectionSlotMarks = effectiveSectionSlotMarks(section.slots);
+    if (sectionSlotMarks !== section.marks) {
+      warnings.push(
+        `${section.title} is labelled ${section.marks} marks, but its Slots total ${sectionSlotMarks}.`,
+      );
+    }
+  }
+
+  return warnings;
+}
+
+function effectiveSectionSlotMarks(
+  slots: { marks: number; orGroup?: number }[],
+) {
+  let total = 0;
+  const orGroupMarks = new Map<number, number>();
+
+  for (const slot of slots) {
+    if (slot.orGroup === undefined) {
+      total += slot.marks;
+      continue;
+    }
+
+    orGroupMarks.set(
+      slot.orGroup,
+      Math.max(orGroupMarks.get(slot.orGroup) ?? 0, slot.marks),
+    );
+  }
+
+  for (const marks of orGroupMarks.values()) {
+    total += marks;
+  }
+
+  return total;
+}
+
 function filterAlternatives(
   currentQuestion: DocQuestion | undefined,
   alternatives: DocQuestion[],
   intent: EditorAlternativesIntent,
 ) {
   const candidates = currentQuestion
-    ? alternatives.filter(
-        (question) => question.questionId !== currentQuestion.questionId,
-      )
+    ? alternatives.filter((question) => question.id !== currentQuestion.id)
     : alternatives;
 
   if (!currentQuestion || intent === 'swap') return candidates;
@@ -370,24 +449,24 @@ function difficultyRank(difficulty: string) {
 
 function questionToAlternativeView(
   question: DocQuestion,
-  questionRegionRules: PaperDocument['format']['questionRegions'],
+  questionRegionRules: QuestionRegionRules,
 ): EditorQuestionAlternativeView {
   return {
-    questionId: question.questionId,
+    questionId: question.id,
     questionText: question.rawText,
     questionBlockTree: questionToBlockTree(
-      `alternative:${question.questionId}`,
+      `alternative:${question.id}`,
       question,
       undefined,
       questionRegionRules,
     ),
-    marks: question.marks,
-    questionType: question.questionType,
+    marks: question.defaultMarks,
+    questionType: question.type,
     chapterNames: question.metadata.chapterNames,
     topicNames: question.metadata.topicNames ?? [],
     difficulty: question.metadata.difficulty,
     cbseRelevance: question.metadata.cbseRelevance,
-    sourceName: question.source.sourceName,
+    sourceName: question.source.name,
   };
 }
 
@@ -405,7 +484,7 @@ function questionToBlockTree(
   slotId: string,
   question: DocQuestion,
   overrides: SlotOverrides | undefined,
-  questionRegionRules: PaperDocument['format']['questionRegions'],
+  questionRegionRules: QuestionRegionRules,
 ): EditorQuestionContainerBlock {
   const children: EditorQuestionRegionBlock[] = [];
 
@@ -457,7 +536,7 @@ function questionToBlockTree(
   return {
     blockType: 'questionContainerBlock',
     slotId,
-    questionId: question.questionId,
+    questionId: question.id,
     allowRegionReorder: questionRegionRules.allowRegionReorder,
     allowRegionDelete: questionRegionRules.allowRegionDelete,
     children,
@@ -579,10 +658,10 @@ function paperChromeBlocks(
 ): EditorPaperChromeBlock[] {
   return (blocks ?? []).map((block) =>
     paperChromeBlock(
-      `${regionPrefix}:${block.blockId}`,
-      block.blockType,
+      `${regionPrefix}:${block.id}`,
+      block.role,
       block.text,
-      block.editable ?? true,
+      block.can,
     ),
   );
 }
@@ -591,8 +670,10 @@ function paperChromeBlock(
   regionKey: string,
   blockType: string,
   text: string,
-  editable = true,
+  editCapabilities?: EditableTextBlock['can'],
 ): EditorPaperChromeBlock {
+  const editable = editCapabilities?.editText ?? true;
+
   return {
     blockId: regionKey,
     blockType,
@@ -600,10 +681,57 @@ function paperChromeBlock(
     text,
     blockNoteBlocks: [paragraphBlock(text)],
     editable,
+    editCapabilities: {
+      text: editCapabilities?.editText ?? editable,
+      delete: editCapabilities?.delete ?? false,
+      reorder: editCapabilities?.reorder ?? false,
+    },
     sourceKind: 'paper_chrome',
     editTarget: 'paper_document',
     sourceLocked: false,
   };
+}
+
+function slotEditCapabilities(
+  can: SlotEditCapabilities | undefined,
+): EditorSlotCapabilities {
+  return {
+    editText: can?.editText ?? true,
+    editMarks: can?.editMarks ?? true,
+    swap: can?.swap ?? true,
+    lock: can?.lock ?? true,
+    reorder: can?.reorder ?? true,
+  };
+}
+
+function questionCarriesMarks(
+  question: DocQuestion,
+  questionBlockTree: EditorQuestionContainerBlock,
+  marks: number,
+) {
+  if (questionBlockTree.children.some((block) => block.displaySuffix)) {
+    return true;
+  }
+
+  return [
+    question.rawText,
+    ...questionBlockTree.children.map((block) => block.text),
+  ]
+    .filter(Boolean)
+    .some((text) => textContainsMarksLabel(text, marks));
+}
+
+function textContainsMarksLabel(text: string, marks: number) {
+  const bracketedLabel = new RegExp(
+    String.raw`(?:\(|\[)\s*${marks}\s*(?:marks?|m)\s*(?:\)|\])`,
+    'i',
+  );
+  const trailingLabel = new RegExp(
+    String.raw`(?:^|\s)${marks}\s*(?:marks?|m)\s*$`,
+    'i',
+  );
+
+  return bracketedLabel.test(text) || trailingLabel.test(text);
 }
 
 export function contentItemsToText(items: ContentItem[]): string {

@@ -16,19 +16,24 @@ import type { AlternativesIntent } from './editor-types';
 
 export function QuestionActionRail({
   locked,
+  lockEnabled = true,
+  swapEnabled = true,
   onInfo,
   onAlternatives,
   onToggleLock,
   onAsk,
 }: {
   locked: boolean;
+  lockEnabled?: boolean;
+  swapEnabled?: boolean;
   onInfo: () => void;
   onAlternatives: (intent: AlternativesIntent) => void;
   onToggleLock: () => void;
   onAsk: () => void;
 }) {
-  const replacementDisabledLabel =
-    'Unlock this question before choosing replacements.';
+  const replacementDisabledLabel = !swapEnabled
+    ? 'Swapping is disabled for this slot.'
+    : 'Unlock this question before choosing replacements.';
 
   return (
     <div
@@ -53,9 +58,13 @@ export function QuestionActionRail({
         variant="ghost"
         size="sm"
         className="justify-start px-2 text-xs"
-        title={locked ? replacementDisabledLabel : 'Show swap alternatives'}
+        title={
+          locked || !swapEnabled
+            ? replacementDisabledLabel
+            : 'Show swap alternatives'
+        }
         aria-label="Show swap alternatives"
-        disabled={locked}
+        disabled={locked || !swapEnabled}
         onClick={() => onAlternatives('swap')}
       >
         <Shuffle className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
@@ -66,8 +75,15 @@ export function QuestionActionRail({
         variant="ghost"
         size="sm"
         className="justify-start px-2 text-xs"
-        title={locked ? 'Unlock question' : 'Lock question'}
+        title={
+          lockEnabled
+            ? locked
+              ? 'Unlock question'
+              : 'Lock question'
+            : 'Locking is disabled for this slot.'
+        }
         aria-label={locked ? 'Unlock question' : 'Lock question'}
+        disabled={!lockEnabled}
         onClick={onToggleLock}
       >
         {locked ? (

@@ -1,13 +1,13 @@
 /**
- * PaperDocumentV1 editor shell.
+ * Mock-backed PaperDocumentV1 editor shell.
  *
- * This page loads a persisted backend paper when routed with a paper id, then
- * maps it into a print-faithful paper view model and renders the V1 shell
- * around the paper.
+ * This page loads the issue #21 mock, maps it into a print-faithful paper
+ * view model, and renders the V1 shell around the paper: top bar, outline
+ * rail, inspector, BlockNote-backed question regions, and bottom chat.
  *
  * Patterns:
- * - `PaperDocumentV1` is canonical; BlockNote only renders editable region
- *   surfaces for the shell.
+ * - The mocked `PaperDocumentV1` is canonical; BlockNote only renders editable
+ *   region surfaces for the shell.
  * - Editor chrome is marked with `data-editor-chrome` so print/export styling
  *   can remove it without hiding paper content.
  *
@@ -45,13 +45,8 @@ import {
 } from 'lucide-react';
 import '@blocknote/mantine/style.css';
 import { mockPaperDocumentV1 } from '@/mocks';
-import {
-  approvePaper,
-  downloadPaperPdf,
-  fetchPaperDocument,
-  savePaperDraft,
-} from '@/lib/api';
 import { buildEditorPaperView } from '@/lib/editor-paper';
+import { openMockPrintDocument } from '@/lib/editor-print';
 import {
   assertPaperDocument,
   buildOrderZones,
@@ -79,30 +74,35 @@ import {
 } from '@/components/editor';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { ContentItem, PaperDocument } from '@/types';
-import { useLocation, useParams } from 'react-router-dom';
+import type { ContentItem } from '@/types';
 
 function contentItemsEqual(left: ContentItem[], right: ContentItem[]) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function toRoman(value: number) {
+  const numerals = [
+    'I',
+    'II',
+    'III',
+    'IV',
+    'V',
+    'VI',
+    'VII',
+    'VIII',
+    'IX',
+    'X',
+  ];
+  return numerals[value - 1] ?? String(value);
+}
+
 export default function EditorPage() {
-  const { paperId } = useParams();
-  const location = useLocation();
-  const routePaper = (location.state as { paper?: PaperDocument } | null)
-    ?.paper;
-  const document = useMemo(
-    () => routePaper ?? assertPaperDocument(mockPaperDocumentV1),
-    [routePaper],
-  );
+  const document = useMemo(() => assertPaperDocument(mockPaperDocumentV1), []);
   const initialPaperState = useMemo(
     () => normalizePaperDocument(document),
     [document],
   );
   const [paperState, setPaperState] = useState(initialPaperState);
-  const [loadStatus, setLoadStatus] = useState(
-    paperId && !routePaper ? 'Loading saved draft...' : '',
-  );
   const [undoEntry, setUndoEntry] = useState<StructuredPaperUndoEntry | null>(
     null,
   );
@@ -120,10 +120,6 @@ export default function EditorPage() {
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
   const [dragNotice, setDragNotice] = useState<string | null>(null);
-  const [persistenceStatus, setPersistenceStatus] = useState<string | null>(
-    null,
-  );
-  const [persistenceBusy, setPersistenceBusy] = useState(false);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const alternativesOpenerRef = useRef<HTMLElement | null>(null);
   const inspectorHighlightTimeoutRef = useRef<number | null>(null);
@@ -193,36 +189,6 @@ export default function EditorPage() {
     : undefined;
 
   useEffect(() => {
-    setPaperState(initialPaperState);
-  }, [initialPaperState]);
-
-  useEffect(() => {
-    if (!paperId || routePaper) {
-      setLoadStatus('');
-      return undefined;
-    }
-
-    let cancelled = false;
-    setLoadStatus('Loading saved draft...');
-    fetchPaperDocument(paperId)
-      .then((nextDocument) => {
-        if (cancelled) return;
-        setPaperState(normalizePaperDocument(nextDocument));
-        setLoadStatus('');
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        setLoadStatus(
-          error instanceof Error ? error.message : 'Could not load paper.',
-        );
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [paperId, routePaper]);
-
-  useEffect(() => {
     function handleOutsidePointerDown(event: PointerEvent) {
       const target = event.target;
       if (!(target instanceof Element)) return;
@@ -279,16 +245,17 @@ export default function EditorPage() {
     currentContent: ContentItem[],
     content: ContentItem[],
   ) {
+    if ((paperState.slotsById[slotId]?.can?.editText ?? true) === false) {
+      return;
+    }
     if (contentItemsEqual(currentContent, content)) return;
-    setPaperState((currentState) =>
-      setSlotRegionOverride(currentState, slotId, regionKey, content),
+    commitStructuredAction(
+      setSlotRegionOverride(paperState, slotId, regionKey, content),
     );
   }
 
   function handlePaperChromeChange(regionKey: string, text: string) {
-    setPaperState((currentState) =>
-      setPaperChromeText(currentState, regionKey, text),
-    );
+    commitStructuredAction(setPaperChromeText(paperState, regionKey, text));
   }
 
   function handleRestoreSelectedSlot() {
@@ -324,6 +291,9 @@ export default function EditorPage() {
   }
 
   function handleShowAlternatives(slotId: string, intent: AlternativesIntent) {
+    if ((paperState.slotsById[slotId]?.can?.swap ?? true) === false) {
+      return;
+    }
     handleSelectSlot(slotId);
     setAlternativesIntent(intent);
     setInspectorMode('alternatives');
@@ -331,12 +301,18 @@ export default function EditorPage() {
   }
 
   function handleToggleLock(slotId: string, locked: boolean) {
+    if ((paperState.slotsById[slotId]?.can?.lock ?? true) === false) {
+      return;
+    }
     handleSelectSlot(slotId);
     const nextState = setSlotLockState(paperState, slotId, !locked);
     commitStructuredAction(nextState);
   }
 
   function handleUseAlternative(slotId: string, questionId: string) {
+    if ((paperState.slotsById[slotId]?.can?.swap ?? true) === false) {
+      return;
+    }
     const slot = view.sections
       .flatMap((section) => section.slots)
       .find((candidate) => candidate.slotId === slotId);
@@ -407,63 +383,6 @@ export default function EditorPage() {
     window.setTimeout(() => chatInputRef.current?.focus(), 0);
   }
 
-  async function handleSaveDraft() {
-    await runPersistenceAction('Draft saved.', () => persistDraft());
-  }
-
-  async function handleApprovePaper() {
-    if (
-      view.validationSummary.warnings.length > 0 &&
-      !window.confirm(
-        'This paper still has warnings. Approve the final paper anyway?',
-      )
-    ) {
-      return;
-    }
-
-    await runPersistenceAction('Paper approved.', () =>
-      approvePaper(paperState.document),
-    );
-  }
-
-  async function handleDownloadPdf() {
-    await runPersistenceAction('PDF download started.', async () => {
-      const document = await persistDraft();
-      await downloadPaperPdf(document.paper.paperId);
-    });
-  }
-
-  async function persistDraft() {
-    const result = await savePaperDraft(paperState.document);
-    const document = result.document ?? {
-      ...paperState.document,
-      paper: {
-        ...paperState.document.paper,
-        paperId: result.paperId,
-      },
-    };
-    setPaperState(normalizePaperDocument(document));
-    return document;
-  }
-
-  async function runPersistenceAction(
-    successMessage: string,
-    action: () => Promise<unknown>,
-  ) {
-    setPersistenceBusy(true);
-    setPersistenceStatus(null);
-    try {
-      await action();
-      setPersistenceStatus(successMessage);
-    } catch (error) {
-      setPersistenceStatus(
-        error instanceof Error ? error.message : 'Paper update failed.',
-      );
-    } finally {
-      setPersistenceBusy(false);
-    }
-  }
-
   function openAlternativesOverlay() {
     alternativesOpenerRef.current =
       window.document.activeElement instanceof HTMLElement
@@ -476,6 +395,36 @@ export default function EditorPage() {
     setAlternativesOverlayOpen(false);
     window.setTimeout(() => alternativesOpenerRef.current?.focus(), 0);
   }
+
+  function handleDownloadPdf() {
+    openMockPrintDocument(paperState);
+  }
+
+  const seriesBlock = view.chromeBlocks.find(
+    (block) => block.blockType === 'series',
+  );
+  const setBlock = view.chromeBlocks.find((block) => block.blockType === 'set');
+  const paperCodeBlock = view.chromeBlocks.find(
+    (block) => block.blockType === 'paper_code',
+  );
+  const subjectLabelBlock = view.chromeBlocks.find(
+    (block) => block.blockType === 'subject_label',
+  );
+  const rollNumberBlock = view.chromeBlocks.find(
+    (block) => block.blockType === 'roll_number',
+  );
+  const timeAllowedBlock = view.chromeBlocks.find(
+    (block) => block.blockType === 'paper_meta_left',
+  );
+  const maximumMarksBlock = view.chromeBlocks.find(
+    (block) => block.blockType === 'paper_meta_right',
+  );
+  const noteBlocks = view.instructionBlocks.filter(
+    (block) => block.blockType === 'note',
+  );
+  const generalInstructionBlocks = view.instructionBlocks.filter(
+    (block) => block.blockType === 'general_instruction',
+  );
 
   return (
     <div className="editor-shell min-h-screen bg-secondary text-foreground">
@@ -505,8 +454,6 @@ export default function EditorPage() {
             variant="outline"
             size="sm"
             className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
-            disabled={persistenceBusy}
-            onClick={handleSaveDraft}
           >
             <Save className="mr-2 h-4 w-4" aria-hidden="true" />
             Save draft
@@ -523,105 +470,301 @@ export default function EditorPage() {
             variant="outline"
             size="sm"
             className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
-            disabled={persistenceBusy}
             onClick={handleDownloadPdf}
           >
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Download PDF
           </Button>
-          <Button
-            size="sm"
-            className="max-sm:flex-1 max-sm:basis-full"
-            disabled={persistenceBusy}
-            onClick={handleApprovePaper}
-          >
+          <Button size="sm" className="max-sm:flex-1 max-sm:basis-full">
             <CheckCircle2 className="mr-2 h-4 w-4" aria-hidden="true" />
             Approve
           </Button>
         </div>
       </header>
-      {loadStatus && (
-        <div
-          data-editor-chrome
-          role="status"
-          className="fixed left-4 top-16 z-30 max-w-sm rounded-md border bg-background px-3 py-2 text-sm shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
-        >
-          {loadStatus}
-        </div>
-      )}
-      {persistenceStatus && (
-        <div
-          data-editor-chrome
-          role="status"
-          className="fixed right-4 top-16 z-30 max-w-sm rounded-md border bg-background px-3 py-2 text-sm shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
-        >
-          {persistenceStatus}
-        </div>
-      )}
 
       <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:hidden max-lg:[&_.editor-left-rail]:static max-sm:px-3">
         <EditorOutlineRail view={view} />
 
         <main className="flex justify-center max-lg:order-1">
-          <article className="paper-canvas w-full max-w-[56rem] bg-background px-14 py-10 text-[15px] leading-7 shadow-none max-xl:px-10 max-lg:max-w-[48rem] max-sm:px-5 max-sm:py-8">
-            <header className="mb-6 text-center">
-              <div onClick={() => handleSelectChromeBlock('paper:title')}>
-                <PaperChromeEditor
-                  block={view.paperChromeBlocks[0]}
-                  editable={selectedChromeBlockId === 'paper:title'}
-                  className="qpg-paper-title"
-                  onCommit={(text) =>
-                    handlePaperChromeChange('paper:title', text)
-                  }
-                />
+          <article className="paper-canvas editor-paper-sheet w-full bg-background shadow-none max-sm:px-5 max-sm:py-8">
+            <header className="editor-paper-masthead">
+              <div className="paper-topline">
+                {seriesBlock ? (
+                  <div
+                    className="paper-series"
+                    onClick={() =>
+                      handleSelectChromeBlock(seriesBlock.regionKey)
+                    }
+                  >
+                    <span>Series : </span>
+                    <PaperChromeEditor
+                      block={seriesBlock}
+                      editable={
+                        selectedChromeBlockId === seriesBlock.regionKey &&
+                        seriesBlock.editCapabilities.text
+                      }
+                      className="qpg-paper-inline-chrome"
+                      onCommit={(text) =>
+                        handlePaperChromeChange(seriesBlock.regionKey, text)
+                      }
+                    />
+                  </div>
+                ) : (
+                  <div />
+                )}
+                <div className="paper-code-stack">
+                  <div className="paper-barcode" aria-hidden="true" />
+                  {setBlock && (
+                    <div
+                      className="paper-set"
+                      onClick={() =>
+                        handleSelectChromeBlock(setBlock.regionKey)
+                      }
+                    >
+                      <PaperChromeEditor
+                        block={setBlock}
+                        editable={
+                          selectedChromeBlockId === setBlock.regionKey &&
+                          setBlock.editCapabilities.text
+                        }
+                        className="qpg-paper-inline-chrome"
+                        onCommit={(text) =>
+                          handlePaperChromeChange(setBlock.regionKey, text)
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-              {view.subtitle && view.paperChromeBlocks[1] && (
-                <div onClick={() => handleSelectChromeBlock('paper:subtitle')}>
+
+              <div className="paper-identity-row">
+                <div className="paper-roll">
+                  <div>रोल नं.</div>
+                  <div>Roll No.</div>
+                  <div
+                    className="paper-roll-blank"
+                    onClick={() =>
+                      rollNumberBlock &&
+                      handleSelectChromeBlock(rollNumberBlock.regionKey)
+                    }
+                  >
+                    {rollNumberBlock && (
+                      <PaperChromeEditor
+                        block={rollNumberBlock}
+                        editable={
+                          selectedChromeBlockId === rollNumberBlock.regionKey &&
+                          rollNumberBlock.editCapabilities.text
+                        }
+                        className="qpg-paper-roll-editor"
+                        onCommit={(text) =>
+                          handlePaperChromeChange(
+                            rollNumberBlock.regionKey,
+                            text,
+                          )
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+                <div
+                  className="paper-code-box"
+                  onClick={() =>
+                    paperCodeBlock &&
+                    handleSelectChromeBlock(paperCodeBlock.regionKey)
+                  }
+                >
+                  <span>प्रश्न-पत्र कोड</span>
+                  <strong>Q.P. Code</strong>
+                  {paperCodeBlock && (
+                    <PaperChromeEditor
+                      block={paperCodeBlock}
+                      editable={
+                        selectedChromeBlockId === paperCodeBlock.regionKey &&
+                        paperCodeBlock.editCapabilities.text
+                      }
+                      className="qpg-paper-code-value"
+                      onCommit={(text) =>
+                        handlePaperChromeChange(paperCodeBlock.regionKey, text)
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="paper-title-block">
+                {subjectLabelBlock && (
+                  <div
+                    onClick={() =>
+                      handleSelectChromeBlock(subjectLabelBlock.regionKey)
+                    }
+                  >
+                    <PaperChromeEditor
+                      block={subjectLabelBlock}
+                      editable={
+                        selectedChromeBlockId === subjectLabelBlock.regionKey &&
+                        subjectLabelBlock.editCapabilities.text
+                      }
+                      className="paper-title-local"
+                      onCommit={(text) =>
+                        handlePaperChromeChange(
+                          subjectLabelBlock.regionKey,
+                          text,
+                        )
+                      }
+                    />
+                  </div>
+                )}
+                <div onClick={() => handleSelectChromeBlock('paper:title')}>
                   <PaperChromeEditor
-                    block={view.paperChromeBlocks[1]}
-                    editable={selectedChromeBlockId === 'paper:subtitle'}
-                    className="qpg-paper-subtitle"
+                    block={view.paperChromeBlocks[0]}
+                    editable={selectedChromeBlockId === 'paper:title'}
+                    className="qpg-paper-title editor-paper-title"
                     onCommit={(text) =>
-                      handlePaperChromeChange('paper:subtitle', text)
+                      handlePaperChromeChange('paper:title', text)
                     }
                   />
                 </div>
-              )}
-              <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm">
-                {view.paperMeta.slice(1).map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
+                {view.subtitle && view.paperChromeBlocks[1] && (
+                  <div
+                    onClick={() => handleSelectChromeBlock('paper:subtitle')}
+                  >
+                    <PaperChromeEditor
+                      block={view.paperChromeBlocks[1]}
+                      editable={selectedChromeBlockId === 'paper:subtitle'}
+                      className="qpg-paper-subtitle editor-paper-subtitle"
+                      onCommit={(text) =>
+                        handlePaperChromeChange('paper:subtitle', text)
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="paper-meta-grid">
+                {timeAllowedBlock ? (
+                  <div
+                    onClick={() =>
+                      handleSelectChromeBlock(timeAllowedBlock.regionKey)
+                    }
+                  >
+                    <PaperChromeEditor
+                      block={timeAllowedBlock}
+                      editable={
+                        selectedChromeBlockId === timeAllowedBlock.regionKey &&
+                        timeAllowedBlock.editCapabilities.text
+                      }
+                      className="qpg-paper-chrome-text editor-paper-meta-text"
+                      onCommit={(text) =>
+                        handlePaperChromeChange(
+                          timeAllowedBlock.regionKey,
+                          text,
+                        )
+                      }
+                    />
+                  </div>
+                ) : (
+                  <span>Time allowed : 3 hours</span>
+                )}
+                {maximumMarksBlock ? (
+                  <div
+                    onClick={() =>
+                      handleSelectChromeBlock(maximumMarksBlock.regionKey)
+                    }
+                  >
+                    <PaperChromeEditor
+                      block={maximumMarksBlock}
+                      editable={
+                        selectedChromeBlockId === maximumMarksBlock.regionKey &&
+                        maximumMarksBlock.editCapabilities.text
+                      }
+                      className="qpg-paper-chrome-text editor-paper-meta-text"
+                      onCommit={(text) =>
+                        handlePaperChromeChange(
+                          maximumMarksBlock.regionKey,
+                          text,
+                        )
+                      }
+                    />
+                  </div>
+                ) : (
+                  <span>
+                    Maximum Marks : {paperState.document.paper.totalMarks}
+                  </span>
+                )}
               </div>
             </header>
 
             {view.instructionBlocks.length > 0 && (
-              <section className="mb-8">
-                <div className="space-y-1 text-sm leading-6">
-                  {view.instructionBlocks.map((block) => (
-                    <div
-                      key={block.regionKey}
-                      onClick={() => handleSelectChromeBlock(block.regionKey)}
-                      className={cn(
-                        'qpg-paper-chrome-hit rounded-sm transition-colors duration-150 ease-out hover:bg-secondary/45',
-                        selectedChromeBlockId === block.regionKey &&
-                          'bg-secondary/70 ring-1 ring-inset ring-ring',
-                      )}
-                    >
-                      <PaperChromeEditor
-                        block={block}
-                        editable={selectedChromeBlockId === block.regionKey}
-                        className={
-                          block.blockType.includes('heading')
-                            ? 'qpg-instruction-heading'
-                            : 'qpg-instruction-line'
-                        }
-                        onCommit={(text) =>
-                          handlePaperChromeChange(block.regionKey, text)
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
+              <section className="editor-paper-instructions">
+                {noteBlocks.length > 0 && (
+                  <div className="paper-note-table">
+                    <h2>नोट / NOTE</h2>
+                    {noteBlocks.map((block, index) => (
+                      <div key={block.regionKey} className="paper-note-row">
+                        <span>({toRoman(index + 1)})</span>
+                        <div
+                          onClick={() =>
+                            handleSelectChromeBlock(block.regionKey)
+                          }
+                          className={cn(
+                            'qpg-paper-chrome-hit rounded-sm transition-colors duration-150 ease-out hover:bg-secondary/45',
+                            selectedChromeBlockId === block.regionKey &&
+                              'bg-secondary/70 ring-1 ring-inset ring-ring',
+                          )}
+                        >
+                          <PaperChromeEditor
+                            block={block}
+                            editable={
+                              selectedChromeBlockId === block.regionKey &&
+                              block.editCapabilities.text
+                            }
+                            className="qpg-instruction-line"
+                            onCommit={(text) =>
+                              handlePaperChromeChange(block.regionKey, text)
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {generalInstructionBlocks.length > 0 && (
+                  <div className="paper-general-instructions">
+                    <h2>General Instructions :</h2>
+                    <p>
+                      Read the following instructions carefully and follow them
+                      :
+                    </p>
+                    {generalInstructionBlocks.map((block, index) => (
+                      <div key={block.regionKey} className="paper-general-row">
+                        <span>({toRoman(index + 1).toLowerCase()})</span>
+                        <div
+                          onClick={() =>
+                            handleSelectChromeBlock(block.regionKey)
+                          }
+                          className={cn(
+                            'qpg-paper-chrome-hit rounded-sm transition-colors duration-150 ease-out hover:bg-secondary/45',
+                            selectedChromeBlockId === block.regionKey &&
+                              'bg-secondary/70 ring-1 ring-inset ring-ring',
+                          )}
+                        >
+                          <PaperChromeEditor
+                            block={block}
+                            editable={
+                              selectedChromeBlockId === block.regionKey &&
+                              block.editCapabilities.text
+                            }
+                            className="qpg-instruction-line"
+                            onCommit={(text) =>
+                              handlePaperChromeChange(block.regionKey, text)
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </section>
             )}
 
@@ -645,7 +788,7 @@ export default function EditorPage() {
                       }
                       onMouseLeave={() => setHoveredSectionId(null)}
                       className={cn(
-                        'paper-section border transition-colors duration-150 ease-out',
+                        'editor-paper-section transition-colors duration-150 ease-out',
                         hoveredSectionId === section.sectionId &&
                           'bg-secondary/20',
                         section.slots.some(
@@ -654,7 +797,7 @@ export default function EditorPage() {
                       )}
                     >
                       <header
-                        className="border-b px-4 py-3 text-center"
+                        className="editor-paper-section-header"
                         onClick={() =>
                           handleSelectChromeBlock(section.titleBlock.regionKey)
                         }
@@ -735,6 +878,7 @@ export default function EditorPage() {
                               slotId={slot.slotId}
                               displayNumber={slot.displayNumber}
                               orderZoneId={`section:${section.sectionId}`}
+                              reorderEnabled={slot.editCapabilities.reorder}
                               selected={selectedSlotId === slot.slotId}
                               hovered={hoveredSlotId === slot.slotId}
                               onClick={() => handleSelectSlot(slot.slotId)}
@@ -763,7 +907,8 @@ export default function EditorPage() {
                                             region={region}
                                             editable={
                                               selectedSlotId === slot.slotId &&
-                                              region.editable
+                                              region.editable &&
+                                              slot.editCapabilities.editText
                                             }
                                             onCommit={(content) =>
                                               handleRegionChange(
@@ -776,7 +921,7 @@ export default function EditorPage() {
                                           />
                                         </div>
                                         {region.displaySuffix && (
-                                          <span className="qpg-question-region-suffix select-none text-xs text-muted-foreground">
+                                          <span className="qpg-question-region-suffix select-none">
                                             {region.displaySuffix}
                                           </span>
                                         )}
@@ -805,12 +950,18 @@ export default function EditorPage() {
                                   )}
                                 </div>
                               </div>
-                              <div className="text-right text-sm font-medium">
-                                [{slot.marksLabel}]
+                              <div className="qpg-question-mark-cell">
+                                {slot.showMarksLabel ? (
+                                  <span className="qpg-question-mark-label">
+                                    {slot.marksLabel}
+                                  </span>
+                                ) : null}
                               </div>
                               {activeRailSlotId === slot.slotId && (
                                 <QuestionActionRail
                                   locked={slot.locked}
+                                  lockEnabled={slot.editCapabilities.lock}
+                                  swapEnabled={slot.editCapabilities.swap}
                                   onInfo={() => handleShowInfo(slot.slotId)}
                                   onAlternatives={(intent) =>
                                     handleShowAlternatives(slot.slotId, intent)

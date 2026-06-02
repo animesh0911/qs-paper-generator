@@ -2,7 +2,7 @@
  * TypeScript mirrors of the backend's response shapes.
  *
  * Source of truth:
- * - `PaperDocument` mirrors `docs/Varad/v1_contract.md`.
+ * - `PaperDocument` mirrors `contracts/v1_contract.md`.
  * - `AssembleRequest` mirrors `AssembleRequestSerializer` input.
  *
  * If the contract doc or backend serializer changes, update this module in the
@@ -86,18 +86,18 @@ export interface QuestionMetadata {
 }
 
 export interface QuestionSource {
-  sourceType: string;
-  sourceName: string;
+  type: string;
+  name: string;
   fileName?: string;
   pageNumber?: number;
   originalQuestionNumber?: string;
 }
 
 export interface DocQuestion {
-  questionId: string;
+  id: string;
   language: string;
-  marks: number;
-  questionType: QuestionType;
+  defaultMarks: number;
+  type: QuestionType;
   rawText: string;
   content: DocQuestionContent;
   metadata: QuestionMetadata;
@@ -105,24 +105,33 @@ export interface DocQuestion {
 }
 
 export interface SlotOverrides {
-  modifiedFromSource: boolean;
+  modified: boolean;
   regions: Record<string, ContentItem[]>;
 }
 
+export interface SlotEditCapabilities {
+  editText?: boolean;
+  editMarks?: boolean;
+  swap?: boolean;
+  lock?: boolean;
+  reorder?: boolean;
+}
+
 export interface DocSlot {
-  slotId: string;
-  displayNumber: string;
+  id: string;
+  number: string;
   marks: number;
-  questionType: QuestionType;
+  type: QuestionType;
   selectedQuestionId: string | null;
   locked: boolean;
   alternateQuestionIds: string[];
   orGroup?: number;
   overrides?: SlotOverrides;
+  can?: SlotEditCapabilities;
 }
 
 export interface DocSection {
-  sectionId: string;
+  id: string;
   title: string;
   subtitle?: string;
   marks: number;
@@ -131,19 +140,19 @@ export interface DocSection {
 }
 
 export interface DocPaper {
-  paperId: string;
+  id: string;
   title: string;
   subtitle?: string;
   totalMarks: number;
   durationMinutes: number;
   language: string;
-  headerBlocks?: EditableTextBlock[];
+  chromeBlocks?: EditableTextBlock[];
   instructionBlocks?: EditableTextBlock[];
   sections: DocSection[];
 }
 
 export interface PaperRequest {
-  requestId: string;
+  id: string;
   language: string;
   classLevel: string;
   subject: string;
@@ -157,8 +166,8 @@ export interface PaperRequest {
 }
 
 export interface PaperTemplate {
-  templateId: string;
-  templateName: string;
+  id: string;
+  name: string;
   board?: string;
   classLevel: string;
   subject: string;
@@ -169,39 +178,38 @@ export interface PaperTemplate {
 }
 
 export interface PaperFormat {
-  formatId: string;
+  id: string;
   page: {
     size: string;
     orientation: string;
+    widthPt?: number;
+    heightPt?: number;
+    marginPt?: {
+      top: number;
+      right: number;
+      bottom: number;
+      left: number;
+    };
   };
-  paperChrome: {
-    showOuterBorder: boolean;
-    sectionStyle: string;
-    marksPlacement: string;
-  };
-  numbering: {
-    scope: string;
-    style: string;
-    recomputeOnSectionReorder: boolean;
-  };
-  sections: {
-    allowQuestionReorderWithinSection: boolean;
-    allowCrossSectionMove: boolean;
-  };
-  questionRegions: {
-    allowRegionReorder: boolean;
-    allowRegionDelete: boolean;
-  };
-  mcqOptions: {
-    layout: string;
+  layout: {
+    marks: string;
+    questionNumbers: string;
+    mcqOptions: string;
+    instructions: string;
+    masthead: string;
+    footer: string;
   };
 }
 
 export interface EditableTextBlock {
-  blockId: string;
-  blockType: string;
+  id: string;
+  role: string;
   text: string;
-  editable?: boolean;
+  can?: {
+    editText?: boolean;
+    delete?: boolean;
+    reorder?: boolean;
+  };
 }
 
 export interface PaperDocument {
