@@ -44,10 +44,13 @@ class GeminiClient:
     ):
         self.model = model or os.getenv("GEMINI_MODEL", _DEFAULT_MODEL)
         self._generate_func = generate_func
+        # Generous default: gemini-2.5-pro on a full scanned bilingual paper can
+        # take minutes, and ingestion is an offline batch (latency irrelevant —
+        # ADR-0004). 60s reliably 504s on scanned PDFs.
         self.timeout = (
             timeout
             if timeout is not None
-            else float(os.getenv("LLM_TIMEOUT_SECONDS", "60"))
+            else float(os.getenv("LLM_TIMEOUT_SECONDS", "240"))
         )
         self._api_key = api_key or os.getenv("GEMINI_API_KEY")
 
