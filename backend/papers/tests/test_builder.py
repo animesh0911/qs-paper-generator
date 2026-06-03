@@ -223,3 +223,114 @@ def test_paper_pdf_endpoint_targets_print_route_with_auth_token(
     assert calls[0][1].startswith(
         f"http://frontend:5173/editor/{paper_pk}/print?token="
     )
+
+
+def _pdf_text(pdf_bytes: bytes) -> str:
+    with fitz.open(stream=pdf_bytes, filetype="pdf") as rendered:
+        return "\n".join(page.get_text() for page in rendered)
+
+
+def _first_selected_qid(document: dict) -> str:
+    for section in document["paper"]["sections"]:
+        for slot in section["slots"]:
+            if slot.get("selectedQuestionId"):
+                return slot["selectedQuestionId"]
+    raise AssertionError("seeded bank must fill at least one slot")
+
+
+@pytest.mark.django_db
+def test_answer_key_pdf_endpoint_renders_stored_answers(api_client, seeded_bank):
+    """The marking-scheme endpoint joins the canonical paper with bank answers.
+
+    The answer text lives only on the Question row (never the document), so this
+    proves the gated join reaches the PDF — not that a constant was printed.
+    """
+    from bank.models import Question
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    document = create.data
+    paper_pk = document["paper"]["id"].removeprefix("paper_")
+    qid = _first_selected_qid(document)
+    selected_pk = int(qid.removeprefix("q_"))
+    Question.objects.filter(pk=selected_pk).update(answer="UNIQUE_MARKING_ANSWER_42")
+
+    resp = api_client.get(f"/api/papers/{paper_pk}/answer-key/pdf/")
+
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp["Content-Type"] == "application/pdf"
+    assert resp.content[:4] == b"%PDF"
+    assert "UNIQUE_MARKING_ANSWER_42" in _pdf_text(resp.content)
+
+
+@pytest.mark.django_db
+def test_answer_never_leaks_through_assemble_or_detail(api_client, seeded_bank):
+    """Answers must stay behind the answer-key endpoint — never in paper JSON.
+
+    Guards the gate: if a future serializer change started echoing ``answer``
+    into the document's questions, the marking key would leak to every client
+    that can fetch the paper.
+    """
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+    detail = api_client.get(f"/api/papers/{paper_pk}/")
+
+    for payload in (create.data, detail.data):
+        for question in payload["questions"]:
+            assert "answer" not in question
+
+
+@pytest.mark.django_db
+def test_answer_key_pdf_endpoint_is_owner_scoped(api_client, seeded_bank):
+    """Another teacher cannot pull a paper's answers — owner-scoped, 404 not 403.
+
+    A 404 (not 403) keeps the paper's existence private; either way answers
+    never cross to a non-owner request.
+    """
+    from rest_framework.test import APIClient
+
+    from accounts.models import User
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+
+    intruder = User.objects.create_user(email="intruder@example.com", password="x")
+    intruder_client = APIClient()
+    intruder_client.force_authenticate(intruder)
+
+    resp = intruder_client.get(f"/api/papers/{paper_pk}/answer-key/pdf/")
+
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.django_db
+def test_branding_flows_from_school_settings_to_document_and_pdf(
+    api_client, user, seeded_bank, settings
+):
+    """A school's branding reaches both the contract and the rendered PDF.
+
+    Branding is configured on the School row (no code change). This asserts the
+    end-to-end path: settings -> document.paper.branding -> PDF header. Forces
+    the ReportLab path so the assertion does not depend on a running browser.
+    """
+    settings.PAPER_PRINT_BASE_URL = ""
+    user.school.settings = {
+        "branding": {
+            "schoolName": "Greenwood High School",
+            "examHeader": "Half-Yearly Examination 2026",
+        }
+    }
+    user.school.save()
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    document = create.data
+    paper_pk = document["paper"]["id"].removeprefix("paper_")
+
+    assert document["paper"]["branding"] == {
+        "schoolName": "Greenwood High School",
+        "examHeader": "Half-Yearly Examination 2026",
+    }
+
+    pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
+    text = _pdf_text(pdf.content)
+    assert "Greenwood High School" in text
+    assert "Half-Yearly Examination 2026" in text

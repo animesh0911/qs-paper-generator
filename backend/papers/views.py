@@ -4,6 +4,8 @@
 ``PaperDetailView`` — GET returns stored document; PATCH overwrites it (drafts only).
 ``PaperApproveView`` — POST locks paper to APPROVED.
 ``PaperPdfView`` — GET renders PDF from paper.document (cached 24h after approve).
+``PaperAnswerKeyPdfView`` — GET renders the separate marking-scheme PDF; the
+only path that reveals answers, gated to the paper owner.
 
 Domain rules live in ``papers.builder`` and ``papers.picker``.
 """
@@ -18,9 +20,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from bank.models import Question
+from bank.serializers import AnswerKeySerializer
+
 from .builder import PaperBuilder
 from .models import Paper, PaperStatus
-from .pdf import render_paper_pdf
+from .pdf import render_answer_key_pdf, render_paper_pdf
 from .serializers import AssembleRequestSerializer, PaperSerializer
 
 _PDF_CACHE_TTL = 60 * 60 * 24  # 1 day
@@ -102,6 +107,42 @@ class PaperPdfView(APIView):
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = f'inline; filename="paper-{paper.pk}.pdf"'
         return response
+
+
+class PaperAnswerKeyPdfView(APIView):
+    """Render the marking-scheme PDF — the one endpoint that reveals answers.
+
+    Owner-scoped (``created_by=request.user``) so answers never reach another
+    teacher's request. Answers are read through ``AnswerKeySerializer`` and
+    joined to the canonical document by question id; the document itself still
+    carries no answers. Cached 24h once the paper is approved, matching the
+    exam PDF.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        document = paper.document or {}
+        if paper.status == PaperStatus.APPROVED:
+            cache_key = f"paper-answer-key-pdf:{paper.pk}"
+            pdf = cache.get(cache_key)
+            if pdf is None:
+                pdf = render_answer_key_pdf(document, self._answers_by_id(paper))
+                cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
+        else:
+            pdf = render_answer_key_pdf(document, self._answers_by_id(paper))
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'inline; filename="paper-{paper.pk}-answer-key.pdf"'
+        )
+        return response
+
+    def _answers_by_id(self, paper: Paper) -> dict[str, str]:
+        """Map contract question id (``"q_{pk}"``) to answer for selected slots."""
+        pks = paper._referenced_question_ids()
+        rows = AnswerKeySerializer(Question.objects.filter(pk__in=pks), many=True).data
+        return {f"q_{row['id']}": row["answer"] for row in rows}
 
 
 def _paper_print_url(user, paper_pk: int) -> str | None:
