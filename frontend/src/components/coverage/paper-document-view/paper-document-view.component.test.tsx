@@ -13,6 +13,20 @@ import { assertPaperDocument } from '@/lib/paper-document';
 import { PaperDocumentView } from './paper-document-view.component';
 
 describe('PaperDocumentView', () => {
+  it('renders a safe message instead of guessing for unsupported format IDs', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    document.format.id = 'unknown_format_v1';
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain(
+      'This paper format is not supported by the editor yet.',
+    );
+    expect(html).not.toContain('Section A');
+  });
+
   it('renders overrides for the matching internal choice group index', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const slot = document.paper.sections[1].slots[1];

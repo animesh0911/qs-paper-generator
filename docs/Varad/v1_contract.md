@@ -217,55 +217,52 @@ one layer.
 
 ```json
 {
-  "formatId": "cbse_science_class_10_v1",
+  "id": "cbse_science_class_10_board_compact_2026_v1",
   "page": {
-    "size": "A4",
-    "orientation": "portrait"
+    "size": "CBSE_COMPACT",
+    "orientation": "portrait",
+    "widthPt": 523.44,
+    "heightPt": 693.36,
+    "marginPt": {
+      "top": 28,
+      "right": 36,
+      "bottom": 34,
+      "left": 36
+    }
   },
-  "paperChrome": {
-    "showOuterBorder": true,
-    "sectionStyle": "boxed",
-    "marksPlacement": "right"
-  },
-  "numbering": {
-    "scope": "paper",
-    "style": "decimal",
-    "recomputeOnSectionReorder": true
-  },
-  "sections": {
-    "allowQuestionReorderWithinSection": true,
-    "allowCrossSectionMove": false
-  },
-  "questionRegions": {
-    "allowRegionReorder": false,
-    "allowRegionDelete": false
-  },
-  "mcqOptions": {
-    "layout": "vertical"
+  "layout": {
+    "marks": "right_column",
+    "questionNumbers": "left_column",
+    "mcqOptions": "two_column",
+    "instructions": "note_table_then_general",
+    "masthead": "cbse_compact",
+    "footer": "code_page_pto"
   }
 }
 ```
 
 | Field | Required | Notes |
 |---|---:|---|
-| `formatId` | Yes | Stable ID for the format rule set. |
-| `page.size` | Yes | Example: `A4`. |
+| `id` | Yes | Stable ID selecting a known frontend renderer. |
+| `page.size` | Yes | Example: `CBSE_COMPACT`. |
 | `page.orientation` | Yes | Example: `portrait`. |
-| `paperChrome.showOuterBorder` | Yes | Whether the paper canvas/print output uses an outer border. |
-| `paperChrome.sectionStyle` | Yes | Example: `boxed`, `plain`. |
-| `paperChrome.marksPlacement` | Yes | Example: `right`. |
-| `numbering.scope` | Yes | Example: `paper` for continuous numbering across sections. |
-| `numbering.style` | Yes | Example: `decimal`. |
-| `numbering.recomputeOnSectionReorder` | Yes | Whether display numbers are derived from current section order. |
-| `sections.allowQuestionReorderWithinSection` | Yes | V1 allows reordering questions within a section. |
-| `sections.allowCrossSectionMove` | Yes | V1 must be `false`; questions cannot move across sections. |
-| `questionRegions.allowRegionReorder` | Yes | V1 must be `false`; question internal structure is fixed. |
-| `questionRegions.allowRegionDelete` | Yes | V1 must be `false`; question internal regions are not deleted. |
-| `mcqOptions.layout` | Yes | Example: `vertical`; richer layout rules can be added later. |
+| `page.widthPt` | Optional | Compact page width when known from an observed source paper. |
+| `page.heightPt` | Optional | Compact page height when known from an observed source paper. |
+| `page.marginPt` | Optional | Renderer hint for compact print margins. |
+| `layout.marks` | Yes | Example: `right_column`. |
+| `layout.questionNumbers` | Yes | Example: `left_column`. |
+| `layout.mcqOptions` | Yes | Example: `two_column`. |
+| `layout.instructions` | Yes | Example: `note_table_then_general`. |
+| `layout.masthead` | Yes | Example: `cbse_compact`. |
+| `layout.footer` | Yes | Example: `code_page_pto`. |
 
 For V1, this object is expected to be hardcoded to the CBSE format. Later
 versions may add typography, margins, page breaks, two-column options, diagram
 placement, and uploaded-paper-derived template rules as optional fields.
+`format.id` must select a known frontend renderer from a registry; it must not
+contain arbitrary CSS, React component names, or low-level drawing commands. If
+the frontend receives an unsupported `format.id`, it must fail loud instead of
+guessing a layout.
 
 ---
 
@@ -1163,31 +1160,26 @@ Frontend sends canonical edited paper state after teacher edits.
     "language": "en"
   },
   "format": {
-    "formatId": "cbse_science_class_10_v1",
+    "id": "cbse_science_class_10_board_compact_2026_v1",
     "page": {
-      "size": "A4",
-      "orientation": "portrait"
+      "size": "CBSE_COMPACT",
+      "orientation": "portrait",
+      "widthPt": 523.44,
+      "heightPt": 693.36,
+      "marginPt": {
+        "top": 28,
+        "right": 36,
+        "bottom": 34,
+        "left": 36
+      }
     },
-    "paperChrome": {
-      "showOuterBorder": true,
-      "sectionStyle": "boxed",
-      "marksPlacement": "right"
-    },
-    "numbering": {
-      "scope": "paper",
-      "style": "decimal",
-      "recomputeOnSectionReorder": true
-    },
-    "sections": {
-      "allowQuestionReorderWithinSection": true,
-      "allowCrossSectionMove": false
-    },
-    "questionRegions": {
-      "allowRegionReorder": false,
-      "allowRegionDelete": false
-    },
-    "mcqOptions": {
-      "layout": "vertical"
+    "layout": {
+      "marks": "right_column",
+      "questionNumbers": "left_column",
+      "mcqOptions": "two_column",
+      "instructions": "note_table_then_general",
+      "masthead": "cbse_compact",
+      "footer": "code_page_pto"
     }
   },
   "paper": {
@@ -1344,7 +1336,7 @@ The frontend can build the MVP if backend reliably provides:
 paper.sections[].slots[]
 questions[]
 format
-stable paperId/templateId/formatId/sectionId/slotId/questionId
+stable paperId/templateId/format.id/sectionId/slotId/questionId
 marks/questionType/language/chapter/topic/difficulty/source/rawText
 slot overrides for paper-specific edits
 ```

@@ -15,7 +15,7 @@
  * @module PaperDocumentView
  */
 import { useMemo } from 'react';
-import { buildSimplePaperView } from './build-simple-paper-view';
+import { getPaperFormatRendererResult } from '@/lib/paper-format-renderers';
 import type {
   ChoiceGroup,
   ChoiceOption,
@@ -38,8 +38,30 @@ export function PaperDocumentView({
   mode = 'preview',
   includeHeader = true,
 }: PaperDocumentViewProps) {
-  const view = useMemo(() => buildSimplePaperView(paper), [paper]);
+  const rendererResult = useMemo(
+    () => getPaperFormatRendererResult(paper.format.id),
+    [paper.format.id],
+  );
+  const view = useMemo(
+    () =>
+      rendererResult.ok
+        ? rendererResult.renderer.buildPrintPaperView(paper)
+        : null,
+    [paper, rendererResult],
+  );
   const printMode = mode === 'print';
+
+  if (!rendererResult.ok || !view) {
+    return (
+      <article className={printMode ? 'paper-sheet print-paper' : ''}>
+        <p className={printMode ? 'paper-unfilled' : 'text-sm'}>
+          {rendererResult.ok
+            ? 'Unable to render paper.'
+            : rendererResult.error.userMessage}
+        </p>
+      </article>
+    );
+  }
 
   if (printMode) {
     return (

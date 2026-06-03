@@ -46,8 +46,11 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
 import { resolveEditorFixture } from '@/mocks';
-import { buildEditorPaperView } from '@/lib/editor-paper';
 import { openMockPrintDocument } from '@/lib/editor-print';
+import {
+  getPaperFormatRendererResult,
+  type PaperFormatRenderer,
+} from '@/lib/paper-format-renderers';
 import {
   assertPaperDocument,
   buildOrderZones,
@@ -75,7 +78,7 @@ import {
 } from '@/components/editor';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { ContentItem } from '@/types';
+import type { ContentItem, PaperDocument } from '@/types';
 
 function contentItemsEqual(left: ContentItem[], right: ContentItem[]) {
   return JSON.stringify(left) === JSON.stringify(right);
@@ -107,6 +110,48 @@ export default function EditorPage() {
     () => assertPaperDocument(selectedFixture.paper),
     [selectedFixture],
   );
+  const rendererResult = useMemo(
+    () => getPaperFormatRendererResult(document.format.id),
+    [document.format.id],
+  );
+
+  if (!rendererResult.ok) {
+    return <UnsupportedPaperFormatNotice message={rendererResult.error} />;
+  }
+
+  return (
+    <EditorPageWorkspace
+      document={document}
+      renderer={rendererResult.renderer}
+      selectedFixtureId={selectedFixture.id}
+    />
+  );
+}
+
+function UnsupportedPaperFormatNotice({
+  message,
+}: {
+  message: { userMessage: string; message: string };
+}) {
+  return (
+    <main className="grid min-h-screen place-items-center bg-secondary px-4 text-foreground">
+      <section className="w-full max-w-xl rounded-md border bg-background p-6">
+        <h1 className="text-base font-semibold">{message.userMessage}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{message.message}</p>
+      </section>
+    </main>
+  );
+}
+
+function EditorPageWorkspace({
+  document,
+  renderer,
+  selectedFixtureId,
+}: {
+  document: PaperDocument;
+  renderer: PaperFormatRenderer;
+  selectedFixtureId: string;
+}) {
   const initialPaperState = useMemo(
     () => normalizePaperDocument(document),
     [document],
@@ -145,13 +190,13 @@ export default function EditorPage() {
   );
   const view = useMemo(
     () =>
-      buildEditorPaperView(paperState.document, {
+      renderer.buildEditorPaperView(paperState.document, {
         slotEditsById: paperState.slotEditsById,
         alternativesIntentBySlotId: selectedSlotId
           ? { [selectedSlotId]: alternativesIntent }
           : undefined,
       }),
-    [alternativesIntent, paperState, selectedSlotId],
+    [alternativesIntent, paperState, renderer, selectedSlotId],
   );
   const orderZones = useMemo(() => buildOrderZones(paperState), [paperState]);
   const slotZoneById = useMemo(
@@ -205,7 +250,7 @@ export default function EditorPage() {
     setSelectedChromeBlockId(null);
     setInspectorMode('info');
     setAlternativesOverlayOpen(false);
-  }, [initialPaperState, selectedFixture.id]);
+  }, [initialPaperState, selectedFixtureId]);
 
   useEffect(() => {
     function handleOutsidePointerDown(event: PointerEvent) {

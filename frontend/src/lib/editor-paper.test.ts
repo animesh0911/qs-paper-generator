@@ -151,6 +151,77 @@ describe('editor paper view model', () => {
     );
   });
 
+  it('exposes CBSE compact masthead and instruction blocks from canonical chrome', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const view = buildEditorPaperView(document);
+
+    expect(
+      view.chromeBlocks.map((block) => ({
+        blockType: block.blockType,
+        text: block.text,
+        editTarget: block.editTarget,
+      })),
+    ).toEqual(
+      expect.arrayContaining([
+        {
+          blockType: 'series',
+          text: 'LMNK2',
+          editTarget: 'paper_document',
+        },
+        {
+          blockType: 'set',
+          text: 'SET ~ 1',
+          editTarget: 'paper_document',
+        },
+        {
+          blockType: 'paper_code',
+          text: '31/2/1',
+          editTarget: 'paper_document',
+        },
+        {
+          blockType: 'subject_label',
+          text: 'विज्ञान',
+          editTarget: 'paper_document',
+        },
+        {
+          blockType: 'roll_number',
+          text: '',
+          editTarget: 'paper_document',
+        },
+        {
+          blockType: 'paper_meta_left',
+          text: 'Time allowed : 3 hours',
+          editTarget: 'paper_document',
+        },
+        {
+          blockType: 'paper_meta_right',
+          text: 'Maximum Marks : 80',
+          editTarget: 'paper_document',
+        },
+      ]),
+    );
+    expect(
+      view.instructionBlocks.map((block) => ({
+        blockType: block.blockType,
+        text: block.text,
+        editTarget: block.editTarget,
+      })),
+    ).toEqual(
+      expect.arrayContaining([
+        {
+          blockType: 'note',
+          text: 'Please check that this question paper contains 31 printed pages.',
+          editTarget: 'paper_document',
+        },
+        {
+          blockType: 'general_instruction',
+          text: 'This question paper contain 39 questions. All questions are compulsory.',
+          editTarget: 'paper_document',
+        },
+      ]),
+    );
+  });
+
   it('supports every V1 question region block type across the mock paper', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const view = buildEditorPaperView(document);
