@@ -14,6 +14,7 @@
 import { useEffect, useRef } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
+import { Trash2 } from 'lucide-react';
 import {
   blockNoteBlocksToText,
   type EditorPaperChromeBlock,
@@ -25,29 +26,63 @@ export function PaperChromeEditor({
   editable,
   className,
   onCommit,
+  onDelete,
 }: {
   block: EditorPaperChromeBlock;
   editable: boolean;
   className?: string;
   onCommit: (text: string) => void;
+  onDelete?: () => void;
 }) {
+  const deleteControl =
+    block.editCapabilities.delete && onDelete ? (
+      <button
+        type="button"
+        data-editor-chrome
+        className="qpg-paper-chrome-delete inline-flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={`Delete ${formatChromeBlockLabel(block.blockType)}`}
+        title={`Delete ${formatChromeBlockLabel(block.blockType)}`}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onDelete();
+        }}
+      >
+        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
+    ) : null;
+
   if (!editable) {
     return (
-      <div className={cn('qpg-paper-chrome-text', className)}>
-        {block.text.split('\n').map((line, index) => (
-          <p key={`${block.regionKey}:${index}`}>{line}</p>
-        ))}
+      <div className="qpg-paper-chrome-control-group">
+        <div className={cn('qpg-paper-chrome-text', className)}>
+          {block.text.split('\n').map((line, index) => (
+            <p key={`${block.regionKey}:${index}`}>{line}</p>
+          ))}
+        </div>
+        {deleteControl}
       </div>
     );
   }
 
   return (
-    <ActivePaperChromeEditor
-      block={block}
-      className={className}
-      onCommit={onCommit}
-    />
+    <div className="qpg-paper-chrome-control-group">
+      <ActivePaperChromeEditor
+        block={block}
+        className={className}
+        onCommit={onCommit}
+      />
+      {deleteControl}
+    </div>
   );
+}
+
+function formatChromeBlockLabel(blockType: string) {
+  return blockType.replace(/_/g, ' ');
 }
 
 function ActivePaperChromeEditor({

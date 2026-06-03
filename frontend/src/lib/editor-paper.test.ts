@@ -272,6 +272,44 @@ describe('editor paper view model', () => {
     });
   });
 
+  it('defaults missing Slot capabilities to enabled editor actions', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    delete document.paper.sections[0].slots[0].can;
+
+    const view = buildEditorPaperView(document);
+    const slot = findSlot(view, 'slot_A_01');
+
+    expect(slot.editCapabilities).toEqual({
+      editText: true,
+      editMarks: true,
+      swap: true,
+      lock: true,
+      reorder: true,
+    });
+  });
+
+  it('maps disabled Slot capabilities into the editor slot view', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    document.paper.sections[0].slots[0].can = {
+      editText: false,
+      editMarks: false,
+      swap: false,
+      lock: false,
+      reorder: false,
+    };
+
+    const view = buildEditorPaperView(document);
+    const slot = findSlot(view, 'slot_A_01');
+
+    expect(slot.editCapabilities).toEqual({
+      editText: false,
+      editMarks: false,
+      swap: false,
+      lock: false,
+      reorder: false,
+    });
+  });
+
   it('preserves multi-paragraph manual edits as separate editable blocks', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const state = normalizePaperDocument(document);

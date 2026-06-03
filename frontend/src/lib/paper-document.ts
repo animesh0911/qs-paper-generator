@@ -142,7 +142,8 @@ export function setSlotRegionOverride(
   regionKey: string,
   content: ContentItem[],
 ): NormalizedPaperDocument {
-  if (!state.slotsById[slotId]) return state;
+  const slot = state.slotsById[slotId];
+  if (!slot || (slot.can?.editText ?? true) === false) return state;
 
   const currentEdits = state.slotEditsById[slotId] ?? {
     modified: false,
@@ -205,6 +206,8 @@ export function setSlotLockState(
   slotId: string,
   locked: boolean,
 ): NormalizedPaperDocument {
+  if ((state.slotsById[slotId]?.can?.lock ?? true) === false) return state;
+
   return {
     ...state,
     lockStateBySlotId: {
@@ -240,6 +243,7 @@ export function setSlotSelectedQuestion(
 ): NormalizedPaperDocument {
   const currentSlot = state.slotsById[slotId];
   if (!currentSlot) return state;
+  if ((currentSlot.can?.swap ?? true) === false) return state;
 
   const alternateQuestionIds = rotateSlotAlternativeQuestionIds(
     currentSlot,
@@ -312,6 +316,8 @@ export function setPaperChromeText(
   regionKey: string,
   text: string,
 ): NormalizedPaperDocument {
+  if (!canEditPaperChromeRegion(state.document, regionKey)) return state;
+
   return {
     ...state,
     document: {
@@ -339,6 +345,84 @@ export function setPaperChromeText(
       },
     },
   };
+}
+
+export function removePaperChromeBlock(
+  state: NormalizedPaperDocument,
+  regionKey: string,
+): NormalizedPaperDocument {
+  const parsedRegion = parsePaperTextBlockRegion(regionKey);
+  if (!parsedRegion) return state;
+
+  const blocks =
+    parsedRegion.kind === 'chrome'
+      ? state.document.paper.chromeBlocks
+      : state.document.paper.instructionBlocks;
+  const block = blocks?.find((candidate) => candidate.id === parsedRegion.id);
+
+  if (!block || (block.can?.delete ?? false) === false) return state;
+
+  return {
+    ...state,
+    document: {
+      ...state.document,
+      paper: {
+        ...state.document.paper,
+        chromeBlocks:
+          parsedRegion.kind === 'chrome'
+            ? removeEditableTextBlock(
+                state.document.paper.chromeBlocks,
+                block.id,
+              )
+            : state.document.paper.chromeBlocks,
+        instructionBlocks:
+          parsedRegion.kind === 'instruction'
+            ? removeEditableTextBlock(
+                state.document.paper.instructionBlocks,
+                block.id,
+              )
+            : state.document.paper.instructionBlocks,
+      },
+    },
+  };
+}
+
+function canEditPaperChromeRegion(document: PaperDocument, regionKey: string) {
+  const parsedRegion = parsePaperTextBlockRegion(regionKey);
+  if (!parsedRegion) return true;
+
+  const blocks =
+    parsedRegion.kind === 'chrome'
+      ? document.paper.chromeBlocks
+      : document.paper.instructionBlocks;
+  const block = blocks?.find((candidate) => candidate.id === parsedRegion.id);
+
+  return block?.can?.editText ?? true;
+}
+
+function parsePaperTextBlockRegion(regionKey: string):
+  | {
+      kind: 'chrome' | 'instruction';
+      id: string;
+    }
+  | undefined {
+  if (regionKey.startsWith('chrome:')) {
+    return { kind: 'chrome', id: regionKey.slice('chrome:'.length) };
+  }
+  if (regionKey.startsWith('instruction:')) {
+    return {
+      kind: 'instruction',
+      id: regionKey.slice('instruction:'.length),
+    };
+  }
+  return undefined;
+}
+
+function removeEditableTextBlock(
+  blocks: EditableTextBlock[] | undefined,
+  blockId: string,
+) {
+  return blocks?.filter((block) => block.id !== blockId);
 }
 
 function updateEditableTextBlocks(
@@ -499,9 +583,7 @@ export function reorderSlotWithinOrderZone(
     }
     return {
       ...section,
-      slots: section.slots.map((slot) =>
-        slotWithCurrentState(state, slot.id),
-      ),
+      slots: section.slots.map((slot) => slotWithCurrentState(state, slot.id)),
     };
   });
 

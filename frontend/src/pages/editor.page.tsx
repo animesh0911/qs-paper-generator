@@ -57,6 +57,7 @@ import {
   commitStructuredPaperAction,
   normalizePaperDocument,
   reorderSlotWithinOrderZone,
+  removePaperChromeBlock,
   restoreSlotSource,
   setPaperChromeText,
   setSlotLockState,
@@ -325,6 +326,13 @@ function EditorPageWorkspace({
     commitStructuredAction(setPaperChromeText(paperState, regionKey, text));
   }
 
+  function handleDeletePaperChrome(regionKey: string) {
+    const nextState = removePaperChromeBlock(paperState, regionKey);
+    if (nextState === paperState) return;
+    commitStructuredAction(nextState);
+    setSelectedChromeBlockId(null);
+  }
+
   function handleRestoreSelectedSlot() {
     if (!selectedSlotId) return;
     const slotId = selectedSlotId;
@@ -575,6 +583,9 @@ function EditorPageWorkspace({
                       onCommit={(text) =>
                         handlePaperChromeChange(seriesBlock.regionKey, text)
                       }
+                      onDelete={() =>
+                        handleDeletePaperChrome(seriesBlock.regionKey)
+                      }
                     />
                   </div>
                 ) : (
@@ -598,6 +609,9 @@ function EditorPageWorkspace({
                         className="qpg-paper-inline-chrome"
                         onCommit={(text) =>
                           handlePaperChromeChange(setBlock.regionKey, text)
+                        }
+                        onDelete={() =>
+                          handleDeletePaperChrome(setBlock.regionKey)
                         }
                       />
                     </div>
@@ -630,6 +644,9 @@ function EditorPageWorkspace({
                             text,
                           )
                         }
+                        onDelete={() =>
+                          handleDeletePaperChrome(rollNumberBlock.regionKey)
+                        }
                       />
                     )}
                   </div>
@@ -653,6 +670,9 @@ function EditorPageWorkspace({
                       className="qpg-paper-code-value"
                       onCommit={(text) =>
                         handlePaperChromeChange(paperCodeBlock.regionKey, text)
+                      }
+                      onDelete={() =>
+                        handleDeletePaperChrome(paperCodeBlock.regionKey)
                       }
                     />
                   )}
@@ -679,6 +699,9 @@ function EditorPageWorkspace({
                           text,
                         )
                       }
+                      onDelete={() =>
+                        handleDeletePaperChrome(subjectLabelBlock.regionKey)
+                      }
                     />
                   </div>
                 )}
@@ -690,6 +713,7 @@ function EditorPageWorkspace({
                     onCommit={(text) =>
                       handlePaperChromeChange('paper:title', text)
                     }
+                    onDelete={() => handleDeletePaperChrome('paper:title')}
                   />
                 </div>
                 {view.subtitle && view.paperChromeBlocks[1] && (
@@ -703,6 +727,7 @@ function EditorPageWorkspace({
                       onCommit={(text) =>
                         handlePaperChromeChange('paper:subtitle', text)
                       }
+                      onDelete={() => handleDeletePaperChrome('paper:subtitle')}
                     />
                   </div>
                 )}
@@ -728,6 +753,9 @@ function EditorPageWorkspace({
                           text,
                         )
                       }
+                      onDelete={() =>
+                        handleDeletePaperChrome(timeAllowedBlock.regionKey)
+                      }
                     />
                   </div>
                 ) : (
@@ -751,6 +779,9 @@ function EditorPageWorkspace({
                           maximumMarksBlock.regionKey,
                           text,
                         )
+                      }
+                      onDelete={() =>
+                        handleDeletePaperChrome(maximumMarksBlock.regionKey)
                       }
                     />
                   </div>
@@ -790,6 +821,9 @@ function EditorPageWorkspace({
                             onCommit={(text) =>
                               handlePaperChromeChange(block.regionKey, text)
                             }
+                            onDelete={() =>
+                              handleDeletePaperChrome(block.regionKey)
+                            }
                           />
                         </div>
                       </div>
@@ -826,6 +860,9 @@ function EditorPageWorkspace({
                             className="qpg-instruction-line"
                             onCommit={(text) =>
                               handlePaperChromeChange(block.regionKey, text)
+                            }
+                            onDelete={() =>
+                              handleDeletePaperChrome(block.regionKey)
                             }
                           />
                         </div>
@@ -883,6 +920,11 @@ function EditorPageWorkspace({
                               text,
                             )
                           }
+                          onDelete={() =>
+                            handleDeletePaperChrome(
+                              section.titleBlock.regionKey,
+                            )
+                          }
                         />
                         {subtitleBlock && (
                           <div
@@ -903,6 +945,9 @@ function EditorPageWorkspace({
                                   subtitleBlock.regionKey,
                                   text,
                                 )
+                              }
+                              onDelete={() =>
+                                handleDeletePaperChrome(subtitleBlock.regionKey)
                               }
                             />
                           </div>
@@ -928,6 +973,11 @@ function EditorPageWorkspace({
                                 handlePaperChromeChange(
                                   instructionsBlock.regionKey,
                                   text,
+                                )
+                              }
+                              onDelete={() =>
+                                handleDeletePaperChrome(
+                                  instructionsBlock.regionKey,
                                 )
                               }
                             />

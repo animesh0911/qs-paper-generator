@@ -15,6 +15,7 @@ import {
   PaperDocumentContractError,
   parsePaperDocument,
   restoreSlotSource,
+  removePaperChromeBlock,
   setPaperChromeText,
   setSlotLockState,
   setSlotSelectedQuestion,
@@ -131,9 +132,7 @@ describe('PaperDocumentV1 normalization', () => {
         stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
       },
     });
-    expect(
-      editedState.document.paper.sections[0].slots[0].overrides,
-    ).toEqual({
+    expect(editedState.document.paper.sections[0].slots[0].overrides).toEqual({
       modified: true,
       regions: {
         stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
@@ -154,6 +153,28 @@ describe('PaperDocumentV1 normalization', () => {
     );
   });
 
+  it('does not store slot text overrides when can.editText is false', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    document.paper.sections[0].slots[0].can = {
+      editText: false,
+      editMarks: true,
+      swap: true,
+      lock: true,
+      reorder: true,
+    };
+    const state = normalizePaperDocument(document);
+
+    const editedState = setSlotRegionOverride(state, 'slot_A_01', 'stem', [
+      { type: 'paragraph', text: 'Blocked paper-specific text.' },
+    ]);
+
+    expect(editedState).toBe(state);
+    expect(editedState.slotEditsById.slot_A_01).toEqual({
+      modified: false,
+      regions: {},
+    });
+  });
+
   it('updates editable paper chrome without changing source questions', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const state = normalizePaperDocument(document);
@@ -171,6 +192,63 @@ describe('PaperDocumentV1 normalization', () => {
     );
   });
 
+  it('does not update paper chrome text when can.editText is false', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    document.paper.chromeBlocks = document.paper.chromeBlocks?.map((block) =>
+      block.id === 'series'
+        ? { ...block, can: { ...block.can, editText: false } }
+        : block,
+    );
+    const state = normalizePaperDocument(document);
+
+    const editedState = setPaperChromeText(
+      state,
+      'chrome:series',
+      'SHOULD NOT APPLY',
+    );
+
+    expect(editedState).toBe(state);
+    expect(
+      editedState.document.paper.chromeBlocks?.find(
+        (block) => block.id === 'series',
+      )?.text,
+    ).toBe('LMNK2');
+  });
+
+  it('removes deletable chrome blocks without changing source questions', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+
+    const nextState = removePaperChromeBlock(state, 'chrome:series');
+
+    expect(
+      nextState.document.paper.chromeBlocks?.some(
+        (block) => block.id === 'series',
+      ),
+    ).toBe(false);
+    expect(nextState.document.questions).toBe(state.document.questions);
+    expect(nextState.questionsById.q_mcq_heredity_001.rawText).toBe(
+      state.questionsById.q_mcq_heredity_001.rawText,
+    );
+  });
+
+  it('keeps non-deletable instruction blocks in the persisted document shape', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = normalizePaperDocument(document);
+
+    const nextState = removePaperChromeBlock(
+      state,
+      'instruction:note_printed_pages',
+    );
+
+    expect(nextState).toBe(state);
+    expect(
+      nextState.document.paper.instructionBlocks?.some(
+        (block) => block.id === 'note_printed_pages',
+      ),
+    ).toBe(true);
+  });
+
   it('updates slot lock state in normalized maps and the canonical document', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const state = normalizePaperDocument(document);
@@ -182,6 +260,23 @@ describe('PaperDocumentV1 normalization', () => {
     expect(lockedState.questionsById.q_mcq_heredity_001).toBe(
       state.questionsById.q_mcq_heredity_001,
     );
+  });
+
+  it('does not update slot lock state when can.lock is false', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    document.paper.sections[0].slots[0].can = {
+      editText: true,
+      editMarks: true,
+      swap: true,
+      lock: false,
+      reorder: true,
+    };
+    const state = normalizePaperDocument(document);
+
+    const lockedState = setSlotLockState(state, 'slot_A_01', true);
+
+    expect(lockedState).toBe(state);
+    expect(lockedState.slotsById.slot_A_01.locked).toBe(false);
   });
 
   it('replaces a slot selected question without changing slot placement or source questions', () => {
@@ -228,6 +323,29 @@ describe('PaperDocumentV1 normalization', () => {
     );
   });
 
+  it('does not replace the selected question when can.swap is false', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    document.paper.sections[0].slots[0].can = {
+      editText: true,
+      editMarks: true,
+      swap: false,
+      lock: true,
+      reorder: true,
+    };
+    const state = normalizePaperDocument(document);
+
+    const replacedState = setSlotSelectedQuestion(
+      state,
+      'slot_A_01',
+      'q_mcq_heredity_002',
+    );
+
+    expect(replacedState).toBe(state);
+    expect(replacedState.slotsById.slot_A_01.selectedQuestionId).toBe(
+      'q_mcq_heredity_001',
+    );
+  });
+
   it('keeps the previous selected Question available after a Slot swap', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const state = normalizePaperDocument(document);
@@ -245,9 +363,7 @@ describe('PaperDocumentV1 normalization', () => {
     ]);
     expect(replacedSlot.selectedQuestionId).toBe('q_table_metals_002');
     expect(replacedSlot.alternateQuestionIds).toEqual(['q_table_metals_001']);
-    expect(canonicalSlot.alternateQuestionIds).toEqual([
-      'q_table_metals_001',
-    ]);
+    expect(canonicalSlot.alternateQuestionIds).toEqual(['q_table_metals_001']);
   });
 
   it('cycles swapped Questions without duplicating alternative ids', () => {
@@ -409,12 +525,17 @@ describe('PaperDocumentV1 ordering', () => {
   it('undoes manual slot region edits committed as structured actions', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const initialState = normalizePaperDocument(document);
-    const editedState = setSlotRegionOverride(initialState, 'slot_A_01', 'stem', [
-      {
-        type: 'paragraph',
-        text: 'Manual question text that should be undoable.',
-      },
-    ]);
+    const editedState = setSlotRegionOverride(
+      initialState,
+      'slot_A_01',
+      'stem',
+      [
+        {
+          type: 'paragraph',
+          text: 'Manual question text that should be undoable.',
+        },
+      ],
+    );
 
     const committed = commitStructuredPaperAction(initialState, editedState);
     const undone = undoStructuredPaperAction(

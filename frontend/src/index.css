@@ -215,6 +215,28 @@
     padding: 1px 2px;
   }
 
+  .qpg-paper-chrome-control-group {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: flex-start;
+    gap: 3pt;
+  }
+
+  .qpg-paper-chrome-control-group > .qpg-paper-chrome-text,
+  .qpg-paper-chrome-control-group > div:first-child {
+    min-width: 0;
+  }
+
+  .qpg-paper-chrome-delete {
+    flex: none;
+    opacity: 0;
+  }
+
+  .qpg-paper-chrome-control-group:hover .qpg-paper-chrome-delete,
+  .qpg-paper-chrome-delete:focus-visible {
+    opacity: 1;
+  }
+
   .qpg-paper-chrome-text {
     cursor: text;
     color: hsl(var(--foreground));
@@ -602,6 +624,10 @@
     grid-template-columns: 22pt 1fr 16pt;
     gap: 7pt;
     margin-top: 7pt;
+  }
+
+  .paper-subquestion-inline-marks {
+    grid-template-columns: 22pt minmax(0, 1fr);
   }
 
   .paper-choice-group {

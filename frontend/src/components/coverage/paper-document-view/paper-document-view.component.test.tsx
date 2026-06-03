@@ -118,6 +118,8 @@ describe('PaperDocumentView', () => {
     );
 
     expect(html).toContain('class="paper-inline-marks">(1 mark)</span>');
+    expect(html).toContain('paper-subquestion paper-subquestion-inline-marks');
+    expect(html).toContain('class="paper-inline-marks">(2 marks)</span>');
     expect(html).not.toContain('class="paper-marks">1</span>');
   });
 

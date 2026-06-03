@@ -349,6 +349,7 @@ function PrintQuestion({
         <QuestionContent
           question={question}
           slot={slot}
+          marksPlacement={marksPlacement}
           mcqLayout={mcqLayout}
         />
         {!useRightColumnMarks && (
@@ -363,10 +364,12 @@ function PrintQuestion({
 function QuestionContent({
   question,
   slot,
+  marksPlacement,
   mcqLayout,
 }: {
   question: DocQuestion;
   slot: DocSlot;
+  marksPlacement: string;
   mcqLayout: string;
 }) {
   const overrides = slot.overrides?.regions ?? {};
@@ -400,6 +403,7 @@ function QuestionContent({
           key={subpart.label}
           subpart={subpart}
           overrides={overrides}
+          marksPlacement={marksPlacement}
         />
       ))}
       {question.content.choices?.map((choice, index) => (
@@ -436,19 +440,34 @@ function PrintOption({
 function PrintSubQuestion({
   subpart,
   overrides,
+  marksPlacement,
 }: {
   subpart: SubQuestion;
   overrides: Record<string, ContentItem[]>;
+  marksPlacement: string;
 }) {
+  const useRightColumnMarks = marksPlacement === 'right_column';
+
   return (
-    <div className="paper-subquestion">
+    <div
+      className={
+        useRightColumnMarks
+          ? 'paper-subquestion'
+          : 'paper-subquestion paper-subquestion-inline-marks'
+      }
+    >
       <span>{subpart.label}.</span>
       <div className="paper-subquestion-body">
         <PaperContentItems
           items={overrides[`subquestion:${subpart.label}`] ?? subpart.content}
         />
+        {!useRightColumnMarks && subpart.marks && (
+          <span className="paper-inline-marks">
+            ({marksLabel(subpart.marks)})
+          </span>
+        )}
       </div>
-      {subpart.marks && <b>{subpart.marks}</b>}
+      {useRightColumnMarks && subpart.marks && <b>{subpart.marks}</b>}
     </div>
   );
 }
