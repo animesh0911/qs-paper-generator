@@ -155,13 +155,21 @@ class Extractor(Protocol):
 
     Each dict carries: ``section``, ``qtype``, ``marks``, ``text``, ``options``,
     ``content`` (contract §9 region shape), ``chapter_slug``, ``cognitive_level``,
-    ``topic_names``, ``primary_form``. The coordinator sets ``parse_quality``.
+    ``topic_names``, ``primary_form``, and ``figures`` (bounding boxes the
+    coordinator crops into assets). The coordinator sets ``parse_quality``.
     """
 
     def extract(self, pdf_bytes: bytes) -> list[dict]: ...
 
 
 _PRIMARY_FORMS = ("none", "diagram_based", "table_based")
+
+# content regions a figure may anchor to. Item-array regions hold ContentItem[]
+# directly; labelled regions hold {label, content:[...]} entries (the model's
+# `label` picks the option/subpart). `choices` nesting is out of scope (#77).
+_FIGURE_ITEM_REGIONS = ("stem", "assertion", "reason", "passage")
+_FIGURE_LABELLED_REGIONS = ("options", "subparts")
+_FIGURE_REGIONS = _FIGURE_ITEM_REGIONS + _FIGURE_LABELLED_REGIONS
 
 
 def _coerce_topic_names(value) -> list[str]:
@@ -263,6 +271,29 @@ _QUESTION_SCHEMA = {
                         "type": "STRING",
                         "enum": list(_PRIMARY_FORMS),
                     },
+                    # Figure bounding boxes for deterministic PyMuPDF cropping
+                    # (#77). bbox is [x0, y0, x1, y1] normalized to [0, 1],
+                    # top-left origin; page is 1-based.
+                    "figures": {
+                        "type": "ARRAY",
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "page": {"type": "INTEGER"},
+                                "bbox": {
+                                    "type": "ARRAY",
+                                    "items": {"type": "NUMBER"},
+                                },
+                                "region": {
+                                    "type": "STRING",
+                                    "enum": list(_FIGURE_REGIONS),
+                                },
+                                "label": {"type": "STRING"},
+                                "caption": {"type": "STRING"},
+                            },
+                            "required": ["page", "bbox", "region"],
+                        },
+                    },
                 },
                 "required": ["section", "qtype", "marks", "rawText", "content"],
             },
@@ -311,12 +342,62 @@ def _section_prompt(section: str) -> str:
         "  chapter_slug — closest CBSE Cl.10 Science chapter slug, or null if unsure.\n"
         "  cognitive_level — one of R, U, Ap, An.\n"
         "  topic_names — short topic strings within the chapter; [] if none.\n"
-        "  primary_form — one of none, diagram_based, table_based.\n\n"
+        "  primary_form — one of none, diagram_based, table_based.\n"
+        "  figures — bounding boxes of any diagrams the question depends on, for "
+        "deterministic cropping. [] if none. Each: {page, bbox, region, label?, "
+        "caption?} where page is 1-based, bbox is [x0, y0, x1, y1] normalized to "
+        "[0, 1] with the page top-left as origin, region is the content region the "
+        "figure belongs to (stem / assertion / reason / passage / options / "
+        "subparts), and label names the option/subpart for options/subparts.\n\n"
         "If a question depends on a figure or diagram, put a single "
         "{type:'image_placeholder', text:'<short description>'} item in the region "
-        "where the figure appears — real image crops are added later. Never invent "
-        "pixels, options, or subparts."
+        "where the figure appears AND add a matching entry to figures (same region "
+        "and, for an option/subpart, the same label). The crop is made from the "
+        "box; the placeholder is the anchor. Never invent pixels, options, or "
+        "subparts."
     )
+
+
+def _coerce_figures(value) -> list[dict]:
+    """Normalise a model ``figures`` value to clean, croppable box dicts.
+
+    Keeps only entries with a 1-based int ``page``, a ``bbox`` of exactly four
+    numbers forming a non-empty rectangle once clamped to ``[0, 1]``, and a known
+    ``region``. ``label`` is coerced to a string. Anything malformed is dropped
+    silently — the question's ``image_placeholder`` simply stays (fail-soft per
+    ADR-0004; bad localisation is caught at human review).
+    """
+    if not isinstance(value, list):
+        return []
+    figures: list[dict] = []
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        page = item.get("page")
+        if not isinstance(page, int) or isinstance(page, bool) or page < 1:
+            continue
+        bbox = item.get("bbox")
+        if not isinstance(bbox, list) or len(bbox) != 4:
+            continue
+        if not all(
+            isinstance(n, (int, float)) and not isinstance(n, bool) for n in bbox
+        ):
+            continue
+        x0, y0, x1, y1 = (min(1.0, max(0.0, float(n))) for n in bbox)
+        if x0 >= x1 or y0 >= y1:
+            continue
+        region = item.get("region")
+        if region not in _FIGURE_REGIONS:
+            continue
+        figure = {"page": page, "bbox": [x0, y0, x1, y1], "region": region}
+        label = item.get("label")
+        if isinstance(label, str) and label.strip():
+            figure["label"] = label.strip()
+        caption = item.get("caption")
+        if isinstance(caption, str) and caption.strip():
+            figure["caption"] = caption.strip()
+        figures.append(figure)
+    return figures
 
 
 def _coerce_question(obj: dict, section: str) -> dict:
@@ -336,6 +417,7 @@ def _coerce_question(obj: dict, section: str) -> dict:
         "cognitive_level": obj.get("cognitive_level", "R") or "R",
         "topic_names": _coerce_topic_names(obj.get("topic_names")),
         "primary_form": _coerce_primary_form(obj.get("primary_form")),
+        "figures": _coerce_figures(obj.get("figures")),
     }
 
 
@@ -359,6 +441,184 @@ class GeminiExtractor:
                 if isinstance(obj, dict):
                     questions.append(_coerce_question(obj, section))
         return questions
+
+
+# ---------------------------------------------------------------------------
+# Figure cropping
+# ---------------------------------------------------------------------------
+
+
+def _open_pdf(pdf_bytes: bytes):
+    """Open PDF bytes as a PyMuPDF document, or ``None`` if unparseable.
+
+    Opened once per batch so the stream is parsed a single time rather than once
+    per figure. Returns ``None`` on failure so every figure soft-misses and the
+    placeholders stay (ADR-0004).
+    """
+    import fitz
+
+    try:
+        return fitz.open(stream=pdf_bytes, filetype="pdf")
+    except Exception:  # noqa: BLE001 — any parse failure is a soft miss
+        return None
+
+
+def _crop_figure(
+    doc,
+    page_1based: int,
+    bbox_norm: list[float],
+    *,
+    dpi: int = 300,
+    pad: float = 0.01,
+) -> bytes | None:
+    """Crop one figure box from an open PDF ``doc`` to PNG bytes via PyMuPDF.
+
+    ``bbox_norm`` is ``[x0, y0, x1, y1]`` normalized to ``[0, 1]`` with the page
+    top-left as origin (the extractor's convention). The box is padded slightly
+    to avoid clipping diagram borders, mapped to page points, and rendered at
+    ``dpi``. Returns ``None`` on any failure (out-of-range page, empty clip,
+    render error) so the caller keeps the question's ``image_placeholder`` — bad
+    crops are caught at human review, not by code (ADR-0004).
+    """
+    import fitz
+
+    try:
+        idx = page_1based - 1
+        if idx < 0 or idx >= doc.page_count:
+            return None
+        page = doc[idx]
+        rect = page.rect
+        x0, y0, x1, y1 = bbox_norm
+        x0 = max(0.0, x0 - pad)
+        y0 = max(0.0, y0 - pad)
+        x1 = min(1.0, x1 + pad)
+        y1 = min(1.0, y1 + pad)
+        clip = fitz.Rect(
+            x0 * rect.width,
+            y0 * rect.height,
+            x1 * rect.width,
+            y1 * rect.height,
+        )
+        if clip.is_empty or clip.is_infinite:
+            return None
+        zoom = dpi / 72
+        pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), clip=clip)
+        return pix.tobytes("png")
+    except Exception:  # noqa: BLE001 — a render failure degrades to placeholder
+        return None
+
+
+def _place_image_item(content: dict, figure: dict, image_item: dict) -> None:
+    """Insert ``image_item`` into the figure's content region.
+
+    Replaces the first ``image_placeholder`` in the target region with the real
+    image item; if there is no placeholder to upgrade, appends it. Item-array
+    regions (stem/assertion/reason/passage) hold the items directly; labelled
+    regions (options/subparts) hold ``{label, content:[...]}`` entries selected
+    by ``figure['label']``.
+    """
+    region = figure["region"]
+    if region in _FIGURE_ITEM_REGIONS:
+        items = content.get(region)
+        if not isinstance(items, list):
+            items = []
+            content[region] = items
+        _upgrade_or_append(items, image_item)
+        return
+
+    # Labelled region: find the matching option/subpart entry. Compare labels
+    # case/space-insensitively so "a" matches an "A" option (the model is asked
+    # for verbatim labels, but casing can drift across the figure vs the option).
+    entries = content.get(region)
+    if not isinstance(entries, list):
+        return
+    label = (figure.get("label") or "").strip().casefold()
+    for entry in entries:
+        if (
+            isinstance(entry, dict)
+            and (entry.get("label") or "").strip().casefold() == label
+        ):
+            items = entry.get("content")
+            if not isinstance(items, list):
+                items = []
+                entry["content"] = items
+            _upgrade_or_append(items, image_item)
+            return
+
+
+def _upgrade_or_append(items: list, image_item: dict) -> None:
+    """Swap the first image_placeholder in ``items`` for ``image_item``; else append."""
+    for i, it in enumerate(items):
+        if isinstance(it, dict) and it.get("type") == "image_placeholder":
+            items[i] = image_item
+            return
+    items.append(image_item)
+
+
+def _apply_figures(
+    pdf_bytes: bytes, rows: list[dict], fingerprints: list[str]
+) -> list[str | None]:
+    """Crop each question's figures, save them as assets, reference them in content.
+
+    For every coerced figure with a successful crop: save the PNG to
+    ``default_storage`` at ``diagrams/{fp8}-{n}.png`` and rewrite the target
+    region's ``image_placeholder`` into an ``{type:"image", assetId, caption?}``
+    item (``assetId`` is the storage path; ``PaperDocumentBuilder`` resolves it to
+    a URL in #45 — no inline URL here, per contract §9). Figures that fail to crop
+    leave the placeholder untouched. Returns the per-question primary (first) asset
+    name for the ``Question.diagram`` FileField, or ``None`` if nothing cropped.
+    """
+    from django.core.files.base import ContentFile
+    from django.core.files.storage import default_storage
+
+    # Parse the PDF once for the whole batch, not once per figure.
+    doc = _open_pdf(pdf_bytes)
+    try:
+        primary_assets: list[str | None] = []
+        for q, fp in zip(rows, fingerprints):
+            figures = q.get("figures", []) if doc is not None else []
+            content = q.get("content") or {}
+            primary: str | None = None
+            crop_index = 0
+            for figure in figures:
+                png = _crop_figure(doc, figure["page"], figure["bbox"])
+                if png is None:
+                    continue
+                asset_id = default_storage.save(
+                    f"diagrams/{fp[:8]}-{crop_index}.png", ContentFile(png)
+                )
+                crop_index += 1
+                image_item = {"type": "image", "assetId": asset_id}
+                if figure.get("caption"):
+                    image_item["caption"] = figure["caption"]
+                _place_image_item(content, figure, image_item)
+                if primary is None:
+                    primary = asset_id
+            q["content"] = content
+            primary_assets.append(primary)
+        return primary_assets
+    finally:
+        if doc is not None:
+            doc.close()
+
+
+def _content_has_figure(content: dict) -> bool:
+    """True if any region holds an ``image`` or ``image_placeholder`` content item."""
+    if not isinstance(content, dict):
+        return False
+
+    def _scan(items) -> bool:
+        if not isinstance(items, list):
+            return False
+        for it in items:
+            if isinstance(it, dict):
+                if it.get("type") in ("image", "image_placeholder"):
+                    return True
+                if isinstance(it.get("content"), list) and _scan(it["content"]):
+                    return True
+        return False
+
+    return any(_scan(region_items) for region_items in content.values())
 
 
 # ---------------------------------------------------------------------------
@@ -452,12 +712,12 @@ class Ingestor:
 
         chapter_by_slug = {c.slug: c for c in Chapter.objects.all()}
         provenance = _Provenance.from_filename(source_file_name, source_type)
-        # Diagrams are image_placeholder content items this slice; no crops yet.
-        diagram_bytes_list: list[bytes | None] = [None] * len(raw_questions)
+        # Crop figure boxes to media assets and rewrite content image references.
+        primary_assets = _apply_figures(pdf_bytes, raw_questions, fingerprints)
         created = self._persist(
             raw_questions,
             fingerprints,
-            diagram_bytes_list,
+            primary_assets,
             chapter_by_slug,
             provenance,
         )
@@ -467,20 +727,20 @@ class Ingestor:
     def _persist(
         tagged: list[dict],
         fingerprints: list[str],
-        diagram_bytes_list: list[bytes | None],
+        primary_assets: list[str | None],
         chapter_by_slug: dict[str, Chapter],
         provenance: _Provenance,
     ) -> int:
-        from django.core.files.base import ContentFile
-
         rows: list[Question] = []
         for i, q in enumerate(tagged):
-            image_bytes = diagram_bytes_list[i] if i < len(diagram_bytes_list) else None
+            primary_asset = primary_assets[i] if i < len(primary_assets) else None
             primary_form = q.get("primary_form", "none")
+            content = q.get("content", {})
             has_diagram = (
-                image_bytes is not None
+                primary_asset is not None
                 or primary_form == "diagram_based"
                 or _mentions_diagram(q["text"])
+                or _content_has_figure(content)
             )
 
             row = Question(
@@ -491,7 +751,7 @@ class Ingestor:
                 cognitive_level=q.get("cognitive_level", CognitiveLevel.REMEMBER),
                 text=q["text"],
                 options=q.get("options", []),
-                content=q.get("content", {}),
+                content=content,
                 topic_names=q.get("topic_names", []),
                 primary_form=primary_form,
                 parse_quality=q.get("parse_quality", "partial"),
@@ -505,12 +765,10 @@ class Ingestor:
                 source_file_name=provenance.source_file_name,
                 source_page_number=q.get("source_page_number"),
             )
-            if image_bytes:
-                row.diagram.save(
-                    f"q_{fingerprints[i][:8]}.png",
-                    ContentFile(image_bytes),
-                    save=False,
-                )
+            if primary_asset:
+                # File already saved to storage by _apply_figures; just point the
+                # FileField at it (assetId == storage name) for Admin review.
+                row.diagram.name = primary_asset
             rows.append(row)
 
         Question.objects.bulk_create(rows)

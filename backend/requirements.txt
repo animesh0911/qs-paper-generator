@@ -5,6 +5,7 @@ celery>=5.4
 redis>=5.0
 django-cors-headers>=4.3
 reportlab>=4.0
+pymupdf>=1.24,<2.0
 pytest-django>=4.8
 factory-boy>=3.3
 playwright>=1.52

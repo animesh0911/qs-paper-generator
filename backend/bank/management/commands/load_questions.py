@@ -138,10 +138,11 @@ class Command(BaseCommand):
         if not rows:
             return 0, skipped
 
-        # No PDF in hand → no diagram extraction; _persist still flags
-        # has_diagram from primary_form and the question text.
-        diagram_bytes_list: list[bytes | None] = [None] * len(rows)
+        # No PDF in hand → no diagram cropping; committed content keeps whatever
+        # image/image_placeholder items it already carries. _persist still flags
+        # has_diagram from primary_form, the question text, and those items.
+        primary_assets: list[str | None] = [None] * len(rows)
         created = Ingestor._persist(
-            rows, fingerprints, diagram_bytes_list, chapter_by_slug, provenance
+            rows, fingerprints, primary_assets, chapter_by_slug, provenance
         )
         return created, skipped
