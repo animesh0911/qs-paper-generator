@@ -1,5 +1,11 @@
 # LLM segmentation with a fidelity guardrail
 
+> **Superseded by [ADR-0004](0004-gemini-native-pdf-ingestion.md) (2026-06-03).**
+> Ingestion now sends the PDF directly to a multimodal model; the text
+> extraction this ADR's guardrail graded against no longer exists, so the
+> `Segmenter`/`RegexSegmenter`/`_verify` design described below is removed.
+> Retained for history.
+
 The Ingestor's `Segmenter` seam splits cleaned PDF text into structured questions using an LLM (`LLMSegmenter`) instead of the regex rules of `segment_questions` (kept as `RegexSegmenter`, a deterministic fallback). CBSE PYQ layouts vary too much for regex to classify qtype and build contract-shape `content` reliably; an LLM handles the variety. To contain LLM hallucination, emitted output must pass deterministic **verification checks** against the source text before it is trusted; failures are forced to `parse_quality='broken'` (or the batch degraded to `partial`). The checks: (1) **fidelity** — each question's `text` is a whitespace-normalised substring of the source or `difflib` ratio ≥ threshold (catches invented words); (2) **coverage** — emitted question count matches the source's question-number anchors (catches dropped/merged questions); (3) **order** — emitted questions appear in source reading order, and within MCQ/assertion-reason questions the options appear in source order too (catches reordering and swapped option labels).
 
 ## Why

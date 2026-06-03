@@ -121,13 +121,19 @@ blueprint config** so presets are just scaled variants reusing the same section 
 ## 6. Two pipelines
 
 ### 6a. Bank ingestion (offline, one-time + per new year)
-1. **Parse PDF** (vision/LLM) → split English from Hindi, segment into questions, capture
-   section/marks/options, crop diagrams to images.
-2. **Match official marking scheme** → attach authoritative answer/marking scheme.
-3. **Auto-tag** chapter + cognitive level + difficulty band.
-4. **De-duplicate** across sets within a year (CBSE rotates questions).
-5. **Human verification** in Django Admin → correct tags/keys, approve. Only `verified` questions
-   are eligible for papers.
+1. **Parse PDF with a multimodal LLM** (Gemini `gemini-2.5-pro`) — the source PDF is sent
+   directly to the model (no text-extraction library, no regex). In one pass per section it
+   filters to English only (discards the Hindi column), segments into questions, classifies
+   type, structures `content` regions + `rawText`, auto-tags chapter/cognitive level/topics,
+   and returns figure bounding boxes. See [ADR-0004](adr/0004-gemini-native-pdf-ingestion.md).
+2. **Crop diagrams** deterministically with PyMuPDF from the model's figure boxes; store as
+   assets referenced by the question content (the model never emits pixels).
+3. **De-duplicate** across sets within a year (CBSE rotates questions).
+4. **Human verification** in Django Admin → correct tags/text/crops, approve. Only verified
+   questions are eligible for papers — this review is the accuracy backstop (replaces the old
+   deterministic fidelity guardrail).
+5. **Reviewed bank is reloadable**: `load_questions` rebuilds the DB from committed, reviewed
+   JSON so the bank reproduces without re-billing the LLM.
 
 ### 6b. Paper generation (online, Celery job)
 1. **Resolve blueprint** from preset → required questions per section/marks/cognitive mix.

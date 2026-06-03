@@ -50,21 +50,23 @@ PaperPdfView               ← cache lookup by paper id
 
 ## The ingestion pipeline (Slice 4)
 
+Native multimodal extraction — the PDF goes straight to Gemini, no text
+extraction or regex. See [ADR-0004](adr/0004-gemini-native-pdf-ingestion.md).
+
 ```
 HTTP POST /api/bank/ingest/   (admin-only, multipart PDF)
         │
         ▼
 Ingestor.ingest(pdf_bytes)
         │
-        ├──▶ Parser.parse(pdf_bytes)       → str            (default: PdfplumberParser)
-        ├──▶ strip_hindi(text)             → str            (pure)
-        ├──▶ segment_questions(text)       → list[dict]     (pure)
-        ├──▶ Tagger.tag(raw, chapters)     → list[dict]     (default: LLMTagger)
-        │           │
-        │           └──▶ LLMClient.complete(prompt)         (default: make_llm_client())
-        │                       ↓
-        │                   LiteLLMClient (ai_services.llm)
+        ├──▶ Extractor.extract(pdf_bytes, chapters)   → list[dict] + figure boxes
+        │           │                                   (default: GeminiExtractor)
+        │           └──▶ LLMClient.extract(pdf, schema)   (one pass: English-only
+        │                       ↓                          + segment + classify +
+        │                   GeminiClient (ai_services.llm)  structure + tag)
         │
+        ├──▶ crop figures (PyMuPDF) from boxes → Question.diagram assets
+        ├──▶ de-dup by source_hash
         └──▶ Question.objects.bulk_create(... verified=False)
         │
         ▼
@@ -81,8 +83,8 @@ IngestResult{created: N}
 | `QuestionPool` (internal) | `papers.picker` | Decouples ORM fetch from pure allocation. Algorithm is testable with hand-built pools, no DB. |
 | `CoverageReport` | `papers.picker` | Single source of truth for the coverage report shape. |
 | `PaperDocumentV1` | `papers.document` | Single render-time contract. Frontend and PDF renderer both consume the same dict from `Paper.document`. |
-| `Parser` / `Tagger` | `bank.ingestor` | Two adapter seams of the Ingestor. Tests inject `StubParser` / `StubTagger`. |
-| `LLMClient` | `ai_services.llm` | Provider-agnostic LLM call (`complete(prompt) → str`). One `LiteLLMClient` adapter over `litellm.completion` spans OpenAI / Anthropic / Gemini. Model chosen via `LLM_MODEL` (or `LLM_PROVIDER` fallback). |
+| `Extractor` | `bank.ingestor` | The Ingestor's one adapter seam: PDF bytes → structured question dicts + figure boxes (default `GeminiExtractor`). Tests inject a stub extractor. |
+| `LLMClient` | `ai_services.llm` | Multimodal LLM call (`extract(pdf_bytes, schema) → dict`). `GeminiClient` adapter over the Gemini SDK with response-schema enforcement. Model chosen via `GEMINI_MODEL` (default `gemini-2.5-pro`). |
 | `AssembleRequestSerializer` | `papers.serializers` | Declarative input contract for `POST /papers/assemble`. New fields accrete here. |
 | `useCoverageForm` | `frontend/hooks` | Owns the teacher's form state and builds the assemble payload. |
 
@@ -96,8 +98,8 @@ The product ships in vertical slices defined in `docs/PLAN.md`. Each slice cuts 
 | 2 — Blueprint + presets | done | `TemplateBuilder`, `PaperTemplate`, OR-groups, board/half_yearly/unit_test presets. |
 | 3 — Selection engine | done | Chapter taxonomy + cognitive level + `QuestionPicker` + teacher form. |
 | 3b — Document contract | done | `PaperDocumentV1`, draft/approve lifecycle, document-driven PDF rendering. |
-| 4 — Ingestion A (PDF parse) | done | `Ingestor` + `Parser`/`Tagger` adapters + provider-agnostic `LLMClient`. Auto-tags chapter + cognitive level. |
-| 5 — Ingestion B | next | Diagrams, marking scheme, de-dup, human verification. |
+| 4 — Ingestion A (PDF parse) | rework | Native Gemini multimodal extraction (ADR-0004): PDF → structured questions, English-only, auto-tagged. Drops pdfplumber + regex. |
+| 5 — Ingestion B | next | Diagram crops (PyMuPDF) as assets, de-dup, human verification. |
 | 6 — Review / edit / approve | upcoming | Provenance on `PaperQuestion`. |
 | 7 — Async generation | upcoming | Celery jobs, progress. |
 | 8 — Grounded gen + verifier | upcoming | LLM with HITL. |
