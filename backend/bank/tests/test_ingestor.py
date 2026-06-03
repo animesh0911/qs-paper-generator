@@ -2,8 +2,8 @@
 
 The Ingestor coordinator is tested end-to-end with a stub Extractor — no live
 Gemini call. GeminiExtractor's section-chunking + coercion is tested against a
-stub LLMClient. Pure helpers (`_compute_parse_quality`, `_parse_source_filename`)
-are tested directly.
+stub LLMClient. Pure helpers (`compute_parse_quality` from `bank.question_shape`,
+`_parse_source_filename`) are tested directly.
 """
 
 from __future__ import annotations
@@ -12,15 +12,15 @@ from pathlib import Path
 
 import pytest
 
+from bank.diagram_cropper import _crop_figure
 from bank.ingestor import (
     GeminiExtractor,
     Ingestor,
     _coerce_figures,
-    _compute_parse_quality,
-    _crop_figure,
     _parse_source_filename,
 )
 from bank.models import Chapter, Question
+from bank.question_shape import compute_parse_quality
 
 # ---------------------------------------------------------------------------
 # Test doubles
@@ -55,6 +55,18 @@ class StubExtractor:
         return [dict(q) for q in self._questions]
 
 
+class StubCropper:
+    """DiagramCropper adapter returning a fixed primary asset per row, no fitz."""
+
+    def __init__(self, primary_assets: list[str | None]):
+        self._primary_assets = primary_assets
+        self.calls: list[tuple[int, int]] = []
+
+    def crop(self, pdf_bytes, rows, fingerprints):
+        self.calls.append((len(rows), len(fingerprints)))
+        return list(self._primary_assets)
+
+
 # ---------------------------------------------------------------------------
 # Ingestor — end-to-end with a stub Extractor
 # ---------------------------------------------------------------------------
@@ -85,6 +97,28 @@ def test_ingestor_persists_unverified_questions_with_tags():
     electricity = Chapter.objects.get(slug="electricity")
     assert all(q.chapter_id == electricity.pk for q in Question.objects.all())
     assert all(q.cognitive_level == "Ap" for q in Question.objects.all())
+
+
+@pytest.mark.django_db
+def test_ingestor_uses_injected_cropper(settings, tmp_path):
+    """The DiagramCropper seam is injectable: a stub's asset reaches the row.
+
+    Why this matters: cropping is the Ingestor's second adapter (CONTEXT.md). The
+    coordinator must delegate to whatever cropper it's handed and wire that
+    cropper's primary asset onto Question.diagram — provable without PyMuPDF."""
+    settings.MEDIA_ROOT = str(tmp_path)
+    cropper = StubCropper(["diagrams/stub-0.png"])
+    Ingestor(
+        extractor=StubExtractor(
+            [_q(section="C", qtype="short_answer", text="Draw it.")]
+        ),
+        cropper=cropper,
+    ).ingest(b"%PDF")
+
+    assert cropper.calls == [(1, 1)]  # coordinator called the seam once
+    row = Question.objects.get()
+    assert row.diagram.name == "diagrams/stub-0.png"
+    assert row.has_diagram is True
 
 
 @pytest.mark.django_db
@@ -232,19 +266,19 @@ def test_compute_parse_quality_clean_assertion_reason():
         "reason": [{"type": "paragraph", "text": "Some reason."}],
     }
     raw_q = {"text": "AR", "content": content}
-    assert _compute_parse_quality(raw_q, "assertion_reason") == "clean"
+    assert compute_parse_quality(raw_q, "assertion_reason") == "clean"
 
 
 def test_compute_parse_quality_broken_when_content_empty():
     """A structured qtype with empty content is broken, not silently partial:
     parse_quality='broken' means the picker excludes the question."""
     raw_q = {"text": "Assertion (A): X", "content": {}}
-    assert _compute_parse_quality(raw_q, "assertion_reason") == "broken"
+    assert compute_parse_quality(raw_q, "assertion_reason") == "broken"
 
 
 def test_compute_parse_quality_broken_mcq_missing_options():
     raw_q = {"text": "Which gas?", "options": [], "content": {}}
-    assert _compute_parse_quality(raw_q, "mcq") == "broken"
+    assert compute_parse_quality(raw_q, "mcq") == "broken"
 
 
 def test_compute_parse_quality_clean_mcq_four_options():
@@ -253,12 +287,12 @@ def test_compute_parse_quality_clean_mcq_four_options():
         for label, t in [("A", "O2"), ("B", "CO2"), ("C", "N2"), ("D", "H2")]
     ]
     raw_q = {"text": "Which gas?", "options": opts, "content": {}}
-    assert _compute_parse_quality(raw_q, "mcq") == "clean"
+    assert compute_parse_quality(raw_q, "mcq") == "clean"
 
 
 def test_compute_parse_quality_clean_short_answer_with_text():
     raw_q = {"text": "Define refraction.", "content": {}}
-    assert _compute_parse_quality(raw_q, "short_answer") == "clean"
+    assert compute_parse_quality(raw_q, "short_answer") == "clean"
 
 
 # ---------------------------------------------------------------------------

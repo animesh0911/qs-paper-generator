@@ -4,9 +4,15 @@ The renderer consumes a PaperDocumentV1 dict directly — these tests build
 a minimal document fixture and verify the bytes back without touching the DB.
 """
 
-import pdfplumber
+import fitz
 
 from papers.pdf import render_paper_pdf
+
+
+def _pdf_text(pdf_bytes: bytes) -> str:
+    """Extract all text from rendered PDF bytes via PyMuPDF (a production dep)."""
+    with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
+        return "\n".join(page.get_text() for page in doc)
 
 
 def _doc(slot_question_id: str | None = "q_1") -> dict:
@@ -67,7 +73,7 @@ def test_render_handles_unfilled_slot():
     assert pdf[:4] == b"%PDF"
 
 
-def test_render_uses_slot_override_instead_of_stale_question_text(tmp_path):
+def test_render_uses_slot_override_instead_of_stale_question_text():
     """PDF must reflect final Slot edits because PaperDocumentV1 is canonical."""
     document = _doc()
     document["paper"]["sections"][0]["slots"][0]["overrides"] = {
@@ -77,11 +83,7 @@ def test_render_uses_slot_override_instead_of_stale_question_text(tmp_path):
         },
     }
 
-    pdf_path = tmp_path / "paper.pdf"
-    pdf_path.write_bytes(render_paper_pdf(document))
-
-    with pdfplumber.open(pdf_path) as pdf:
-        text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+    text = _pdf_text(render_paper_pdf(document))
 
     assert "Teacher edited water question." in text
     assert "What is water?" not in text

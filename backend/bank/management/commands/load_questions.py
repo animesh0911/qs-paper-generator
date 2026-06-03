@@ -16,7 +16,8 @@ Each input file is one source PDF's worth of questions::
     }
 
 ``parse_quality`` is set here from the question's structure via
-``_compute_parse_quality`` (no source-text verification pass — ADR-0004). A
+``question_shape.compute_parse_quality`` (no source-text verification pass —
+ADR-0004). A
 legacy ``source_text`` field, if present, is ignored. ``source_pdf`` feeds
 ``_parse_source_filename`` for provenance (year from the parent dir name).
 
@@ -35,12 +36,12 @@ from django.core.management.base import BaseCommand, CommandError
 
 from bank.ingestor import (
     Ingestor,
-    _compute_parse_quality,
     _fingerprint,
     _parse_source_filename,
     _Provenance,
 )
 from bank.models import Chapter, Question
+from bank.question_shape import compute_parse_quality
 
 
 class Command(BaseCommand):
@@ -109,7 +110,7 @@ class Command(BaseCommand):
 
         # Structural self-assessment — no source-text verification (ADR-0004).
         for q in questions:
-            q["parse_quality"] = _compute_parse_quality(q, q.get("qtype", ""))
+            q["parse_quality"] = compute_parse_quality(q, q.get("qtype", ""))
 
         prov = _parse_source_filename(Path(source_pdf))
         provenance = _Provenance(

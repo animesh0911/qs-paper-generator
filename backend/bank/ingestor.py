@@ -1,10 +1,13 @@
 """Ingestion pipeline: extract questions from a CBSE past-paper PDF via Gemini.
 
 `Ingestor` is the coordinator. It runs the pipeline and persists Question rows
-(verified=False). One seam is injected as an adapter:
+(verified=False). Two seams are injected as adapters:
 
 * `Extractor` — sends the source PDF straight to a multimodal LLM and returns
                 structured, tagged question dicts. Default: `GeminiExtractor`.
+* `DiagramCropper` — crops the Extractor's figure boxes into media assets and
+                rewrites the content. Default: `PyMuPdfCropper` (see
+                `bank.diagram_cropper`).
 
 The PDF goes to the model unchanged: no text extraction, no regex segmentation,
 no fidelity guardrail (see ADR-0004). The model does, in one pass per section,
@@ -13,10 +16,11 @@ classification, `content` region structuring, and chapter/level/topic tagging.
 The human verification gate (ADR-0002) is the backstop — rows land
 `verified=False` and only reviewed rows reach the picker.
 
-Pure text predicates (`_detect_numerical`, `_mentions_diagram`) and the
-structural `_compute_parse_quality` self-assessment are module-level and run by
-the coordinator. Tests inject a stub Extractor into Ingestor — no module-level
-patching.
+The structural `parse_quality` self-assessment lives in `bank.question_shape`
+(`compute_parse_quality`); the Content tree-walk used to flag `has_diagram` lives
+in `bank.content`. Pure text predicates (`_detect_numerical`,
+`_mentions_diagram`) stay module-level. Tests inject stub adapters into
+Ingestor — no module-level patching.
 """
 
 from __future__ import annotations
@@ -29,7 +33,10 @@ from typing import Protocol
 
 from ai_services.llm import LLMClient, make_llm_client
 
+from . import content as content_mod
+from .diagram_cropper import DiagramCropper, PyMuPdfCropper
 from .models import Chapter, CognitiveLevel, Question
+from .question_shape import compute_parse_quality
 
 # Numerical: equation-like text, SI units, or standalone numbers with units.
 _NUMERICAL_RE = re.compile(
@@ -108,43 +115,6 @@ def _mentions_diagram(text: str) -> bool:
     return bool(_DIAGRAM_RE.search(text))
 
 
-def _compute_parse_quality(raw_question: dict, classified_qtype: str) -> str:
-    """Return clean/partial/broken from how well structure matches qtype.
-
-    A plain structural self-assessment (ADR-0004): the picker draws from
-    clean+partial and excludes broken. No verification against source text.
-    """
-    text = raw_question.get("text", "")
-    content = raw_question.get("content", {})
-
-    if classified_qtype == "assertion_reason":
-        if content.get("assertion") and content.get("reason"):
-            return "clean"
-        return "broken"
-
-    if classified_qtype == "case_based":
-        if content.get("passage") and len(content.get("subparts", [])) >= 2:
-            return "clean"
-        return "partial"
-
-    if classified_qtype == "internal_choice":
-        choices = content.get("choices", [])
-        if choices and len(choices[0].get("options", [])) == 2:
-            return "clean"
-        return "broken"
-
-    if classified_qtype == "mcq":
-        options = raw_question.get("options", [])
-        if len(options) == 4:
-            return "clean"
-        return "partial" if options else "broken"
-
-    # short_answer, long_answer, very_short_answer
-    if text.strip():
-        return "clean"
-    return "broken"
-
-
 # ---------------------------------------------------------------------------
 # Extractor seam
 # ---------------------------------------------------------------------------
@@ -164,12 +134,10 @@ class Extractor(Protocol):
 
 _PRIMARY_FORMS = ("none", "diagram_based", "table_based")
 
-# content regions a figure may anchor to. Item-array regions hold ContentItem[]
-# directly; labelled regions hold {label, content:[...]} entries (the model's
-# `label` picks the option/subpart). `choices` nesting is out of scope (#77).
-_FIGURE_ITEM_REGIONS = ("stem", "assertion", "reason", "passage")
-_FIGURE_LABELLED_REGIONS = ("options", "subparts")
-_FIGURE_REGIONS = _FIGURE_ITEM_REGIONS + _FIGURE_LABELLED_REGIONS
+# Content regions a figure may anchor to: item-array + labelled regions (the
+# model's `label` picks the option/subpart). `choices` nesting is out of scope
+# (#77). Region names are owned by `bank.content`.
+_FIGURE_REGIONS = content_mod.ITEM_REGIONS + content_mod.LABELLED_REGIONS
 
 
 def _coerce_topic_names(value) -> list[str]:
@@ -444,184 +412,6 @@ class GeminiExtractor:
 
 
 # ---------------------------------------------------------------------------
-# Figure cropping
-# ---------------------------------------------------------------------------
-
-
-def _open_pdf(pdf_bytes: bytes):
-    """Open PDF bytes as a PyMuPDF document, or ``None`` if unparseable.
-
-    Opened once per batch so the stream is parsed a single time rather than once
-    per figure. Returns ``None`` on failure so every figure soft-misses and the
-    placeholders stay (ADR-0004).
-    """
-    import fitz
-
-    try:
-        return fitz.open(stream=pdf_bytes, filetype="pdf")
-    except Exception:  # noqa: BLE001 — any parse failure is a soft miss
-        return None
-
-
-def _crop_figure(
-    doc,
-    page_1based: int,
-    bbox_norm: list[float],
-    *,
-    dpi: int = 300,
-    pad: float = 0.01,
-) -> bytes | None:
-    """Crop one figure box from an open PDF ``doc`` to PNG bytes via PyMuPDF.
-
-    ``bbox_norm`` is ``[x0, y0, x1, y1]`` normalized to ``[0, 1]`` with the page
-    top-left as origin (the extractor's convention). The box is padded slightly
-    to avoid clipping diagram borders, mapped to page points, and rendered at
-    ``dpi``. Returns ``None`` on any failure (out-of-range page, empty clip,
-    render error) so the caller keeps the question's ``image_placeholder`` — bad
-    crops are caught at human review, not by code (ADR-0004).
-    """
-    import fitz
-
-    try:
-        idx = page_1based - 1
-        if idx < 0 or idx >= doc.page_count:
-            return None
-        page = doc[idx]
-        rect = page.rect
-        x0, y0, x1, y1 = bbox_norm
-        x0 = max(0.0, x0 - pad)
-        y0 = max(0.0, y0 - pad)
-        x1 = min(1.0, x1 + pad)
-        y1 = min(1.0, y1 + pad)
-        clip = fitz.Rect(
-            x0 * rect.width,
-            y0 * rect.height,
-            x1 * rect.width,
-            y1 * rect.height,
-        )
-        if clip.is_empty or clip.is_infinite:
-            return None
-        zoom = dpi / 72
-        pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), clip=clip)
-        return pix.tobytes("png")
-    except Exception:  # noqa: BLE001 — a render failure degrades to placeholder
-        return None
-
-
-def _place_image_item(content: dict, figure: dict, image_item: dict) -> None:
-    """Insert ``image_item`` into the figure's content region.
-
-    Replaces the first ``image_placeholder`` in the target region with the real
-    image item; if there is no placeholder to upgrade, appends it. Item-array
-    regions (stem/assertion/reason/passage) hold the items directly; labelled
-    regions (options/subparts) hold ``{label, content:[...]}`` entries selected
-    by ``figure['label']``.
-    """
-    region = figure["region"]
-    if region in _FIGURE_ITEM_REGIONS:
-        items = content.get(region)
-        if not isinstance(items, list):
-            items = []
-            content[region] = items
-        _upgrade_or_append(items, image_item)
-        return
-
-    # Labelled region: find the matching option/subpart entry. Compare labels
-    # case/space-insensitively so "a" matches an "A" option (the model is asked
-    # for verbatim labels, but casing can drift across the figure vs the option).
-    entries = content.get(region)
-    if not isinstance(entries, list):
-        return
-    label = (figure.get("label") or "").strip().casefold()
-    for entry in entries:
-        if (
-            isinstance(entry, dict)
-            and (entry.get("label") or "").strip().casefold() == label
-        ):
-            items = entry.get("content")
-            if not isinstance(items, list):
-                items = []
-                entry["content"] = items
-            _upgrade_or_append(items, image_item)
-            return
-
-
-def _upgrade_or_append(items: list, image_item: dict) -> None:
-    """Swap the first image_placeholder in ``items`` for ``image_item``; else append."""
-    for i, it in enumerate(items):
-        if isinstance(it, dict) and it.get("type") == "image_placeholder":
-            items[i] = image_item
-            return
-    items.append(image_item)
-
-
-def _apply_figures(
-    pdf_bytes: bytes, rows: list[dict], fingerprints: list[str]
-) -> list[str | None]:
-    """Crop each question's figures, save them as assets, reference them in content.
-
-    For every coerced figure with a successful crop: save the PNG to
-    ``default_storage`` at ``diagrams/{fp8}-{n}.png`` and rewrite the target
-    region's ``image_placeholder`` into an ``{type:"image", assetId, caption?}``
-    item (``assetId`` is the storage path; ``PaperDocumentBuilder`` resolves it to
-    a URL in #45 — no inline URL here, per contract §9). Figures that fail to crop
-    leave the placeholder untouched. Returns the per-question primary (first) asset
-    name for the ``Question.diagram`` FileField, or ``None`` if nothing cropped.
-    """
-    from django.core.files.base import ContentFile
-    from django.core.files.storage import default_storage
-
-    # Parse the PDF once for the whole batch, not once per figure.
-    doc = _open_pdf(pdf_bytes)
-    try:
-        primary_assets: list[str | None] = []
-        for q, fp in zip(rows, fingerprints):
-            figures = q.get("figures", []) if doc is not None else []
-            content = q.get("content") or {}
-            primary: str | None = None
-            crop_index = 0
-            for figure in figures:
-                png = _crop_figure(doc, figure["page"], figure["bbox"])
-                if png is None:
-                    continue
-                asset_id = default_storage.save(
-                    f"diagrams/{fp[:8]}-{crop_index}.png", ContentFile(png)
-                )
-                crop_index += 1
-                image_item = {"type": "image", "assetId": asset_id}
-                if figure.get("caption"):
-                    image_item["caption"] = figure["caption"]
-                _place_image_item(content, figure, image_item)
-                if primary is None:
-                    primary = asset_id
-            q["content"] = content
-            primary_assets.append(primary)
-        return primary_assets
-    finally:
-        if doc is not None:
-            doc.close()
-
-
-def _content_has_figure(content: dict) -> bool:
-    """True if any region holds an ``image`` or ``image_placeholder`` content item."""
-    if not isinstance(content, dict):
-        return False
-
-    def _scan(items) -> bool:
-        if not isinstance(items, list):
-            return False
-        for it in items:
-            if isinstance(it, dict):
-                if it.get("type") in ("image", "image_placeholder"):
-                    return True
-                if isinstance(it.get("content"), list) and _scan(it["content"]):
-                    return True
-        return False
-
-    return any(_scan(region_items) for region_items in content.values())
-
-
-# ---------------------------------------------------------------------------
 # Coordinator
 # ---------------------------------------------------------------------------
 
@@ -660,13 +450,19 @@ class _Provenance:
 
 
 class Ingestor:
-    """Pipeline coordinator. The single Extractor adapter is injectable.
+    """Pipeline coordinator. Two adapters are injectable: Extractor and DiagramCropper.
 
-    The default constructor wires `GeminiExtractor`; tests pass a stub.
+    The default constructor wires `GeminiExtractor` + `PyMuPdfCropper`; tests pass
+    stubs for either.
     """
 
-    def __init__(self, extractor: Extractor | None = None):
+    def __init__(
+        self,
+        extractor: Extractor | None = None,
+        cropper: DiagramCropper | None = None,
+    ):
         self.extractor = extractor or GeminiExtractor()
+        self.cropper = cropper or PyMuPdfCropper()
 
     def ingest(
         self,
@@ -687,7 +483,7 @@ class Ingestor:
 
         # Structural self-assessment — no source-text verification (ADR-0004).
         for q in raw_questions:
-            q["parse_quality"] = _compute_parse_quality(q, q["qtype"])
+            q["parse_quality"] = compute_parse_quality(q, q["qtype"])
 
         # De-duplication: skip questions already in the bank AND repeats within
         # this PDF.
@@ -713,7 +509,7 @@ class Ingestor:
         chapter_by_slug = {c.slug: c for c in Chapter.objects.all()}
         provenance = _Provenance.from_filename(source_file_name, source_type)
         # Crop figure boxes to media assets and rewrite content image references.
-        primary_assets = _apply_figures(pdf_bytes, raw_questions, fingerprints)
+        primary_assets = self.cropper.crop(pdf_bytes, raw_questions, fingerprints)
         created = self._persist(
             raw_questions,
             fingerprints,
@@ -740,7 +536,7 @@ class Ingestor:
                 primary_asset is not None
                 or primary_form == "diagram_based"
                 or _mentions_diagram(q["text"])
-                or _content_has_figure(content)
+                or content_mod.has_item(content, "image", "image_placeholder")
             )
 
             row = Question(
@@ -766,8 +562,8 @@ class Ingestor:
                 source_page_number=q.get("source_page_number"),
             )
             if primary_asset:
-                # File already saved to storage by _apply_figures; just point the
-                # FileField at it (assetId == storage name) for Admin review.
+                # File already saved to storage by the DiagramCropper; just point
+                # the FileField at it (assetId == storage name) for Admin review.
                 row.diagram.name = primary_asset
             rows.append(row)
 
