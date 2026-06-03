@@ -121,7 +121,7 @@ blueprint config** so presets are just scaled variants reusing the same section 
 ## 6. Two pipelines
 
 ### 6a. Bank ingestion (offline, one-time + per new year)
-1. **Parse PDF with a multimodal LLM** (Gemini `gemini-2.5-pro`) — the source PDF is sent
+1. **Parse PDF with a multimodal LLM** (Gemini, default `gemini-3.5-flash`) — the source PDF is sent
    directly to the model (no text-extraction library, no regex). In one pass per section it
    filters to English only (discards the Hindi column), segments into questions, classifies
    type, structures `content` regions + `rawText`, auto-tags chapter/cognitive level/topics,

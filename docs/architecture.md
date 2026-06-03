@@ -84,7 +84,7 @@ IngestResult{created: N}
 | `CoverageReport` | `papers.picker` | Single source of truth for the coverage report shape. |
 | `PaperDocumentV1` | `papers.document` | Single render-time contract. Frontend and PDF renderer both consume the same dict from `Paper.document`. |
 | `Extractor` | `bank.ingestor` | The Ingestor's one adapter seam: PDF bytes → structured question dicts + figure boxes (default `GeminiExtractor`). Tests inject a stub extractor. |
-| `LLMClient` | `ai_services.llm` | Multimodal LLM call (`extract(pdf_bytes, schema) → dict`). `GeminiClient` adapter over the Gemini SDK with response-schema enforcement. Model chosen via `GEMINI_MODEL` (default `gemini-2.5-pro`). |
+| `LLMClient` | `ai_services.llm` | Multimodal LLM call (`extract(pdf_bytes, schema) → dict`). `GeminiClient` adapter over the Gemini SDK with response-schema enforcement. Model chosen via `GEMINI_MODEL` (default `gemini-3.5-flash`). |
 | `AssembleRequestSerializer` | `papers.serializers` | Declarative input contract for `POST /papers/assemble`. New fields accrete here. |
 | `useCoverageForm` | `frontend/hooks` | Owns the teacher's form state and builds the assemble payload. |
 
