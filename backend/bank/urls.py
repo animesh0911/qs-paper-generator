@@ -2,11 +2,10 @@
 
 from django.urls import path
 
-from .views import chapters, ingest, ingest_marking_scheme, metadata
+from .views import chapters, ingest, metadata
 
 urlpatterns = [
     path("metadata/", metadata),
     path("chapters/", chapters),
     path("ingest/", ingest),
-    path("ingest-marking-scheme/", ingest_marking_scheme),
 ]

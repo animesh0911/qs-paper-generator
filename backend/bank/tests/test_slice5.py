@@ -1,17 +1,44 @@
-"""Tests for Slice 5: de-duplication, numerical detection, marking scheme,
-admin actions."""
+"""Tests for ingestion enrichment: de-duplication, numerical detection, diagram
+flagging, source provenance — over the Gemini native-PDF Extractor seam."""
 
 from __future__ import annotations
 
 import pytest
 
-from bank.ingestor import (
-    Ingestor,
-    MarkingSchemeAnswerSource,
-    _detect_numerical,
-    _fingerprint,
-)
+from bank.ingestor import Ingestor, _detect_numerical, _fingerprint
 from bank.models import Question
+
+# ---------------------------------------------------------------------------
+# Test doubles
+# ---------------------------------------------------------------------------
+
+
+def _q(section="B", qtype="short_answer", marks=2, text="Q?", **extra):
+    base = {
+        "section": section,
+        "qtype": qtype,
+        "marks": marks,
+        "text": text,
+        "options": [],
+        "content": {},
+        "chapter_slug": None,
+        "cognitive_level": "U",
+        "topic_names": [],
+        "primary_form": "none",
+    }
+    base.update(extra)
+    return base
+
+
+class StubExtractor:
+    """Extractor adapter returning canned, already-tagged question dicts."""
+
+    def __init__(self, questions: list[dict]):
+        self._questions = questions
+
+    def extract(self, pdf_bytes: bytes) -> list[dict]:
+        return [dict(q) for q in self._questions]
+
 
 # ---------------------------------------------------------------------------
 # _detect_numerical
@@ -59,46 +86,22 @@ def test_fingerprint_different_texts_differ():
 # De-duplication — via Ingestor
 # ---------------------------------------------------------------------------
 
-_DEDUP_TEXT = """\
-SECTION B
-1. Define decomposition reaction and give one example.
-2. What is the function of the stomata in a leaf?
-"""
-
-
-class _StubParser:
-    def __init__(self, text):
-        self._text = text
-
-    def parse(self, b):
-        return self._text
-
-    def parse_pages(self, b):
-        return [self._text]
-
-
-class _StubTagger:
-    def tag(self, qs, chapters):
-        return [{**q, "chapter_slug": None, "cognitive_level": "U"} for q in qs]
-
-
-class _NullExtractor:
-    def extract(self, pdf_bytes, raw_questions):
-        return [None] * len(raw_questions)
+_DEDUP_QUESTIONS = [
+    _q(text="Define decomposition reaction and give one example."),
+    _q(text="What is the function of the stomata in a leaf?"),
+]
 
 
 @pytest.mark.django_db
 def test_ingestor_dedup_skips_existing_questions():
-    """Second ingest of identical text must not create duplicate rows."""
-    parser = _StubParser(_DEDUP_TEXT)
-    tagger = _StubTagger()
-    extractor = _NullExtractor()
+    """Second ingest of identical questions must not create duplicate rows."""
+    extractor = StubExtractor(_DEDUP_QUESTIONS)
 
-    r1 = Ingestor(parser=parser, tagger=tagger, extractor=extractor).ingest(b"x")
+    r1 = Ingestor(extractor=extractor).ingest(b"x")
     assert r1.created == 2
     assert r1.skipped_duplicates == 0
 
-    r2 = Ingestor(parser=parser, tagger=tagger, extractor=extractor).ingest(b"x")
+    r2 = Ingestor(extractor=extractor).ingest(b"x")
     assert r2.created == 0
     assert r2.skipped_duplicates == 2
     assert Question.objects.count() == 2
@@ -106,17 +109,13 @@ def test_ingestor_dedup_skips_existing_questions():
 
 @pytest.mark.django_db
 def test_ingestor_dedup_within_single_pdf():
-    """Repeated questions within one PDF must collapse to a single row."""
-    text = """\
-SECTION B
-1. Define decomposition reaction.
-2. Define decomposition reaction.
-3. What is the function of the stomata in a leaf?
-"""
-    parser = _StubParser(text)
-    r = Ingestor(
-        parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()
-    ).ingest(b"x")
+    """Repeated questions within one PDF collapse to a single row."""
+    questions = [
+        _q(text="Define decomposition reaction."),
+        _q(text="Define decomposition reaction."),
+        _q(text="What is the function of the stomata in a leaf?"),
+    ]
+    r = Ingestor(extractor=StubExtractor(questions)).ingest(b"x")
     assert r.created == 2
     assert r.skipped_duplicates == 1
     assert Question.objects.count() == 2
@@ -125,21 +124,12 @@ SECTION B
 @pytest.mark.django_db
 def test_ingestor_dedup_only_skips_exact_matches():
     """A slightly different question must NOT be skipped."""
-    text1 = """\
-SECTION B
-1. Define decomposition reaction and give one example.
-"""
-    text2 = """\
-SECTION B
-1. Define synthesis reaction and give one example.
-"""
-    extractor = _NullExtractor()
-    tagger = _StubTagger()
-
-    Ingestor(parser=_StubParser(text1), tagger=tagger, extractor=extractor).ingest(b"x")
-    r = Ingestor(parser=_StubParser(text2), tagger=tagger, extractor=extractor).ingest(
-        b"x"
-    )
+    Ingestor(
+        extractor=StubExtractor([_q(text="Define decomposition reaction.")])
+    ).ingest(b"x")
+    r = Ingestor(
+        extractor=StubExtractor([_q(text="Define synthesis reaction.")])
+    ).ingest(b"x")
     assert r.created == 1
     assert Question.objects.count() == 2
 
@@ -148,203 +138,59 @@ SECTION B
 # is_numerical flag on ingested questions
 # ---------------------------------------------------------------------------
 
-_NUMERICAL_TEXT = """\
-SECTION C
-1. A car accelerates from 0 to 20 m/s in 4 s. Calculate the acceleration.
-"""
 
-_NON_NUMERICAL_TEXT = """\
-SECTION C
-1. Describe the role of the liver in the digestive system.
-"""
+@pytest.mark.django_db
+def test_ingestor_flags_numerical_question():
+    Ingestor(
+        extractor=StubExtractor(
+            [_q(section="C", text="A car accelerates from 0 to 20 m/s in 4 s.")]
+        )
+    ).ingest(b"x")
+    assert Question.objects.get().is_numerical is True
 
 
 @pytest.mark.django_db
-def test_ingestor_flags_numerical_question(db):
-    extractor = _NullExtractor()
-    tagger = _StubTagger()
+def test_ingestor_does_not_flag_conceptual_question():
     Ingestor(
-        parser=_StubParser(_NUMERICAL_TEXT), tagger=tagger, extractor=extractor
+        extractor=StubExtractor(
+            [_q(section="C", text="Describe the role of the liver in digestion.")]
+        )
     ).ingest(b"x")
-    q = Question.objects.get()
-    assert q.is_numerical is True
-
-
-@pytest.mark.django_db
-def test_ingestor_does_not_flag_conceptual_question(db):
-    extractor = _NullExtractor()
-    tagger = _StubTagger()
-    Ingestor(
-        parser=_StubParser(_NON_NUMERICAL_TEXT), tagger=tagger, extractor=extractor
-    ).ingest(b"x")
-    q = Question.objects.get()
-    assert q.is_numerical is False
+    assert Question.objects.get().is_numerical is False
 
 
 # ---------------------------------------------------------------------------
-# Diagram keyword detection — moved from extractor to coordinator
+# Diagram keyword flagging — coordinator flags has_diagram from question text
 # ---------------------------------------------------------------------------
-
-_DIAGRAM_KEYWORD_TEXT = """\
-SECTION B
-1. Refer to the diagram below and label the parts. (Fig. 3)
-2. Define photosynthesis.
-"""
 
 
 @pytest.mark.django_db
-def test_ingestor_flags_diagram_keyword_question_via_text_only():
-    """Questions mentioning 'Fig.' get has_diagram=True even when no image is
-    extracted."""
-    parser = _StubParser(_DIAGRAM_KEYWORD_TEXT)
-    Ingestor(parser=parser, tagger=_StubTagger(), extractor=_NullExtractor()).ingest(
-        b"not-a-pdf"
-    )
+def test_ingestor_flags_diagram_keyword_question_via_text():
+    """A question mentioning 'Fig.' gets has_diagram=True from text alone."""
+    questions = [
+        _q(text="Refer to the diagram below and label the parts. (Fig. 3)"),
+        _q(text="Define photosynthesis."),
+    ]
+    Ingestor(extractor=StubExtractor(questions)).ingest(b"x")
     qs = Question.objects.order_by("id")
     assert qs[0].has_diagram is True  # mentions "Fig. 3"
     assert qs[1].has_diagram is False  # plain text
 
 
-# ---------------------------------------------------------------------------
-# AnswerSource — MarkingSchemeAnswerSource
-# ---------------------------------------------------------------------------
-
-
-def _fake_pdf(monkeypatch, text: str | None = None) -> None:
-    """Monkeypatch pdfplumber.open so MarkingSchemeAnswerSource sees `text`."""
-    import pdfplumber
-
-    class FakePage:
-        def extract_text(self):
-            return text
-
-    class FakePDF:
-        pages = [FakePage()] if text is not None else []
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            pass
-
-    monkeypatch.setattr(pdfplumber, "open", lambda *a, **kw: FakePDF())
-
-
-def test_marking_scheme_answer_source_extracts_answers(monkeypatch):
-    _fake_pdf(
-        monkeypatch,
-        text=(
-            "1. Oxygen (O2)\n"
-            "2. The SI unit of current is Ampere.\n"
-            "3. Decomposition is the breakdown of a compound into simpler substances.\n"
-        ),
-    )
-    scheme = MarkingSchemeAnswerSource().answers(b"fake")
-    assert scheme[1] == "Oxygen (O2)"
-    assert scheme[2] == "The SI unit of current is Ampere."
-    assert (
-        scheme[3]
-        == "Decomposition is the breakdown of a compound into simpler substances."
-    )
-
-
-def test_marking_scheme_answer_source_empty_pdf(monkeypatch):
-    _fake_pdf(monkeypatch, text=None)
-    assert MarkingSchemeAnswerSource().answers(b"fake") == {}
-
-
-# ---------------------------------------------------------------------------
-# Ingestor.apply_answers — coordinator method
-# ---------------------------------------------------------------------------
-
-
-class _StubAnswerSource:
-    def __init__(self, scheme: dict[int, str]):
-        self.scheme = scheme
-
-    def answers(self, pdf_bytes: bytes) -> dict[int, str]:
-        return self.scheme
-
-
 @pytest.mark.django_db
-def test_apply_answers_fills_unverified_rows_by_position():
-    """n-th answer in the scheme maps to the n-th unverified Question by id."""
-    q1 = Question.objects.create(
-        section="B",
-        qtype="very_short_answer",
-        marks=2,
-        text="Q1?",
-        verified=False,
-        answer="",
-    )
-    q2 = Question.objects.create(
-        section="B",
-        qtype="very_short_answer",
-        marks=2,
-        text="Q2?",
-        verified=False,
-        answer="",
-    )
-
-    ingestor = Ingestor(
-        parser=_StubParser(""),
-        tagger=_StubTagger(),
-        extractor=_NullExtractor(),
-        answer_source=_StubAnswerSource({1: "Answer one", 2: "Answer two"}),
-    )
-    assert ingestor.apply_answers(b"x") == 2
-
-    q1.refresh_from_db()
-    q2.refresh_from_db()
-    assert q1.answer == "Answer one"
-    assert q2.answer == "Answer two"
-
-
-@pytest.mark.django_db
-def test_apply_answers_skips_verified_questions():
-    """Verified questions are excluded from the candidate list, so they are
-    never overwritten."""
-    Question.objects.create(
-        section="B",
-        qtype="very_short_answer",
-        marks=2,
-        text="Verified?",
-        verified=True,
-        answer="correct",
-    )
-    ingestor = Ingestor(
-        parser=_StubParser(""),
-        tagger=_StubTagger(),
-        extractor=_NullExtractor(),
-        answer_source=_StubAnswerSource({1: "Wrong answer"}),
-    )
-    assert ingestor.apply_answers(b"x") == 0
+def test_ingestor_flags_diagram_from_primary_form():
+    """diagram_based primary_form reinforces has_diagram even without a keyword."""
+    Ingestor(
+        extractor=StubExtractor(
+            [_q(text="Identify the labelled structure.", primary_form="diagram_based")]
+        )
+    ).ingest(b"x")
+    assert Question.objects.get().has_diagram is True
 
 
 # ---------------------------------------------------------------------------
-# Source provenance + enrichment persistence (the formerly-dead seam)
+# Source provenance + enrichment persistence
 # ---------------------------------------------------------------------------
-
-_PROVENANCE_TEXT = """\
-SECTION B
-1. Define decomposition reaction and give one example.
-"""
-
-
-class _EnrichTagger:
-    """Tagger that emits the full documented output, incl. topic_names/primary_form."""
-
-    def tag(self, qs, chapters):
-        return [
-            {
-                **q,
-                "chapter_slug": None,
-                "cognitive_level": "U",
-                "topic_names": ["Decomposition"],
-                "primary_form": "diagram_based",
-            }
-            for q in qs
-        ]
 
 
 @pytest.mark.django_db
@@ -352,44 +198,38 @@ def test_ingest_records_source_provenance_from_filename():
     """Filename + source_type land on the row; source_name is the filename stem.
 
     Why this matters: CONTEXT promises ingest records provenance, and
-    PaperDocumentV1.source maps it. Before this, the fields were never written —
-    a doc that lied about behaviour. This pins the seam as live."""
-    ingestor = Ingestor(
-        parser=_StubParser(_PROVENANCE_TEXT),
-        tagger=_StubTagger(),
-        extractor=_NullExtractor(),
+    PaperDocumentV1.source maps it. source_page_number is a V2 deferral (the
+    Extractor does not track page offsets), so it stays null."""
+    Ingestor(extractor=StubExtractor([_q()])).ingest(
+        b"x", source_file_name="31-2-1.pdf", source_type="sample_paper"
     )
-    ingestor.ingest(b"x", source_file_name="31-2-1.pdf", source_type="sample_paper")
 
     q = Question.objects.get()
     assert q.source_file_name == "31-2-1.pdf"
     assert q.source_name == "31-2-1"  # filename stem
     assert q.source_type == "sample_paper"
-    # V2 deferral: per-question qnum stays blank, but page tracking is resolved.
-    assert q.source_page_number == 1
+    assert q.source_page_number is None
     assert q.source_original_qnum == ""
 
 
 @pytest.mark.django_db
 def test_ingest_defaults_source_type_when_omitted():
     """No source_type → previous_year_paper (the common case for a PYQ PDF)."""
-    Ingestor(
-        parser=_StubParser(_PROVENANCE_TEXT),
-        tagger=_StubTagger(),
-        extractor=_NullExtractor(),
-    ).ingest(b"x", source_file_name="boards-2025.pdf")
+    Ingestor(extractor=StubExtractor([_q()])).ingest(
+        b"x", source_file_name="boards-2025.pdf"
+    )
     assert Question.objects.get().source_type == "previous_year_paper"
 
 
 @pytest.mark.django_db
 def test_ingest_persists_topic_names_and_primary_form():
-    """Tagger enrichment reaches the DB; diagram_based reinforces has_diagram."""
+    """Extractor enrichment reaches the DB; diagram_based reinforces has_diagram."""
     Ingestor(
-        parser=_StubParser(_PROVENANCE_TEXT),
-        tagger=_EnrichTagger(),
-        extractor=_NullExtractor(),
+        extractor=StubExtractor(
+            [_q(topic_names=["Decomposition"], primary_form="diagram_based")]
+        )
     ).ingest(b"x")
     q = Question.objects.get()
     assert q.topic_names == ["Decomposition"]
     assert q.primary_form == "diagram_based"
-    assert q.has_diagram is True  # diagram_based primary_form flags it
+    assert q.has_diagram is True

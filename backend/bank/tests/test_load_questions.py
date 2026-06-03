@@ -1,9 +1,10 @@
 """Tests for the load_questions management command.
 
-The command is the no-key ingestion path: committed JSON → _verify → rows. These
-tests pin the behaviour issue #55 asks for — verifier-set parse_quality, source
-provenance, source_hash dedup on re-run, and one bad file not aborting the
-batch. Chapters are provided by migration 0003 under the django_db fixture.
+The command is the no-key ingestion path: committed JSON → structural
+parse_quality → rows. These tests pin the behaviour — coordinator-set
+parse_quality, source provenance, source_hash dedup on re-run, and one bad file
+not aborting the batch. Chapters are provided by migration 0003 under the
+django_db fixture.
 """
 
 from __future__ import annotations
@@ -16,9 +17,9 @@ from django.core.management import call_command
 
 from bank.models import Question
 
-# A well-formed two-question paper. Both texts (and the MCQ options) are present
-# in source_text in reading order, so _verify leaves their structural quality
-# intact: the 4-option MCQ stays clean, the short-answer stays clean.
+# A well-formed two-question paper. The 4-option MCQ and the non-empty short
+# answer both self-assess as clean via _compute_parse_quality. A legacy
+# source_text field is kept here only to prove the loader ignores it.
 _SOURCE_TEXT = """\
 SECTION A
 1. Which gas is released during photosynthesis?
@@ -93,10 +94,10 @@ def _payload(
 
 @pytest.mark.django_db
 def test_loads_directory_into_rows_with_quality_and_provenance(tmp_path):
-    """A fixture file → expected rows, verifier-set parse_quality, source object.
+    """A fixture file → expected rows, structural parse_quality, source object.
 
     Why this matters: this is the end-to-end proof the command wires JSON →
-    _verify → persist. If a step is dropped, parse_quality or provenance is
+    parse_quality → persist. If a step is dropped, parse_quality or provenance is
     wrong here.
     """
     _write_file(tmp_path, "31_1_1_Science.json", _payload(_MCQ, _SA))
@@ -107,7 +108,7 @@ def test_loads_directory_into_rows_with_quality_and_provenance(tmp_path):
     mcq = Question.objects.get(qtype="mcq")
     sa = Question.objects.get(qtype="short_answer")
 
-    # Verifier left both clean: faithful, in order, full structure.
+    # parse_quality set structurally: 4-option mcq + non-empty short answer.
     assert mcq.parse_quality == "clean"
     assert sa.parse_quality == "clean"
 
@@ -126,19 +127,21 @@ def test_loads_directory_into_rows_with_quality_and_provenance(tmp_path):
 
 
 @pytest.mark.django_db
-def test_verifier_marks_unfaithful_text_broken(tmp_path):
-    """A question whose text is absent from source_text is forced to broken.
+def test_parse_quality_is_structural_not_source_based(tmp_path):
+    """parse_quality is a structural self-assessment now (ADR-0004), not a
+    fidelity check against source text.
 
-    Why this matters: proves _verify actually runs in the loader (not a no-op).
-    If the source_text guardrail were skipped, this row would persist as clean.
+    Why this matters: proves the loader sets parse_quality from structure — an
+    mcq with no options is broken regardless of any text, while a well-formed
+    short answer is clean. There is no source-text verification pass anymore.
     """
-    fabricated = {**_SA, "text": "State Newton's third law of motion."}
-    _write_file(tmp_path, "paper.json", _payload(_MCQ, fabricated))
+    broken_mcq = {**_MCQ, "options": [], "content": {}}
+    _write_file(tmp_path, "paper.json", _payload(broken_mcq, _SA))
 
     call_command("load_questions", str(tmp_path))
 
-    bad = Question.objects.get(text="State Newton's third law of motion.")
-    assert bad.parse_quality == "broken"
+    assert Question.objects.get(qtype="mcq").parse_quality == "broken"
+    assert Question.objects.get(qtype="short_answer").parse_quality == "clean"
 
 
 @pytest.mark.django_db

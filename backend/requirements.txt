@@ -7,6 +7,5 @@ django-cors-headers>=4.3
 reportlab>=4.0
 pytest-django>=4.8
 factory-boy>=3.3
-pdfplumber>=0.11
 playwright>=1.52
-litellm>=1.83.7,<1.84
+google-genai>=1.0,<2.0
