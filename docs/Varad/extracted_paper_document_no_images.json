@@ -2407,13 +2407,7 @@
             "text": "In the given figure, identify the trophic level having maximum concentration of harmful chemicals."
           }
         ],
-        "passage": [
-          {
-            "type": "image",
-            "assetId": "asset_q_31_2_1_06_figure",
-            "caption": "Pyramid diagram representing trophic levels T1, T2, T3, T4, T5"
-          }
-        ],
+        "passage": [],
         "options": [
           {
             "label": "A",
@@ -2980,13 +2974,7 @@
             "text": "Complete the pathways given below, showing the breakdown of glucose. Identify 'A', 'B', 'C', 'D', 'E' and 'F'."
           }
         ],
-        "passage": [
-          {
-            "type": "image",
-            "assetId": "asset_q_31_2_1_13_flowchart",
-            "caption": "Flowchart representing Glucose (6-carbon molecule) breakdown into Pyruvate (3-carbon molecule) + Energy, followed by three pathways: Absence of oxygen (Yeast), Lack of oxygen (Muscle cells), Presence of oxygen (Mitochondria)"
-          }
-        ]
+        "passage": []
       },
       "metadata": {
         "classLevel": "10",
@@ -4769,11 +4757,6 @@
           }
         ],
         "passage": [
-          {
-            "type": "image",
-            "assetId": "asset_q_31_2_1_33_ray_diagram",
-            "caption": "Ray diagram showing refraction from Medium 1 to Medium 2 with angles of incidence 60° and refraction 45°"
-          },
           {
             "type": "equation",
             "text": "sqrt(3) = 1.732",
@@ -7735,31 +7718,5 @@
       }
     }
   ],
-  "assets": [
-    {
-      "id": "asset_q_31_2_1_06_figure",
-      "type": "image",
-      "url": "/assets/q_31_2_1_06_figure.png"
-    },
-    {
-      "id": "asset_q_31_2_1_13_flowchart",
-      "type": "image",
-      "url": "/assets/q_31_2_1_13_flowchart.png"
-    },
-    {
-      "id": "asset_q_31_2_1_28_chloralkali",
-      "type": "image",
-      "url": "/assets/q_31_2_1_28_chloralkali.png"
-    },
-    {
-      "id": "asset_q_31_2_1_33_ray_diagram",
-      "type": "image",
-      "url": "/assets/q_31_2_1_33_ray_diagram.png"
-    },
-    {
-      "id": "asset_q_31_2_1_39_magnetic_force",
-      "type": "image",
-      "url": "/assets/q_31_2_1_39_magnetic_force.png"
-    }
-  ]
+  "assets": []
 }

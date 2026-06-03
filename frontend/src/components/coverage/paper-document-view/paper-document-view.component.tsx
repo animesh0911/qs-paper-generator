@@ -375,9 +375,11 @@ function PrintOption({
   return (
     <li>
       <span>({option.label})</span>
-      <PaperContentItems
-        items={overrides[`option:${option.label}`] ?? option.content}
-      />
+      <div className="paper-option-body">
+        <PaperContentItems
+          items={overrides[`option:${option.label}`] ?? option.content}
+        />
+      </div>
     </li>
   );
 }
@@ -392,9 +394,11 @@ function PrintSubQuestion({
   return (
     <div className="paper-subquestion">
       <span>{subpart.label}.</span>
-      <PaperContentItems
-        items={overrides[`subquestion:${subpart.label}`] ?? subpart.content}
-      />
+      <div className="paper-subquestion-body">
+        <PaperContentItems
+          items={overrides[`subquestion:${subpart.label}`] ?? subpart.content}
+        />
+      </div>
       {subpart.marks && <b>{subpart.marks}</b>}
     </div>
   );

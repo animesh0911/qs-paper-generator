@@ -8,7 +8,11 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { mockPaperDocumentV1 } from '@/mocks';
-import { assertPaperDocument, normalizePaperDocument } from './paper-document';
+import {
+  assertPaperDocument,
+  normalizePaperDocument,
+  setSlotRegionOverride,
+} from './paper-document';
 import { openMockPrintDocument } from './editor-print';
 
 describe('editor print handoff', () => {
@@ -29,5 +33,26 @@ describe('editor print handoff', () => {
       `/editor/${document.paper.id}/print?mock=1`,
       '_blank',
     );
+  });
+
+  it('saves manual Slot edits into the print document', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const state = setSlotRegionOverride(
+      normalizePaperDocument(document),
+      'slot_A_01',
+      'stem',
+      [{ type: 'paragraph', text: 'Edited question for print.' }],
+    );
+    const saveDocument = vi.fn();
+
+    openMockPrintDocument(state, { saveDocument, openWindow: vi.fn() });
+
+    const savedDocument = saveDocument.mock.calls[0]?.[0];
+    expect(savedDocument.paper.sections[0].slots[0].overrides).toEqual({
+      modified: true,
+      regions: {
+        stem: [{ type: 'paragraph', text: 'Edited question for print.' }],
+      },
+    });
   });
 });

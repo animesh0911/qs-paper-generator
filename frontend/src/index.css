@@ -489,6 +489,11 @@
     break-inside: auto;
   }
 
+  .paper-section + .paper-section {
+    break-before: page;
+    page-break-before: always;
+  }
+
   .paper-section-header {
     margin: 18pt 0 13pt;
     text-align: center;
@@ -574,6 +579,11 @@
     display: grid;
     grid-template-columns: 28pt 1fr;
     gap: 7pt;
+  }
+
+  .paper-option-body,
+  .paper-subquestion-body {
+    min-width: 0;
   }
 
   .paper-subquestion {

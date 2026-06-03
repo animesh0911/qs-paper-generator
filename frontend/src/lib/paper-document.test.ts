@@ -131,6 +131,14 @@ describe('PaperDocumentV1 normalization', () => {
         stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
       },
     });
+    expect(
+      editedState.document.paper.sections[0].slots[0].overrides,
+    ).toEqual({
+      modified: true,
+      regions: {
+        stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
+      },
+    });
     expect(editedState.questionsById.q_mcq_heredity_001).toBe(
       state.questionsById.q_mcq_heredity_001,
     );

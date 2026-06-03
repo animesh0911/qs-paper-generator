@@ -471,9 +471,15 @@ function questionToAlternativeView(
 }
 
 export function blockNoteBlocksToContentItems(blocks: Block[]): ContentItem[] {
-  return blockNoteBlocksToText(blocks)
-    .filter((text) => text.length > 0)
-    .map((text) => ({ type: 'paragraph', text }));
+  return blocks.flatMap((block): ContentItem[] => {
+    if (block.type === 'table') {
+      const rows = blockNoteTableRows(block.content);
+      return rows.length > 0 ? [{ type: 'table', rows }] : [];
+    }
+
+    const text = blockContentToText(block.content);
+    return text.length > 0 ? [{ type: 'paragraph', text }] : [];
+  });
 }
 
 export function blockNoteBlocksToText(blocks: Block[]): string[] {
@@ -787,6 +793,54 @@ function blockContentToText(content: unknown): string {
       return '';
     })
     .filter(Boolean)
+    .join('');
+}
+
+function blockNoteTableRows(content: unknown): string[][] {
+  if (
+    !content ||
+    typeof content !== 'object' ||
+    !('type' in content) ||
+    content.type !== 'tableContent' ||
+    !('rows' in content) ||
+    !Array.isArray(content.rows)
+  ) {
+    return [];
+  }
+
+  return content.rows
+    .map((row) => {
+      if (
+        !row ||
+        typeof row !== 'object' ||
+        !('cells' in row) ||
+        !Array.isArray(row.cells)
+      ) {
+        return [];
+      }
+
+      return row.cells.map(cellToText);
+    })
+    .filter((row) => row.length > 0);
+}
+
+function cellToText(cell: unknown): string {
+  if (typeof cell === 'string') return cell;
+  if (!Array.isArray(cell)) return '';
+
+  return cell
+    .map((item) => {
+      if (typeof item === 'string') return item;
+      if (
+        item &&
+        typeof item === 'object' &&
+        'text' in item &&
+        typeof item.text === 'string'
+      ) {
+        return item.text;
+      }
+      return '';
+    })
     .join('');
 }
 

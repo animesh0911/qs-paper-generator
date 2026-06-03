@@ -8,6 +8,7 @@
  * @module editorPaperTests
  */
 import { describe, expect, it } from 'vitest';
+import type { Block } from '@blocknote/core';
 import { mockPaperDocumentV1 } from '@/mocks';
 import {
   assertPaperDocument,
@@ -16,7 +17,10 @@ import {
   setSlotSelectedQuestion,
   setSlotRegionOverride,
 } from './paper-document';
-import { buildEditorPaperView } from './editor-paper';
+import {
+  blockNoteBlocksToContentItems,
+  buildEditorPaperView,
+} from './editor-paper';
 
 describe('editor paper view model', () => {
   it('loads the mocked PaperDocumentV1 into a CBSE paper canvas model', () => {
@@ -263,6 +267,36 @@ describe('editor paper view model', () => {
             { cells: ['V (V)', '1.2', '2.4'] },
           ],
         },
+      },
+    ]);
+  });
+
+  it('preserves BlockNote table blocks when committing edited regions', () => {
+    const blocks = [
+      {
+        type: 'paragraph',
+        content: 'Use the observations below.',
+      },
+      {
+        type: 'table',
+        content: {
+          type: 'tableContent',
+          rows: [
+            { cells: ['I (A)', '0.4', '0.8'] },
+            { cells: ['V (V)', '1.2', '2.4'] },
+          ],
+        },
+      },
+    ] as unknown as Block[];
+
+    expect(blockNoteBlocksToContentItems(blocks)).toEqual([
+      { type: 'paragraph', text: 'Use the observations below.' },
+      {
+        type: 'table',
+        rows: [
+          ['I (A)', '0.4', '0.8'],
+          ['V (V)', '1.2', '2.4'],
+        ],
       },
     ]);
   });

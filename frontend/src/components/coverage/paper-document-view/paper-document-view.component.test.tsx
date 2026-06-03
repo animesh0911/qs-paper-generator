@@ -77,4 +77,44 @@ describe('PaperDocumentView', () => {
     expect(html).toContain('<td>I (A)</td>');
     expect(html).toContain('<td>2.4</td>');
   });
+
+  it('keeps table content inside option and subquestion grid body cells', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const slot = document.paper.sections[0].slots[0];
+    const question = document.questions.find(
+      (candidate) => candidate.id === slot.selectedQuestionId,
+    );
+
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    question.content.options = [
+      {
+        label: 'A',
+        content: [
+          { type: 'paragraph', text: 'Use the option table.' },
+          { type: 'table', rows: [['Metal', 'Reaction']] },
+        ],
+      },
+    ];
+    question.content.subparts = [
+      {
+        label: 'a',
+        marks: 1,
+        content: [
+          { type: 'paragraph', text: 'Use the subquestion table.' },
+          { type: 'table', rows: [['I (A)', '0.4']] },
+        ],
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('class="paper-option-body"');
+    expect(html).toContain('class="paper-subquestion-body"');
+    expect(html).toContain('<td>Metal</td>');
+    expect(html).toContain('<td>I (A)</td>');
+  });
 });

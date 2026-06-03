@@ -30,6 +30,13 @@ describe('editor CSS contracts', () => {
     expect(questionActionRailSource).toContain('absolute');
     expect(questionActionRailSource).toContain('right-[calc(100%+0.5rem)]');
   });
+
+  it('starts each print section after the first on a fresh PDF page', () => {
+    const sectionBreakRule = cssRule('.paper-section + .paper-section');
+
+    expect(sectionBreakRule).toMatch(/\bbreak-before\s*:\s*page\b/);
+    expect(sectionBreakRule).toMatch(/\bpage-break-before\s*:\s*always\b/);
+  });
 });
 
 function cssRule(selector: string) {

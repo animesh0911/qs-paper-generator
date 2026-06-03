@@ -142,21 +142,43 @@ export function setSlotRegionOverride(
   regionKey: string,
   content: ContentItem[],
 ): NormalizedPaperDocument {
+  if (!state.slotsById[slotId]) return state;
+
   const currentEdits = state.slotEditsById[slotId] ?? {
     modified: false,
     regions: {},
+  };
+  const nextOverrides = {
+    modified: true,
+    regions: {
+      ...currentEdits.regions,
+      [regionKey]: content,
+    },
   };
 
   return {
     ...state,
     slotEditsById: {
       ...state.slotEditsById,
+      [slotId]: nextOverrides,
+    },
+    slotsById: {
+      ...state.slotsById,
       [slotId]: {
-        modified: true,
-        regions: {
-          ...currentEdits.regions,
-          [regionKey]: content,
-        },
+        ...state.slotsById[slotId],
+        overrides: nextOverrides,
+      },
+    },
+    document: {
+      ...state.document,
+      paper: {
+        ...state.document.paper,
+        sections: state.document.paper.sections.map((section) => ({
+          ...section,
+          slots: section.slots.map((slot) =>
+            slot.id === slotId ? { ...slot, overrides: nextOverrides } : slot,
+          ),
+        })),
       },
     },
   };

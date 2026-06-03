@@ -43,8 +43,9 @@ import {
   RotateCcw,
   Save,
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
-import { mockPaperDocumentV1 } from '@/mocks';
+import { resolveEditorFixture } from '@/mocks';
 import { buildEditorPaperView } from '@/lib/editor-paper';
 import { openMockPrintDocument } from '@/lib/editor-print';
 import {
@@ -97,7 +98,15 @@ function toRoman(value: number) {
 }
 
 export default function EditorPage() {
-  const document = useMemo(() => assertPaperDocument(mockPaperDocumentV1), []);
+  const [searchParams] = useSearchParams();
+  const selectedFixture = useMemo(
+    () => resolveEditorFixture(searchParams.get('fixture')),
+    [searchParams],
+  );
+  const document = useMemo(
+    () => assertPaperDocument(selectedFixture.paper),
+    [selectedFixture],
+  );
   const initialPaperState = useMemo(
     () => normalizePaperDocument(document),
     [document],
@@ -189,6 +198,16 @@ export default function EditorPage() {
     : undefined;
 
   useEffect(() => {
+    setPaperState(initialPaperState);
+    setUndoEntry(null);
+    setSelectedSlotId(null);
+    setActiveRailSlotId(null);
+    setSelectedChromeBlockId(null);
+    setInspectorMode('info');
+    setAlternativesOverlayOpen(false);
+  }, [initialPaperState, selectedFixture.id]);
+
+  useEffect(() => {
     function handleOutsidePointerDown(event: PointerEvent) {
       const target = event.target;
       if (!(target instanceof Element)) return;
@@ -198,6 +217,9 @@ export default function EditorPage() {
         )
       ) {
         return;
+      }
+      if (window.document.activeElement instanceof HTMLElement) {
+        window.document.activeElement.blur();
       }
       setActiveRailSlotId(null);
       setSelectedSlotId(null);

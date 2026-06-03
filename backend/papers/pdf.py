@@ -52,17 +52,12 @@ def _render_browser_pdf(print_url: str) -> bytes:
         return pdf
 
 
-def _blocks_text(blocks: list) -> str:
-    """Join a region's ContentItem blocks into a single display string."""
-    return " ".join(b.get("text", "") for b in blocks if b.get("text")).strip()
-
-
 def _render_reportlab_pdf(document: dict) -> bytes:
     """Fallback PDF renderer for non-browser environments."""
     paper = document["paper"]
     title = paper["title"]
     total_marks = paper["totalMarks"]
-    questions_by_id = {q["questionId"]: q for q in document.get("questions", [])}
+    questions_by_id = {_question_id(q): q for q in document.get("questions", [])}
 
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -99,7 +94,7 @@ def _render_reportlab_pdf(document: dict) -> bytes:
             qid = slot.get("selectedQuestionId")
             question = questions_by_id.get(qid) if qid else None
             marks = slot["marks"]
-            number = slot["displayNumber"]
+            number = _slot_number(slot)
             if question is None:
                 mark_label = f"{marks} mark{'s' if marks != 1 else ''}"
                 story.append(
@@ -114,10 +109,14 @@ def _render_reportlab_pdf(document: dict) -> bytes:
             # makes them canonical, so they win over the stored question content
             # region-by-region (v1_contract.md §7/§9).
             regions = (slot.get("overrides") or {}).get("regions") or {}
-            stem_text = _blocks_text(regions["stem"]) if "stem" in regions else None
+            stem_text = _content_text(
+                regions.get("stem")
+                or question.get("content", {}).get("stem")
+                or [{"text": question["rawText"]}]
+            )
             story.append(
                 Paragraph(
-                    f"<b>Q{number}.</b> {stem_text or question['rawText']} "
+                    f"<b>Q{number}.</b> {stem_text} "
                     f"<i>({marks} mark{'s' if marks != 1 else ''})</i>",
                     q_style,
                 )
@@ -131,7 +130,8 @@ def _render_reportlab_pdf(document: dict) -> bytes:
                 opts = [
                     ListItem(
                         Paragraph(
-                            f"({opt['label']}) {opt['content'][0]['text']}", q_style
+                            f"({opt['label']}) {_option_text(opt, regions)}",
+                            q_style,
                         )
                     )
                     for opt in options
@@ -150,3 +150,25 @@ def _render_reportlab_pdf(document: dict) -> bytes:
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
+
+
+def _question_id(question: dict) -> str:
+    """Return the question id across current and legacy document keys."""
+    return question.get("id") or question["questionId"]
+
+
+def _slot_number(slot: dict) -> str:
+    """Return the slot display number across current and legacy document keys."""
+    return slot.get("number") or slot["displayNumber"]
+
+
+def _content_text(items: list[dict]) -> str:
+    """Flatten paragraph-style ContentItem arrays for the fallback renderer."""
+    return " ".join(str(item.get("text", "")) for item in items).strip()
+
+
+def _option_text(option: dict, overrides: dict) -> str:
+    """Return option text, preferring Slot overrides."""
+    return _content_text(
+        overrides.get(f"option:{option['label']}") or option["content"]
+    )
