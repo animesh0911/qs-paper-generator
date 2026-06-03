@@ -323,11 +323,17 @@ def test_crop_figure_returns_png_for_in_range_box():
 
     Why this matters: the crop must fail soft so a bad box degrades to the
     image_placeholder instead of crashing the whole ingest batch (ADR-0004)."""
-    pdf = _one_page_pdf()
-    png = _crop_figure(pdf, 1, [0.1, 0.1, 0.5, 0.5])
-    assert png is not None
-    assert png[:8] == b"\x89PNG\r\n\x1a\n"  # PNG magic — a real raster, not whole page
-    assert _crop_figure(pdf, 99, [0.1, 0.1, 0.5, 0.5]) is None
+    import fitz
+
+    doc = fitz.open(stream=_one_page_pdf(), filetype="pdf")
+    try:
+        png = _crop_figure(doc, 1, [0.1, 0.1, 0.5, 0.5])
+        assert png is not None
+        # PNG magic — a real raster, not the whole page.
+        assert png[:8] == b"\x89PNG\r\n\x1a\n"
+        assert _crop_figure(doc, 99, [0.1, 0.1, 0.5, 0.5]) is None
+    finally:
+        doc.close()
 
 
 @pytest.mark.django_db
@@ -393,6 +399,35 @@ def test_ingestor_attaches_option_level_crop_to_right_option(settings, tmp_path)
     assert opt_b["content"][0]["assetId"]
     # Option A had no figure → its placeholder is untouched.
     assert opt_a["content"][0]["type"] == "image_placeholder"
+
+
+@pytest.mark.django_db
+def test_ingestor_matches_option_label_case_insensitively(settings, tmp_path):
+    """A figure label "b" still attaches to option "B".
+
+    Why this matters: figure and option labels come from the model but their
+    casing can drift; a strict match would silently strand the crop and leave the
+    placeholder, hiding the diagram from the assembled paper."""
+    settings.MEDIA_ROOT = str(tmp_path)
+    q = _q(
+        section="A",
+        qtype="mcq",
+        text="Which circuit is correct?",
+        options=[{"label": "B", "text": ""}],
+        content={
+            "options": [
+                {"label": "B", "content": [{"type": "image_placeholder", "text": "B"}]},
+            ],
+        },
+        figures=[
+            {"page": 1, "bbox": [0.1, 0.1, 0.4, 0.4], "region": "options", "label": "b"}
+        ],
+    )
+    Ingestor(extractor=StubExtractor([q])).ingest(_one_page_pdf())
+
+    opt_b = Question.objects.get().content["options"][0]
+    assert opt_b["content"][0]["type"] == "image"
+    assert opt_b["content"][0]["assetId"]
 
 
 @pytest.mark.django_db

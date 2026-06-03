@@ -448,29 +448,40 @@ class GeminiExtractor:
 # ---------------------------------------------------------------------------
 
 
+def _open_pdf(pdf_bytes: bytes):
+    """Open PDF bytes as a PyMuPDF document, or ``None`` if unparseable.
+
+    Opened once per batch so the stream is parsed a single time rather than once
+    per figure. Returns ``None`` on failure so every figure soft-misses and the
+    placeholders stay (ADR-0004).
+    """
+    import fitz
+
+    try:
+        return fitz.open(stream=pdf_bytes, filetype="pdf")
+    except Exception:  # noqa: BLE001 — any parse failure is a soft miss
+        return None
+
+
 def _crop_figure(
-    pdf_bytes: bytes,
+    doc,
     page_1based: int,
     bbox_norm: list[float],
     *,
     dpi: int = 300,
     pad: float = 0.01,
 ) -> bytes | None:
-    """Crop one figure box from a PDF page to PNG bytes via PyMuPDF.
+    """Crop one figure box from an open PDF ``doc`` to PNG bytes via PyMuPDF.
 
     ``bbox_norm`` is ``[x0, y0, x1, y1]`` normalized to ``[0, 1]`` with the page
     top-left as origin (the extractor's convention). The box is padded slightly
     to avoid clipping diagram borders, mapped to page points, and rendered at
-    ``dpi``. Returns ``None`` on any failure (unparseable PDF, out-of-range page,
-    empty clip) so the caller keeps the question's ``image_placeholder`` — bad
+    ``dpi``. Returns ``None`` on any failure (out-of-range page, empty clip,
+    render error) so the caller keeps the question's ``image_placeholder`` — bad
     crops are caught at human review, not by code (ADR-0004).
     """
     import fitz
 
-    try:
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-    except Exception:  # noqa: BLE001 — any parse failure is a soft miss
-        return None
     try:
         idx = page_1based - 1
         if idx < 0 or idx >= doc.page_count:
@@ -495,8 +506,6 @@ def _crop_figure(
         return pix.tobytes("png")
     except Exception:  # noqa: BLE001 — a render failure degrades to placeholder
         return None
-    finally:
-        doc.close()
 
 
 def _place_image_item(content: dict, figure: dict, image_item: dict) -> None:
@@ -517,13 +526,18 @@ def _place_image_item(content: dict, figure: dict, image_item: dict) -> None:
         _upgrade_or_append(items, image_item)
         return
 
-    # Labelled region: find the matching option/subpart entry.
+    # Labelled region: find the matching option/subpart entry. Compare labels
+    # case/space-insensitively so "a" matches an "A" option (the model is asked
+    # for verbatim labels, but casing can drift across the figure vs the option).
     entries = content.get(region)
     if not isinstance(entries, list):
         return
-    label = figure.get("label")
+    label = (figure.get("label") or "").strip().casefold()
     for entry in entries:
-        if isinstance(entry, dict) and entry.get("label") == label:
+        if (
+            isinstance(entry, dict)
+            and (entry.get("label") or "").strip().casefold() == label
+        ):
             items = entry.get("content")
             if not isinstance(items, list):
                 items = []
@@ -557,29 +571,35 @@ def _apply_figures(
     from django.core.files.base import ContentFile
     from django.core.files.storage import default_storage
 
-    primary_assets: list[str | None] = []
-    for q, fp in zip(rows, fingerprints):
-        figures = q.get("figures", [])
-        content = q.get("content") or {}
-        primary: str | None = None
-        crop_index = 0
-        for figure in figures:
-            png = _crop_figure(pdf_bytes, figure["page"], figure["bbox"])
-            if png is None:
-                continue
-            asset_id = default_storage.save(
-                f"diagrams/{fp[:8]}-{crop_index}.png", ContentFile(png)
-            )
-            crop_index += 1
-            image_item = {"type": "image", "assetId": asset_id}
-            if figure.get("caption"):
-                image_item["caption"] = figure["caption"]
-            _place_image_item(content, figure, image_item)
-            if primary is None:
-                primary = asset_id
-        q["content"] = content
-        primary_assets.append(primary)
-    return primary_assets
+    # Parse the PDF once for the whole batch, not once per figure.
+    doc = _open_pdf(pdf_bytes)
+    try:
+        primary_assets: list[str | None] = []
+        for q, fp in zip(rows, fingerprints):
+            figures = q.get("figures", []) if doc is not None else []
+            content = q.get("content") or {}
+            primary: str | None = None
+            crop_index = 0
+            for figure in figures:
+                png = _crop_figure(doc, figure["page"], figure["bbox"])
+                if png is None:
+                    continue
+                asset_id = default_storage.save(
+                    f"diagrams/{fp[:8]}-{crop_index}.png", ContentFile(png)
+                )
+                crop_index += 1
+                image_item = {"type": "image", "assetId": asset_id}
+                if figure.get("caption"):
+                    image_item["caption"] = figure["caption"]
+                _place_image_item(content, figure, image_item)
+                if primary is None:
+                    primary = asset_id
+            q["content"] = content
+            primary_assets.append(primary)
+        return primary_assets
+    finally:
+        if doc is not None:
+            doc.close()
 
 
 def _content_has_figure(content: dict) -> bool:
