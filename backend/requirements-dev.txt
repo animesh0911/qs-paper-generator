@@ -1,5 +1,5 @@
-# Dev-only tooling (linters/formatters). Installed into the dev image so
-# `docker compose exec web ruff/black ...` works without an ad-hoc pip install.
-# Config lives in pyproject.toml ([tool.ruff], [tool.black]).
+# Dev-only tooling (linters/formatters). Installed into the image (Dockerfile)
+# so `docker compose exec web ruff/black ...` works without an ad-hoc pip
+# install. Config lives in pyproject.toml ([tool.ruff], [tool.black]).
 ruff>=0.6,<1.0
 black>=24.0,<26.0

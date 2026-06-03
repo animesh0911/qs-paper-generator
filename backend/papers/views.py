@@ -80,8 +80,7 @@ class PaperApproveView(APIView):
                 {"error": "Paper is already approved."},
                 status=status.HTTP_409_CONFLICT,
             )
-        paper.status = PaperStatus.APPROVED
-        paper.save(update_fields=["status"])
+        paper.approve()
         return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
 
 

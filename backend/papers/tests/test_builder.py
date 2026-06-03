@@ -6,9 +6,8 @@ tests still pass or fail loudly.
 """
 
 from collections import Counter
-from io import BytesIO
 
-import pdfplumber
+import fitz
 import pytest
 from rest_framework import status
 
@@ -134,6 +133,34 @@ def test_approve_locks_paper(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
+def test_approve_marks_referenced_questions_verified(api_client, seeded_bank):
+    """Approving a paper flips ``verified=True`` on its selected questions (ADR-0002).
+
+    Why this matters: ``verified`` is the only signal that a human vetted a
+    question in a real paper. If approve doesn't write it, the flag CONTEXT.md and
+    ADR-0002 promise stays permanently false and analytics built on it are blind."""
+    from bank.models import Question
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    document = create.data
+    paper_pk = document["paper"]["id"].removeprefix("paper_")
+    selected_pks = {
+        int(slot["selectedQuestionId"].removeprefix("q_"))
+        for section in document["paper"]["sections"]
+        for slot in section["slots"]
+        if slot.get("selectedQuestionId")
+    }
+    assert selected_pks  # the seeded bank fills at least one slot
+    # Arrange the unverified pre-state explicitly (seed rows ship verified=True).
+    Question.objects.filter(pk__in=selected_pks).update(verified=False)
+
+    api_client.post(f"/api/papers/{paper_pk}/approve/")
+
+    # Every selected question is flipped; none left unverified.
+    assert not Question.objects.filter(pk__in=selected_pks, verified=False).exists()
+
+
+@pytest.mark.django_db
 def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["id"].removeprefix("paper_")
@@ -168,8 +195,8 @@ def test_paper_pdf_endpoint_uses_saved_document_edits(
 
     pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
 
-    with pdfplumber.open(BytesIO(pdf.content)) as rendered:
-        text = "\n".join(page.extract_text() or "" for page in rendered.pages)
+    with fitz.open(stream=pdf.content, filetype="pdf") as rendered:
+        text = "\n".join(page.get_text() for page in rendered)
     assert "Edited slot text for the saved draft" in text
 
 
