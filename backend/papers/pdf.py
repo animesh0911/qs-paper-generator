@@ -23,6 +23,8 @@ from reportlab.platypus import (
     Spacer,
 )
 
+from bank.content import flatten_text
+
 logger = logging.getLogger(__name__)
 
 
@@ -109,7 +111,7 @@ def _render_reportlab_pdf(document: dict) -> bytes:
             # makes them canonical, so they win over the stored question content
             # region-by-region (v1_contract.md §7/§9).
             regions = (slot.get("overrides") or {}).get("regions") or {}
-            stem_text = _content_text(
+            stem_text = flatten_text(
                 regions.get("stem")
                 or question.get("content", {}).get("stem")
                 or [{"text": question["rawText"]}]
@@ -162,13 +164,6 @@ def _slot_number(slot: dict) -> str:
     return slot.get("number") or slot["displayNumber"]
 
 
-def _content_text(items: list[dict]) -> str:
-    """Flatten paragraph-style ContentItem arrays for the fallback renderer."""
-    return " ".join(str(item.get("text", "")) for item in items).strip()
-
-
 def _option_text(option: dict, overrides: dict) -> str:
     """Return option text, preferring Slot overrides."""
-    return _content_text(
-        overrides.get(f"option:{option['label']}") or option["content"]
-    )
+    return flatten_text(overrides.get(f"option:{option['label']}") or option["content"])

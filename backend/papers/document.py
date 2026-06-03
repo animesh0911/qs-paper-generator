@@ -8,7 +8,9 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 
+from bank import content as content_mod
 from bank.models import Question
+from bank.question_shape import fallback_regions
 
 from .models import Paper
 from .picker import FilledTemplate, PaperOptions
@@ -302,19 +304,18 @@ class PaperDocumentBuilder:
         if q.content:
             return q.content
 
-        if q.qtype == "mcq":
-            content: dict = {
-                "stem": [{"type": "paragraph", "text": q.text}],
-                "options": [
-                    {
-                        "label": opt.get("label", ""),
-                        "content": [{"type": "paragraph", "text": opt.get("text", "")}],
-                    }
-                    for opt in (q.options or [])
-                ],
-            }
-        else:
-            content = {"stem": [{"type": "paragraph", "text": q.text}]}
+        # Which regions to synthesise comes from the QuestionShape spec, so the
+        # fallback can't drift from the qtype's real structure (see CONTEXT.md).
+        regions = fallback_regions(q.qtype)
+        content: dict = {"stem": [{"type": "paragraph", "text": q.text}]}
+        if "options" in regions:
+            content["options"] = [
+                {
+                    "label": opt.get("label", ""),
+                    "content": [{"type": "paragraph", "text": opt.get("text", "")}],
+                }
+                for opt in (q.options or [])
+            ]
 
         self._apply_diagram_fallback(q, content)
         return content
@@ -348,7 +349,7 @@ class PaperDocumentBuilder:
                 q.cognitive_level, "understand"
             ),
             "requiresDiagram": q.has_diagram,
-            "requiresTable": _contains_table(q.content),
+            "requiresTable": content_mod.has_item(q.content, "table"),
         }
         if q.chapter and q.chapter.subject_area:
             meta["subjectArea"] = q.chapter.subject_area
@@ -372,19 +373,3 @@ class PaperDocumentBuilder:
         if q.source_original_qnum:
             source["originalQuestionNumber"] = q.source_original_qnum
         return source
-
-
-def _contains_table(node) -> bool:
-    """True if any table content item is reachable inside the content tree.
-
-    Walks the region-keyed content (and nested option/subpart/choice content)
-    looking for a ``{"type": "table"}`` item, so metadata.requiresTable reflects
-    the actual structured content rather than a separate flag.
-    """
-    if isinstance(node, dict):
-        if node.get("type") == "table":
-            return True
-        return any(_contains_table(v) for v in node.values())
-    if isinstance(node, list):
-        return any(_contains_table(item) for item in node)
-    return False
