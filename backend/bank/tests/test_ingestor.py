@@ -15,7 +15,9 @@ import pytest
 from bank.ingestor import (
     GeminiExtractor,
     Ingestor,
+    _coerce_figures,
     _compute_parse_quality,
+    _crop_figure,
     _parse_source_filename,
 )
 from bank.models import Chapter, Question
@@ -297,3 +299,181 @@ def test_parse_source_filename_no_year_in_parent():
     result = _parse_source_filename(Path("uploads/31_1_1_Science.pdf"))
     assert result["source_type"] == "previous_year_paper"
     assert result["source_name"] == "31-1-1 Science"
+
+
+# ---------------------------------------------------------------------------
+# Figure crops as assets (#77)
+# ---------------------------------------------------------------------------
+
+
+def _one_page_pdf() -> bytes:
+    """A real 1-page PDF with a drawn rectangle, so cropping has pixels to grab."""
+    import fitz
+
+    doc = fitz.open()
+    page = doc.new_page()  # default A4
+    page.draw_rect(fitz.Rect(60, 60, 300, 300), fill=(0, 0, 0))
+    pdf_bytes = doc.tobytes()
+    doc.close()
+    return pdf_bytes
+
+
+def test_crop_figure_returns_png_for_in_range_box():
+    """A valid page+box yields PNG bytes; an out-of-range page yields None.
+
+    Why this matters: the crop must fail soft so a bad box degrades to the
+    image_placeholder instead of crashing the whole ingest batch (ADR-0004)."""
+    pdf = _one_page_pdf()
+    png = _crop_figure(pdf, 1, [0.1, 0.1, 0.5, 0.5])
+    assert png is not None
+    assert png[:8] == b"\x89PNG\r\n\x1a\n"  # PNG magic — a real raster, not whole page
+    assert _crop_figure(pdf, 99, [0.1, 0.1, 0.5, 0.5]) is None
+
+
+@pytest.mark.django_db
+def test_ingestor_crops_figure_and_references_asset(settings, tmp_path):
+    """A boxed stem diagram persists a crop and is referenced by assetId, no URL.
+
+    Why this matters: contract §9 forbids inline image URLs — the frontend
+    resolves assetId to served media. If the loader emitted a `url` or skipped the
+    crop, structured rendering of diagram questions would break."""
+    settings.MEDIA_ROOT = str(tmp_path)
+    q = _q(
+        section="C",
+        qtype="short_answer",
+        text="Draw the magnetic field lines around a bar magnet.",
+        content={
+            "stem": [
+                {"type": "paragraph", "text": "Draw the field lines."},
+                {"type": "image_placeholder", "text": "Bar magnet field."},
+            ]
+        },
+        figures=[{"page": 1, "bbox": [0.1, 0.1, 0.5, 0.5], "region": "stem"}],
+    )
+    Ingestor(extractor=StubExtractor([q])).ingest(_one_page_pdf())
+
+    row = Question.objects.get()
+    assert row.diagram  # FileField points at the primary crop
+    assert row.has_diagram is True
+    items = row.content["stem"]
+    image_items = [it for it in items if it["type"] == "image"]
+    assert len(image_items) == 1
+    assert image_items[0]["assetId"]
+    assert "url" not in image_items[0]
+    # Placeholder was upgraded in place, not left alongside the image.
+    assert not any(it["type"] == "image_placeholder" for it in items)
+
+
+@pytest.mark.django_db
+def test_ingestor_attaches_option_level_crop_to_right_option(settings, tmp_path):
+    """An option-scoped figure lands inside that option's content, not the stem."""
+    settings.MEDIA_ROOT = str(tmp_path)
+    q = _q(
+        section="A",
+        qtype="mcq",
+        text="Which circuit is correct?",
+        options=[{"label": "A", "text": ""}, {"label": "B", "text": ""}],
+        content={
+            "stem": [{"type": "paragraph", "text": "Which circuit is correct?"}],
+            "options": [
+                {"label": "A", "content": [{"type": "image_placeholder", "text": "A"}]},
+                {"label": "B", "content": [{"type": "image_placeholder", "text": "B"}]},
+            ],
+        },
+        figures=[
+            {"page": 1, "bbox": [0.1, 0.1, 0.4, 0.4], "region": "options", "label": "B"}
+        ],
+    )
+    Ingestor(extractor=StubExtractor([q])).ingest(_one_page_pdf())
+
+    row = Question.objects.get()
+    opt_b = next(o for o in row.content["options"] if o["label"] == "B")
+    opt_a = next(o for o in row.content["options"] if o["label"] == "A")
+    assert opt_b["content"][0]["type"] == "image"
+    assert opt_b["content"][0]["assetId"]
+    # Option A had no figure → its placeholder is untouched.
+    assert opt_a["content"][0]["type"] == "image_placeholder"
+
+
+@pytest.mark.django_db
+def test_ingestor_unboxable_diagram_keeps_placeholder_and_flags_has_diagram(
+    settings, tmp_path
+):
+    """No figure box → placeholder stays and has_diagram is still True.
+
+    Why this matters: a diagram the model could not localise must still be flagged
+    so the reviewer knows a crop is missing — silently dropping has_diagram would
+    hide it."""
+    settings.MEDIA_ROOT = str(tmp_path)
+    q = _q(
+        section="C",
+        qtype="short_answer",
+        text="Describe the experiment.",
+        content={"stem": [{"type": "image_placeholder", "text": "Apparatus diagram."}]},
+        primary_form="diagram_based",
+        figures=[],
+    )
+    Ingestor(extractor=StubExtractor([q])).ingest(_one_page_pdf())
+
+    row = Question.objects.get()
+    assert not row.diagram
+    assert row.has_diagram is True
+    assert row.content["stem"][0]["type"] == "image_placeholder"
+
+
+@pytest.mark.django_db
+def test_ingestor_bad_box_degrades_to_placeholder(settings, tmp_path):
+    """An out-of-range page box fails soft: placeholder stays, no crop, no crash."""
+    settings.MEDIA_ROOT = str(tmp_path)
+    q = _q(
+        section="C",
+        qtype="short_answer",
+        text="Draw the ray diagram.",
+        content={"stem": [{"type": "image_placeholder", "text": "Ray diagram."}]},
+        figures=[{"page": 99, "bbox": [0.1, 0.1, 0.5, 0.5], "region": "stem"}],
+    )
+    Ingestor(extractor=StubExtractor([q])).ingest(_one_page_pdf())
+
+    row = Question.objects.get()
+    assert not row.diagram
+    assert row.content["stem"][0]["type"] == "image_placeholder"
+    assert row.has_diagram is True  # placeholder still present
+
+
+def test_coerce_figures_drops_malformed_entries():
+    """Only well-formed boxes survive; bad page/bbox/region are dropped silently."""
+    figures = _coerce_figures(
+        [
+            {"page": 1, "bbox": [0.1, 0.1, 0.5, 0.5], "region": "stem"},  # keep
+            {"page": 0, "bbox": [0.1, 0.1, 0.5, 0.5], "region": "stem"},  # page < 1
+            {"page": 1, "bbox": [0.1, 0.1, 0.5], "region": "stem"},  # bbox len != 4
+            {"page": 1, "bbox": [0.5, 0.5, 0.1, 0.1], "region": "stem"},  # x0>=x1
+            {"page": 1, "bbox": [0.1, 0.1, 0.5, 0.5], "region": "nope"},  # bad region
+            {"page": 1, "bbox": [0.1, 0.1, 0.5, 0.5]},  # missing region
+            "not-a-dict",
+        ]
+    )
+    assert figures == [{"page": 1, "bbox": [0.1, 0.1, 0.5, 0.5], "region": "stem"}]
+
+
+def test_coerce_figures_clamps_and_keeps_label_caption():
+    figures = _coerce_figures(
+        [
+            {
+                "page": 2,
+                "bbox": [-0.2, 0.0, 1.5, 0.6],  # clamps to [0, 0, 1, 0.6]
+                "region": "options",
+                "label": " B ",
+                "caption": " Circuit ",
+            }
+        ]
+    )
+    assert figures == [
+        {
+            "page": 2,
+            "bbox": [0.0, 0.0, 1.0, 0.6],
+            "region": "options",
+            "label": "B",
+            "caption": "Circuit",
+        }
+    ]
