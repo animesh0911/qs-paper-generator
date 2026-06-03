@@ -24,7 +24,7 @@ def test_extract_sends_pdf_prompt_schema_and_parses_json():
 
     schema = {"type": "OBJECT"}
     client = GeminiClient(
-        model="gemini-2.5-pro", generate_func=fake_generate, timeout=12
+        model="gemini-3.5-flash", generate_func=fake_generate, timeout=12
     )
 
     result = client.extract(b"%PDF-bytes", "extract section A", schema)
@@ -32,23 +32,23 @@ def test_extract_sends_pdf_prompt_schema_and_parses_json():
     assert result == {"questions": [{"section": "A", "rawText": "Q?"}]}
     assert len(calls) == 1
     call = calls[0]
-    assert call["model"] == "gemini-2.5-pro"
+    assert call["model"] == "gemini-3.5-flash"
     assert call["pdf_bytes"] == b"%PDF-bytes"
     assert call["prompt"] == "extract section A"
     assert call["response_schema"] is schema
     assert call["timeout"] == 12
 
 
-def test_model_defaults_to_gemini_pro(monkeypatch):
+def test_model_defaults_to_gemini_3_5_flash(monkeypatch):
     monkeypatch.delenv("GEMINI_MODEL", raising=False)
     client = GeminiClient(generate_func=lambda **kw: "{}")
-    assert client.model == "gemini-2.5-pro"
+    assert client.model == "gemini-3.5-flash"
 
 
 def test_model_from_env(monkeypatch):
-    monkeypatch.setenv("GEMINI_MODEL", "gemini-2.5-flash")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-3.1-pro-preview")
     client = GeminiClient(generate_func=lambda **kw: "{}")
-    assert client.model == "gemini-2.5-flash"
+    assert client.model == "gemini-3.1-pro-preview"
 
 
 def test_make_llm_client_returns_gemini_client():

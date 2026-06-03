@@ -1,7 +1,7 @@
 # Gemini native-PDF ingestion (supersedes ADR-0003)
 
 Bank ingestion sends the **source PDF directly** to a multimodal LLM (Gemini,
-`gemini-2.5-pro`) which returns structured questions conforming to the
+default `gemini-3.5-flash`) which returns structured questions conforming to the
 `paper_document.v1` question shape (contract §8–10) via a provider-enforced
 response schema. There is no intermediate text-extraction step: `pdfplumber`,
 the regex segmenter, the regex shape-detectors (assertion-reason / case-based /
@@ -29,9 +29,11 @@ A native multimodal call is simpler (one model, one pass, no text-extraction
 library, no regex), reads scanned and born-digital pages uniformly, handles the
 bilingual two-column instruction tables that broke naive left-to-right OCR, and
 keeps equations/tables intact. Ingestion is an **offline, one-time-per-year
-batch over ~51 papers**, so latency and per-call cost are irrelevant and Pro's
-accuracy is worth more than Flash's speed (`GEMINI_MODEL` makes that a one-env
-downgrade).
+batch over ~51 papers**, so latency and per-call cost are secondary to accuracy.
+The default is `gemini-3.5-flash` — newest-generation and near-pro accuracy at
+flash speed/cost, a strong fit for this batch. `GEMINI_MODEL` is a one-env switch
+to a pro tier (`gemini-3.1-pro-preview` now, `gemini-3.5-pro` once GA) if review
+shows the flash tier dropping or misreading too much.
 
 ## What replaces the deleted guardrail
 
