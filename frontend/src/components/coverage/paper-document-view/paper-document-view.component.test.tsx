@@ -60,6 +60,67 @@ describe('PaperDocumentView', () => {
     );
   });
 
+  it('uses format layout rules for MCQ options and right-column marks', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    document.format.layout.mcqOptions = 'two_column';
+    document.format.layout.marks = 'right_column';
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('paper-options paper-options-two-column');
+    expect(html).toContain('class="paper-marks">1</span>');
+    expect(html).not.toContain('class="paper-inline-marks"');
+  });
+
+  it('renders CBSE masthead chrome and one right-column mark per slot', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    document.paper.chromeBlocks = document.paper.chromeBlocks?.map((block) => {
+      if (block.role === 'series') return { ...block, text: 'SERIES-X' };
+      if (block.role === 'set') return { ...block, text: 'SET-9' };
+      if (block.role === 'paper_code') return { ...block, text: '99/9/9' };
+      if (block.role === 'subject_label') return { ...block, text: 'SCIENCE' };
+      if (block.role === 'paper_meta_left') {
+        return { ...block, text: 'Time allowed : 2 hours' };
+      }
+      if (block.role === 'paper_meta_right') {
+        return { ...block, text: 'Maximum Marks : 40' };
+      }
+      return block;
+    });
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+    const slotCount = document.paper.sections.reduce(
+      (total, section) => total + section.slots.length,
+      0,
+    );
+
+    expect(html).toContain('Series : SERIES-X');
+    expect(html).toContain('SET-9');
+    expect(html).toContain('99/9/9');
+    expect(html).toContain('SCIENCE');
+    expect(html).toContain('Roll No.');
+    expect(html).toContain('class="paper-roll-blank"');
+    expect(html).toContain('Time allowed : 2 hours');
+    expect(html).toContain('Maximum Marks : 40');
+    expect(html.match(/class="paper-marks"/g)).toHaveLength(slotCount);
+  });
+
+  it('can render marks inline when the format does not request a right column', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    document.format.layout.marks = 'inline';
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('class="paper-inline-marks">(1 mark)</span>');
+    expect(html).not.toContain('class="paper-marks">1</span>');
+  });
+
   it('renders structured content tables as paper tables', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const slot = document.paper.sections[0].slots[0];

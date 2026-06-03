@@ -530,6 +530,10 @@
     line-height: 1.3;
   }
 
+  .paper-question-inline-marks {
+    grid-template-columns: 26pt minmax(0, 1fr);
+  }
+
   .paper-question-number {
     font-weight: 700;
   }
@@ -559,6 +563,13 @@
   .paper-marks {
     justify-self: end;
     padding-top: 0.15em;
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .paper-inline-marks {
+    display: inline-block;
+    margin-left: 4pt;
     font-style: italic;
     font-weight: 700;
   }

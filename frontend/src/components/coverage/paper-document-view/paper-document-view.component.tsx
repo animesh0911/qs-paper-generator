@@ -87,6 +87,7 @@ export function PaperDocumentView({
                     key={slot.id}
                     slot={slot}
                     question={question}
+                    marksPlacement={paper.format.layout.marks}
                     mcqLayout={paper.format.layout.mcqOptions}
                   />
                 ))}
@@ -300,26 +301,49 @@ function PrintInstructionBlocks({ paper }: { paper: PaperDocument }) {
 function PrintQuestion({
   slot,
   question,
+  marksPlacement,
   mcqLayout,
 }: {
   slot: DocSlot;
   question: DocQuestion | null;
+  marksPlacement: string;
   mcqLayout: string;
 }) {
+  const useRightColumnMarks = marksPlacement === 'right_column';
+
   if (!question) {
     return (
-      <li className="paper-question">
+      <li
+        className={
+          useRightColumnMarks
+            ? 'paper-question'
+            : 'paper-question paper-question-inline-marks'
+        }
+      >
         <span className="paper-question-number">{slot.number}.</span>
         <div className="paper-question-body paper-unfilled">
           No question selected.
+          {!useRightColumnMarks && (
+            <span className="paper-inline-marks">
+              ({marksLabel(slot.marks)})
+            </span>
+          )}
         </div>
-        <span className="paper-marks">{slot.marks}</span>
+        {useRightColumnMarks && (
+          <span className="paper-marks">{slot.marks}</span>
+        )}
       </li>
     );
   }
 
   return (
-    <li className="paper-question">
+    <li
+      className={
+        useRightColumnMarks
+          ? 'paper-question'
+          : 'paper-question paper-question-inline-marks'
+      }
+    >
       <span className="paper-question-number">{slot.number}.</span>
       <div className="paper-question-body">
         <QuestionContent
@@ -327,8 +351,11 @@ function PrintQuestion({
           slot={slot}
           mcqLayout={mcqLayout}
         />
+        {!useRightColumnMarks && (
+          <span className="paper-inline-marks">({marksLabel(slot.marks)})</span>
+        )}
       </div>
-      <span className="paper-marks">{slot.marks}</span>
+      {useRightColumnMarks && <span className="paper-marks">{slot.marks}</span>}
     </li>
   );
 }
@@ -523,4 +550,8 @@ function toRoman(value: number) {
     'X',
   ];
   return numerals[value - 1] ?? String(value);
+}
+
+function marksLabel(marks: number) {
+  return `${marks} mark${marks === 1 ? '' : 's'}`;
 }
