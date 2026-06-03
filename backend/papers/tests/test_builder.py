@@ -73,7 +73,7 @@ def test_assemble_endpoint_returns_document(api_client, seeded_bank):
 @pytest.mark.django_db
 def test_document_slots_reference_questions_array(api_client, seeded_bank):
     resp = api_client.post("/api/papers/assemble", {}, format="json")
-    question_ids = {q["questionId"] for q in resp.data["questions"]}
+    question_ids = {q["id"] for q in resp.data["questions"]}
     for section in resp.data["paper"]["sections"]:
         for slot in section["slots"]:
             if slot["selectedQuestionId"] is not None:
@@ -83,7 +83,7 @@ def test_document_slots_reference_questions_array(api_client, seeded_bank):
 @pytest.mark.django_db
 def test_paper_detail_returns_stored_document(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     detail = api_client.get(f"/api/papers/{paper_pk}/")
     assert detail.status_code == status.HTTP_200_OK
     assert detail.data["schemaVersion"] == "paper_document.v1"
@@ -92,7 +92,7 @@ def test_paper_detail_returns_stored_document(api_client, seeded_bank):
 @pytest.mark.django_db
 def test_patch_saves_edited_document(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     edited_doc = dict(create.data)
     edited_doc["paper"] = dict(edited_doc["paper"])
     edited_doc["paper"]["title"] = "Edited Title"
@@ -109,7 +109,7 @@ def test_patch_saves_edited_document(api_client, seeded_bank):
 @pytest.mark.django_db
 def test_patch_rejected_wrong_schema(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     bad_doc = {"schemaVersion": "wrong.v1"}
     resp = api_client.patch(
         f"/api/papers/{paper_pk}/", {"document": bad_doc}, format="json"
@@ -120,7 +120,7 @@ def test_patch_rejected_wrong_schema(api_client, seeded_bank):
 @pytest.mark.django_db
 def test_approve_locks_paper(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     approve = api_client.post(f"/api/papers/{paper_pk}/approve/")
     assert approve.status_code == status.HTTP_200_OK
     assert approve.data["status"] == "approved"
@@ -136,7 +136,7 @@ def test_approve_locks_paper(api_client, seeded_bank):
 @pytest.mark.django_db
 def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
     assert pdf.status_code == status.HTTP_200_OK
     assert pdf["Content-Type"] == "application/pdf"
@@ -150,10 +150,16 @@ def test_paper_pdf_endpoint_uses_saved_document_edits(
     """PDF download must render the edited PaperDocumentV1, not bank text."""
     settings.PAPER_PRINT_BASE_URL = ""
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     edited_doc = dict(create.data)
     edited_doc["questions"] = [dict(q) for q in edited_doc["questions"]]
-    edited_doc["questions"][0]["rawText"] = "Edited slot text for the saved draft"
+    # Edit the canonical render path: the renderer prefers content.stem over
+    # rawText, so an edit must land in the structured region to reach the PDF.
+    edited_question = edited_doc["questions"][0]
+    edited_question["content"] = {
+        **edited_question["content"],
+        "stem": [{"type": "paragraph", "text": "Edited slot text for the saved draft"}],
+    }
     api_client.patch(
         f"/api/papers/{paper_pk}/",
         {"document": edited_doc},
@@ -174,7 +180,7 @@ def test_paper_pdf_endpoint_targets_print_route_with_auth_token(
     """Browser PDF rendering goes through the React print route for parity."""
     settings.PAPER_PRINT_BASE_URL = "http://frontend:5173"
     create = api_client.post("/api/papers/assemble", {}, format="json")
-    paper_pk = create.data["paper"]["paperId"].removeprefix("paper_")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     calls = []
 
     def fake_render(document, print_url=None):

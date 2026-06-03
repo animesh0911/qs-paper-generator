@@ -6,7 +6,7 @@ defined in contracts/v1_contract.md. No DB writes; all IDs are derived.
 
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 from bank.models import Question
 
@@ -41,6 +41,15 @@ _QUESTION_DIFFICULTY_BY_COG: dict[str, str] = {
     "An": "hard",
 }
 
+# metadata.cognitiveLevel: the contract spells the Bloom level out; the bank
+# stores the CBSE shorthand (R/U/Ap/An). One-way mapping for the document only.
+_COGNITIVE_LEVEL_BY_COG: dict[str, str] = {
+    "R": "remember",
+    "U": "understand",
+    "Ap": "apply",
+    "An": "analyse",
+}
+
 
 class PaperDocumentBuilder:
     """Builds PaperDocumentV1 dict from internal domain objects."""
@@ -61,7 +70,7 @@ class PaperDocumentBuilder:
             "request": self._build_request(paper, inp, preset.exam_type),
             "template": self._build_template(paper, preset),
             "format": self._build_format(),
-            "paper": self._build_paper(paper, result),
+            "paper": self._build_paper(paper, result, questions_by_pk),
             "questions": [self._build_question(q) for q in questions_by_pk.values()],
         }
 
@@ -86,7 +95,7 @@ class PaperDocumentBuilder:
 
     def _build_request(self, paper: Paper, inp: PaperOptions, exam_type: str) -> dict:
         return {
-            "requestId": f"req_{paper.pk}",
+            "id": f"req_{paper.pk}",
             "language": "en",
             "classLevel": "10",
             "subject": "Science",
@@ -99,34 +108,31 @@ class PaperDocumentBuilder:
         }
 
     def _build_format(self) -> dict:
+        # Contract §3: format.id selects the frontend renderer; page/layout carry
+        # the compact CBSE board geometry and semantic layout roles only.
         return {
-            "formatId": "cbse_science_class_10_v1",
-            "page": {"size": "A4", "orientation": "portrait"},
-            "paperChrome": {
-                "showOuterBorder": True,
-                "sectionStyle": "boxed",
-                "marksPlacement": "right",
+            "id": "cbse_science_class_10_board_compact_2026_v1",
+            "page": {
+                "size": "CBSE_COMPACT",
+                "orientation": "portrait",
+                "widthPt": 523.44,
+                "heightPt": 693.36,
+                "marginPt": {"top": 28, "right": 36, "bottom": 34, "left": 36},
             },
-            "numbering": {
-                "scope": "paper",
-                "style": "decimal",
-                "recomputeOnSectionReorder": True,
+            "layout": {
+                "marks": "right_column",
+                "questionNumbers": "left_column",
+                "mcqOptions": "two_column",
+                "instructions": "note_table_then_general",
+                "masthead": "cbse_compact",
+                "footer": "code_page_pto",
             },
-            "sections": {
-                "allowQuestionReorderWithinSection": True,
-                "allowCrossSectionMove": False,
-            },
-            "questionRegions": {
-                "allowRegionReorder": False,
-                "allowRegionDelete": False,
-            },
-            "mcqOptions": {"layout": "vertical"},
         }
 
     def _build_template(self, paper: Paper, preset) -> dict:
         return {
-            "templateId": f"cbse_science_class_10_{preset.name}_v1",
-            "templateName": preset.template_name,
+            "id": f"cbse_science_class_10_{preset.name}_v1",
+            "name": preset.template_name,
             "board": "CBSE",
             "classLevel": "10",
             "subject": "Science",
@@ -136,38 +142,55 @@ class PaperDocumentBuilder:
             "language": "en",
         }
 
-    def _build_paper(self, paper: Paper, result: FilledTemplate) -> dict:
+    def _build_paper(
+        self,
+        paper: Paper,
+        result: FilledTemplate,
+        questions_by_pk: dict[int, Question],
+    ) -> dict:
         duration = result.template.preset.duration_minutes
         return {
-            "paperId": f"paper_{paper.pk}",
+            "id": f"paper_{paper.pk}",
             "title": paper.title,
             "subtitle": "Class X",
             "totalMarks": paper.total_marks,
             "durationMinutes": duration,
             "language": "en",
-            "headerBlocks": [
+            # Chrome = visible paper text keyed by CBSE role (contract §5).
+            "chromeBlocks": [
+                {"id": "subject_label", "role": "subject_label", "text": paper.title},
                 {
-                    "blockId": "header_001",
-                    "blockType": "paper_header",
-                    "text": f"{paper.title} — Class X",
-                    "editable": True,
-                }
+                    "id": "paper_meta_left",
+                    "role": "paper_meta_left",
+                    "text": f"Time allowed: {duration // 60} hours",
+                },
+                {
+                    "id": "paper_meta_right",
+                    "role": "paper_meta_right",
+                    "text": f"Maximum Marks: {paper.total_marks}",
+                },
+                {"id": "roll_number", "role": "roll_number", "text": "Roll No."},
             ],
             "instructionBlocks": [
                 {
-                    "blockId": "instruction_001",
-                    "blockType": "instruction",
-                    "text": (
-                        f"Maximum Marks: {paper.total_marks}. "
-                        f"Time allowed: {duration // 60} hours."
-                    ),
-                    "editable": True,
-                }
+                    "id": "general_instructions_heading",
+                    "role": "general_instructions_heading",
+                    "text": "General Instructions:",
+                },
+                {
+                    "id": "general_instruction_1",
+                    "role": "general_instruction",
+                    "text": "All questions are compulsory.",
+                },
             ],
-            "sections": self._build_sections(result),
+            "sections": self._build_sections(result, questions_by_pk),
         }
 
-    def _build_sections(self, result: FilledTemplate) -> list[dict]:
+    def _build_sections(
+        self,
+        result: FilledTemplate,
+        questions_by_pk: dict[int, Question],
+    ) -> list[dict]:
         # Group slots by section, preserving PaperTemplate order.
         section_entries: dict[str, list[tuple[Slot, int | None, list[int]]]] = (
             defaultdict(list)
@@ -197,37 +220,70 @@ class PaperDocumentBuilder:
             slots_data = []
             for local_idx, (slot, qid, alts) in enumerate(entries, start=1):
                 slot_data: dict = {
-                    "slotId": f"slot_{section_key}_{local_idx:02d}",
-                    "displayNumber": str(display_counter),
+                    "id": f"slot_{section_key}_{local_idx:02d}",
+                    "number": str(display_counter),
                     "marks": slot.marks,
-                    "questionType": slot.qtype,
+                    "type": slot.qtype,
                     "selectedQuestionId": f"q_{qid}" if qid is not None else None,
                     "alternateQuestionIds": [f"q_{aid}" for aid in alts],
                     "locked": False,
+                    "can": {
+                        "editText": True,
+                        "editMarks": True,
+                        "swap": True,
+                        "lock": True,
+                        "reorder": True,
+                    },
+                    "overrides": {"modified": False, "regions": {}},
                 }
                 if slot.or_group is not None:
                     slot_data["orGroup"] = slot.or_group
                 slots_data.append(slot_data)
                 display_counter += 1
 
-            sections.append(
-                {
-                    "sectionId": section_key,
-                    "title": _SECTION_TITLE[section_key],
-                    "marks": section_marks,
-                    "instructions": _SECTION_INSTRUCTIONS[section_key],
-                    "slots": slots_data,
-                }
+            section: dict = {
+                "id": section_key,
+                "title": _SECTION_TITLE[section_key],
+                "marks": section_marks,
+                "instructions": _SECTION_INSTRUCTIONS[section_key],
+                "slots": slots_data,
+            }
+            subtitle = self._section_subtitle(
+                [qid for _, qid, _ in entries], questions_by_pk
             )
+            if subtitle:
+                section["subtitle"] = subtitle
+            sections.append(section)
 
         return sections
 
+    def _section_subtitle(
+        self,
+        qids: list[int | None],
+        questions_by_pk: dict[int, Question],
+    ) -> str | None:
+        """Subtitle from the section's majority subject_area, else None.
+
+        A subtitle is only emitted when one subject_area holds a strict majority
+        of the section's tagged questions; mixed sections stay untitled (no
+        hardcoded "Class X"). See contract §6.
+        """
+        areas = []
+        for qid in qids:
+            question = questions_by_pk.get(qid) if qid is not None else None
+            if question and question.chapter and question.chapter.subject_area:
+                areas.append(question.chapter.subject_area)
+        if not areas:
+            return None
+        area, count = Counter(areas).most_common(1)[0]
+        return area if count * 2 > len(areas) else None
+
     def _build_question(self, q: Question) -> dict:
         return {
-            "questionId": f"q_{q.pk}",
+            "id": f"q_{q.pk}",
             "language": "en",
-            "marks": q.marks,
-            "questionType": q.qtype,
+            "defaultMarks": q.marks,
+            "type": q.qtype,
             "rawText": q.text,
             "content": self._build_content(q),
             "metadata": self._build_metadata(q),
@@ -235,8 +291,19 @@ class PaperDocumentBuilder:
         }
 
     def _build_content(self, q: Question) -> dict:
+        """Return the question's structured content, region-keyed (contract §9).
+
+        Ingested rows carry the full region map verbatim (stem/options/
+        assertion/reason/passage/subparts/choices and any embedded image items),
+        so it is passed through untouched — contract §10, source content
+        preserved. Seed/back-compat rows with empty content fall back to a
+        text-only stem, with diagram items synthesised from the bank flags.
+        """
+        if q.content:
+            return q.content
+
         if q.qtype == "mcq":
-            return {
+            content: dict = {
                 "stem": [{"type": "paragraph", "text": q.text}],
                 "options": [
                     {
@@ -246,16 +313,46 @@ class PaperDocumentBuilder:
                     for opt in (q.options or [])
                 ],
             }
-        return {"stem": [{"type": "paragraph", "text": q.text}]}
+        else:
+            content = {"stem": [{"type": "paragraph", "text": q.text}]}
+
+        self._apply_diagram_fallback(q, content)
+        return content
+
+    def _apply_diagram_fallback(self, q: Question, content: dict) -> None:
+        """Append a diagram item to the stem for rows without structured content.
+
+        A cropped file resolves to an ``image`` item referencing the asset by
+        storage name (``assetId``; no inline URL, contract §9). ``has_diagram``
+        with no file yields an ``image_placeholder`` so the gap is visible.
+        """
+        stem = content.setdefault("stem", [])
+        if q.diagram:
+            stem.append({"type": "image", "assetId": q.diagram.name})
+        elif q.has_diagram:
+            stem.append(
+                {
+                    "type": "image_placeholder",
+                    "text": "Diagram present in source PDF, extraction pending.",
+                }
+            )
 
     def _build_metadata(self, q: Question) -> dict:
-        return {
+        meta: dict = {
             "classLevel": "10",
             "subject": "Science",
             "chapterNames": [q.chapter.name] if q.chapter else [],
             "topicNames": list(q.topic_names or []),
             "difficulty": _QUESTION_DIFFICULTY_BY_COG.get(q.cognitive_level, "medium"),
+            "cognitiveLevel": _COGNITIVE_LEVEL_BY_COG.get(
+                q.cognitive_level, "understand"
+            ),
+            "requiresDiagram": q.has_diagram,
+            "requiresTable": _contains_table(q.content),
         }
+        if q.chapter and q.chapter.subject_area:
+            meta["subjectArea"] = q.chapter.subject_area
+        return meta
 
     def _build_source(self, q: Question) -> dict:
         """Map a Question's provenance fields to the contract source object.
@@ -265,8 +362,8 @@ class PaperDocumentBuilder:
         (fileName/pageNumber/originalQuestionNumber) are emitted only when set.
         """
         source: dict = {
-            "sourceType": q.source_type or "question_bank",
-            "sourceName": q.source_name or "School Science Question Bank",
+            "type": q.source_type or "question_bank",
+            "name": q.source_name or "School Science Question Bank",
         }
         if q.source_file_name:
             source["fileName"] = q.source_file_name
@@ -275,3 +372,19 @@ class PaperDocumentBuilder:
         if q.source_original_qnum:
             source["originalQuestionNumber"] = q.source_original_qnum
         return source
+
+
+def _contains_table(node) -> bool:
+    """True if any table content item is reachable inside the content tree.
+
+    Walks the region-keyed content (and nested option/subpart/choice content)
+    looking for a ``{"type": "table"}`` item, so metadata.requiresTable reflects
+    the actual structured content rather than a separate flag.
+    """
+    if isinstance(node, dict):
+        if node.get("type") == "table":
+            return True
+        return any(_contains_table(v) for v in node.values())
+    if isinstance(node, list):
+        return any(_contains_table(item) for item in node)
+    return False
