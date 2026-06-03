@@ -151,7 +151,7 @@ class PaperDocumentBuilder:
         questions_by_pk: dict[int, Question],
     ) -> dict:
         duration = result.template.preset.duration_minutes
-        return {
+        paper_doc: dict = {
             "id": f"paper_{paper.pk}",
             "title": paper.title,
             "subtitle": "Class X",
@@ -187,6 +187,31 @@ class PaperDocumentBuilder:
             ],
             "sections": self._build_sections(result, questions_by_pk),
         }
+        branding = self._build_branding(paper)
+        if branding is not None:
+            # Optional additive field (contract §1): school identity, distinct
+            # from the CBSE masthead. Omitted entirely when the school carries
+            # no branding so no empty placeholder object ships.
+            paper_doc["branding"] = branding
+        return paper_doc
+
+    def _build_branding(self, paper: Paper) -> dict | None:
+        """School identity (name/logo/exam header) from ``School.settings``.
+
+        Branding lives on the ``School`` row, not in code, so a school rebrands
+        by editing its settings JSON. Returns None when the paper has no school
+        or the school configures no branding. Only set keys are emitted.
+        """
+        school = paper.school
+        if school is None:
+            return None
+        configured = (school.settings or {}).get("branding") or {}
+        branding = {
+            key: configured[key]
+            for key in ("schoolName", "logoUrl", "examHeader")
+            if configured.get(key)
+        }
+        return branding or None
 
     def _build_sections(
         self,

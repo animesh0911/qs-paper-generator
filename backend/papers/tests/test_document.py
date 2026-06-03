@@ -8,6 +8,8 @@ test that couldn't fail when the question changed. Now they must reflect it.
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 from bank.models import Chapter, Question
@@ -217,3 +219,48 @@ def test_build_content_emits_placeholder_when_diagram_pending():
     )
     content = PaperDocumentBuilder()._build_content(q)
     assert any(item.get("type") == "image_placeholder" for item in content["stem"])
+
+
+def _paper_with_settings(settings: dict | None):
+    """A Paper stand-in carrying a School with the given settings (no DB)."""
+    school = None if settings is None else SimpleNamespace(settings=settings)
+    return SimpleNamespace(school=school)
+
+
+def test_build_branding_reads_school_settings():
+    """Branding is driven by the School row, so a school rebrands without code.
+
+    Pins that name/logo/header come straight from settings JSON — a regression
+    to a hardcoded school identity would fail here.
+    """
+    paper = _paper_with_settings(
+        {
+            "branding": {
+                "schoolName": "Greenwood High School",
+                "logoUrl": "https://cdn.example.com/logo.png",
+                "examHeader": "Half-Yearly Examination 2026",
+            }
+        }
+    )
+    branding = PaperDocumentBuilder()._build_branding(paper)
+    assert branding == {
+        "schoolName": "Greenwood High School",
+        "logoUrl": "https://cdn.example.com/logo.png",
+        "examHeader": "Half-Yearly Examination 2026",
+    }
+
+
+def test_build_branding_emits_only_set_keys():
+    """Unset branding keys are dropped, not emitted blank (contract §1)."""
+    paper = _paper_with_settings({"branding": {"schoolName": "Greenwood High"}})
+    assert PaperDocumentBuilder()._build_branding(paper) == {
+        "schoolName": "Greenwood High"
+    }
+
+
+def test_build_branding_none_without_school_or_config():
+    """No school, or a school with no branding, yields None (block omitted)."""
+    builder = PaperDocumentBuilder()
+    assert builder._build_branding(_paper_with_settings(None)) is None
+    assert builder._build_branding(_paper_with_settings({})) is None
+    assert builder._build_branding(_paper_with_settings({"branding": {}})) is None
