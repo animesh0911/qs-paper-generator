@@ -1,25 +1,23 @@
 """load_questions — deterministic, no-key ingestion from committed JSON.
 
 The no-API-key ingestion entry point. Where the LLM pipeline (``Ingestor``)
-parses a PDF and tags it at runtime via the LLM seams, this command loads
-question dicts that were already parsed (``RegexSegmenter``) and tagged offline,
-then reviewed and committed to ``content/parsed/``. It runs the *same*
-guardrails and persistence as the LLM path, so both produce identical row
-shapes (see #54).
+sends a PDF to Gemini and tags it at runtime, this command loads question dicts
+that were extracted, tagged, reviewed, and committed to ``content/parsed/``
+offline. It runs the *same* persistence as the LLM path, so both produce
+identical row shapes (see #54).
 
 Each input file is one source PDF's worth of questions::
 
     {
       "source_pdf": "science_2024/31_1_1_Science.pdf",
-      "source_text": "<cleaned paper text, the strip_hindi blob>",
       "questions": [ {section, qtype, marks, text, options, content,
                       chapter_slug, cognitive_level, topic_names,
-                      primary_form}, ... ]
+                      primary_form, parse_quality?}, ... ]
     }
 
-``source_text`` is the cleaned paper blob the questions were segmented from. It
-travels in the file so ``_verify`` can do real fidelity/coverage/order work
-against the genuine paper — not a reconstruction. ``source_pdf`` feeds
+``parse_quality`` is set here from the question's structure via
+``_compute_parse_quality`` (no source-text verification pass — ADR-0004). A
+legacy ``source_text`` field, if present, is ignored. ``source_pdf`` feeds
 ``_parse_source_filename`` for provenance (year from the parent dir name).
 
 Run as ``python manage.py load_questions content/parsed/``. Idempotent: rows are
@@ -37,10 +35,10 @@ from django.core.management.base import BaseCommand, CommandError
 
 from bank.ingestor import (
     Ingestor,
+    _compute_parse_quality,
     _fingerprint,
     _parse_source_filename,
     _Provenance,
-    _verify,
 )
 from bank.models import Chapter, Question
 
@@ -94,24 +92,24 @@ class Command(BaseCommand):
     def _load_file(path: Path, chapter_by_slug: dict[str, Chapter]) -> tuple[int, int]:
         """Load one committed JSON file into Question rows. Returns (created, skipped).
 
-        Mirrors ``Ingestor.ingest`` from ``_verify`` onward: the parse and tag
-        steps already happened offline, so this picks up the reviewed dicts and
-        runs verification → dedup → persist. Files are processed one at a time
-        and persisted before the next, so cross-file duplicates are caught via
-        the DB ``source_hash`` lookup just like within-file ones.
+        Mirrors ``Ingestor.ingest`` from ``parse_quality`` onward: extraction and
+        tagging already happened offline, so this picks up the reviewed dicts,
+        sets parse_quality from structure, then dedups and persists. Files are
+        processed one at a time and persisted before the next, so cross-file
+        duplicates are caught via the DB ``source_hash`` lookup just like
+        within-file ones.
         """
         data = json.loads(path.read_text())
         if not isinstance(data, dict):
             raise ValueError("top-level JSON must be an object")
         source_pdf = data["source_pdf"]
-        source_text = data.get("source_text", "")
         questions = data["questions"]
         if not isinstance(questions, list):
             raise ValueError("'questions' must be a list")
 
-        # Guardrail: score the reviewed dicts against the real paper text before
-        # trusting them, setting parse_quality (fidelity/coverage/order, ADR-0003).
-        verified = _verify(questions, source_text)
+        # Structural self-assessment — no source-text verification (ADR-0004).
+        for q in questions:
+            q["parse_quality"] = _compute_parse_quality(q, q.get("qtype", ""))
 
         prov = _parse_source_filename(Path(source_pdf))
         provenance = _Provenance(
@@ -122,7 +120,7 @@ class Command(BaseCommand):
 
         # De-duplication: skip questions already in the bank AND repeats within
         # this file — identical to Ingestor.ingest.
-        all_fingerprints = [_fingerprint(q["text"]) for q in verified]
+        all_fingerprints = [_fingerprint(q["text"]) for q in questions]
         seen = set(
             Question.objects.filter(source_hash__in=all_fingerprints).values_list(
                 "source_hash", flat=True
@@ -134,8 +132,8 @@ class Command(BaseCommand):
                 continue
             seen.add(fp)
             unique_indices.append(i)
-        skipped = len(verified) - len(unique_indices)
-        rows = [verified[i] for i in unique_indices]
+        skipped = len(questions) - len(unique_indices)
+        rows = [questions[i] for i in unique_indices]
         fingerprints = [all_fingerprints[i] for i in unique_indices]
         if not rows:
             return 0, skipped

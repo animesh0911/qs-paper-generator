@@ -1,123 +1,99 @@
-"""Shared LLM gateway built on LiteLLM.
+"""Shared LLM gateway — Gemini native-PDF extraction.
 
-The rest of the backend should depend on ``LLMClient.complete`` instead of
-provider SDKs. LiteLLM gives us one call shape for OpenAI, Anthropic, Gemini,
-and future providers while keeping provider keys server-side.
+The bank ingestion path sends the source PDF straight to a multimodal model
+(Gemini) and gets back structured questions via a provider-enforced response
+schema. There is no text-extraction step (see ADR-0004). The rest of the backend
+depends on ``LLMClient.extract`` rather than the Gemini SDK directly, so the
+provider key stays server-side and the call shape is swappable.
 """
 
 from __future__ import annotations
 
+import json
 import os
 from collections.abc import Callable
 from typing import Any, Protocol
 
 
 class LLMClient(Protocol):
-    def complete(self, prompt: str, max_tokens: int = 2048) -> str: ...
+    def extract(self, pdf_bytes: bytes, prompt: str, response_schema: Any) -> dict: ...
 
 
-CompletionFunc = Callable[..., Any]
+# A generate function turns one PDF + prompt + schema into the model's raw JSON
+# text. Injectable so tests exercise GeminiClient without importing google-genai
+# or hitting the network.
+GenerateFunc = Callable[..., str]
+
+_DEFAULT_MODEL = "gemini-2.5-pro"
 
 
-_DEFAULT_PROVIDER_MODELS = {
-    "anthropic": ("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
-    "openai": ("OPENAI_MODEL", "gpt-4.1-mini"),
-    "gemini": ("GEMINI_MODEL", "gemini-2.5-flash"),
-}
+class GeminiClient:
+    """Adapter around ``google-genai`` native-PDF structured output.
 
-
-def configured_model() -> str:
-    """Return the LiteLLM model id from env.
-
-    Prefer ``LLM_MODEL`` because LiteLLM expects provider-prefixed model ids
-    such as ``anthropic/claude-...`` or ``openai/gpt-...``. The older
-    ``LLM_PROVIDER`` + provider-specific model env vars remain supported so
-    the existing ingestion path keeps working after the lift-and-shift.
-    """
-    model = os.getenv("LLM_MODEL")
-    if model:
-        return model
-
-    provider = os.getenv("LLM_PROVIDER", "anthropic").lower()
-    return provider_model(provider)
-
-
-def provider_model(provider: str, model: str | None = None) -> str:
-    """Return a provider-prefixed LiteLLM model id."""
-    provider = provider.lower()
-    model_env, fallback_model = _DEFAULT_PROVIDER_MODELS.get(
-        provider,
-        _DEFAULT_PROVIDER_MODELS["anthropic"],
-    )
-    selected_model = model or os.getenv(model_env, fallback_model)
-    if "/" in selected_model:
-        return selected_model
-    return f"{provider}/{selected_model}"
-
-
-class LiteLLMClient:
-    """Small adapter around ``litellm.completion``.
-
-    ``completion_func`` is injectable so tests can verify our normalization
-    without importing or calling the real LiteLLM package.
+    Model from ``GEMINI_MODEL`` (default ``gemini-2.5-pro``), key from
+    ``GEMINI_API_KEY``, request timeout from ``LLM_TIMEOUT_SECONDS``. ``extract``
+    returns the parsed JSON dict the response schema guarantees.
     """
 
     def __init__(
         self,
         model: str | None = None,
-        completion_func: CompletionFunc | None = None,
+        generate_func: GenerateFunc | None = None,
         timeout: float | None = None,
+        api_key: str | None = None,
     ):
-        self.model = model or configured_model()
-        self._completion_func = completion_func
-        self.timeout = timeout or float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))
+        self.model = model or os.getenv("GEMINI_MODEL", _DEFAULT_MODEL)
+        self._generate_func = generate_func
+        self.timeout = (
+            timeout
+            if timeout is not None
+            else float(os.getenv("LLM_TIMEOUT_SECONDS", "60"))
+        )
+        self._api_key = api_key or os.getenv("GEMINI_API_KEY")
 
-    def complete(self, prompt: str, max_tokens: int = 2048) -> str:
-        completion = self._completion_func or _load_litellm_completion()
-        response = completion(
+    def extract(self, pdf_bytes: bytes, prompt: str, response_schema: Any) -> dict:
+        generate = self._generate_func or _load_default_generate(self._api_key)
+        text = generate(
             model=self.model,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens,
+            pdf_bytes=pdf_bytes,
+            prompt=prompt,
+            response_schema=response_schema,
             timeout=self.timeout,
         )
-        return _extract_text(response)
+        return json.loads(text)
 
 
 def make_llm_client() -> LLMClient:
-    return LiteLLMClient()
+    return GeminiClient()
 
 
-def _load_litellm_completion() -> CompletionFunc:
-    from litellm import completion
+def _load_default_generate(api_key: str | None) -> GenerateFunc:
+    """Build the real google-genai generate function (imported lazily)."""
+    from google import genai
+    from google.genai import types
 
-    return completion
+    client = genai.Client(api_key=api_key)
 
+    def generate(
+        *,
+        model: str,
+        pdf_bytes: bytes,
+        prompt: str,
+        response_schema: Any,
+        timeout: float,
+    ) -> str:
+        response = client.models.generate_content(
+            model=model,
+            contents=[
+                types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf"),
+                prompt,
+            ],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=response_schema,
+                http_options=types.HttpOptions(timeout=int(timeout * 1000)),
+            ),
+        )
+        return response.text
 
-def _extract_text(response: Any) -> str:
-    """Normalize LiteLLM's OpenAI-compatible response into plain text."""
-    choices = _get(response, "choices")
-    if not choices:
-        raise ValueError("LLM response did not include choices.")
-
-    first = choices[0]
-    message = _get(first, "message")
-    content = _get(message, "content")
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        parts: list[str] = []
-        for item in content:
-            if isinstance(item, str):
-                parts.append(item)
-            else:
-                text = _get(item, "text")
-                if isinstance(text, str):
-                    parts.append(text)
-        return "".join(parts)
-    raise ValueError("LLM response message did not include text content.")
-
-
-def _get(value: Any, key: str) -> Any:
-    if isinstance(value, dict):
-        return value.get(key)
-    return getattr(value, key, None)
+    return generate

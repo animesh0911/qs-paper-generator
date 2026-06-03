@@ -3,10 +3,8 @@
 * ``GET  /api/bank/metadata/`` — canonical labels for Section / QuestionType /
   CognitiveLevel.
 * ``GET  /api/bank/chapters/`` — full 13-chapter taxonomy.
-* ``POST /api/bank/ingest/`` — admin-only PDF upload; parses + auto-tags +
+* ``POST /api/bank/ingest/`` — admin-only PDF upload; extracts + auto-tags +
   stores questions.
-* ``POST /api/bank/ingest-marking-scheme/`` — admin-only marking-scheme PDF
-  upload; matches answers.
 """
 
 from rest_framework.decorators import api_view, parser_classes, permission_classes
@@ -64,22 +62,3 @@ def ingest(request):
     return Response(
         {"created": result.created, "skipped_duplicates": result.skipped_duplicates}
     )
-
-
-@api_view(["POST"])
-@parser_classes([MultiPartParser])
-@permission_classes([IsAdminUser])
-def ingest_marking_scheme(request):
-    """Parse a CBSE marking-scheme PDF and update Question.answer for matched rows.
-
-    Request: multipart/form-data with field ``pdf`` (file).
-    Response: ``{"updated": N}`` — count of Question rows with answers filled in.
-    """
-    from .ingestor import Ingestor
-
-    pdf_file = request.FILES.get("pdf")
-    if pdf_file is None:
-        return Response({"detail": "Field 'pdf' is required."}, status=400)
-
-    updated = Ingestor().apply_answers(pdf_file.read())
-    return Response({"updated": updated})

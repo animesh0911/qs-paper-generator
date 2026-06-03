@@ -1,76 +1,55 @@
-"""Tests for the shared LiteLLM gateway."""
+"""Tests for the Gemini native-PDF LLM gateway.
+
+`GeminiClient.extract` is exercised through an injected `generate_func`, so the
+suite never imports google-genai or hits the network.
+"""
 
 from __future__ import annotations
 
-from types import SimpleNamespace
+import json
 
-from ai_services.llm import LiteLLMClient, configured_model, provider_model
-
-
-def test_configured_model_prefers_litellm_model_env(monkeypatch):
-    monkeypatch.setenv("LLM_MODEL", "openai/gpt-5-mini")
-    monkeypatch.setenv("LLM_PROVIDER", "anthropic")
-    monkeypatch.setenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
-
-    assert configured_model() == "openai/gpt-5-mini"
+from ai_services.llm import GeminiClient, make_llm_client
 
 
-def test_configured_model_supports_legacy_provider_env(monkeypatch):
-    monkeypatch.delenv("LLM_MODEL", raising=False)
-    monkeypatch.setenv("LLM_PROVIDER", "gemini")
-    monkeypatch.setenv("GEMINI_MODEL", "gemini-2.5-flash")
+def test_extract_sends_pdf_prompt_schema_and_parses_json():
+    """extract passes the PDF + prompt + schema through and returns parsed JSON.
 
-    assert configured_model() == "gemini/gemini-2.5-flash"
-
-
-def test_provider_model_does_not_double_prefix():
-    assert provider_model("openai", "openai/gpt-5-mini") == "openai/gpt-5-mini"
-    assert provider_model("openai", "gpt-5-mini") == "openai/gpt-5-mini"
-
-
-def test_litellm_client_sends_openai_style_messages_and_returns_text():
+    Why this matters: this is the seam every section call goes through. If the
+    arg contract or JSON parsing drifts, every ingested paper breaks."""
     calls = []
 
-    def fake_completion(**kwargs):
+    def fake_generate(**kwargs):
         calls.append(kwargs)
-        return {
-            "choices": [
-                {"message": {"content": "Tagged successfully."}},
-            ],
-        }
+        return json.dumps({"questions": [{"section": "A", "rawText": "Q?"}]})
 
-    client = LiteLLMClient(
-        model="anthropic/claude-haiku-4-5-20251001",
-        completion_func=fake_completion,
-        timeout=12,
+    schema = {"type": "OBJECT"}
+    client = GeminiClient(
+        model="gemini-2.5-pro", generate_func=fake_generate, timeout=12
     )
 
-    result = client.complete("tag this", max_tokens=123)
+    result = client.extract(b"%PDF-bytes", "extract section A", schema)
 
-    assert result == "Tagged successfully."
-    assert calls == [
-        {
-            "model": "anthropic/claude-haiku-4-5-20251001",
-            "messages": [{"role": "user", "content": "tag this"}],
-            "max_tokens": 123,
-            "timeout": 12,
-        }
-    ]
+    assert result == {"questions": [{"section": "A", "rawText": "Q?"}]}
+    assert len(calls) == 1
+    call = calls[0]
+    assert call["model"] == "gemini-2.5-pro"
+    assert call["pdf_bytes"] == b"%PDF-bytes"
+    assert call["prompt"] == "extract section A"
+    assert call["response_schema"] is schema
+    assert call["timeout"] == 12
 
 
-def test_litellm_client_supports_object_style_response():
-    def fake_completion(**_kwargs):
-        return SimpleNamespace(
-            choices=[
-                SimpleNamespace(
-                    message=SimpleNamespace(content="Object response works."),
-                )
-            ]
-        )
+def test_model_defaults_to_gemini_pro(monkeypatch):
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    client = GeminiClient(generate_func=lambda **kw: "{}")
+    assert client.model == "gemini-2.5-pro"
 
-    client = LiteLLMClient(
-        model="openai/gpt-5-mini",
-        completion_func=fake_completion,
-    )
 
-    assert client.complete("hello") == "Object response works."
+def test_model_from_env(monkeypatch):
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-2.5-flash")
+    client = GeminiClient(generate_func=lambda **kw: "{}")
+    assert client.model == "gemini-2.5-flash"
+
+
+def test_make_llm_client_returns_gemini_client():
+    assert isinstance(make_llm_client(), GeminiClient)
