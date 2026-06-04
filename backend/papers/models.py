@@ -114,6 +114,33 @@ def _pk_from_question_id(question_id) -> int | None:
     return None
 
 
+class PaperFormat(models.Model):
+    """Canonical paper format definition owned and seeded by the backend.
+
+    Maps a stable ``format_id`` slug (used in ``paper_document.v1``) to the
+    internal ``preset_name`` that drives slot layout, plus the page/layout data
+    the doc builder copies verbatim into the contract ``format`` object.
+    Frontend never invents format rules — it picks from this table.
+    """
+
+    format_id = models.SlugField(unique=True, max_length=100)
+    name = models.CharField(max_length=255)
+    preset_name = models.CharField(max_length=50)
+    page = models.JSONField()
+    layout = models.JSONField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def format_data(self) -> dict:
+        return {"id": self.format_id, "page": self.page, "layout": self.layout}
+
+
 class PaperQuestion(models.Model):
     """Ordered placement of a bank question within a paper.
 

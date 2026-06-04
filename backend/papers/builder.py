@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from django.db import transaction
 
 from .document import PaperDocumentBuilder
-from .models import Paper, PaperQuestion
+from .models import Paper, PaperFormat, PaperQuestion
 from .picker import DEFAULT_DIFFICULTY, FilledTemplate, PaperOptions, QuestionPicker
 from .template import TemplateBuilder
 
@@ -33,7 +33,13 @@ class PaperBuilder:
         weights: dict[str, float] | None = None,
         difficulty: str = DEFAULT_DIFFICULTY,
         reuse_question_ids: list[int] | None = None,
+        format_id: str | None = None,
     ) -> AssemblyResult:
+        paper_format: PaperFormat | None = None
+        if format_id:
+            paper_format = PaperFormat.objects.get(format_id=format_id, is_active=True)
+            preset = paper_format.preset_name
+
         template = TemplateBuilder().build(preset)
         opts = PaperOptions(
             template=template,
@@ -43,10 +49,11 @@ class PaperBuilder:
             # Freshness is scoped to the teacher who builds the paper.
             requesting_user=user,
             reuse_question_ids=set(reuse_question_ids or []),
+            format_id=format_id,
         )
         result = QuestionPicker().select(opts)
         paper = self._persist(user, title, result)
-        document = PaperDocumentBuilder().build(paper, result, opts)
+        document = PaperDocumentBuilder().build(paper, result, opts, paper_format)
         paper.document = document
         paper.save(update_fields=["document"])
         return AssemblyResult(paper=paper, document=document)

@@ -15,7 +15,7 @@ from rest_framework import serializers
 
 from bank.serializers import QuestionSerializer
 
-from .models import Paper, PaperQuestion
+from .models import Paper, PaperFormat, PaperQuestion
 from .picker import DEFAULT_DIFFICULTY, DIFFICULTY_NAMES
 from .template import PRESET_NAMES
 
@@ -55,11 +55,28 @@ class AssembleRequestSerializer(serializers.Serializer):
         required=False,
         default=list,
     )
+    format_id = serializers.CharField(required=False, allow_null=True, default=None)
 
     def validate_title(self, value: str) -> str:
         # Empty title means "use the assembler's default" — strip and let the
         # caller fall back rather than persisting an empty string.
         return value.strip()
+
+    def validate(self, data):
+        # Reject unknown formats at the API boundary so the caller gets a 4xx,
+        # not the 500 the builder's .get() would raise. The preset derived from
+        # the format is owned by PaperBuilder, not duplicated here.
+        format_id = data.get("format_id")
+        if (
+            format_id
+            and not PaperFormat.objects.filter(
+                format_id=format_id, is_active=True
+            ).exists()
+        ):
+            raise serializers.ValidationError(
+                {"format_id": f"Unsupported format_id: {format_id!r}"}
+            )
+        return data
 
 
 class PaperQuestionSerializer(serializers.ModelSerializer):

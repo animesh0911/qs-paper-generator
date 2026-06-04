@@ -24,12 +24,24 @@ from bank.models import Question
 from bank.serializers import AnswerKeySerializer
 
 from .builder import PaperBuilder
-from .models import Paper, PaperStatus
+from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
 from .serializers import AssembleRequestSerializer, PaperSerializer
 
 _PDF_CACHE_TTL = 60 * 60 * 24  # 1 day
 _SCHEMA_VERSION = "paper_document.v1"
+
+
+class PaperFormatsView(APIView):
+    """Return available paper formats for the frontend format selector."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        formats = list(
+            PaperFormat.objects.filter(is_active=True).values("format_id", "name")
+        )
+        return Response(formats)
 
 
 class AssemblePaperView(APIView):

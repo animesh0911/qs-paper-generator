@@ -381,3 +381,71 @@ def test_reapproving_a_paper_does_not_double_count_usage(user, seeded_bank):
 
     paper.approve()
     assert QuestionUsage.objects.filter(paper=paper).count() == first
+
+
+# --- PaperFormat / format_id tests ---
+
+
+@pytest.mark.django_db
+def test_formats_endpoint_lists_active_formats(api_client):
+    """GET /api/papers/formats returns at least the seeded CBSE board format."""
+    resp = api_client.get("/api/papers/formats")
+    assert resp.status_code == status.HTTP_200_OK
+    ids = [f["format_id"] for f in resp.data]
+    assert "cbse_science_class_10_board_compact_2026_v1" in ids
+    names = [f["name"] for f in resp.data]
+    assert "CBSE End Term Exam" in names
+
+
+@pytest.mark.django_db
+def test_assemble_with_format_id_echoes_format_in_response(api_client, seeded_bank):
+    """format_id in assemble request → request.filters.formatId in document."""
+    resp = api_client.post(
+        "/api/papers/assemble",
+        {"format_id": "cbse_science_class_10_board_compact_2026_v1"},
+        format="json",
+    )
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert (
+        resp.data["request"]["filters"]["formatId"]
+        == "cbse_science_class_10_board_compact_2026_v1"
+    )
+
+
+@pytest.mark.django_db
+def test_assemble_with_format_id_uses_stored_format_object(api_client, seeded_bank):
+    """format object in document comes from PaperFormat row, not hardcoded builder."""
+    from papers.models import PaperFormat
+
+    fmt = PaperFormat.objects.get(
+        format_id="cbse_science_class_10_board_compact_2026_v1"
+    )
+    resp = api_client.post(
+        "/api/papers/assemble",
+        {"format_id": "cbse_science_class_10_board_compact_2026_v1"},
+        format="json",
+    )
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.data["format"] == fmt.format_data
+
+
+@pytest.mark.django_db
+def test_assemble_rejects_unsupported_format_id(api_client, seeded_bank):
+    """Unknown format_id returns 400 with a clear error."""
+    resp = api_client.post(
+        "/api/papers/assemble",
+        {"format_id": "does_not_exist"},
+        format="json",
+    )
+    assert resp.status_code == status.HTTP_400_BAD_REQUEST
+    assert "format_id" in str(resp.data)
+
+
+@pytest.mark.django_db
+def test_assemble_without_format_id_still_works(api_client, seeded_bank):
+    """Existing callers that don't send format_id keep working (backward compat)."""
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.data["schemaVersion"] == "paper_document.v1"
+    # No formatId in filters when not supplied.
+    assert "formatId" not in resp.data["request"]["filters"]

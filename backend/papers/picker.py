@@ -51,6 +51,8 @@ class PaperOptions:
     # Questions the teacher chose to reuse despite freshness — exempt from the
     # usage penalty so they compete as if unused.
     reuse_question_ids: set[int] = field(default_factory=set)
+    # Selected format ID echoed into request.filters.formatId in the contract.
+    format_id: str | None = None
 
 
 @dataclass

@@ -12,7 +12,7 @@ from bank import content as content_mod
 from bank.models import Question
 from bank.question_shape import fallback_regions
 
-from .models import Paper
+from .models import Paper, PaperFormat
 from .picker import FilledTemplate, PaperOptions
 from .template import Slot
 
@@ -61,6 +61,7 @@ class PaperDocumentBuilder:
         paper: Paper,
         result: FilledTemplate,
         inp: PaperOptions,
+        paper_format: PaperFormat | None = None,
     ) -> dict:
         all_qids = self._all_question_ids(result)
         questions_by_pk = self._fetch_questions(all_qids)
@@ -71,7 +72,7 @@ class PaperDocumentBuilder:
             "schemaVersion": "paper_document.v1",
             "request": self._build_request(paper, inp, preset.exam_type),
             "template": self._build_template(paper, preset),
-            "format": self._build_format(),
+            "format": self._build_format(paper_format),
             "paper": self._build_paper(paper, result, questions_by_pk),
             "questions": [self._build_question(q) for q in questions_by_pk.values()],
         }
@@ -96,22 +97,26 @@ class PaperDocumentBuilder:
         }
 
     def _build_request(self, paper: Paper, inp: PaperOptions, exam_type: str) -> dict:
+        filters: dict = {
+            "chapters": list(inp.chapter_slugs or []),
+            "topics": [],
+            "englishOnly": True,
+        }
+        if inp.format_id:
+            filters["formatId"] = inp.format_id
         return {
             "id": f"req_{paper.pk}",
             "language": "en",
             "classLevel": "10",
             "subject": "Science",
             "examType": exam_type,
-            "filters": {
-                "chapters": list(inp.chapter_slugs or []),
-                "topics": [],
-                "englishOnly": True,
-            },
+            "filters": filters,
         }
 
-    def _build_format(self) -> dict:
-        # Contract §3: format.id selects the frontend renderer; page/layout carry
-        # the compact CBSE board geometry and semantic layout roles only.
+    def _build_format(self, paper_format: PaperFormat | None = None) -> dict:
+        if paper_format is not None:
+            return paper_format.format_data
+        # Fallback for callers that don't supply a stored format (tests, seed rows).
         return {
             "id": "cbse_science_class_10_board_compact_2026_v1",
             "page": {
