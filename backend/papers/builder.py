@@ -32,6 +32,7 @@ class PaperBuilder:
         chapter_slugs: list[str] | None = None,
         weights: dict[str, float] | None = None,
         difficulty: str = DEFAULT_DIFFICULTY,
+        reuse_question_ids: list[int] | None = None,
     ) -> AssemblyResult:
         template = TemplateBuilder().build(preset)
         opts = PaperOptions(
@@ -39,6 +40,9 @@ class PaperBuilder:
             chapter_slugs=list(chapter_slugs or []),
             weights=weights,
             difficulty=difficulty,
+            # Freshness is scoped to the teacher who builds the paper.
+            requesting_user=user,
+            reuse_question_ids=set(reuse_question_ids or []),
         )
         result = QuestionPicker().select(opts)
         paper = self._persist(user, title, result)

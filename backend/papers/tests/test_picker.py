@@ -274,3 +274,138 @@ def test_assemble_rejects_unknown_difficulty(api_client, seeded_bank):
         format="json",
     )
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+
+# ---------------------------------------------------------------------------
+# Freshness / UsageTracker (Slice 10): the picker deprioritises questions the
+# teacher has already used in approved papers, but never at the cost of filling
+# a slot.
+# ---------------------------------------------------------------------------
+
+
+def test_pure_allocator_prefers_fresher_question_when_quotas_tie():
+    """With chapter/cog quotas tied, the less-used question wins over lower id.
+
+    Why this matters: freshness is the whole point of the slice. If usage did
+    not break the tie, the picker would keep handing out the same low-id
+    questions paper after paper.
+    """
+    bucket = (Section.A, QuestionType.MCQ, 1)
+    pool: QuestionPool = {bucket: [(1, "electricity", "R"), (2, "electricity", "R")]}
+    opts = PaperOptions(template=_spec(1), chapter_slugs=["electricity"])
+
+    # q1 already used once; q2 is fresh -> q2 picked despite its higher id.
+    used = QuestionPicker._select_from_pool(opts, pool, usage={1: 1})
+    assert used.question_ids == [2]
+    # No usage -> deterministic lowest id (unchanged legacy behaviour).
+    fresh = QuestionPicker._select_from_pool(opts, pool, usage={})
+    assert fresh.question_ids == [1]
+
+
+def test_freshness_never_leaves_a_fillable_slot_empty():
+    """A heavily-used question is still picked when it is the only candidate.
+
+    Why this matters: freshness sits below the coverage goal. Deprioritising a
+    repeat must never turn a fillable slot into an unfilled one against a
+    finite bank.
+    """
+    bucket = (Section.A, QuestionType.MCQ, 1)
+    pool: QuestionPool = {bucket: [(1, "electricity", "R")]}
+    opts = PaperOptions(template=_spec(1), chapter_slugs=["electricity"])
+
+    result = QuestionPicker._select_from_pool(opts, pool, usage={1: 99})
+
+    assert result.question_ids == [1]
+    assert result.unfilled == []
+
+
+@pytest.mark.django_db
+def test_picker_scopes_freshness_to_the_requesting_teacher(user, two_chapters):
+    """Only the requesting teacher's own usage deprioritises a question.
+
+    Why this matters: freshness is per-teacher. Another teacher's history must
+    not steer my paper, or two teachers sharing a bank would fight over it.
+    """
+    from django.contrib.auth import get_user_model
+
+    from papers.models import Paper, QuestionUsage
+
+    ch1, _ = two_chapters
+    q1 = _make_question(chapter=ch1, level=CognitiveLevel.REMEMBER, idx=1)
+    _make_question(chapter=ch1, level=CognitiveLevel.REMEMBER, idx=2)
+
+    # A *different* teacher used q1; it must not penalise q1 for `user`.
+    stranger = get_user_model().objects.create_user(
+        email="stranger@example.com", password="x"
+    )
+    stranger_paper = Paper.objects.create(created_by=stranger, total_marks=1)
+    QuestionUsage.objects.create(question=q1, paper=stranger_paper, used_by=stranger)
+
+    opts = PaperOptions(
+        template=_spec(1), chapter_slugs=[ch1.slug], requesting_user=user
+    )
+    result = QuestionPicker().select(opts)
+
+    # q1 is fresh for `user` despite the stranger's use -> lowest id wins.
+    assert result.question_ids == [q1.id]
+
+
+@pytest.mark.django_db
+def test_successive_papers_for_a_teacher_reduce_repetition(user, two_chapters):
+    """A second paper avoids the questions the first one already used.
+
+    Why this matters: this is the slice's demoable outcome — successive papers
+    stay fresh. With four candidates and two slots, paper two must pick the two
+    the first paper did not.
+    """
+    from papers.models import Paper, QuestionUsage
+
+    ch1, _ = two_chapters
+    for i in range(4):
+        _make_question(chapter=ch1, level=CognitiveLevel.REMEMBER, idx=i)
+
+    opts = PaperOptions(
+        template=_spec(2), chapter_slugs=[ch1.slug], requesting_user=user
+    )
+    first = QuestionPicker().select(opts)
+    # Record usage exactly as Paper.approve would.
+    paper = Paper.objects.create(created_by=user, total_marks=2)
+    QuestionUsage.objects.bulk_create(
+        QuestionUsage(question_id=qid, paper=paper, used_by=user)
+        for qid in first.question_ids
+    )
+
+    second = QuestionPicker().select(opts)
+
+    assert set(first.question_ids).isdisjoint(second.question_ids)
+
+
+@pytest.mark.django_db
+def test_reuse_override_lets_a_used_question_compete_again(user, two_chapters):
+    """A question in reuse_question_ids is exempt from the freshness penalty.
+
+    Why this matters: the teacher must be able to deliberately reuse a specific
+    question; the override drops its usage count so it competes as if fresh.
+    """
+    from papers.models import Paper, QuestionUsage
+
+    ch1, _ = two_chapters
+    q1 = _make_question(chapter=ch1, level=CognitiveLevel.REMEMBER, idx=1)
+    q2 = _make_question(chapter=ch1, level=CognitiveLevel.REMEMBER, idx=2)
+    paper = Paper.objects.create(created_by=user, total_marks=1)
+    QuestionUsage.objects.create(question=q1, paper=paper, used_by=user)
+
+    base = PaperOptions(
+        template=_spec(1), chapter_slugs=[ch1.slug], requesting_user=user
+    )
+    # Without override, used q1 loses to fresh q2.
+    assert QuestionPicker().select(base).question_ids == [q2.id]
+
+    override = PaperOptions(
+        template=_spec(1),
+        chapter_slugs=[ch1.slug],
+        requesting_user=user,
+        reuse_question_ids={q1.id},
+    )
+    # Exempt q1 scores as unused -> lowest id wins -> q1 returns.
+    assert QuestionPicker().select(override).question_ids == [q1.id]
