@@ -334,3 +334,50 @@ def test_branding_flows_from_school_settings_to_document_and_pdf(
     text = _pdf_text(pdf.content)
     assert "Greenwood High School" in text
     assert "Half-Yearly Examination 2026" in text
+
+
+@pytest.mark.django_db
+def test_approve_records_question_usage_for_the_teacher(api_client, user, seeded_bank):
+    """Approving a paper records QuestionUsage for its selected questions (Slice 10).
+
+    Why this matters: usage is the freshness signal. If approve does not write
+    it, the picker can never deprioritise a repeat and successive papers stay
+    stale.
+    """
+    from papers.models import QuestionUsage
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    document = create.data
+    paper_pk = int(document["paper"]["id"].removeprefix("paper_"))
+    selected_pks = {
+        int(slot["selectedQuestionId"].removeprefix("q_"))
+        for section in document["paper"]["sections"]
+        for slot in section["slots"]
+        if slot.get("selectedQuestionId")
+    }
+    assert selected_pks
+
+    api_client.post(f"/api/papers/{paper_pk}/approve/")
+
+    usages = QuestionUsage.objects.filter(paper_id=paper_pk)
+    assert set(usages.values_list("question_id", flat=True)) == selected_pks
+    assert all(u.used_by_id == user.id for u in usages)
+
+
+@pytest.mark.django_db
+def test_reapproving_a_paper_does_not_double_count_usage(user, seeded_bank):
+    """Re-running approve adds no duplicate usage — approval stays idempotent.
+
+    Why this matters: the per-question unique constraint plus ignore_conflicts
+    must hold, or a re-approve would inflate a question's usage count and skew
+    freshness against it.
+    """
+    from papers.models import QuestionUsage
+
+    paper = PaperBuilder().assemble(user).paper
+    paper.approve()
+    first = QuestionUsage.objects.filter(paper=paper).count()
+    assert first > 0
+
+    paper.approve()
+    assert QuestionUsage.objects.filter(paper=paper).count() == first

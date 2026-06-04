@@ -18,8 +18,11 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 
+from django.db.models import Count
+
 from bank.models import Question
 
+from .models import QuestionUsage
 from .template import PaperTemplate
 
 # Cognitive-level mix per difficulty level. Codes match CognitiveLevel.
@@ -41,6 +44,13 @@ class PaperOptions:
     # Normalised by the picker so absolute scale doesn't matter.
     weights: dict[str, float] | None = None
     difficulty: str = DEFAULT_DIFFICULTY
+    # Teacher this paper is for. Drives freshness: the picker counts how often
+    # each question already appears in this teacher's approved papers and
+    # deprioritises the heavily-used ones (Slice 10). None disables freshness.
+    requesting_user: object | None = None
+    # Questions the teacher chose to reuse despite freshness — exempt from the
+    # usage penalty so they compete as if unused.
+    reuse_question_ids: set[int] = field(default_factory=set)
 
 
 @dataclass
@@ -115,7 +125,29 @@ class QuestionPicker:
                 f"Choose from {DIFFICULTY_NAMES}"
             )
         pool = self._fetch_candidates(opts)
-        return self._select_from_pool(opts, pool)
+        usage = self._fetch_usage(opts)
+        return self._select_from_pool(opts, pool, usage)
+
+    @staticmethod
+    def _fetch_usage(opts: PaperOptions) -> dict[int, int]:
+        """How many of this teacher's approved papers already use each question.
+
+        Empty (no freshness penalty) when no teacher is set — keeps the pure
+        allocator path and tests unaffected. Questions the teacher chose to
+        reuse are dropped, so they score as unused and can come back."""
+        user = opts.requesting_user
+        if user is None:
+            return {}
+        counts = (
+            QuestionUsage.objects.filter(used_by=user)
+            .values("question_id")
+            .annotate(n=Count("question_id"))
+        )
+        return {
+            row["question_id"]: row["n"]
+            for row in counts
+            if row["question_id"] not in opts.reuse_question_ids
+        }
 
     @staticmethod
     def _fetch_candidates(opts: PaperOptions) -> QuestionPool:
@@ -141,13 +173,19 @@ class QuestionPicker:
 
     @classmethod
     def _select_from_pool(
-        cls, opts: PaperOptions, pool: QuestionPool
+        cls,
+        opts: PaperOptions,
+        pool: QuestionPool,
+        usage: dict[int, int] | None = None,
     ) -> FilledTemplate:
         """Pure allocator: take a pool and options, produce the report.
 
         No ORM access. All tests of allocation invariants — chapter weighting,
         cognitive mix, no-dup, unfilled reporting — flow through this method.
+        ``usage`` (question id -> prior-use count) is the freshness signal; the
+        default empty map means every question is equally fresh.
         """
+        usage = usage or {}
         profile = DIFFICULTY_LEVELS[opts.difficulty]
 
         bucket_slot_indices: dict[_BucketKey, list[int]] = defaultdict(list)
@@ -170,7 +208,7 @@ class QuestionPicker:
             candidates = pool.get(key, [])
 
             for slot_idx in slot_indices:
-                pick = cls._pick(candidates, used, chapter_target, cog_target)
+                pick = cls._pick(candidates, used, chapter_target, cog_target, usage)
                 if pick is None:
                     unfilled.append(
                         {
@@ -196,7 +234,11 @@ class QuestionPicker:
         alternate_ids: list[list[int]] = [[] for _ in range(len(opts.template.slots))]
         for key, slot_indices in bucket_slot_indices.items():
             candidates = pool.get(key, [])
-            alt_pool = [qid for qid, _, _ in candidates if qid not in used]
+            # Offer the freshest swap candidates first, mirroring the pick order.
+            alt_pool = sorted(
+                (qid for qid, _, _ in candidates if qid not in used),
+                key=lambda qid: (usage.get(qid, 0), qid),
+            )
             for slot_idx in slot_indices:
                 alternate_ids[slot_idx] = alt_pool[:_N_ALTERNATES]
 
@@ -248,20 +290,23 @@ class QuestionPicker:
         used: set[int],
         chapter_target: dict[str, int],
         cog_target: dict[str, int],
+        usage: dict[int, int],
     ) -> PoolRow | None:
         """Pick the unused candidate that best fills remaining quotas.
 
         Priority: highest remaining chapter quota, then highest remaining
-        cognitive-level quota, then lowest id (deterministic).
+        cognitive-level quota, then fewest prior uses (freshness), then lowest
+        id (deterministic). Freshness sits below the quota goals so coverage
+        and difficulty mix are never sacrificed to avoid a repeat.
         """
         best: PoolRow | None = None
-        best_key: tuple[int, int, int] | None = None
+        best_key: tuple[int, int, int, int] | None = None
         for qid, ch_slug, level in candidates:
             if qid in used:
                 continue
             ch_score = chapter_target.get(ch_slug, 0) if ch_slug else 0
             cog_score = cog_target.get(level, 0)
-            key = (-ch_score, -cog_score, qid)
+            key = (-ch_score, -cog_score, usage.get(qid, 0), qid)
             if best_key is None or key < best_key:
                 best = (qid, ch_slug, level)
                 best_key = key

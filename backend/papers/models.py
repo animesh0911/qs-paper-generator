@@ -58,12 +58,36 @@ class Paper(models.Model):
         not reject it", so the referenced set is the final document's selected
         questions (post-edit), falling back to the assembly ``PaperQuestion`` rows
         when there is no document. Idempotent: re-running flips nothing new.
+
+        Approval is also the moment a question counts as *used* (Slice 10): the
+        same referenced set is recorded as ``QuestionUsage`` so the picker can
+        keep later papers fresh.
         """
         self.status = PaperStatus.APPROVED
         self.save(update_fields=["status"])
         qids = self._referenced_question_ids()
         if qids:
             Question.objects.filter(pk__in=qids).update(verified=True)
+            self._record_usage(qids)
+
+    def _record_usage(self, qids: set[int]) -> None:
+        """Record one QuestionUsage per referenced question for this paper.
+
+        Scoped to the paper's teacher (``created_by``) so freshness is per the
+        teacher who builds the papers. ``ignore_conflicts`` keeps approval
+        idempotent: re-approving the same paper adds no duplicate usage."""
+        QuestionUsage.objects.bulk_create(
+            [
+                QuestionUsage(
+                    question_id=qid,
+                    paper=self,
+                    used_by=self.created_by,
+                    school=self.school,
+                )
+                for qid in qids
+            ],
+            ignore_conflicts=True,
+        )
 
     def _referenced_question_ids(self) -> set[int]:
         """PKs of the questions selected into this paper (not alternates)."""
@@ -106,3 +130,35 @@ class PaperQuestion(models.Model):
     class Meta:
         ordering = ["order"]
         unique_together = [("paper", "order")]
+
+
+class QuestionUsage(models.Model):
+    """One record that a question was used in an approved paper (Slice 10).
+
+    Written by ``Paper.approve`` for every referenced question. The picker
+    counts these per teacher to deprioritise recently-used questions, keeping
+    successive papers fresh against the finite bank. ``school`` mirrors the
+    paper's tenant for parity with the other models; freshness is scoped by
+    ``used_by`` today.
+    """
+
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="usages"
+    )
+    paper = models.ForeignKey(
+        Paper, on_delete=models.CASCADE, related_name="question_usages"
+    )
+    used_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="question_usages",
+    )
+    school = models.ForeignKey(
+        School, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # A question is used at most once per paper; re-approving is a no-op.
+        unique_together = [("question", "paper")]
+        indexes = [models.Index(fields=["used_by", "question"])]

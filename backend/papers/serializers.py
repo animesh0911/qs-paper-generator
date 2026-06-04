@@ -47,6 +47,14 @@ class AssembleRequestSerializer(serializers.Serializer):
     difficulty = serializers.ChoiceField(
         choices=DIFFICULTY_NAMES, required=False, default=DEFAULT_DIFFICULTY
     )
+    # Questions the teacher wants reused despite freshness (Slice 10). Exempts
+    # them from the usage penalty so a deliberately-repeated question competes
+    # as if unused.
+    reuse_question_ids = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        required=False,
+        default=list,
+    )
 
     def validate_title(self, value: str) -> str:
         # Empty title means "use the assembler's default" — strip and let the
