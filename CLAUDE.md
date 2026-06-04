@@ -87,3 +87,15 @@ If you genuinely think a convention is harmful, surface it. Don't fork silently.
 "Completed" is wrong if anything was skipped silently.
 "Tests pass" is wrong if any were skipped.
 Default to surfacing uncertainty, not hiding it.
+
+## Rule 13 — Never invoke a paid LLM API without explicit consent
+Any action that calls an LLM API costs real money. STOP and ask for explicit
+consent before running ANYTHING that hits an LLM API — extraction, answer
+generation, management commands, scripts, tests, or live endpoints that call
+Gemini / OpenAI / Anthropic / any model provider.
+This includes re-runs, retries, and "just to verify" calls. One run = one
+charge; assume nothing is free.
+Do NOT decide on your own that a run is worth it. Present what will run, how
+many API calls it makes, and which model, then wait for a yes.
+Also surface any config that changes model/cost (e.g. `GEMINI_MODEL` in `.env`)
+the moment you notice it conflicts with stated intent — never silently proceed.

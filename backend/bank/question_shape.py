@@ -90,6 +90,12 @@ def compute_parse_quality(raw_question: dict, classified_qtype: str) -> str:
 
     if classified_qtype == "mcq":
         options = raw_question.get("options", [])
+        if not options:
+            # The flat ``options`` list is optional; the model often emits the
+            # choices only under ``content.options`` (the contract source the
+            # renderer actually reads). Count those so a fully-formed MCQ isn't
+            # falsely marked broken just because the flat mirror is empty.
+            options = content.get("options", [])
         if len(options) == 4:
             return "clean"
         return "partial" if options else "broken"

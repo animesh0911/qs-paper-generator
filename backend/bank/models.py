@@ -77,6 +77,19 @@ class PrimaryForm(models.TextChoices):
     TABLE_BASED = "table_based", "Table-based"
 
 
+class AnswerSource(models.TextChoices):
+    """Provenance of a stored ``Question.answer``.
+
+    Blank (``""``) means no answer has been populated yet. ``generated_unverified``
+    is the default for LLM-generated answers and gates them out of the marking
+    scheme until a teacher sets ``generated_verified`` via the admin action."""
+
+    HUMAN = "human", "Human-entered"
+    EXTRACTED = "extracted", "Extracted from source"
+    GENERATED_UNVERIFIED = "generated_unverified", "Generated (unverified)"
+    GENERATED_VERIFIED = "generated_verified", "Generated (verified)"
+
+
 class Chapter(models.Model):
     """Canonical CBSE Class 10 Science chapter.
 
@@ -105,8 +118,10 @@ class Question(models.Model):
     Owns enough metadata for ``QuestionPicker`` to allocate it under chapter
     weights and difficulty profiles: ``chapter`` (FK), ``cognitive_level``,
     ``section``, ``qtype``, ``marks``. ``answer`` is stored alongside but is
-    omitted by ``QuestionSerializer``; an answer-revealing serializer + its
-    access rule will land with the answer-key endpoint (Slice 9).
+    omitted by ``QuestionSerializer``; it is exposed only by
+    ``AnswerKeySerializer`` behind the owner-scoped answer-key endpoint
+    (``papers.views.PaperAnswerKeyPdfView``). ``answer_source`` records its
+    provenance and gates unverified generated answers out of the marking scheme.
     """
 
     school = models.ForeignKey(
@@ -143,6 +158,12 @@ class Question(models.Model):
         max_length=16, choices=PrimaryForm.choices, default=PrimaryForm.NONE, blank=True
     )
     answer = models.TextField(blank=True)
+    answer_source = models.CharField(
+        max_length=24,
+        choices=AnswerSource.choices,
+        blank=True,
+        default="",
+    )
     # Set True automatically by Paper.approve for every referenced question.
     # See ADR-0002. NOT a picker gate — parse_quality is.
     verified = models.BooleanField(default=False)

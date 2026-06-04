@@ -1,9 +1,9 @@
 """Tests for bank.ingestor (Gemini native-PDF path).
 
 The Ingestor coordinator is tested end-to-end with a stub Extractor — no live
-Gemini call. GeminiExtractor's section-chunking + coercion is tested against a
-stub LLMClient. Pure helpers (`compute_parse_quality` from `bank.question_shape`,
-`_parse_source_filename`) are tested directly.
+Gemini call. GeminiExtractor's per-page extraction + coercion is tested against
+a stub LLMClient. Pure helpers (`compute_parse_quality` from
+`bank.question_shape`, `_parse_source_filename`) are tested directly.
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from bank.diagram_cropper import _crop_figure
+from bank.diagram_cropper import _crop_figure, crop_to_dir
 from bank.ingestor import (
     GeminiExtractor,
     Ingestor,
@@ -179,7 +179,7 @@ def test_ingestor_persists_content_options_and_topics():
 
 
 # ---------------------------------------------------------------------------
-# GeminiExtractor — section-chunking + coercion, via a stub LLMClient
+# GeminiExtractor — per-page extraction + coercion, via a stub LLMClient
 # ---------------------------------------------------------------------------
 
 
@@ -187,32 +187,33 @@ class SequenceLLMClient:
     """LLMClient stub: one question per call, so we can assert call count + order."""
 
     def __init__(self):
-        self.calls: list[str] = []
+        self.calls: list[bytes] = []
 
     def extract(self, pdf_bytes, prompt, response_schema):
-        self.calls.append(prompt)
+        self.calls.append(pdf_bytes)
         n = len(self.calls)
         return {
             "questions": [{"qtype": "short_answer", "marks": 2, "rawText": f"Q{n}"}]
         }
 
 
-def test_gemini_extractor_calls_client_once_per_section_and_merges():
-    """One request per Section A–E; results merge in document order.
+def test_gemini_extractor_calls_client_once_per_page_and_merges(monkeypatch):
+    """One request per page; results merge in document order.
 
-    Why this matters: section-chunking keeps the model's attention dense; the
-    coordinator relies on the section label coming from the loop, not the model."""
+    Why this matters: per-page extraction is what gives deep reads on long
+    scanned papers — the coordinator must call once per page, not once per doc."""
+    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2", b"p3"])
     client = SequenceLLMClient()
     out = GeminiExtractor(client=client).extract(b"%PDF")
 
-    assert len(client.calls) == 5
-    assert [q["section"] for q in out] == ["A", "B", "C", "D", "E"]
-    assert [q["text"] for q in out] == ["Q1", "Q2", "Q3", "Q4", "Q5"]
-    assert all(q["marks"] == 2 for q in out)
+    assert client.calls == [b"p1", b"p2", b"p3"]
+    assert [q["text"] for q in out] == ["Q1", "Q2", "Q3"]
+    # marks=2 → Section B, derived deterministically (not from the model).
+    assert all(q["section"] == "B" for q in out)
 
 
-class OneSectionLLMClient:
-    """Returns a payload on the first call (Section A), empty afterwards."""
+class OnePageLLMClient:
+    """Returns a payload on the first call, empty afterwards."""
 
     def __init__(self, payload: dict):
         self.payload = payload
@@ -224,15 +225,16 @@ class OneSectionLLMClient:
 
 
 def test_gemini_extractor_coerces_question_fields():
-    """rawText→text, marks fallback, topic_names cleaned, primary_form clamped.
+    """rawText→text, marks/section derived, topic_names cleaned, primary_form clamped.
 
     Why this matters: the model's output is normalised to the row shape here; a
-    garbage primary_form must be clamped, not persisted raw."""
+    garbage primary_form must be clamped, not persisted raw. Invalid PDF bytes
+    can't be split, so the extractor makes one whole-document call."""
     payload = {
         "questions": [
             {
                 "qtype": "mcq",
-                # no marks → falls back to Section A default (1)
+                # no marks → qtype implies 1 → Section A
                 "rawText": "Which gas?",
                 "options": [{"label": "A", "text": "O2"}],
                 "content": {"stem": [{"type": "paragraph", "text": "Which gas?"}]},
@@ -243,16 +245,108 @@ def test_gemini_extractor_coerces_question_fields():
             }
         ]
     }
-    out = GeminiExtractor(client=OneSectionLLMClient(payload)).extract(b"%PDF")
+    out = GeminiExtractor(client=OnePageLLMClient(payload)).extract(b"%PDF")
 
     assert len(out) == 1
     q = out[0]
-    assert q["section"] == "A"
-    assert q["marks"] == 1  # section default fallback
+    assert q["section"] == "A"  # marks 1 → A
+    assert q["marks"] == 1  # qtype default (mcq → 1)
     assert q["text"] == "Which gas?"
     assert q["topic_names"] == ["Photosynthesis"]  # blanks/non-str dropped
     assert q["primary_form"] == "none"  # unknown value clamped
     assert q["chapter_slug"] == "electricity"
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        ("17. Which gas is released?", "Which gas is released?"),
+        ("3. State the law.", "State the law."),
+        # Decimals must survive — only a number + dot + whitespace is stripped.
+        ("3.5 kg of water is heated.", "3.5 kg of water is heated."),
+        ("No leading number here.", "No leading number here."),
+    ],
+)
+def test_coerce_strips_leading_question_number(raw, expected):
+    """A leading 'NN. ' question number is stripped from the stem, decimals kept.
+
+    Why this matters: the model leaves question numbers on some stems; they are
+    noise in the bank and would break dedup against a clean re-extract."""
+    payload = {"questions": [{"qtype": "short_answer", "marks": 3, "rawText": raw}]}
+    out = GeminiExtractor(client=OnePageLLMClient(payload)).extract(b"%PDF")
+    assert out[0]["text"] == expected
+
+
+@pytest.mark.parametrize(
+    "marks,expected_section",
+    [(1, "A"), (2, "B"), (3, "C"), (4, "E"), (5, "D")],
+)
+def test_section_derived_from_marks(marks, expected_section):
+    """Section is a deterministic function of marks, not the model's guess.
+
+    Why this matters: per-page extraction has no section header to trust, so the
+    mark value is the source of truth (CBSE format: 1→A, 2→B, 3→C, 4→E, 5→D)."""
+    payload = {
+        "questions": [
+            # The model's own "section" is deliberately wrong to prove it is ignored.
+            {"section": "A", "qtype": "short_answer", "marks": marks, "rawText": "Q?"}
+        ]
+    }
+    out = GeminiExtractor(client=OnePageLLMClient(payload)).extract(b"%PDF")
+    assert out[0]["section"] == expected_section
+
+
+def test_gemini_extractor_dedups_question_spanning_pages(monkeypatch):
+    """A question repeated across two page calls is emitted once.
+
+    Why this matters: a question straddling a page break is seen on both pages;
+    the fingerprint dedup keeps the bank from carrying duplicates."""
+    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2"])
+
+    class RepeatClient:
+        def extract(self, pdf_bytes, prompt, response_schema):
+            return {
+                "questions": [
+                    {
+                        "qtype": "short_answer",
+                        "marks": 3,
+                        "rawText": "Define refraction.",
+                    }
+                ]
+            }
+
+    out = GeminiExtractor(client=RepeatClient()).extract(b"%PDF")
+    assert len(out) == 1
+
+
+def test_gemini_extractor_rewrites_figure_page_to_absolute(monkeypatch):
+    """A figure localised on its single-page slice gets the absolute page number.
+
+    Why this matters: the cropper clips from the full document, so a per-page
+    figure ref of 1 must become the real page or the wrong page gets cropped."""
+    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2", b"p3"])
+
+    class FigureOnEachPage:
+        def __init__(self):
+            self.n = 0
+
+        def extract(self, pdf_bytes, prompt, response_schema):
+            self.n += 1
+            return {
+                "questions": [
+                    {
+                        "qtype": "short_answer",
+                        "marks": 3,
+                        "rawText": f"Question {self.n}",
+                        "figures": [
+                            {"page": 1, "bbox": [0, 0, 1, 1], "region": "stem"}
+                        ],
+                    }
+                ]
+            }
+
+    out = GeminiExtractor(client=FigureOnEachPage()).extract(b"%PDF")
+    assert [q["figures"][0]["page"] for q in out] == [1, 2, 3]
 
 
 # ---------------------------------------------------------------------------
@@ -288,6 +382,32 @@ def test_compute_parse_quality_clean_mcq_four_options():
     ]
     raw_q = {"text": "Which gas?", "options": opts, "content": {}}
     assert compute_parse_quality(raw_q, "mcq") == "clean"
+
+
+def test_compute_parse_quality_mcq_counts_content_options_when_flat_empty():
+    """An MCQ with options only in content.options is clean, not broken.
+
+    Why this matters: the model often fills content.options (the contract source
+    the renderer reads) but leaves the flat options list empty. Gating on the
+    flat list alone falsely marked ~half of a real paper's MCQs broken and
+    dropped them from the picker."""
+    content = {
+        "stem": [{"type": "paragraph", "text": "Which gas?"}],
+        "options": [
+            {"label": "A", "content": [{"type": "paragraph", "text": "O2"}]},
+            {"label": "B", "content": [{"type": "paragraph", "text": "CO2"}]},
+            {"label": "C", "content": [{"type": "paragraph", "text": "N2"}]},
+            {"label": "D", "content": [{"type": "paragraph", "text": "H2"}]},
+        ],
+    }
+    raw_q = {"text": "Which gas?", "options": [], "content": content}
+    assert compute_parse_quality(raw_q, "mcq") == "clean"
+
+
+def test_compute_parse_quality_mcq_broken_when_no_options_anywhere():
+    """No options in flat list or content → still broken (not a false clean)."""
+    raw_q = {"text": "Which gas?", "options": [], "content": {"stem": []}}
+    assert compute_parse_quality(raw_q, "mcq") == "broken"
 
 
 def test_compute_parse_quality_clean_short_answer_with_text():
@@ -350,6 +470,42 @@ def _one_page_pdf() -> bytes:
     pdf_bytes = doc.tobytes()
     doc.close()
     return pdf_bytes
+
+
+def test_crop_to_dir_writes_committed_png_and_rewrites_content():
+    """crop_to_dir saves a PNG beside the JSON and upgrades the placeholder.
+
+    Why this matters: this is the offline path that makes diagrams survive a
+    fresh checkout — the file must be written under assets_dir and the content's
+    image_placeholder replaced by an image item referencing it by storage name
+    (contract §9, no inline URL)."""
+    assets_dir = Path(_tmp_assets_dir())
+    q = {
+        "text": "Draw the magnetic field lines around a bar magnet.",
+        "content": {
+            "stem": [
+                {"type": "paragraph", "text": "Draw the field lines."},
+                {"type": "image_placeholder", "text": "bar magnet"},
+            ]
+        },
+        "figures": [{"page": 1, "bbox": [0.1, 0.1, 0.5, 0.5], "region": "stem"}],
+    }
+
+    crop_to_dir(_one_page_pdf(), [q], ["abcd1234ef"], assets_dir)
+
+    pngs = list(assets_dir.glob("*.png"))
+    assert [p.name for p in pngs] == ["abcd1234-0.png"]
+    stem = q["content"]["stem"]
+    images = [it for it in stem if it["type"] == "image"]
+    assert images == [{"type": "image", "assetId": "diagrams/abcd1234-0.png"}]
+    # The placeholder was upgraded in place, not left alongside the image.
+    assert not any(it["type"] == "image_placeholder" for it in stem)
+
+
+def _tmp_assets_dir() -> str:
+    import tempfile
+
+    return tempfile.mkdtemp()
 
 
 def test_crop_figure_returns_png_for_in_range_box():

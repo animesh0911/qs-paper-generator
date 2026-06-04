@@ -16,6 +16,7 @@ in place via :func:`bank.content.place_item`. Symmetric to the Extractor seam
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Protocol
 
 from . import content as content_mod
@@ -129,3 +130,46 @@ class PyMuPdfCropper:
         finally:
             if doc is not None:
                 doc.close()
+
+
+def crop_to_dir(
+    pdf_bytes: bytes,
+    rows: list[dict],
+    fingerprints: list[str],
+    assets_dir: Path,
+) -> None:
+    """Crop figures to PNG files under ``assets_dir`` and rewrite content in place.
+
+    The offline counterpart to ``PyMuPdfCropper`` (which saves to
+    ``default_storage``): used by ``extract_paper`` so cropped diagrams are
+    committed next to the JSON in ``content/parsed/``. Each crop is written to
+    ``assets_dir/<fp8>-<n>.png`` (deterministic, so re-runs reproduce the same
+    files) and the question's first ``image_placeholder`` in the figure's region
+    is upgraded to ``{type: image, assetId: "diagrams/<fp8>-<n>.png"}``. The
+    ``diagrams/`` prefix is the storage name ``load_questions`` re-hydrates into
+    ``default_storage`` so the renderer can serve it. A figure that fails to crop
+    soft-misses and its placeholder stays (ADR-0004)."""
+    doc = _open_pdf(pdf_bytes)
+    if doc is None:
+        return
+    try:
+        assets_dir.mkdir(parents=True, exist_ok=True)
+        for q, fp in zip(rows, fingerprints):
+            content = q.get("content") or {}
+            crop_index = 0
+            for figure in q.get("figures", []):
+                png = _crop_figure(doc, figure["page"], figure["bbox"])
+                if png is None:
+                    continue
+                name = f"{fp[:8]}-{crop_index}.png"
+                (assets_dir / name).write_bytes(png)
+                crop_index += 1
+                image_item = {"type": "image", "assetId": f"diagrams/{name}"}
+                if figure.get("caption"):
+                    image_item["caption"] = figure["caption"]
+                content_mod.place_item(
+                    content, figure["region"], image_item, label=figure.get("label")
+                )
+            q["content"] = content
+    finally:
+        doc.close()
