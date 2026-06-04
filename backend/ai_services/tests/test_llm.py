@@ -8,7 +8,12 @@ from __future__ import annotations
 
 import json
 
-from ai_services.llm import GeminiClient, make_llm_client
+from ai_services.llm import (
+    _DEFAULT_THINKING_BUDGET,
+    GeminiClient,
+    _thinking_budget,
+    make_llm_client,
+)
 
 
 def test_extract_sends_pdf_prompt_schema_and_parses_json():
@@ -83,3 +88,19 @@ def test_model_from_env(monkeypatch):
 
 def test_make_llm_client_returns_gemini_client():
     assert isinstance(make_llm_client(), GeminiClient)
+
+
+def test_thinking_budget_defaults_to_dynamic(monkeypatch):
+    monkeypatch.delenv("GEMINI_THINKING_BUDGET", raising=False)
+    assert _thinking_budget() == _DEFAULT_THINKING_BUDGET == -1
+
+
+def test_thinking_budget_from_env(monkeypatch):
+    monkeypatch.setenv("GEMINI_THINKING_BUDGET", "0")  # thinking off
+    assert _thinking_budget() == 0
+
+
+def test_thinking_budget_invalid_env_falls_back(monkeypatch):
+    """A non-integer env value falls back to the default, not a crash."""
+    monkeypatch.setenv("GEMINI_THINKING_BUDGET", "lots")
+    assert _thinking_budget() == _DEFAULT_THINKING_BUDGET
