@@ -47,8 +47,9 @@ class AnswerKeySerializer(serializers.ModelSerializer):
     """Answer-revealing question shape — the one place ``answer`` is exposed.
 
     Used only by the answer-key endpoint to assemble the marking scheme. The
-    access rule (paper owner only) lives at the view; this serializer carries
-    the minimum needed to render the key and nothing renderable to clients.
+    access rule (paper owner only) lives at the view, which also uses
+    ``answer_source`` to suppress unverified generated answers. Carries only
+    those fields — nothing renderable to clients.
     """
 
     class Meta:
