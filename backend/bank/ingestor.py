@@ -49,8 +49,21 @@ _NUMERICAL_RE = re.compile(
 )
 _DIAGRAM_RE = re.compile(r"\bfig(?:ure)?\.?\s*\d*\b|\bdiagram\b", re.IGNORECASE)
 
-# Per-section default marks — used as a fallback when the model omits `marks`.
-SECTION_DEFAULT_MARKS: dict[str, int] = {"A": 1, "B": 2, "C": 3, "D": 5, "E": 4}
+# Per-page extraction derives the section deterministically from each question's
+# marks (Rule 5 — code, not the model, owns this mapping). In the CBSE Cl.10
+# Science format the mark value is a clean key to the section: A=1, B=2, C=3,
+# E=4 (case-based), D=5 (long answer). When the model omits a usable mark, the
+# qtype implies one.
+MARKS_TO_SECTION: dict[int, str] = {1: "A", 2: "B", 3: "C", 4: "E", 5: "D"}
+QTYPE_DEFAULT_MARKS: dict[str, int] = {
+    "mcq": 1,
+    "assertion_reason": 1,
+    "very_short_answer": 2,
+    "short_answer": 3,
+    "long_answer": 5,
+    "case_based": 4,
+    "internal_choice": 3,
+}
 
 
 # ---------------------------------------------------------------------------
@@ -270,34 +283,34 @@ _QUESTION_SCHEMA = {
     "required": ["questions"],
 }
 
-_SECTIONS = ("A", "B", "C", "D", "E")
-_SECTION_LABELS = {
-    "A": "Section A (objective: MCQ / assertion-reason, 1 mark each)",
-    "B": "Section B (very short answer, 2 marks each)",
-    "C": "Section C (short answer, 3 marks each)",
-    "D": "Section D (long answer, 5 marks each)",
-    "E": "Section E (case-based, 4 marks each)",
-}
 
+def _page_prompt() -> str:
+    """Build the per-page extraction prompt (one PDF page in, English-only).
 
-def _section_prompt(section: str) -> str:
-    """Build the per-section extraction prompt (English-only, verbatim)."""
+    The extractor feeds the model one page at a time (see ``GeminiExtractor``),
+    so the model reads a single page deeply instead of skimming the whole paper.
+    Section is NOT requested verbatim — the coordinator derives it from each
+    question's marks (``MARKS_TO_SECTION``)."""
     return (
-        "You are extracting questions from a CBSE Class 10 Science board paper PDF "
-        "into a question bank.\n\n"
-        f"Extract ONLY the questions in {_SECTION_LABELS[section]}. Ignore every "
-        "other section, the cover page, the general instructions, and any marking "
-        "scheme. If this section is absent, return an empty list.\n\n"
-        "ENGLISH ONLY: these papers are bilingual — a Hindi (Devanagari) column or "
-        "block sits alongside the English. Keep the English only; discard the Hindi "
-        "entirely and do NOT translate it. No Devanagari characters in the output.\n\n"
+        "You are extracting questions from ONE PAGE of a CBSE Class 10 Science "
+        "board paper into a question bank. The input is a single page image.\n\n"
+        "Extract EVERY question that appears on this page. Include a question even "
+        "if it looks partial (continued from the previous page or running onto the "
+        "next) — copy whatever English text is on this page. Ignore the cover page, "
+        "general instructions, and any marking scheme.\n\n"
+        "ENGLISH ONLY: these papers are bilingual. A page is usually entirely in "
+        "one language — either Hindi (Devanagari) or English. If THIS page is in "
+        "Hindi, return an empty list. If it is English, extract its questions. "
+        "Never translate Hindi; emit no Devanagari characters.\n\n"
         "Copy each question VERBATIM from the English text — never paraphrase, "
         "correct, complete, or summarise it.\n\n"
         "Per question return:\n"
-        f"  section — always {section}.\n"
+        "  section — the section letter (A–E) if a 'SECTION X' header is visible "
+        "on this page, else your best guess; the importer re-derives it from marks.\n"
         "  qtype — one of: mcq, assertion_reason, very_short_answer, short_answer, "
         "long_answer, case_based, internal_choice.\n"
-        "  marks — integer marks for the question.\n"
+        "  marks — the integer mark value printed for the question (the digit at "
+        "the right margin). This is important: the section is derived from it.\n"
         "  rawText — the stem copied verbatim, WITHOUT any visible marks "
         "(no '[1]', '(2 marks)', trailing mark digits) and WITHOUT option labels.\n"
         "  options — for mcq/assertion_reason: [{label, text}] verbatim; else [].\n"
@@ -313,10 +326,11 @@ def _section_prompt(section: str) -> str:
         "  primary_form — one of none, diagram_based, table_based.\n"
         "  figures — bounding boxes of any diagrams the question depends on, for "
         "deterministic cropping. [] if none. Each: {page, bbox, region, label?, "
-        "caption?} where page is 1-based, bbox is [x0, y0, x1, y1] normalized to "
-        "[0, 1] with the page top-left as origin, region is the content region the "
-        "figure belongs to (stem / assertion / reason / passage / options / "
-        "subparts), and label names the option/subpart for options/subparts.\n\n"
+        "caption?}. Set page to 1 (this is a single page); bbox is "
+        "[x0, y0, x1, y1] normalized to [0, 1] with the page top-left as origin; "
+        "region is the content region the figure belongs to (stem / assertion / "
+        "reason / passage / options / subparts); label names the option/subpart "
+        "for options/subparts.\n\n"
         "If a question depends on a figure or diagram, put a single "
         "{type:'image_placeholder', text:'<short description>'} item in the region "
         "where the figure appears AND add a matching entry to figures (same region "
@@ -368,17 +382,31 @@ def _coerce_figures(value) -> list[dict]:
     return figures
 
 
-def _coerce_question(obj: dict, section: str) -> dict:
-    """Normalise one model-emitted question object to the coordinator dict shape."""
+def _coerce_question(obj: dict) -> dict:
+    """Normalise one model-emitted question object to the coordinator dict shape.
+
+    ``section`` is derived from ``marks`` (``MARKS_TO_SECTION``), not taken from
+    the model: per-page extraction has no reliable section header to anchor on,
+    but the printed mark value maps cleanly to a section. When the model omits a
+    usable mark, the qtype implies one (``QTYPE_DEFAULT_MARKS``).
+    """
+    qtype = obj.get("qtype", "short_answer")
     try:
         marks = int(obj.get("marks"))
     except (TypeError, ValueError):
-        marks = SECTION_DEFAULT_MARKS.get(section, 1)
+        marks = None
+    if marks not in MARKS_TO_SECTION:
+        marks = QTYPE_DEFAULT_MARKS.get(qtype, 3)
+    section = MARKS_TO_SECTION[marks]
+    # Strip a leading question number the model sometimes leaves on the stem
+    # ("17. ..."). Requires whitespace after the dot, so decimals like "3.5 kg"
+    # are left intact.
+    text = re.sub(r"^\d{1,3}\.\s+", "", (obj.get("rawText", "") or "").strip())
     return {
         "section": section,
-        "qtype": obj.get("qtype", "short_answer"),
+        "qtype": qtype,
         "marks": marks,
-        "text": obj.get("rawText", "") or "",
+        "text": text,
         "options": obj.get("options", []) or [],
         "content": obj.get("content", {}) or {},
         "chapter_slug": obj.get("chapter_slug"),
@@ -389,25 +417,68 @@ def _coerce_question(obj: dict, section: str) -> dict:
     }
 
 
-class GeminiExtractor:
-    """Default Extractor — one native-PDF Gemini call per section A–E.
+def _split_pages(pdf_bytes: bytes) -> list[bytes]:
+    """Split a PDF into one single-page PDF per page (in document order).
 
-    Section-chunking keeps the model's attention dense on one section at a time;
-    results merge in document order. Provider-agnostic via `LLMClient`.
+    Each slice is fed to the model alone so it reads one page deeply rather than
+    skimming a long scanned paper. Returns ``[pdf_bytes]`` unchanged if the PDF
+    cannot be opened — the caller then does a single whole-document call."""
+    import fitz
+
+    try:
+        src = fitz.open(stream=pdf_bytes, filetype="pdf")
+    except Exception:  # noqa: BLE001 — unparseable PDF: fall back to one call
+        return [pdf_bytes]
+    try:
+        pages: list[bytes] = []
+        for i in range(src.page_count):
+            one = fitz.open()
+            try:
+                one.insert_pdf(src, from_page=i, to_page=i)
+                pages.append(one.tobytes())
+            finally:
+                one.close()
+        return pages or [pdf_bytes]
+    finally:
+        src.close()
+
+
+class GeminiExtractor:
+    """Default Extractor — one native-PDF Gemini call per PAGE, merged in order.
+
+    Page-at-a-time extraction forces a deep read of each page: on long scanned
+    bilingual papers a single whole-document call skims and under-recalls (Hindi
+    pages duplicate question numbers, later sections get dropped). Each page's
+    questions are coerced, their figure page-refs rewritten to the absolute page
+    number, and duplicates (a question spilling across a page break) dropped by
+    text fingerprint. Provider-agnostic via `LLMClient`.
     """
 
     def __init__(self, client: LLMClient | None = None):
         self.client = client or make_llm_client()
 
     def extract(self, pdf_bytes: bytes) -> list[dict]:
+        prompt = _page_prompt()
         questions: list[dict] = []
-        for section in _SECTIONS:
-            payload = self.client.extract(
-                pdf_bytes, _section_prompt(section), _QUESTION_SCHEMA
-            )
+        seen: set[str] = set()
+        for page_index, page_bytes in enumerate(_split_pages(pdf_bytes)):
+            payload = self.client.extract(page_bytes, prompt, _QUESTION_SCHEMA)
             for obj in payload.get("questions", []):
-                if isinstance(obj, dict):
-                    questions.append(_coerce_question(obj, section))
+                if not isinstance(obj, dict):
+                    continue
+                question = _coerce_question(obj)
+                if not question["text"].strip():
+                    continue
+                fp = _fingerprint(question["text"])
+                if fp in seen:
+                    continue
+                seen.add(fp)
+                # The model localises figures on the single page it was shown
+                # (page 1 of the slice); rewrite to the absolute 1-based page so
+                # the cropper clips the right page of the full document.
+                for figure in question["figures"]:
+                    figure["page"] = page_index + 1
+                questions.append(question)
         return questions
 
 
