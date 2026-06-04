@@ -135,6 +135,96 @@ def test_wrong_section_counts_against_section_accuracy():
     assert r["section_accuracy"] == 0.0
 
 
+def test_key_matches_text_in_content_regions():
+    """A key found only in assertion/reason or nested choices still matches.
+
+    Why this matters: thin-stem types (assertion-reason, differences,
+    internal-choice) carry their identifying wording in content regions, not the
+    stem. If matching looked only at the stem, every such question would read as
+    missed and recall would be meaningless for the bulk of a real paper."""
+    gt = _gt(
+        {
+            "num": 1,
+            "section": "A",
+            "qtype": "assertion_reason",
+            "marks": 1,
+            "key": "reflex actions do not involve thinking",
+        },
+        {
+            "num": 2,
+            "section": "C",
+            "qtype": "internal_choice",
+            "marks": 3,
+            "key": "chlor-alkali process",
+        },
+    )
+    ext = _ext(
+        {
+            "text": "",  # AR question has no stem; wording lives in content
+            "section": "A",
+            "qtype": "assertion_reason",
+            "marks": 1,
+            "options": [],
+            "content": {
+                "assertion": [
+                    {
+                        "type": "paragraph",
+                        "text": "Reflex actions do not involve thinking.",
+                    }
+                ],
+                "reason": [
+                    {
+                        "type": "paragraph",
+                        "text": "Controlled by the spinal cord.",
+                    }
+                ],
+            },
+        },
+        {
+            "text": "",  # internal-choice wording lives in nested choices
+            "section": "C",
+            "qtype": "internal_choice",
+            "marks": 3,
+            "options": [],
+            "content": {
+                "choices": [
+                    {
+                        "displayStyle": "or",
+                        "chooseCount": 1,
+                        "options": [
+                            {
+                                "label": "a",
+                                "content": [
+                                    {
+                                        "type": "paragraph",
+                                        "text": "Explain chlor-alkali process "
+                                        "with chemical equation.",
+                                    }
+                                ],
+                            },
+                            {
+                                "label": "b",
+                                "content": [
+                                    {
+                                        "type": "paragraph",
+                                        "text": "Write the preparation of "
+                                        "baking soda.",
+                                    }
+                                ],
+                            },
+                        ],
+                    }
+                ]
+            },
+        },
+    )
+
+    r = score(ext, gt)
+
+    assert r["recall"] == 1.0
+    assert r["missed"] == []
+
+
 def test_duplicate_key_matches_only_one_extraction():
     """One ground-truth entry consumes at most one extracted question.
 
