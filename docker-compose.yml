@@ -41,7 +41,7 @@ services:
       GEMINI_MODEL: ${GEMINI_MODEL:-}
     volumes:
       - ./backend:/app
-      - ./content:/content:ro
+      - ./content:/content
     ports:
       - "8000:8000"
     depends_on:
@@ -69,7 +69,7 @@ services:
       GEMINI_MODEL: ${GEMINI_MODEL:-}
     volumes:
       - ./backend:/app
-      - ./content:/content:ro
+      - ./content:/content
     depends_on:
       db:
         condition: service_healthy

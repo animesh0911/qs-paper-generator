@@ -65,6 +65,14 @@ class Command(BaseCommand):
             self.stdout.write(f"No JSON files found in {directory}.")
             return
 
+        # Diagrams committed by extract_paper live in <dir>/assets/ and are
+        # referenced by the questions' content as "diagrams/<name>". Copy them
+        # into default_storage so the renderer can serve them — the committed
+        # JSON is otherwise inert (no PDF in hand at load time, ADR-0004).
+        rehydrated = self._rehydrate_assets(directory / "assets")
+        if rehydrated:
+            self.stdout.write(f"Re-hydrated {rehydrated} diagram asset(s).")
+
         # Resolved once: chapter slugs are a fixed taxonomy (migration 0003).
         chapter_by_slug = {c.slug: c for c in Chapter.objects.all()}
 
@@ -89,6 +97,28 @@ class Command(BaseCommand):
                 f"duplicate(s) skipped, {total_failed} file(s) failed."
             )
         )
+
+    @staticmethod
+    def _rehydrate_assets(assets_dir: Path) -> int:
+        """Copy committed crop PNGs into default_storage under ``diagrams/``.
+
+        Idempotent: an asset already present (its exact storage name) is left
+        alone, so re-running the loader neither duplicates files nor drifts the
+        ``assetId`` the content references. Returns the number copied this run.
+        """
+        if not assets_dir.is_dir():
+            return 0
+        from django.core.files.base import ContentFile
+        from django.core.files.storage import default_storage
+
+        copied = 0
+        for png in sorted(assets_dir.glob("*.png")):
+            target = f"diagrams/{png.name}"
+            if default_storage.exists(target):
+                continue
+            default_storage.save(target, ContentFile(png.read_bytes()))
+            copied += 1
+        return copied
 
     @staticmethod
     def _load_file(path: Path, chapter_by_slug: dict[str, Chapter]) -> tuple[int, int]:

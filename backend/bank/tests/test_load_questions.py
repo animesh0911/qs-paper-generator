@@ -199,3 +199,42 @@ def test_missing_answer_fields_default_to_blank(tmp_path):
     q = Question.objects.get(qtype="mcq")
     assert q.answer == ""
     assert q.answer_source == ""
+
+
+@pytest.mark.django_db
+def test_rehydrates_committed_assets_into_storage(tmp_path, settings):
+    """Committed crop PNGs in <dir>/assets/ are copied into default_storage.
+
+    Why this matters: the committed JSON references diagrams by storage name; if
+    the loader didn't re-hydrate the asset, that reference would 404 on a fresh
+    checkout and the diagram would silently vanish from the rendered paper."""
+    from django.core.files.storage import default_storage
+
+    settings.MEDIA_ROOT = str(tmp_path / "media")
+    assets = tmp_path / "assets"
+    assets.mkdir()
+    (assets / "abcd1234-0.png").write_bytes(b"\x89PNG\r\n\x1a\nfake")
+    _write_file(tmp_path, "paper.json", _payload(_MCQ))
+
+    call_command("load_questions", str(tmp_path))
+
+    assert default_storage.exists("diagrams/abcd1234-0.png")
+
+
+@pytest.mark.django_db
+def test_rehydration_is_idempotent(tmp_path, settings):
+    """Re-running the loader does not duplicate an already-present asset."""
+    from django.core.files.storage import default_storage
+
+    settings.MEDIA_ROOT = str(tmp_path / "media")
+    assets = tmp_path / "assets"
+    assets.mkdir()
+    (assets / "abcd1234-0.png").write_bytes(b"\x89PNG\r\n\x1a\nfake")
+    _write_file(tmp_path, "paper.json", _payload(_MCQ))
+
+    call_command("load_questions", str(tmp_path))
+    call_command("load_questions", str(tmp_path))
+
+    # Exact storage name preserved (no "_<suffix>" collision copies).
+    stored = default_storage.listdir("diagrams")[1]
+    assert stored == ["abcd1234-0.png"]
