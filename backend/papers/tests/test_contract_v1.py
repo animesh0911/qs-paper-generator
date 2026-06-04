@@ -4,10 +4,12 @@ Assembles a paper via the API and validates the response against every required
 field in contracts/v1_contract.md. These tests run against whatever the bank
 has — seed data, or a real loaded bank.
 
-NOTE on #46 Step 1: content/parsed/ has no committed JSON yet. load_questions
-compliance against real ingested data is deferred until that JSON is committed.
-These tests cover acceptance criteria 2 and 3 (contract shape + structured
-content rendering) against the seed bank.
+NOTE on #46/#87 Step 1: content/parsed/ exists but has no committed JSON yet
+(JSON production requires a Gemini API key — run the ingestor against the source
+PDFs, then commit the output). load_questions compliance against real ingested
+data is deferred until that JSON is committed. These tests cover acceptance
+criteria 2 and 3 (contract shape + structured content rendering) against the
+seed bank.
 """
 
 from __future__ import annotations

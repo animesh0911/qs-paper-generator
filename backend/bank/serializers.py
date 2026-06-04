@@ -53,4 +53,4 @@ class AnswerKeySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ["id", "marks", "answer"]
+        fields = ["id", "marks", "answer", "answer_source"]

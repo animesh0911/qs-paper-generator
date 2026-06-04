@@ -21,7 +21,8 @@ ADR-0004). A
 legacy ``source_text`` field, if present, is ignored. ``source_pdf`` feeds
 ``_parse_source_filename`` for provenance (year from the parent dir name).
 
-Run as ``python manage.py load_questions content/parsed/``. Idempotent: rows are
+Run as ``python manage.py load_questions /content/parsed/`` (Docker) or
+``python manage.py load_questions ../content/parsed/`` (host). Idempotent: rows are
 de-duplicated by ``source_hash`` exactly like ``Ingestor.ingest``, so wiping the
 DB and reloading the committed JSON reproduces the same bank. A malformed file
 is reported and skipped — it does not abort the batch.

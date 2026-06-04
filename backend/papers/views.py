@@ -151,10 +151,18 @@ class PaperAnswerKeyPdfView(APIView):
         return response
 
     def _answers_by_id(self, paper: Paper) -> dict[str, str]:
-        """Map contract question id (``"q_{pk}"``) to answer for selected slots."""
+        """Map contract question id (``"q_{pk}"``) to answer for selected slots.
+
+        ``generated_unverified`` answers are suppressed — they fall through to
+        the ``(no answer on file)`` placeholder until a teacher approves them.
+        """
         pks = paper._referenced_question_ids()
         rows = AnswerKeySerializer(Question.objects.filter(pk__in=pks), many=True).data
-        return {f"q_{row['id']}": row["answer"] for row in rows}
+        return {
+            f"q_{row['id']}": row["answer"]
+            for row in rows
+            if row["answer_source"] != "generated_unverified"
+        }
 
 
 def _paper_print_url(user, paper_pk: int) -> str | None:

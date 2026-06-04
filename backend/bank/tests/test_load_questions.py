@@ -165,3 +165,37 @@ def test_malformed_file_skipped_not_fatal(tmp_path):
 
     # The valid file's rows landed despite the broken sibling.
     assert Question.objects.count() == 2
+
+
+@pytest.mark.django_db
+def test_answer_and_answer_source_survive_load(tmp_path):
+    """answer + answer_source in the JSON are stored verbatim on the row.
+
+    Why this matters: committed JSON produced by the extraction pipeline carries
+    pre-generated answers; load_questions must preserve them so the marking
+    scheme is populated without a separate generate_answers run.
+    """
+    mcq_with_answer = {
+        **_MCQ,
+        "answer": "A",
+        "answer_source": "human",
+    }
+    _write_file(tmp_path, "paper.json", _payload(mcq_with_answer))
+
+    call_command("load_questions", str(tmp_path))
+
+    q = Question.objects.get(qtype="mcq")
+    assert q.answer == "A"
+    assert q.answer_source == "human"
+
+
+@pytest.mark.django_db
+def test_missing_answer_fields_default_to_blank(tmp_path):
+    """Questions without answer/answer_source in JSON get empty strings (no crash)."""
+    _write_file(tmp_path, "paper.json", _payload(_MCQ))
+
+    call_command("load_questions", str(tmp_path))
+
+    q = Question.objects.get(qtype="mcq")
+    assert q.answer == ""
+    assert q.answer_source == ""

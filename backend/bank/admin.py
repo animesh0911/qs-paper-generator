@@ -3,7 +3,7 @@
 from django.contrib import admin, messages
 from django.utils.html import format_html
 
-from .models import Chapter, Question
+from .models import AnswerSource, Chapter, Question
 
 
 @admin.register(Chapter)
@@ -22,12 +22,14 @@ class QuestionAdmin(admin.ModelAdmin):
         "chapter",
         "cognitive_level",
         "verified",
+        "answer_source",
         "has_diagram",
         "is_numerical",
         "short_text",
     )
     list_filter = (
         "verified",
+        "answer_source",
         "has_diagram",
         "is_numerical",
         "section",
@@ -46,6 +48,7 @@ class QuestionAdmin(admin.ModelAdmin):
         "text",
         "options",
         "answer",
+        "answer_source",
         "verified",
         "has_diagram",
         "is_numerical",
@@ -53,7 +56,7 @@ class QuestionAdmin(admin.ModelAdmin):
         "diagram_preview",
         "source_hash",
     )
-    actions = ["mark_verified", "mark_unverified"]
+    actions = ["mark_verified", "mark_unverified", "approve_generated_answers"]
 
     # Default to showing unverified questions first in the review queue.
     ordering = ("verified", "section", "id")
@@ -83,4 +86,15 @@ class QuestionAdmin(admin.ModelAdmin):
         updated = queryset.update(verified=False)
         self.message_user(
             request, f"{updated} question(s) marked as unverified.", messages.WARNING
+        )
+
+    @admin.action(description="Approve generated answers (mark as verified)")
+    def approve_generated_answers(self, request, queryset):
+        updated = queryset.filter(
+            answer_source=AnswerSource.GENERATED_UNVERIFIED
+        ).update(answer_source=AnswerSource.GENERATED_VERIFIED)
+        self.message_user(
+            request,
+            f"{updated} generated answer(s) approved.",
+            messages.SUCCESS,
         )
