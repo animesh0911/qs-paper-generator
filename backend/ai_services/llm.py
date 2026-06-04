@@ -29,6 +29,18 @@ class LLMClient(Protocol):
 GenerateFunc = Callable[..., str]
 
 _DEFAULT_MODEL = "gemini-3.5-flash"
+# Gemini thinking budget (tokens). -1 = dynamic (model decides — the default),
+# 0 = thinking off, >0 = a fixed cap. Thinking lets the model reason before
+# emitting the schema-constrained JSON, which helps recall/structuring on dense
+# scanned pages without polluting the structured output. Override per env.
+_DEFAULT_THINKING_BUDGET = -1
+
+
+def _thinking_budget() -> int:
+    try:
+        return int(os.getenv("GEMINI_THINKING_BUDGET", _DEFAULT_THINKING_BUDGET))
+    except ValueError:
+        return _DEFAULT_THINKING_BUDGET
 
 
 class GeminiClient:
@@ -112,6 +124,9 @@ def _load_default_generate(api_key: str | None) -> GenerateFunc:
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 response_schema=response_schema,
+                thinking_config=types.ThinkingConfig(
+                    thinking_budget=_thinking_budget()
+                ),
                 http_options=types.HttpOptions(timeout=int(timeout * 1000)),
             ),
         )
@@ -140,6 +155,9 @@ def _load_default_generate_text(api_key: str | None) -> Callable[..., str]:
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 response_schema=response_schema,
+                thinking_config=types.ThinkingConfig(
+                    thinking_budget=_thinking_budget()
+                ),
                 http_options=types.HttpOptions(timeout=int(timeout * 1000)),
             ),
         )
