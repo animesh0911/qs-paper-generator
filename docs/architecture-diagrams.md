@@ -26,16 +26,8 @@ flowchart LR
       HZ["/healthz"]
     end
 
-    subgraph WorkerSvc["worker — Celery"]
-      CW["celery -A config worker<br/>(ingest jobs, async tagging)"]
-    end
-
     subgraph DB["db — postgres:16"]
-      PG[("Postgres<br/>qpg")]
-    end
-
-    subgraph Cache["redis:7"]
-      RDS[("Redis<br/>broker + result backend")]
+      PG[("Postgres<br/>qpg + qpg_cache (DatabaseCache)")]
     end
 
     subgraph FEDev["frontend — Vite dev :5173"]
@@ -54,12 +46,9 @@ flowchart LR
   FE -- "PDF GET /api/papers/id/pdf/" --> DJ
 
   DJ -- "ORM psycopg" --> PG
-  CW -- "ORM" --> PG
-  DJ -- "enqueue" --> RDS
-  CW -- "consume / result" --> RDS
+  DJ -- "cache get/set (PDF bytes)" --> PG
 
   DJ -- "LLMClient.complete()" --> AN
-  CW -- "LLMClient.complete()" --> AN
   DJ -. alt .-> OA
   DJ -. alt .-> GM
 ```
@@ -232,7 +221,7 @@ flowchart LR
 ## Key invariants
 
 - **Single render contract**: `Paper.document` (PaperDocumentV1) is the only thing the PDF renderer and FE editor read. `PaperQuestion` rows are an assembly snapshot for analytics, not a render input.
-- **Process isolation**: `web` (sync DRF) and `worker` (Celery) share Postgres + Redis only; no in-process state.
+- **Stateless web**: `web` (sync DRF) keeps no in-process state — the cache (PDF bytes) lives in Postgres via `DatabaseCache`, so any process serves a warm cache hit.
 - **LLM provider swap**: env `LLM_PROVIDER` selects adapter; SDKs imported lazily so unused providers add zero import cost.
 - **Four ingestion seams** (`Parser` / `Tagger` / `DiagramExtractor` / `AnswerSource`) let tests inject stubs without PDF I/O or network.
 - **Auth**: Django SessionAuth + CSRF; multi-tenant `School` FK present but passive in Slice 1.

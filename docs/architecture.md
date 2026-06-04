@@ -6,9 +6,9 @@ How the question paper generator hangs together. Read this first if you're new t
 
 ## Stack
 
-- **Backend**: Django 5 + Django REST Framework. Postgres. Celery + Redis (workers not exercised until Slice 7).
+- **Backend**: Django 5 + Django REST Framework. Postgres (also backs the Django cache via `DatabaseCache`).
 - **Frontend**: Vite + React 18 + TypeScript. Tailwind. shadcn-style UI primitives.
-- **Dev**: Docker Compose (`docker-compose.yml`) runs db, redis, web, worker, frontend together.
+- **Dev**: Docker Compose (`docker-compose.yml`) runs db, web, frontend together.
 
 ## The paper-assembly pipeline
 
@@ -101,7 +101,7 @@ The product ships in vertical slices defined in `docs/PLAN.md`. Each slice cuts 
 | 4 — Ingestion A (PDF parse) | rework | Native Gemini multimodal extraction (ADR-0004): PDF → structured questions, English-only, auto-tagged. Drops pdfplumber + regex. |
 | 5 — Ingestion B | next | Diagram crops (PyMuPDF) as assets, de-dup, human verification. |
 | 6 — Review / edit / approve | upcoming | Provenance on `PaperQuestion`. |
-| 7 — Async generation | upcoming | Celery jobs, progress. |
+| 7 — Async generation | upcoming | Postgres-backed jobs drained by a cron management command (no Celery/Redis — see #105), progress. |
 | 8 — Grounded gen + verifier | upcoming | LLM with HITL. |
 | 9 — Export suite | upcoming | DOCX, answer key, branding. |
 | 10 — Cross-paper usage | upcoming | Freshness tracking. |

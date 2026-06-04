@@ -174,7 +174,7 @@ it. Phases 1-3 are schema-only; ingestion runs in phase 6.
 - Topic canonicalisation / `Topic` model — deferred.
 - `(B)` visually-impaired file ingestion.
 - Textbook parsing.
-- Async ingest jobs (Celery) — runs synchronously in the mgmt command for V1.
+- Async ingest jobs — runs synchronously in the mgmt command for V1.
 - Per-question manual review UI in admin — superseded by editor "Fix in bank"
   flow (separate V issue).
 

@@ -105,7 +105,7 @@ per-school configuration.
 **Repetition:** No duplicates within a paper; cross-paper usage tracked with a less-recently-used
 preference that the teacher can override.
 
-**Stack:** Django + DRF + Celery + Redis + PostgreSQL backend; React + Vite + TypeScript + Tailwind +
+**Stack:** Django + DRF + PostgreSQL backend (Postgres also backs the Django cache; no Celery/Redis for MVP — see #105); React + Vite + TypeScript + Tailwind +
 shadcn/ui frontend; Docker; Claude API for generation and a separate call for verification; Django
 Admin as the bank verification and taxonomy-management tool. Chosen to be framework-compatible with
 the Apptension SaaS boilerplate so its modules (auth, billing, multi-tenancy, GraphQL, IaC) can be
@@ -117,7 +117,7 @@ settings/school row rather than in code; no assumption of a single global user s
 multi-tenancy an additive step.
 
 **Asynchronous processing:** Paper assembly (selection → generation → verification → render) runs as
-a Celery job with progress reported to the UI.
+an async job with progress reported to the UI.
 
 ## Testing Decisions
 
@@ -142,7 +142,7 @@ Modules to be unit-tested in isolation:
 
 Prior art: there is no existing codebase yet (greenfield); these tests establish the testing
 conventions. Integration tests will cover the end-to-end generate→review→export flow and the
-ingestion pipeline; the API, UI, and Celery orchestration are validated via integration rather than
+ingestion pipeline; the API, UI, and async-job orchestration are validated via integration rather than
 isolated unit tests.
 
 ## Out of Scope

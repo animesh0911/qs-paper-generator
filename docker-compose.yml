@@ -13,14 +13,6 @@ services:
       timeout: 3s
       retries: 10
 
-  redis:
-    image: redis:7
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
   web:
     build: ./backend
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -31,7 +23,6 @@ services:
       POSTGRES_DB: qpg
       POSTGRES_USER: qpg
       POSTGRES_PASSWORD: qpg
-      REDIS_URL: redis://redis:6379/0
       LLM_PROVIDER: ${LLM_PROVIDER:-anthropic}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
@@ -47,36 +38,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  worker:
-    build: ./backend
-    command: ["celery", "-A", "config", "worker", "-l", "info"]
-    environment:
-      DJANGO_DEBUG: "1"
-      POSTGRES_HOST: db
-      POSTGRES_DB: qpg
-      POSTGRES_USER: qpg
-      POSTGRES_PASSWORD: qpg
-      REDIS_URL: redis://redis:6379/0
-      LLM_PROVIDER: ${LLM_PROVIDER:-anthropic}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-}
-    volumes:
-      - ./backend:/app
-      - ./content:/content
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      web:
-        condition: service_started
 
   frontend:
     build: ./frontend

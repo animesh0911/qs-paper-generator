@@ -42,7 +42,7 @@ It is an **assistant**, not an oracle: the teacher stays in control and accounta
 
 **Assumed defaults (override if needed):** LLM = Claude API (capable model for generation + a
 *separate* call as verifier/solver); auth = Django email/password (no SSO); hosting =
-Render/Railway/Fly + managed Postgres/Redis; Docker from day one.
+Render/Railway/Fly + managed Postgres; Docker from day one.
 
 ---
 
@@ -80,10 +80,11 @@ blueprint config** so presets are just scaled variants reusing the same section 
 └───────┬───────────────────────────┬─────────────────────────┘
         │                           │
 ┌───────▼────────┐         ┌────────▼─────────────────────────┐
-│ PostgreSQL      │         │ Celery workers (Redis broker)     │
-│ - syllabus tree │         │ - paper assembly job              │
-│ - question bank │         │ - generation + verifier pipeline  │
-│ - papers/usage  │         │ - PDF/DOCX render job             │
+│ PostgreSQL      │         │ Async jobs (Postgres-backed,      │
+│ - syllabus tree │         │ cron-drained — no Celery/Redis)   │
+│ - question bank │         │ - paper assembly job              │
+│ - papers/usage  │         │ - generation + verifier pipeline  │
+│ - job queue     │         │ - PDF/DOCX render job             │
 │ - school config │         └────────┬─────────────────────────┘
 └─────────────────┘                  │
                               ┌───────▼────────┐   ┌──────────────┐
@@ -129,7 +130,7 @@ blueprint config** so presets are just scaled variants reusing the same section 
 5. **Human verification** in Django Admin → correct tags/keys, approve. Only `verified` questions
    are eligible for papers.
 
-### 6b. Paper generation (online, Celery job)
+### 6b. Paper generation (online, async job)
 1. **Resolve blueprint** from preset → required questions per section/marks/cognitive mix.
 2. **Translate difficulty slider** → target cognitive-level distribution per section.
 3. **Allocate** questions to chapters by weight.
@@ -148,8 +149,9 @@ blueprint config** so presets are just scaled variants reusing the same section 
 
 ## 7. Tech stack & repo layout (boilerplate-compatible)
 
-**Keep identical to Apptension (so code/concepts transfer):** Django 5.2 + DRF + Celery + Redis +
-PostgreSQL; React 19 + Vite + TypeScript + Tailwind + shadcn/ui; Docker.
+**Keep close to Apptension (so code/concepts transfer):** Django 5.2 + DRF + PostgreSQL;
+React 19 + Vite + TypeScript + Tailwind + shadcn/ui; Docker. (Celery + Redis dropped for the MVP —
+Postgres backs the cache and any async jobs are cron-drained DB rows; see #105.)
 
 **Skip for v1 (add later by adopting boilerplate modules):** GraphQL (use DRF REST + React Query),
 Nx (plain folders), AWS CDK (simple PaaS deploy), Stripe, Contentful, SSO/passkeys.
@@ -158,11 +160,11 @@ Nx (plain folders), AWS CDK (simple PaaS deploy), Stripe, Contentful, SSO/passke
 qs_paper_generator/
 ├─ backend/                 # Django project
 │  ├─ accounts/  bank/  papers/  generation/  rendering/
-│  ├─ config/               # settings, celery app
+│  ├─ config/               # settings, urls, wsgi/asgi
 │  └─ Dockerfile
 ├─ frontend/                # React + Vite + Tailwind + shadcn/ui
 │  └─ Dockerfile
-├─ docker-compose.yml       # web, worker, postgres, redis
+├─ docker-compose.yml       # web, postgres, frontend
 ├─ data/                    # source PDFs + textbook (gitignored if large)
 └─ PLAN.md
 ```
@@ -176,7 +178,7 @@ GraphQL addition); shadcn UI (copy-paste compatible); Docker (matches their cont
 ## 8. Phased roadmap
 
 **Phase 0 — Foundations (skeleton)**
-- Repo, docker-compose (web/worker/postgres/redis), Django + React + Tailwind/shadcn, basic auth.
+- Repo, docker-compose (web/postgres/frontend), Django + React + Tailwind/shadcn, basic auth.
 - Seed the **canonical Class 10 Science chapter taxonomy**.
 - Encode the **blueprint config** + the board preset.
 
