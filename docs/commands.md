@@ -105,6 +105,61 @@ Django settings come from env vars (`backend/config/settings.py`). Key flags:
 
 ---
 
+## Extraction eval / benchmark
+
+How well does `GeminiExtractor` parse a source paper? Measure it instead of
+eyeballing. The loop is **extract (paid) → score (free) → benchmark (free)**.
+
+Ground-truth manifests live under `content/eval/*.truth.json` — one per paper,
+hand-built from the PDF: `{num, section, qtype, marks, key}` per question, where
+`section` is the **mark band** (1→A, 2→B, 3→C, 4→E, 5→D) the importer derives,
+not the printed discipline grouping. See `content/eval/31_1_1_Science.truth.json`.
+
+```bash
+# 1. Produce an extraction JSON — PAID, ~1 LLM call per page, model from
+#    GEMINI_MODEL. Consent-gated (CLAUDE.md Rule 13). One run = one charge.
+docker compose run --rm web python manage.py extract_paper \
+  /content/science_2026/31_1_1_Science.pdf --out /content/parsed/baseline
+
+# 2. Score one extraction against its manifest — FREE, deterministic, no LLM.
+docker compose run --rm web python manage.py score_extraction \
+  /content/parsed/baseline/31_1_1_Science.json \
+  /content/eval/31_1_1_Science.truth.json
+```
+
+`score_extraction` prints `expected / extracted / matched`, then `recall /
+precision / section_acc / qtype_acc / structure_usable`, plus the `MISSED` and
+`SPURIOUS` lists so a regression names what changed.
+
+### A/B harness — benchmark_extraction
+
+Compare prompt/model variants over **every** manifest in `content/eval` at once.
+Each `--arm name=dir` is a directory of `extract_paper` outputs from one variant
+(producing them is the paid step above; the benchmark itself never calls an LLM).
+For each manifest it looks up `<dir>/<paper>.json` per arm, scores it, and prints
+one table; `--record` writes the rows to JSON for regression tracking.
+
+```bash
+# Each arm is its own paid extraction run into a distinct --out dir. Vary
+# GEMINI_THINKING_BUDGET (-1 dynamic / 0 off / >0 cap) or GEMINI_MODEL per arm.
+docker compose run --rm -e GEMINI_THINKING_BUDGET=-1 web python manage.py extract_paper \
+  /content/science_2026/31_1_1_Science.pdf --out /content/parsed/thinking_on
+docker compose run --rm -e GEMINI_THINKING_BUDGET=0  web python manage.py extract_paper \
+  /content/science_2026/31_1_1_Science.pdf --out /content/parsed/thinking_off
+
+# Score both arms into one table and record the numbers (free, no LLM).
+docker compose run --rm web python manage.py benchmark_extraction /content/eval \
+  --arm thinking_on=/content/parsed/thinking_on \
+  --arm thinking_off=/content/parsed/thinking_off \
+  --record /content/eval/results/$(date +%F).json
+```
+
+To check a later change for regression, re-run the arms, re-record, and diff the
+new results JSON against the committed baseline — a dropped `recall` or a paper
+that flipped to `— no extraction found —` is the signal.
+
+---
+
 ## Database — Postgres
 
 ```bash
