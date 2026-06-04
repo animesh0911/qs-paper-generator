@@ -10,6 +10,7 @@ from __future__ import annotations
 import pytest
 from django.core.management import call_command
 
+from bank.management.commands.generate_answers import _build_prompt
 from bank.models import AnswerSource, Chapter, Question
 
 
@@ -162,3 +163,21 @@ def test_dry_run_does_not_write(monkeypatch):
     q.refresh_from_db()
     assert q.answer == ""
     assert stub.calls == []
+
+
+@pytest.mark.django_db
+def test_build_prompt_tolerates_malformed_options():
+    """A malformed option dict must not raise from _build_prompt.
+
+    Why this matters: _build_prompt runs before the per-question try in
+    handle(); a KeyError here would abort the whole batch, not one question.
+    """
+    q = _make_question(
+        qtype="mcq",
+        options=[{"label": "A"}, {"text": "no label"}, {}],
+    )
+
+    prompt = _build_prompt(q)
+
+    assert "A." in prompt
+    assert "no label" in prompt

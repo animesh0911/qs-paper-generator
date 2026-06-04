@@ -2,8 +2,11 @@
 
 Calls Gemini once per question to produce a CBSE-appropriate model answer,
 storing it with ``answer_source='generated_unverified'``. A teacher must set
-``answer_source='generated_verified'`` via the Django admin before the marking
-scheme will surface the answer (see ``pdf.render_answer_key_pdf`` and ADR-0002).
+``answer_source='generated_verified'`` via the Django admin ("Approve generated
+answers" action) before the answer can appear in a marking scheme. The gate that
+enforces this is ``PaperAnswerKeyPdfView._answers_by_id`` (papers/views.py),
+which drops ``generated_unverified`` answers so they render as
+``(no answer on file)`` until approved.
 
 Usage::
 
@@ -48,7 +51,12 @@ def _build_prompt(q: Question) -> str:
     chapter = q.chapter.name if q.chapter else "unknown chapter"
     options_block = ""
     if q.options:
-        lines = "\n".join(f"  {o['label']}. {o['text']}" for o in q.options)
+        # .get(): a malformed option dict must not crash prompt-building (and
+        # thereby abort the whole batch — _build_prompt runs before the
+        # per-question try in handle()).
+        lines = "\n".join(
+            f"  {o.get('label', '?')}. {o.get('text', '')}" for o in q.options
+        )
         options_block = f"\nOptions:\n{lines}"
     return (
         "You are generating a CBSE Class 10 Science model answer for the "
