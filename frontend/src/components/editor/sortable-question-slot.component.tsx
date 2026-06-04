@@ -82,7 +82,12 @@ export function SortableQuestionSlot({
           ref={setActivatorNodeRef}
           type="button"
           data-editor-chrome
-          className="mt-1 inline-flex h-5 w-5 flex-none cursor-grab items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
+          className={cn(
+            'mt-1 inline-flex h-5 w-5 flex-none items-center justify-center rounded-sm text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            reorderEnabled
+              ? 'cursor-grab hover:bg-secondary hover:text-foreground active:cursor-grabbing'
+              : 'cursor-not-allowed opacity-40',
+          )}
           aria-label={`Drag question ${displayNumber}`}
           title={
             reorderEnabled
