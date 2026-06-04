@@ -17,10 +17,12 @@ Ground-truth manifest shape (one per source paper, hand-built from the PDF)::
       ]
     }
 
-``key`` is a short, unique phrase from the question's English stem; an extracted
+``key`` is a short, unique phrase from the question's English text; an extracted
 question matches a ground-truth entry when the (normalised) key is a substring
-of the (normalised) extracted text. Each ground-truth entry matches at most one
-extracted question and vice-versa.
+of the question's (normalised) full text — stem plus options, subparts, choices
+and assertion/reason regions (see ``_question_text``), so thin-stem types still
+match. Each ground-truth entry matches at most one extracted question and
+vice-versa.
 
 Usage::
 
@@ -45,18 +47,47 @@ def _norm(text: str) -> str:
     return re.sub(r"[^\w\s]", "", text)
 
 
+def _question_text(q: dict) -> str:
+    """All matchable text of an extracted question, flattened to one string.
+
+    The stem alone (``text``) misses thin-stem types — assertion-reason,
+    "give differences", internal-choice — whose identifying wording lives in
+    ``options``, ``content.subparts``, ``content.choices``, or
+    ``content.assertion`` / ``content.reason``. We collect every ``text`` /
+    ``latex`` string anywhere in the question so a ground-truth key drawn from
+    any region still matches, and recall counts a question as found wherever its
+    distinctive phrase sits.
+    """
+    parts: list[str] = []
+
+    def walk(node) -> None:
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if key in ("text", "latex") and isinstance(value, str):
+                    parts.append(value)
+                else:
+                    walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    walk(q)
+    return " ".join(parts)
+
+
 def score(extraction: dict, ground_truth: dict) -> dict:
     """Score one extraction against its ground truth. Pure — no I/O, no LLM.
 
     Matching: a ground-truth entry is matched by the first not-yet-claimed
-    extracted question whose normalised text contains the normalised ``key``.
+    extracted question whose normalised full text (``_question_text``) contains
+    the normalised ``key``.
     Returns recall/precision plus section, qtype and structure accuracy, and the
     lists of missed (uncaptured) and spurious (captured-but-not-in-truth) rows so
     a regression can name what changed, not just move a number.
     """
     ext = extraction.get("questions", [])
     gt = ground_truth.get("questions", [])
-    ext_norm = [_norm(q.get("text", "")) for q in ext]
+    ext_norm = [_norm(_question_text(q)) for q in ext]
 
     claimed: set[int] = set()
     pairs: list[tuple[dict, dict]] = []  # (gt_entry, ext_question)
