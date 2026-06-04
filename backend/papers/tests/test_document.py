@@ -264,3 +264,148 @@ def test_build_branding_none_without_school_or_config():
     assert builder._build_branding(_paper_with_settings(None)) is None
     assert builder._build_branding(_paper_with_settings({})) is None
     assert builder._build_branding(_paper_with_settings({"branding": {}})) is None
+
+
+# --- structured qtype content regions (contract §9, issue #46 AC-3) ---
+#
+# AC-3: structured qtypes render from `content`, not `rawText` fallback.
+# These tests verify the pass-through and the fallback for each structured type.
+# They run against Question instances (no DB needed) so they never require
+# a real loaded bank.
+
+
+def _question(**kwargs) -> Question:
+    """Build an unsaved Question with defaults suitable for content tests."""
+    from bank.models import Question
+
+    defaults = dict(
+        section="A",
+        marks=1,
+        cognitive_level="U",
+        text="Default stem text.",
+        options=[],
+        content={},
+        has_diagram=False,
+    )
+    defaults.update(kwargs)
+    return Question(**defaults)
+
+
+def test_assertion_reason_structured_content_passthrough():
+    """assertion_reason with structured content emits all regions verbatim."""
+    structured = {
+        "assertion": [{"type": "paragraph", "text": "Mendel used pea plants."}],
+        "reason": [{"type": "paragraph", "text": "Peas self-pollinate."}],
+        "options": [
+            {
+                "label": "A",
+                "content": [{"type": "paragraph", "text": "Both true, reason correct"}],
+            },
+            {
+                "label": "B",
+                "content": [
+                    {"type": "paragraph", "text": "Both true, reason incorrect"}
+                ],
+            },
+        ],
+    }
+    q = _question(qtype="assertion_reason", content=structured)
+    result = PaperDocumentBuilder()._build_content(q)
+    assert result == structured
+
+
+def test_assertion_reason_fallback_has_only_stem():
+    """assertion_reason without structured content falls back to stem only.
+
+    Why: fallback_regions for AR is ('stem',) — the builder can't synthesise
+    assertion/reason text from rawText, so it doesn't try. The frontend renders
+    from rawText for unstructured AR rows.
+    """
+    q = _question(qtype="assertion_reason", content={}, text="Assertion: X. Reason: Y.")
+    result = PaperDocumentBuilder()._build_content(q)
+    assert "stem" in result
+    assert "assertion" not in result
+    assert "reason" not in result
+
+
+def test_case_based_structured_content_passthrough():
+    """case_based with structured content emits passage + subparts verbatim."""
+    structured = {
+        "passage": [{"type": "paragraph", "text": "Read the passage about circuits."}],
+        "subparts": [
+            {
+                "label": "i",
+                "marks": 1,
+                "content": [{"type": "paragraph", "text": "What is current?"}],
+            },
+            {
+                "label": "ii",
+                "marks": 1,
+                "content": [{"type": "paragraph", "text": "State Ohm's law."}],
+            },
+        ],
+    }
+    q = _question(qtype="case_based", content=structured)
+    result = PaperDocumentBuilder()._build_content(q)
+    assert result == structured
+
+
+def test_case_based_fallback_has_only_stem():
+    """case_based without structured content falls back to stem only."""
+    q = _question(qtype="case_based", content={}, text="Read this passage.")
+    result = PaperDocumentBuilder()._build_content(q)
+    assert "stem" in result
+    assert "passage" not in result
+    assert "subparts" not in result
+
+
+def test_internal_choice_structured_content_passthrough():
+    """internal_choice with structured content emits choices (ChoiceGroup) verbatim."""
+    structured = {
+        "choices": [
+            {
+                "displayStyle": "or",
+                "chooseCount": 1,
+                "options": [
+                    {
+                        "label": "A",
+                        "content": [
+                            {"type": "paragraph", "text": "Explain photosynthesis."}
+                        ],
+                    },
+                    {
+                        "label": "B",
+                        "content": [
+                            {"type": "paragraph", "text": "Explain respiration."}
+                        ],
+                    },
+                ],
+            }
+        ]
+    }
+    q = _question(qtype="internal_choice", content=structured)
+    result = PaperDocumentBuilder()._build_content(q)
+    assert result == structured
+
+
+def test_internal_choice_fallback_has_only_stem():
+    """internal_choice without structured content falls back to stem only."""
+    q = _question(qtype="internal_choice", content={}, text="Answer any one.")
+    result = PaperDocumentBuilder()._build_content(q)
+    assert "stem" in result
+    assert "choices" not in result
+
+
+def test_content_regions_are_lists_not_scalars():
+    """Every region value in _build_content output is a list, never a scalar.
+
+    Why: contract §9 says each region holds ContentItem[] or option objects.
+    A scalar would break the frontend's array iteration.
+    """
+    for qtype in ("mcq", "short_answer", "long_answer", "very_short_answer"):
+        q = _question(qtype=qtype, content={})
+        result = PaperDocumentBuilder()._build_content(q)
+        for region, value in result.items():
+            assert isinstance(
+                value, list
+            ), f"{qtype}: region '{region}' is {type(value).__name__}, expected list"
