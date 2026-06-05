@@ -35,6 +35,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
+from bank.guardrails import apply_guardrails
 from bank.ingestor import (
     Ingestor,
     _fingerprint,
@@ -142,6 +143,11 @@ class Command(BaseCommand):
         # Structural self-assessment — no source-text verification (ADR-0004).
         for q in questions:
             q["parse_quality"] = compute_parse_quality(q, q.get("qtype", ""))
+
+        # Same Layer-2 guardrails the live path runs: resolve chapters toward the
+        # taxonomy and flag structural defects in this (possibly pre-Layer-1)
+        # committed JSON before persisting.
+        apply_guardrails(questions, set(chapter_by_slug))
 
         prov = _parse_source_filename(Path(source_pdf))
         provenance = _Provenance(

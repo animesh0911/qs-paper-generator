@@ -18,6 +18,7 @@ from bank.ingestor import (
     Ingestor,
     _coerce_figures,
     _parse_source_filename,
+    build_question_schema,
 )
 from bank.models import Chapter, Question
 from bank.question_shape import compute_parse_quality
@@ -129,13 +130,36 @@ def test_ingestor_empty_pdf_creates_nothing():
 
 
 @pytest.mark.django_db
-def test_ingestor_unknown_chapter_slug_persists_without_chapter():
-    """An unknown slug → chapter stays None, ingestion still succeeds."""
+def test_response_schema_chapter_enum_equals_seeded_taxonomy():
+    """The schema's chapter_slug enum is built from the live Chapter taxonomy.
+
+    Why this matters (#126): chapter_slug was the one free-form taxonomy field
+    and the root cause of cross-paper mis-tagging. Closing it to a dynamically
+    built enum stops bad values at the source; this asserts the enum can't drift
+    from the seeded slugs (and stays nullable for the genuine 'unsure' case)."""
+    slugs = list(Chapter.objects.values_list("slug", flat=True))
+    schema = build_question_schema(slugs)
+    chapter = schema["properties"]["questions"]["items"]["properties"]["chapter_slug"]
+    assert set(chapter["enum"]) == set(slugs)
+    assert chapter["nullable"] is True
+
+
+@pytest.mark.django_db
+def test_ingestor_unresolvable_chapter_slug_is_flagged_not_silent():
+    """An unresolvable slug → chapter null but LOUD: flagged + parse_quality down.
+
+    Why this matters: the old behaviour silently `.get()`d an unknown slug to
+    None with no signal (the #108 root cause). The guardrails must record
+    ``chapter_unresolved`` and downgrade so the row surfaces in the review queue
+    instead of entering the bank as a clean, untagged question."""
     result = Ingestor(
         extractor=StubExtractor([_q(chapter_slug="no-such-chapter")])
     ).ingest(b"x")
     assert result.created == 1
-    assert Question.objects.get().chapter_id is None
+    row = Question.objects.get()
+    assert row.chapter_id is None
+    assert row.review_flags == ["chapter_unresolved"]
+    assert row.parse_quality == "partial"
 
 
 @pytest.mark.django_db
@@ -143,10 +167,25 @@ def test_ingestor_sets_parse_quality_from_structure():
     """Coordinator sets parse_quality structurally (no source-text verification).
 
     Why this matters: parse_quality is the picker gate. An mcq with no options is
-    broken; a non-empty short answer is clean — both decided by structure here."""
+    broken; a non-empty short answer is clean — both decided by structure here.
+    A canonical chapter + marks matching the section keep the guardrails quiet so
+    the assertion isolates the structural signal."""
     questions = [
-        _q(section="A", qtype="mcq", text="Which gas?", options=[]),
-        _q(section="C", qtype="short_answer", text="Define refraction."),
+        _q(
+            section="A",
+            qtype="mcq",
+            marks=1,
+            text="Which gas?",
+            options=[],
+            chapter_slug="electricity",
+        ),
+        _q(
+            section="C",
+            qtype="short_answer",
+            marks=3,
+            text="Define refraction.",
+            chapter_slug="electricity",
+        ),
     ]
     Ingestor(extractor=StubExtractor(questions)).ingest(b"x")
 
@@ -197,6 +236,7 @@ class SequenceLLMClient:
         }
 
 
+@pytest.mark.django_db
 def test_gemini_extractor_calls_client_once_per_page_and_merges(monkeypatch):
     """One request per page; results merge in document order.
 
@@ -224,6 +264,7 @@ class OnePageLLMClient:
         return self.payload if self.calls == 1 else {"questions": []}
 
 
+@pytest.mark.django_db
 def test_gemini_extractor_coerces_question_fields():
     """rawText→text, marks/section derived, topic_names cleaned, primary_form clamped.
 
@@ -257,6 +298,7 @@ def test_gemini_extractor_coerces_question_fields():
     assert q["chapter_slug"] == "electricity"
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "raw,expected",
     [
@@ -277,6 +319,7 @@ def test_coerce_strips_leading_question_number(raw, expected):
     assert out[0]["text"] == expected
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "marks,expected_section",
     [(1, "A"), (2, "B"), (3, "C"), (4, "E"), (5, "D")],
@@ -296,6 +339,7 @@ def test_section_derived_from_marks(marks, expected_section):
     assert out[0]["section"] == expected_section
 
 
+@pytest.mark.django_db
 def test_gemini_extractor_dedups_question_spanning_pages(monkeypatch):
     """A question repeated across two page calls is emitted once.
 
@@ -319,6 +363,7 @@ def test_gemini_extractor_dedups_question_spanning_pages(monkeypatch):
     assert len(out) == 1
 
 
+@pytest.mark.django_db
 def test_gemini_extractor_rewrites_figure_page_to_absolute(monkeypatch):
     """A figure localised on its single-page slice gets the absolute page number.
 

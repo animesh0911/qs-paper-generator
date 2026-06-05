@@ -12,6 +12,27 @@ class ChapterAdmin(admin.ModelAdmin):
     ordering = ("order",)
 
 
+class NeedsReviewFilter(admin.SimpleListFilter):
+    """Filter the question list to rows the ingest guardrails flagged.
+
+    ``review_flags`` is a JSON list; "Yes" is any non-empty list. This is the
+    review queue — rows a deterministic check (bank.guardrails) couldn't accept
+    silently (unresolved chapter, marks/section mismatch, blueprint drift, …)."""
+
+    title = "needs review"
+    parameter_name = "needs_review"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Yes — has guardrail flags"), ("no", "No — clean"))
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.exclude(review_flags=[])
+        if self.value() == "no":
+            return queryset.filter(review_flags=[])
+        return queryset
+
+
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = (
@@ -25,9 +46,11 @@ class QuestionAdmin(admin.ModelAdmin):
         "answer_source",
         "has_diagram",
         "is_numerical",
+        "review_flags",
         "short_text",
     )
     list_filter = (
+        NeedsReviewFilter,
         "verified",
         "answer_source",
         "has_diagram",
@@ -38,7 +61,12 @@ class QuestionAdmin(admin.ModelAdmin):
         "cognitive_level",
     )
     search_fields = ("text",)
-    readonly_fields = ("source_hash", "diagram_preview")
+    readonly_fields = (
+        "source_hash",
+        "diagram_preview",
+        "parse_quality",
+        "review_flags",
+    )
     fields = (
         "section",
         "qtype",
@@ -50,6 +78,8 @@ class QuestionAdmin(admin.ModelAdmin):
         "answer",
         "answer_source",
         "verified",
+        "parse_quality",
+        "review_flags",
         "has_diagram",
         "is_numerical",
         "diagram",
