@@ -157,6 +157,61 @@ that flipped to `— no extraction found —` is the signal.
 
 ---
 
+## Teacher PDF upload (live HTTP ingest)
+
+The bank has **two ingestion front doors** (both intentional — see CONTEXT.md
+`Ingestor`). The eval/benchmark section above is the *developer* path
+(`extract_paper` → committed JSON → `load_questions`). This is the *teacher*
+path: upload a PDF over HTTP at runtime, no shell/repo/git.
+
+The upload itself makes **no LLM call** — it persists the PDF and queues an
+`IngestionJob` row (`status=pending`), returning `202` immediately. A separate
+`drain_ingestion_jobs` command does the extraction out-of-request (in
+production it runs on the platform's **cron**; there is no Celery / Redis /
+worker daemon). Locally you run the drain by hand.
+
+```bash
+# 1. Log in as the seeded teacher to get a token.
+TOKEN=$(curl -s -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"teacher@example.com","password":"teacher123"}' \
+  | python3 -c 'import sys,json; print(json.load(sys.stdin)["token"])')
+
+# 2. Upload a PDF — returns 202 + a job id. No extraction happens yet.
+#    source_type is optional (one of previous_year_paper / sample_paper /
+#    question_bank); it defaults to previous_year_paper.
+JOB_ID=$(curl -s -X POST http://localhost:8000/api/bank/ingest/ \
+  -H "Authorization: Token $TOKEN" \
+  -F "pdf=@content/science_2026/31_1_1_Science.pdf" \
+  -F "source_type=previous_year_paper" \
+  | python3 -c 'import sys,json; print(json.load(sys.stdin)["id"])')
+
+# 3. See what's queued — FREE, never calls Gemini.
+docker compose run --rm web python manage.py drain_ingestion_jobs --dry-run
+
+# 4. Drain the queue — PAID, ~1 LLM call per PDF page, model from GEMINI_MODEL.
+#    Consent-gated (CLAUDE.md Rule 13). One run = one charge per pending job.
+docker compose run --rm web python manage.py drain_ingestion_jobs
+
+# 5. Poll the job — status flips pending -> running -> done (or failed), with
+#    created/skipped counts (or an error message).
+curl -s -H "Authorization: Token $TOKEN" \
+  http://localhost:8000/api/bank/ingest/$JOB_ID/
+```
+
+Drained questions land scoped to the uploading teacher's `school`, `verified=False`
+(filtered by the downstream `parse_quality`/`verified` gate — there is no upfront
+review step in V1). `--limit N` caps how many pending jobs one drain run
+processes. One bad PDF is recorded as `failed` with its error and does not abort
+the rest of the run.
+
+> **Production:** schedule `python manage.py drain_ingestion_jobs` on your host's
+> cron (Render Cron Job / Railway cron / VPS crontab, e.g. `* * * * *`). The
+> ~1-minute pickup latency is irrelevant — extraction takes minutes. No code
+> change is needed to deploy it; it is purely scheduler config.
+
+---
+
 ## Database — Postgres
 
 ```bash

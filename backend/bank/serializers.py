@@ -15,7 +15,7 @@ owner-scoped answer-key endpoint (``papers.views.PaperAnswerKeyPdfView``).
 
 from rest_framework import serializers
 
-from .models import Chapter, Question
+from .models import Chapter, IngestionJob, Question, SourceType
 
 
 class ChapterSerializer(serializers.ModelSerializer):
@@ -55,3 +55,36 @@ class AnswerKeySerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ["id", "marks", "answer", "answer_source"]
+
+
+class IngestionUploadSerializer(serializers.Serializer):
+    """Validates a teacher's PDF-upload request (multipart/form-data).
+
+    ``pdf`` is the source file; ``source_type`` is the caller-supplied
+    provenance (one of ``SourceType``), defaulting to ``previous_year_paper`` —
+    no longer hardcoded on the server. The view (not this serializer) supplies
+    ``school`` and ``created_by`` from the authenticated teacher."""
+
+    pdf = serializers.FileField()
+    source_type = serializers.ChoiceField(
+        choices=SourceType.choices,
+        default=SourceType.PREVIOUS_YEAR_PAPER,
+    )
+
+
+class IngestionJobSerializer(serializers.ModelSerializer):
+    """Job status shape the frontend polls — never exposes the stored PDF."""
+
+    class Meta:
+        model = IngestionJob
+        fields = [
+            "id",
+            "status",
+            "source_type",
+            "source_file_name",
+            "created_count",
+            "skipped_count",
+            "error",
+            "created_at",
+            "updated_at",
+        ]

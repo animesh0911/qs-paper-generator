@@ -77,6 +77,20 @@ class PrimaryForm(models.TextChoices):
     TABLE_BASED = "table_based", "Table-based"
 
 
+class SourceType(models.TextChoices):
+    """Where a batch of questions came from.
+
+    Maps to the ``PaperDocumentV1`` source ``type`` (contract §10). The default
+    for an ingested PDF is ``previous_year_paper``; a teacher uploading their
+    own material may pick ``sample_paper`` or ``question_bank``. Set as the
+    ``Question.source_type`` and ``IngestionJob.source_type`` choices so the
+    allowed values live in one place."""
+
+    PREVIOUS_YEAR_PAPER = "previous_year_paper", "Previous-year paper"
+    SAMPLE_PAPER = "sample_paper", "Sample paper"
+    QUESTION_BANK = "question_bank", "Question bank"
+
+
 class AnswerSource(models.TextChoices):
     """Provenance of a stored ``Question.answer``.
 
@@ -180,7 +194,10 @@ class Question(models.Model):
     source_hash = models.CharField(max_length=32, blank=True, db_index=True)
     # Source provenance — maps to PaperDocumentV1 `source` object.
     source_type = models.CharField(
-        max_length=32, blank=True, default="previous_year_paper"
+        max_length=32,
+        choices=SourceType.choices,
+        blank=True,
+        default=SourceType.PREVIOUS_YEAR_PAPER,
     )
     source_name = models.CharField(max_length=160, blank=True)
     source_file_name = models.CharField(max_length=160, blank=True)
@@ -193,3 +210,75 @@ class Question(models.Model):
 
     def __str__(self):
         return f"[{self.section}/{self.marks}m] {self.text[:60]}"
+
+
+class IngestionJobStatus(models.TextChoices):
+    """Lifecycle of an out-of-request PDF ingestion (no upfront review, V1).
+
+    ``pending`` rows are picked up by ``drain_ingestion_jobs`` (cron), flipped
+    to ``running`` while Gemini extracts, then ``done`` (with result counts) or
+    ``failed`` (with ``error``)."""
+
+    PENDING = "pending", "Pending"
+    RUNNING = "running", "Running"
+    DONE = "done", "Done"
+    FAILED = "failed", "Failed"
+
+
+class IngestionJob(models.Model):
+    """A queued teacher PDF upload, drained out-of-request into the bank.
+
+    The HTTP ingest front door (``bank.views.ingest``) persists the uploaded PDF
+    and creates one of these rows with ``status=pending``, returning 202 + the
+    job id immediately — no Gemini call inside the request. A scheduled
+    ``drain_ingestion_jobs`` management command (platform cron, no Celery /
+    Redis / worker daemon) processes pending rows via the same
+    ``GeminiExtractor`` + ``Ingestor`` the CLI path uses, scoping the created
+    ``Question`` rows to ``school``. The frontend polls ``GET
+    /api/bank/ingest/{id}/`` for status and result counts.
+
+    See the two-front-door note in CONTEXT.md ``Ingestor``: this is the live
+    HTTP path for teachers; the committed-JSON CLI path is the developer one.
+    """
+
+    school = models.ForeignKey(
+        School,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="ingestion_jobs",
+    )
+    # Who uploaded it. SET_NULL so deleting a teacher does not drop their jobs.
+    created_by = models.ForeignKey(
+        "accounts.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="ingestion_jobs",
+    )
+    pdf = models.FileField(upload_to="ingestion_uploads/")
+    source_file_name = models.CharField(max_length=160, blank=True)
+    source_type = models.CharField(
+        max_length=32,
+        choices=SourceType.choices,
+        default=SourceType.PREVIOUS_YEAR_PAPER,
+    )
+    status = models.CharField(
+        max_length=8,
+        choices=IngestionJobStatus.choices,
+        default=IngestionJobStatus.PENDING,
+        db_index=True,
+    )
+    # Result counts, populated on success (mirror IngestResult).
+    created_count = models.PositiveIntegerField(default=0)
+    skipped_count = models.PositiveIntegerField(default=0)
+    # Failure detail — set when status is failed.
+    error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"IngestionJob #{self.pk} [{self.status}] {self.source_file_name}"

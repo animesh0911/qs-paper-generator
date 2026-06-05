@@ -2,10 +2,11 @@
 
 from django.urls import path
 
-from .views import chapters, ingest, metadata
+from .views import chapters, ingest, ingest_status, metadata
 
 urlpatterns = [
     path("metadata/", metadata),
     path("chapters/", chapters),
     path("ingest/", ingest),
+    path("ingest/<int:job_id>/", ingest_status),
 ]
