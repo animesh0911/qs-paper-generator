@@ -186,6 +186,10 @@ class Question(models.Model):
     parse_quality = models.CharField(
         max_length=8, choices=ParseQuality.choices, default=ParseQuality.PARTIAL
     )
+    # Deterministic ingest-guardrail flags (bank.guardrails) — reason codes like
+    # "chapter_unresolved", "marks_section_mismatch", "blueprint_count_drift".
+    # Empty = clean; non-empty = surfaced in the admin review queue. Queryable.
+    review_flags = models.JSONField(default=list, blank=True)
     # Slice 5 — ingestion enrichment flags
     has_diagram = models.BooleanField(default=False)
     is_numerical = models.BooleanField(default=False)

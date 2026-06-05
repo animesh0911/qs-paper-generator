@@ -25,6 +25,7 @@ Ingestor — no module-level patching.
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import re
 from dataclasses import dataclass
@@ -242,7 +243,11 @@ _QUESTION_SCHEMA = {
                             "choices": {"type": "ARRAY", "items": _CHOICE_GROUP},
                         },
                     },
-                    "chapter_slug": {"type": "STRING"},
+                    # Closed-vocab enum is injected per call by
+                    # ``build_question_schema`` from the live ``Chapter`` slugs —
+                    # the base stays free-form so the module constant has no DB
+                    # dependency at import (and ``test_question_shape`` can read it).
+                    "chapter_slug": {"type": "STRING", "nullable": True},
                     "cognitive_level": {
                         "type": "STRING",
                         "enum": ["R", "U", "Ap", "An"],
@@ -284,6 +289,26 @@ _QUESTION_SCHEMA = {
 }
 
 
+def build_question_schema(chapter_slugs) -> dict:
+    """Return the response schema with ``chapter_slug`` closed to the taxonomy.
+
+    ``chapter_slug`` is the one taxonomy field the model used to free-form, the
+    root cause of the cross-paper chapter mis-tagging in #108. Closing it to the
+    seeded ``Chapter`` slugs (built dynamically, never hardcoded, so it can't
+    drift from migration ``0003``) stops bad values at the source — the Layer 1
+    half of the fix; ``bank.guardrails`` is the deterministic safety net for
+    anything that still slips through (e.g. legacy committed JSON).
+    """
+    schema = copy.deepcopy(_QUESTION_SCHEMA)
+    props = schema["properties"]["questions"]["items"]["properties"]
+    props["chapter_slug"] = {
+        "type": "STRING",
+        "enum": sorted(chapter_slugs),
+        "nullable": True,
+    }
+    return schema
+
+
 def _page_prompt() -> str:
     """Build the per-page extraction prompt (one PDF page in, English-only).
 
@@ -310,10 +335,22 @@ def _page_prompt() -> str:
         "Never translate Hindi; emit no Devanagari characters.\n\n"
         "Copy each question VERBATIM from the English text — never paraphrase, "
         "correct, complete, or summarise it.\n\n"
+        "ONE ENTRY PER QUESTION NUMBER: emit exactly one JSON entry per printed "
+        "question number. All sub-parts (i)/(ii)/(a)/(b) stay inside that entry "
+        "(content.subparts), and an 'OR' alternative stays inside it "
+        "(content.choices) — never split a question's parts or its OR-alternative "
+        "into separate entries.\n\n"
+        "SYMBOLS: emit scientific symbols and units as LaTeX — an inline "
+        "{type:'equation', latex:'...'} item, or the item's latex field (e.g. "
+        "\\Omega for ohm, \\rightarrow, ^\\circ C). Never paste raw Unicode glyphs "
+        "that may be garbled in the source scan.\n\n"
         "STRUCTURE:\n"
         "  - assertion_reason: put the Assertion sentence in content.assertion and "
         "the Reason sentence in content.reason; the fixed (A)–(D) 'Both A and R …' "
         "codes are the options. The shared Directions block is not the stem.\n"
+        "  - mcq/assertion_reason: ALSO mirror the choices into content.options as "
+        "labelled entries ([{label, content:[...]}]) — content.options is the "
+        "source the renderer reads; never leave it empty for an objective question.\n"
         "  - internal choice: an 'OR' (अथवा) alternative is part of the SAME "
         "question — capture both alternatives in content.choices as one "
         "internal_choice question. Never emit the alternative as a separate "
@@ -334,7 +371,8 @@ def _page_prompt() -> str:
         "    options / subparts: [{label, marks?, content:[item, ...]}].\n"
         "    choices (internal_choice): [{displayStyle:'or', chooseCount, "
         "options:[{label, content:[item, ...]}]}].\n"
-        "  chapter_slug — closest CBSE Cl.10 Science chapter slug, or null if unsure.\n"
+        "  chapter_slug — pick EXACTLY ONE slug from the allowed list the schema "
+        "enumerates, or null if unsure. Never invent or reformat a slug.\n"
         "  cognitive_level — one of R, U, Ap, An.\n"
         "  topic_names — short topic strings within the chapter; [] if none.\n"
         "  primary_form — one of none, diagram_based, table_based.\n"
@@ -473,10 +511,13 @@ class GeminiExtractor:
 
     def extract(self, pdf_bytes: bytes) -> list[dict]:
         prompt = _page_prompt()
+        # Close chapter_slug to the live taxonomy so the model can only emit a
+        # canonical slug (or null) — built once per paper, not per page.
+        schema = build_question_schema(Chapter.objects.values_list("slug", flat=True))
         questions: list[dict] = []
         seen: set[str] = set()
         for page_index, page_bytes in enumerate(_split_pages(pdf_bytes)):
-            payload = self.client.extract(page_bytes, prompt, _QUESTION_SCHEMA)
+            payload = self.client.extract(page_bytes, prompt, schema)
             for obj in payload.get("questions", []):
                 if not isinstance(obj, dict):
                     continue
@@ -573,6 +614,15 @@ class Ingestor:
         for q in raw_questions:
             q["parse_quality"] = compute_parse_quality(q, q["qtype"])
 
+        # Layer-2 guardrails: resolve chapters toward the taxonomy and flag
+        # structural defects (review_flags + parse_quality) over the full batch
+        # before de-dup, so split fragments are still counted for the blueprint
+        # check. Imported here to keep the ingestor↔guardrails dependency acyclic.
+        from .guardrails import apply_guardrails
+
+        chapter_by_slug = {c.slug: c for c in Chapter.objects.all()}
+        apply_guardrails(raw_questions, set(chapter_by_slug))
+
         # De-duplication: skip questions already in the bank AND repeats within
         # this PDF.
         all_fingerprints = [_fingerprint(q["text"]) for q in raw_questions]
@@ -594,7 +644,6 @@ class Ingestor:
         if not raw_questions:
             return IngestResult(created=0, skipped_duplicates=skipped)
 
-        chapter_by_slug = {c.slug: c for c in Chapter.objects.all()}
         provenance = _Provenance.from_filename(source_file_name, source_type)
         # Crop figure boxes to media assets and rewrite content image references.
         primary_assets = self.cropper.crop(pdf_bytes, raw_questions, fingerprints)
@@ -642,6 +691,7 @@ class Ingestor:
                 topic_names=q.get("topic_names", []),
                 primary_form=primary_form,
                 parse_quality=q.get("parse_quality", "partial"),
+                review_flags=q.get("review_flags", []),
                 answer=q.get("answer", ""),
                 answer_source=q.get("answer_source", ""),
                 verified=False,
