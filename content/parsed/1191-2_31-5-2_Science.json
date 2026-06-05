@@ -1,0 +1,2609 @@
+{
+  "source_pdf": "science_2026/1191-2_31-5-2_Science.pdf",
+  "questions": [
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "In human beings, the implantation of fertilised egg takes place in which part of female reproductive system ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Oviduct"
+        },
+        {
+          "label": "B",
+          "text": "Cervix"
+        },
+        {
+          "label": "C",
+          "text": "Uterus"
+        },
+        {
+          "label": "D",
+          "text": "Vagina"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "In human beings, the implantation of fertilised egg takes place in which part of female reproductive system ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Oviduct"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Cervix"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Uterus"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Vagina"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Sexual Reproduction in Human Beings"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Yeast multiplies by which of the following methods ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Fragmentation"
+        },
+        {
+          "label": "B",
+          "text": "Binary Fission"
+        },
+        {
+          "label": "C",
+          "text": "Multiple Fission"
+        },
+        {
+          "label": "D",
+          "text": "Budding"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Yeast multiplies by which of the following methods ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Fragmentation"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Binary Fission"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Multiple Fission"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Budding"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Modes of Reproduction Used by Single Organisms"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Identify the part that controls the closing and opening of the stomatal pore in leaves of plants.\nSelect the correct option.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Stomata"
+        },
+        {
+          "label": "B",
+          "text": "Epidermal cells"
+        },
+        {
+          "label": "C",
+          "text": "Guard cells"
+        },
+        {
+          "label": "D",
+          "text": "Chloroplasts"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Identify the part that controls the closing and opening of the stomatal pore in leaves of plants."
+          },
+          {
+            "type": "paragraph",
+            "text": "Select the correct option."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Stomata"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Epidermal cells"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Guard cells"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Chloroplasts"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Autotrophic Nutrition"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Choose the equation of reaction that correctly represents anaerobic respiration in muscles :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Glucose -> Pyruvate (Absence of O2) -> Ethanol + CO2 + Energy"
+        },
+        {
+          "label": "B",
+          "text": "Glucose (O2) -> Pyruvate (O2) -> Energy"
+        },
+        {
+          "label": "C",
+          "text": "Glucose (O2) -> Pyruvate (Lack of oxygen) -> Ethanol + Energy"
+        },
+        {
+          "label": "D",
+          "text": "Glucose -> Pyruvate (Lack of oxygen) -> Lactic acid + Energy"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Choose the equation of reaction that correctly represents anaerobic respiration in muscles :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "equation",
+                "text": "Glucose -> Pyruvate -(Absence of O2)-> Ethanol + CO2 + Energy",
+                "latex": "\\text{Glucose} \\rightarrow \\text{Pyruvate} \\xrightarrow{\\substack{\\text{Absence} \\\\ \\text{of } \\text{O}_2}} \\text{Ethanol} + \\text{CO}_2 + \\text{Energy}"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "equation",
+                "text": "Glucose -(O2)-> Pyruvate -(O2)-> Energy",
+                "latex": "\\text{Glucose} \\xrightarrow{\\text{O}_2} \\text{Pyruvate} \\xrightarrow{\\text{O}_2} \\text{Energy}"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "equation",
+                "text": "Glucose -(O2)-> Pyruvate -(Lack of oxygen)-> Ethanol + Energy",
+                "latex": "\\text{Glucose} \\xrightarrow{\\text{O}_2} \\text{Pyruvate} \\xrightarrow{\\substack{\\text{Lack of} \\\\ \\text{oxygen}}} \\text{Ethanol} + \\text{Energy}"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "equation",
+                "text": "Glucose -> Pyruvate -(Lack of oxygen)-> Lactic acid + Energy",
+                "latex": "\\text{Glucose} \\rightarrow \\text{Pyruvate} \\xrightarrow{\\substack{\\text{Lack of} \\\\ \\text{oxygen}}} \\text{Lactic acid} + \\text{Energy}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Respiration"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following is a non-biodegradable pollutant ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Paper"
+        },
+        {
+          "label": "B",
+          "text": "DDT"
+        },
+        {
+          "label": "C",
+          "text": "Wood"
+        },
+        {
+          "label": "D",
+          "text": "Vegetable peel"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following is a non-biodegradable pollutant ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Paper"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "DDT"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Wood"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Vegetable peel"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Biodegradable and non-biodegradable substances"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "When a human egg is fertilized by a sperm having \u2018Y\u2019 chromosome, the zygote has the following combination of chromosomes :",
+      "options": [
+        {
+          "label": "A",
+          "text": "44 + XX"
+        },
+        {
+          "label": "B",
+          "text": "22 + XX"
+        },
+        {
+          "label": "C",
+          "text": "44 + XY"
+        },
+        {
+          "label": "D",
+          "text": "22 + XY"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "When a human egg is fertilized by a sperm having \u2018Y\u2019 chromosome, the zygote has the following combination of chromosomes :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "44 + XX"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "22 + XX"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "44 + XY"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "22 + XY"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Sex determination"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The reasons for excessive generation of wastes are :\n(i) Use and throw policy.\n(ii) Increased availability of packaged food.\n(iii) Increased construction wastes.\n(iv) Non-sorting of dry and wet wastes.",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i), (iii) and (iv)"
+        },
+        {
+          "label": "B",
+          "text": "(i), (ii) and (iii)"
+        },
+        {
+          "label": "C",
+          "text": "(i), (ii), (iii) and (iv)"
+        },
+        {
+          "label": "D",
+          "text": "(ii), (iii) and (iv)"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The reasons for excessive generation of wastes are :"
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) Use and throw policy."
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) Increased availability of packaged food."
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) Increased construction wastes."
+          },
+          {
+            "type": "paragraph",
+            "text": "(iv) Non-sorting of dry and wet wastes."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i), (iii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i), (ii) and (iii)"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i), (ii), (iii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii), (iii) and (iv)"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Waste management"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : The peristaltic movements occur all along the gut.\nReason (R) : The lining of the gut has muscles that contract rhythmically to push the food in regulated manner.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "The peristaltic movements occur all along the gut."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "The lining of the gut has muscles that contract rhythmically to push the food in regulated manner."
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Nutrition in Human Beings",
+        "Alimentary Canal",
+        "Peristalsis"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Bacteria produced as a result of asexual reproduction would be similar.\nReason (R) : There would be only minor differences between the bacteria generated due to small inaccuracies in DNA replication.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Bacteria produced as a result of asexual reproduction would be similar."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "There would be only minor differences between the bacteria generated due to small inaccuracies in DNA replication."
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Asexual Reproduction",
+        "DNA copying and Variation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "(A) Observe the given figure and identify the labelled parts P, Q, R and S :\nOR\n(B) Which of the plant hormones are responsible for the following processes ?\n(i) Promote cell division\n(ii) Inhibition of growth\n(iii) Detection of light\n(iv) Wilting of leaves",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Observe the given figure and identify the labelled parts P, Q, R and S :"
+                  },
+                  {
+                    "type": "image_placeholder",
+                    "text": "Diagram depicting a reflex arc action where a hand touches a hot pot, with labels P on the stimulus/receptor in skin, Q on the sensory neuron, R on the relay neuron/spinal cord, and S on the motor neuron/effector."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Which of the plant hormones are responsible for the following processes ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Promote cell division"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Inhibition of growth"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Detection of light"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iv) Wilting of leaves"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/ee8b80e0-0.png"
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Reflex Action",
+        "Plant Hormones"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 9,
+          "bbox": [
+            0.23,
+            0.37,
+            0.75,
+            0.62
+          ],
+          "region": "stem",
+          "label": "A"
+        }
+      ]
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Briefly mention the steps in double-circulation through human heart.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Briefly mention the steps in double-circulation through human heart."
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Double Circulation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Given below is a diagrammatic representation of cross-section of a leaf :\n(i) Identify \u2018P\u2019 in the given diagram and write down its role in plants.\n(ii) Write down a balanced equation of process of photo-synthesis.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Given below is a diagrammatic representation of cross-section of a leaf :"
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/2bfa536c-0.png"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "i",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Identify \u2018P\u2019 in the given diagram and write down its role in plants."
+              }
+            ]
+          },
+          {
+            "label": "ii",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write down a balanced equation of process of photo-synthesis."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Leaf Anatomy",
+        "Photosynthesis"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 11,
+          "bbox": [
+            0.2,
+            0.19,
+            0.45,
+            0.38
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Mention any one harmful effect of using plastic bags on the environment. Suggest better alternatives to the usage of plastic bags.\n(b) Paddy fields require a large amount of water. The pesticides and chemical fertilizers used are washed down into the soil or waterbodies. How do these chemicals reach our bodies ? What is this phenomenon known as ?",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Mention any one harmful effect of using plastic bags on the environment. Suggest better alternatives to the usage of plastic bags."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Paddy fields require a large amount of water. The pesticides and chemical fertilizers used are washed down into the soil or waterbodies. How do these chemicals reach our bodies ? What is this phenomenon known as ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Environmental Pollution",
+        "Biological Magnification"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Mention the gland and the hormone secreted by it in scary situation in human beings.\n(b) Write two responses that enable the human body to be ready to deal with such situation.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Mention the gland and the hormone secreted by it in scary situation in human beings."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write two responses that enable the human body to be ready to deal with such situation."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Hormones in Animals"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Kidneys help to regulate the volume of fluid and various metabolites waste products in the body.\n\nNormally, kidney filter about 180 L of fluid daily but the volume actually excreted out is only a litre or two a day.\n\nPatients with kidney failures can be saved by dialysis and kidney transplant.\n\n(a) Write the structure and function of Bowman\u2019s capsule.\n(b) Although kidneys filter a large amount (about 180 L daily) of fluids, still the excretion from the body is only about a litre or two. Why ?\n(c) What is excretion ? Why is it necessary for any living organism ?\nOR\n(c) State two similarities between lungs and kidneys.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "Kidneys help to regulate the volume of fluid and various metabolites waste products in the body."
+          },
+          {
+            "type": "paragraph",
+            "text": "Normally, kidney filter about 180 L of fluid daily but the volume actually excreted out is only a litre or two a day."
+          },
+          {
+            "type": "paragraph",
+            "text": "Patients with kidney failures can be saved by dialysis and kidney transplant."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write the structure and function of Bowman\u2019s capsule."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Although kidneys filter a large amount (about 180 L daily) of fluids, still the excretion from the body is only about a litre or two. Why ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What is excretion ? Why is it necessary for any living organism ?"
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "State two similarities between lungs and kidneys."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Excretion in Humans"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(A) (i) Sugarcane does not produce seeds so name the process through which it will be able to reproduce.\n(ii) List any two advantages of this method.\n(iii) Besides sugarcane, give two more examples of plants that reproduce by this method.\n(iv) Why regeneration is not possible in all the types of animals ?\nOR\n(B) (i) In an angiospermic flower, fertilization is said to take place when male gametes carried in the pollen tube fuse with the female gamete, present in the embryo sac. This results in lot of changes in different parts of the flower. State the changes taking place in the following structures of flower post fertilization :\n(a) Zygote\n(b) Ovule\n(c) Ovary\n(d) Sepals\n(ii) Define germination.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Sugarcane does not produce seeds so name the process through which it will be able to reproduce."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) List any two advantages of this method."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Besides sugarcane, give two more examples of plants that reproduce by this method."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iv) Why regeneration is not possible in all the types of animals ?"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) In an angiospermic flower, fertilization is said to take place when male gametes carried in the pollen tube fuse with the female gamete, present in the embryo sac. This results in lot of changes in different parts of the flower. State the changes taking place in the following structures of flower post fertilization :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Zygote"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) Ovule"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(c) Ovary"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(d) Sepals"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Define germination."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Asexual Reproduction",
+        "Sexual Reproduction in Flowering Plants"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following set of compounds does not belong to same homologous series ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "CH4 and C4H10"
+        },
+        {
+          "label": "B",
+          "text": "C2H6 and C3H8"
+        },
+        {
+          "label": "C",
+          "text": "C3H8 and C5H12"
+        },
+        {
+          "label": "D",
+          "text": "C4H8 and C5H12"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following set of compounds does not belong to same homologous series ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "CH4 and C4H10",
+                "latex": "\\text{CH}_4 \\text{ and } \\text{C}_4\\text{H}_{10}"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "C2H6 and C3H8",
+                "latex": "\\text{C}_2\\text{H}_6 \\text{ and } \\text{C}_3\\text{H}_8"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "C3H8 and C5H12",
+                "latex": "\\text{C}_3\\text{H}_8 \\text{ and } \\text{C}_5\\text{H}_{12}"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "C4H8 and C5H12",
+                "latex": "\\text{C}_4\\text{H}_8 \\text{ and } \\text{C}_5\\text{H}_{12}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Homologous Series"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following is an amphoteric oxide ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Na2O"
+        },
+        {
+          "label": "B",
+          "text": "K2O"
+        },
+        {
+          "label": "C",
+          "text": "CO2"
+        },
+        {
+          "label": "D",
+          "text": "Al2O3"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following is an amphoteric oxide ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Na2O",
+                "latex": "\\text{Na}_2\\text{O}"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "K2O",
+                "latex": "\\text{K}_2\\text{O}"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "CO2",
+                "latex": "\\text{CO}_2"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Al2O3",
+                "latex": "\\text{Al}_2\\text{O}_3"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Amphoteric Oxides"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "In the following diagram, if acetic acid of same concentration is taken in place of dilute sulphuric acid, then",
+      "options": [
+        {
+          "label": "A",
+          "text": "Same amount of H2 gas will be evolved."
+        },
+        {
+          "label": "B",
+          "text": "H2 gas will not be evolved."
+        },
+        {
+          "label": "C",
+          "text": "The amount of H2 gas evolved in less amount."
+        },
+        {
+          "label": "D",
+          "text": "In place of H2 gas, O2 gas will be evolved."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "In the following diagram, if acetic acid of same concentration is taken in place of dilute sulphuric acid, then"
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/a5535748-0.png"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Same amount of H2 gas will be evolved.",
+                "latex": "\\text{Same amount of H}_2 \\text{ gas will be evolved.}"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "H2 gas will not be evolved.",
+                "latex": "\\text{H}_2 \\text{ gas will not be evolved.}"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The amount of H2 gas evolved in less amount.",
+                "latex": "\\text{The amount of H}_2 \\text{ gas evolved in less amount.}"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "In place of H2 gas, O2 gas will be evolved.",
+                "latex": "\\text{In place of H}_2 \\text{ gas, O}_2 \\text{ gas will be evolved.}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Reaction of Acids with Metals",
+        "Strength of Acids"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 15,
+          "bbox": [
+            0.15,
+            0.45,
+            0.85,
+            0.71
+          ],
+          "region": "stem",
+          "label": "zinc_sulphuric_acid_reaction"
+        }
+      ]
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The volume ratio of hydrogen and oxygen gases liberated during electrolysis of water is :",
+      "options": [
+        {
+          "label": "A",
+          "text": "1 : 2"
+        },
+        {
+          "label": "B",
+          "text": "2 : 1"
+        },
+        {
+          "label": "C",
+          "text": "1 : 3"
+        },
+        {
+          "label": "D",
+          "text": "4 : 1"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The volume ratio of hydrogen and oxygen gases liberated during electrolysis of water is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "1 : 2"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "2 : 1"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "1 : 3"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "4 : 1"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Electrolysis of water"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Study the following table and select the correct option : Salt | Acid used | Base used | Nature of Salt",
+      "options": [
+        {
+          "label": "A",
+          "text": "NaCl | HCl | NaOH | Basic"
+        },
+        {
+          "label": "B",
+          "text": "Na2CO3 | H2CO3 | NaOH | Neutral"
+        },
+        {
+          "label": "C",
+          "text": "Na2SO4 | H2SO4 | NaOH | Acidic"
+        },
+        {
+          "label": "D",
+          "text": "CH3COONa | CH3COOH | NaOH | Basic"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Study the following table and select the correct option :"
+          },
+          {
+            "type": "paragraph",
+            "text": "Salt | Acid used | Base used | Nature of Salt"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "NaCl, HCl, NaOH, Basic",
+                "latex": "\\text{NaCl} \\quad \\text{HCl} \\quad \\text{NaOH} \\quad \\text{Basic}"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Na2CO3, H2CO3, NaOH, Neutral",
+                "latex": "\\text{Na}_2\\text{CO}_3 \\quad \\text{H}_2\\text{CO}_3 \\quad \\text{NaOH} \\quad \\text{Neutral}"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Na2SO4, H2SO4, NaOH, Acidic",
+                "latex": "\\text{Na}_2\\text{SO}_4 \\quad \\text{H}_2\\text{SO}_4 \\quad \\text{NaOH} \\quad \\text{Acidic}"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "CH3COONa, CH3COOH, NaOH, Basic",
+                "latex": "\\text{CH}_3\\text{COONa} \\quad \\text{CH}_3\\text{COOH} \\quad \\text{NaOH} \\quad \\text{Basic}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Nature of salts"
+      ],
+      "primary_form": "table_based",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following will not undergo addition reaction ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "C4H8"
+        },
+        {
+          "label": "B",
+          "text": "C2H2"
+        },
+        {
+          "label": "C",
+          "text": "C3H8"
+        },
+        {
+          "label": "D",
+          "text": "C2H4"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following will not undergo addition reaction ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "C4H8",
+                "latex": "\\text{C}_4\\text{H}_8"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "C2H2",
+                "latex": "\\text{C}_2\\text{H}_2"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "C3H8",
+                "latex": "\\text{C}_3\\text{H}_8"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "C2H4",
+                "latex": "\\text{C}_2\\text{H}_4"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Addition reaction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "On reaction with dilute HCl, which of the following pair of metals will evolve hydrogen gas ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "copper and zinc"
+        },
+        {
+          "label": "B",
+          "text": "copper and iron"
+        },
+        {
+          "label": "C",
+          "text": "silver and magnesium"
+        },
+        {
+          "label": "D",
+          "text": "magnesium and aluminium"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "On reaction with dilute HCl, which of the following pair of metals will evolve hydrogen gas ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "copper and zinc"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "copper and iron"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "silver and magnesium"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "magnesium and aluminium"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Reaction of metals with dilute acids"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Reaction of quick lime with water is an exothermic reaction.\nReason (R) : A large amount of heat is evolved on the reaction of quick lime and water.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Reaction of quick lime with water is an exothermic reaction."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "A large amount of heat is evolved on the reaction of quick lime and water."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Exothermic reactions",
+        "Combination reaction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "How is a universal indicator obtained ? How is the wide range of pH of solution tested by it ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "How is a universal indicator obtained ? How is the wide range of pH of solution tested by it ?"
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Universal Indicator",
+        "pH Scale"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "What happens when\n(i) Calcium carbonate is heated ?\n(ii) Silver bromide is exposed to sunlight ?\n(iii) Lead is added to copper (II) chloride solution ?\nWrite balanced chemical equations of the reactions involved in support of your answer.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "What happens when"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "i",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Calcium carbonate is heated ?"
+              }
+            ]
+          },
+          {
+            "label": "ii",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Silver bromide is exposed to sunlight ?"
+              }
+            ]
+          },
+          {
+            "label": "iii",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Lead is added to copper (II) chloride solution ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Thermal Decomposition",
+        "Photolytic Decomposition",
+        "Displacement Reaction",
+        "Balanced Chemical Equations"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "internal_choice",
+      "marks": 3,
+      "text": "(A) (a) Give the chemical name and formula of Plaster of Paris. (b) Write the chemical equation of its preparation. (c) Give any two uses of it. OR (B) (a) Name the acid present in ant's sting. (b) Give reason : (i) While diluting an acid, it is recommended that the acid should be added to water. (ii) Baking soda is used as an antacid.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "marks": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Give the chemical name and formula of Plaster of Paris."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) Write the chemical equation of its preparation."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(c) Give any two uses of it."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "marks": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Name the acid present in ant's sting."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) Give reason :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) While diluting an acid, it is recommended that the acid should be added to water."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Baking soda is used as an antacid."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Plaster of Paris",
+        "Acids and Bases"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Alcohol forms a homologous series with general formula CnH2n + 1 - OH and -OH group as functional group. Ethanol is commonly called alcohol and is used in alcoholic drinks. It is good solvent, used in medicines, cough syrups, tonics etc. (a) Write structural formula and name of 4th member of alcohol homologous series. (b) What happens when ethanol is heated with alkaline KMnO4 ? Write chemical equation involved. (c) Write the chemical equation of reaction of ethanol with ethanoic acid in the presence of concentrated H2SO4. Write the name of this reaction. OR (c) What happens when ethanol is heated with excess concentrated sulphuric acid at 443 K ? Write chemical equation involved. What is the role of concentrated sulphuric acid in this reaction ?",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "Alcohol forms a homologous series with general formula C_n H_{2n + 1} - OH and -OH group as functional group. Ethanol is commonly called alcohol and is used in alcoholic drinks. It is good solvent, used in medicines, cough syrups, tonics etc.",
+            "latex": "\\text{C}_n\\text{H}_{2n + 1}-\\text{OH}"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write structural formula and name of 4th member of alcohol homologous series."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What happens when ethanol is heated with alkaline KMnO_4 ? Write chemical equation involved.",
+                "latex": "\\text{K_MnO}_4"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write the chemical equation of reaction of ethanol with ethanoic acid in the presence of concentrated H_2SO_4. Write the name of this reaction.",
+                "latex": "\\text{H}_2\\text{SO}_4"
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "What happens when ethanol is heated with excess concentrated sulphuric acid at 443 K ? Write chemical equation involved. What is the role of concentrated sulphuric acid in this reaction ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Homologous series",
+        "Chemical properties of ethanol"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "Attempt either option (A) or (B) : (A) (i) Give reasons for the following : (I) Ionic compound have generally high melting points and boiling points. (II) Solder, an alloy of lead and tin, is used for welding electrical wires. (III) Carbon cannot reduce the oxides of Na or Mg. (ii) The reaction of compound 'X' with aluminium is used to join railway tracks : (I) Identify the compound 'X'. (II) Name the reaction. (III) Write the balanced chemical equation of the reaction of compound 'X' with aluminium. OR (B) (i) Write the balanced chemical equations when : (I) A mixture of Cu2O and Cu2S is heated. (II) ZnS is heated in the presence of oxygen. (ii) Give reasons for the following : (I) The wires carrying current in homes have a coating of PVC. (II) To make hot water tanks, copper is used and not steel. (iii) Show the formation of ionic compound CaO with electron dot structure. [Atomic number : Ca = 20, O = 8]",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either option (A) or (B) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Give reasons for the following :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) Ionic compound have generally high melting points and boiling points."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) Solder, an alloy of lead and tin, is used for welding electrical wires."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(III) Carbon cannot reduce the oxides of Na or Mg.",
+                    "latex": "\\text{(III) Carbon cannot reduce the oxides of Na or Mg.}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) The reaction of compound 'X' with aluminium is used to join railway tracks :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) Identify the compound 'X'."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) Name the reaction."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(III) Write the balanced chemical equation of the reaction of compound 'X' with aluminium."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Write the balanced chemical equations when :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) A mixture of Cu2O and Cu2S is heated.",
+                    "latex": "\\text{(I) A mixture of Cu}_2\\text{O and Cu}_2\\text{S is heated.}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) ZnS is heated in the presence of oxygen.",
+                    "latex": "\\text{(II) ZnS is heated in the presence of oxygen.}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Give reasons for the following :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) The wires carrying current in homes have a coating of PVC."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) To make hot water tanks, copper is used and not steel."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Show the formation of ionic compound CaO with electron dot structure.",
+                    "latex": "\\text{(iii) Show the formation of ionic compound CaO with electron dot structure.}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "[Atomic number : Ca = 20, O = 8]",
+                    "latex": "[\\text{Atomic number : Ca} = 20, \\text{O} = 8]"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Properties of ionic compounds",
+        "Thermite reaction",
+        "Alloys",
+        "Extraction of metals",
+        "Electron dot structure"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "To restore clear vision in persons whose size of the eye ball has reduced, he/she is suggested to use suitable",
+      "options": [
+        {
+          "label": "A",
+          "text": "Converging lens"
+        },
+        {
+          "label": "B",
+          "text": "Diverging lens"
+        },
+        {
+          "label": "C",
+          "text": "Bifocal lens"
+        },
+        {
+          "label": "D",
+          "text": "Cylindrical lens"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "To restore clear vision in persons whose size of the eye ball has reduced, he/she is suggested to use suitable"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Converging lens"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Diverging lens"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Bifocal lens"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Cylindrical lens"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Defects of Vision and their Correction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Rays from the sun converge at a point 25 cm behind a convex lens. The distance at which an object be placed in front of the lens to get a virtual image, is :",
+      "options": [
+        {
+          "label": "A",
+          "text": "20 cm"
+        },
+        {
+          "label": "B",
+          "text": "40 cm"
+        },
+        {
+          "label": "C",
+          "text": "50 cm"
+        },
+        {
+          "label": "D",
+          "text": "More than 50 cm"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Rays from the sun converge at a point 25 cm behind a convex lens. The distance at which an object be placed in front of the lens to get a virtual image, is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "20 cm"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "40 cm"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "50 cm"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "More than 50 cm"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Refraction by Spherical Lenses",
+        "Image Formation by Lenses"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : The needle of a magnetic compass kept in strong external magnetic field, always aligns itself in north-south direction on the earth.\nReason (R) : Behaviour of the needle of a compass is same as that of a freely suspended bar magnet.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "The needle of a magnetic compass kept in strong external magnetic field, always aligns itself in north-south direction on the earth."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Behaviour of the needle of a compass is same as that of a freely suspended bar magnet."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Magnetic Field and Field Lines"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "(a) Define absolute refractive index of an optical medium.\n(b) Material Medium | Refractive Index\nA | 1.50\nB | 1.46\nC | 1.31\nD | 1.77\nArrange these material mediums given in the table in increasing order of speed of light through them.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Define absolute refractive index of an optical medium."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Material Medium | Refractive Index\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\nA | 1.50\nB | 1.46\nC | 1.31\nD | 1.77"
+              },
+              {
+                "type": "paragraph",
+                "text": "Arrange these material mediums given in the table in increasing order of speed of light through them."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Refractive Index"
+      ],
+      "primary_form": "table_based",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "(A) (i) How does the change in curvature of the eye lens helps us in the process of seeing the nearby objects clearly ?\n(ii) State the range of the power of accommodation of a normal human eye.\nOR\n(B) Draw a ray diagram to show the correction of eye defect of an old man who can not see an object placed closer than 1 m from his eye, clearly.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) How does the change in curvature of the eye lens helps us in the process of seeing the nearby objects clearly ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) State the range of the power of accommodation of a normal human eye."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Draw a ray diagram to show the correction of eye defect of an old man who can not see an object placed closer than 1 m from his eye, clearly."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Power of accommodation",
+        "Defects of vision and their correction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Why does an electric bulb become dim when an electric heater in parallel circuit is switched ON ?\n(b) How to connect three resistors each of resistance 8 \u03a9, so that the equivalent resistance of the combination is 12 \u03a9 ? Draw diagram of the combination and justify your answer.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why does an electric bulb become dim when an electric heater in parallel circuit is switched ON ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "How to connect three resistors each of resistance 8 ",
+                "latex": "8 \\Omega"
+              },
+              {
+                "type": "paragraph",
+                "text": ", so that the equivalent resistance of the combination is 12 ",
+                "latex": "12 \\Omega"
+              },
+              {
+                "type": "paragraph",
+                "text": " ? Draw diagram of the combination and justify your answer."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Combination of resistors"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "An object is placed at a distance of 30 cm in front of a convex lens of focal length 15 cm. Use lens formula to determine the position of the image. What will be the size of the image in this case ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "An object is placed at a distance of 30 cm in front of a convex lens of focal length 15 cm. Use lens formula to determine the position of the image. What will be the size of the image in this case ?"
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Lens Formula and Magnification"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Draw the ray diagram for refraction of light through a glass prism and mark angle of refraction and angle of deviation. (b) When the path of a light ray refracted through a glass prism is reversed how will the angle of deviation change ? Explain.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Draw the ray diagram for refraction of light through a glass prism and mark angle of refraction and angle of deviation."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "When the path of a light ray refracted through a glass prism is reversed how will the angle of deviation change ? Explain."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Refraction of light through a prism"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Three students Shweta, Ayesha and Samridhi were performing an experiment to understand the factors on which the resistance of a conductor depends. Each one of them completed electric circuit with the help of a cell, an ammeter, a plug key and wire. Shweta put nichrome wire of length \u2018l\u2019 in the circuit and after plugging the key, noted current in the ammeter. Ayesha put nichrome wire of same thickness but twice the length i.e. \u20182l\u2019 in the circuit and after plugging the key, noted current in the ammeter. Samridhi took copper wire of length \u2018l\u2019 and same thickness in the circuit and after plugging the key, noted current in the ammeter. (a) If the ammeter reading is X ampere with nichrome wire of length \u2018l\u2019, then what will be the ammeter reading if the length of nichrome wire is doubled with same area of cross-section ? (b) What happens to the ammeter reading if the area of cross-section of nichrome wire is doubled, keeping the length of wire \u2018l\u2019 the same ? (c) Define \u2018resistivity\u2019. Write its SI unit. Compare the resistivity of an alloy with its constituents metals. OR (c) Give reason : (i) Tungsten is used almost exclusively for making the filament of electric lamps. (ii) Conductors of bread-toasters are made of an alloy rather than a pure metal.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "Three students Shweta, Ayesha and Samridhi were performing an experiment to understand the factors on which the resistance of a conductor depends. Each one of them completed electric circuit with the help of a cell, an ammeter, a plug key and wire."
+          },
+          {
+            "type": "paragraph",
+            "text": "Shweta put nichrome wire of length \u2018l\u2019 in the circuit and after plugging the key, noted current in the ammeter."
+          },
+          {
+            "type": "paragraph",
+            "text": "Ayesha put nichrome wire of same thickness but twice the length i.e. \u20182l\u2019 in the circuit and after plugging the key, noted current in the ammeter."
+          },
+          {
+            "type": "paragraph",
+            "text": "Samridhi took copper wire of length \u2018l\u2019 and same thickness in the circuit and after plugging the key, noted current in the ammeter."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "If the ammeter reading is X ampere with nichrome wire of length \u2018l\u2019, then what will be the ammeter reading if the length of nichrome wire is doubled with same area of cross-section ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What happens to the ammeter reading if the area of cross-section of nichrome wire is doubled, keeping the length of wire \u2018l\u2019 the same ?"
+              }
+            ]
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "c",
+                "marks": 2,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Define \u2018resistivity\u2019. Write its SI unit. Compare the resistivity of an alloy with its constituents metals."
+                  }
+                ]
+              },
+              {
+                "label": "c",
+                "marks": 2,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Give reason :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Tungsten is used almost exclusively for making the filament of electric lamps."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Conductors of bread-toasters are made of an alloy rather than a pure metal."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Factors on which resistance depends",
+        "Resistivity"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(A) (i) List any two features of the electric current used in the houses of India.\n(ii) Write any two differences between direct current and an alternating current.\n(iii) How will you identify live wire and neutral wire in a domestic electric circuit ?\nOR\n(B) (i) Why is fuse an important component in our electric circuits ?\n(ii) Distinguish between overloading and short-circuiting of a circuit.\n(iii) Giving reason explain what type of materials are used in fuse wires.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) List any two features of the electric current used in the houses of India."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Write any two differences between direct current and an alternating current."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) How will you identify live wire and neutral wire in a domestic electric circuit ?"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Why is fuse an important component in our electric circuits ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Distinguish between overloading and short-circuiting of a circuit."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Giving reason explain what type of materials are used in fuse wires."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Domestic Electric Circuits",
+        "Direct and Alternating Current",
+        "Electric Fuse",
+        "Overloading and Short-circuiting"
+      ],
+      "primary_form": "none",
+      "figures": []
+    }
+  ]
+}

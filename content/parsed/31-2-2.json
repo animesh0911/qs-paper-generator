@@ -1,0 +1,2646 @@
+{
+  "source_pdf": "science_2026/31-2-2.pdf",
+  "questions": [
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Spirogyra, despite being a multi-cellular organism, still shows a simple reproductive method. Select the correct option with regard to reproduction in Spirogyra :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Asexual reproduction by division of cells into two cells"
+        },
+        {
+          "label": "B",
+          "text": "Sexual reproduction by division of cells into many cells"
+        },
+        {
+          "label": "C",
+          "text": "Asexual reproduction by breaking up of Spirogyra filaments into smaller parts"
+        },
+        {
+          "label": "D",
+          "text": "Sexual reproduction by the formation of gametes after meiosis of cells of filaments followed by fusion of male and female gametes"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Spirogyra, despite being a multi-cellular organism, still shows a simple reproductive method. Select the correct option with regard to reproduction in Spirogyra :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Asexual reproduction by division of cells into two cells"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Sexual reproduction by division of cells into many cells"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Asexual reproduction by breaking up of Spirogyra filaments into smaller parts"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Sexual reproduction by the formation of gametes after meiosis of cells of filaments followed by fusion of male and female gametes"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Asexual Reproduction",
+        "Fragmentation in Spirogyra"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The genotype of green stemmed tomato plant is denoted by 'GG' and that of purple stemmed tomato plant as 'gg'. Hybrid of a cross between these two were self-pollinated to obtain F2 progeny. What will be the ratio of GG, Gg and gg in this F2 progeny ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "2 : 1 : 1"
+        },
+        {
+          "label": "B",
+          "text": "3 : 1 : 0"
+        },
+        {
+          "label": "C",
+          "text": "1 : 1 : 2"
+        },
+        {
+          "label": "D",
+          "text": "1 : 2 : 1"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The genotype of green stemmed tomato plant is denoted by 'GG' and that of purple stemmed tomato plant as 'gg'. Hybrid of a cross between these two were self-pollinated to obtain F2 progeny. What will be the ratio of GG, Gg and gg in this F2 progeny ?",
+            "latex": "The genotype of green stemmed tomato plant is denoted by 'GG' and that of purple stemmed tomato plant as 'gg'. Hybrid of a cross between these two were self-pollinated to obtain $F_2$ progeny. What will be the ratio of GG, Gg and gg in this $F_2$ progeny ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "2 : 1 : 1"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "3 : 1 : 0"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "1 : 1 : 2"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "1 : 2 : 1"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Monohybrid cross",
+        "Mendelian inheritance"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Identify the type of tropic movement that is responsible for the movement of the pollen tube towards an ovule from the following options.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Hydrotropism"
+        },
+        {
+          "label": "B",
+          "text": "Geotropism"
+        },
+        {
+          "label": "C",
+          "text": "Chemotropism"
+        },
+        {
+          "label": "D",
+          "text": "Phototropism"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Identify the type of tropic movement that is responsible for the movement of the pollen tube towards an ovule from the following options."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Hydrotropism"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Geotropism"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Chemotropism"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Phototropism"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Tropic movements in plants",
+        "Chemotropism"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "If the stomatal pore is open, it indicates which situation from the following ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "The guard cells have shrunk."
+        },
+        {
+          "label": "B",
+          "text": "The water comes out of the guard cells."
+        },
+        {
+          "label": "C",
+          "text": "Large amount of water is lost through stomata."
+        },
+        {
+          "label": "D",
+          "text": "The guard cells have swelled due to inflow of water."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "If the stomatal pore is open, it indicates which situation from the following ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The guard cells have shrunk."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The water comes out of the guard cells."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Large amount of water is lost through stomata."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The guard cells have swelled due to inflow of water."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Nutrition in plants",
+        "Stomata opening and closing"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following limits the number of trophic levels in a food chain ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Availability of water"
+        },
+        {
+          "label": "B",
+          "text": "Deficient food supply"
+        },
+        {
+          "label": "C",
+          "text": "Decrease in energy at higher levels"
+        },
+        {
+          "label": "D",
+          "text": "Pollution in air"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following limits the number of trophic levels in a food chain ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Availability of water"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Deficient food supply"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Decrease in energy at higher levels"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Pollution in air"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Food chains and webs",
+        "Flow of energy in an ecosystem"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The following events occur during the process of photosynthesis. Choose the option that indicates the correct events.\n(i) Oxidation of carbon dioxide to carbohydrates\n(ii) Conversion of light energy into chemical energy\n(iii) Absorption of light energy by chlorophyll\n(iv) Conversion of hydrogen and oxygen into water",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i) and (ii)"
+        },
+        {
+          "label": "B",
+          "text": "(ii) and (iii)"
+        },
+        {
+          "label": "C",
+          "text": "(iii) and (iv)"
+        },
+        {
+          "label": "D",
+          "text": "(i) and (iv)"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The following events occur during the process of photosynthesis. Choose the option that indicates the correct events."
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) Oxidation of carbon dioxide to carbohydrates"
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) Conversion of light energy into chemical energy"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) Absorption of light energy by chlorophyll"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iv) Conversion of hydrogen and oxygen into water"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (ii)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii) and (iii)"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(iii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (iv)"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Photosynthesis",
+        "Nutrition in Plants"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "In the given figure, identify the trophic level having maximum concentration of harmful chemicals.",
+      "options": [
+        {
+          "label": "A",
+          "text": "T1"
+        },
+        {
+          "label": "B",
+          "text": "T5"
+        },
+        {
+          "label": "C",
+          "text": "T4"
+        },
+        {
+          "label": "D",
+          "text": "T3"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/d4d3b5e2-0.png"
+          },
+          {
+            "type": "paragraph",
+            "text": "In the given figure, identify the trophic level having maximum concentration of harmful chemicals."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "T1"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "T5"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "T4"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "T3"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Biomagnification",
+        "Trophic Levels"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 7,
+          "bbox": [
+            0.11,
+            0.33,
+            0.42,
+            0.51
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : There are generally a greater number of individuals at the lower trophic levels of an ecosystem.\nReason (R) : The greatest number is of the producers.",
+      "options": [],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "There are generally a greater number of individuals at the lower trophic levels of an ecosystem."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "The greatest number is of the producers."
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Trophic levels",
+        "Ecosystem"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Blood plasma transports carbon dioxide in dissolved form, while oxygen is transported by respiratory pigments.\nReason (R) : Carbon dioxide is more soluble in water than in oxygen.",
+      "options": [],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Blood plasma transports carbon dioxide in dissolved form, while oxygen is transported by respiratory pigments."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Carbon dioxide is more soluble in water than in oxygen."
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Transportation in human beings",
+        "Respiration"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "(a) \"The timing and the amount of hormone secreted by a gland are regulated in the human body.\" Justify this statement with the help of an example.\nOR\n(b) Electrical impulse is an excellent means to transmit information in the animal body, but there are some limitations to the use of electrical impulses. State any two limitations.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "marks": 2,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "\"The timing and the amount of hormone secreted by a gland are regulated in the human body.\" Justify this statement with the help of an example."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 2,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Electrical impulse is an excellent means to transmit information in the animal body, but there are some limitations to the use of electrical impulses. State any two limitations."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Hormones in animals",
+        "Nervous tissue"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Do all variations in a species have equal chances of surviving in the environment in which they find themselves ? Explain.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Do all variations in a species have equal chances of surviving in the environment in which they find themselves ? Explain."
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Accumulation of variation during reproduction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Suggest two ways of dealing with waste generated at home.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Suggest two ways of dealing with waste generated at home."
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Managing the garbage we produce"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Observe the following diagrams :\nCase P Case Q Case R\n(a) What change will be observed in Cases \u2018P\u2019, \u2018Q\u2019 and \u2018R\u2019 ? Give reasons.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Observe the following diagrams :"
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/a0caa577-0.png"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What change will be observed in Cases \u2018P\u2019, \u2018Q\u2019 and \u2018R\u2019 ? Give reasons."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Respiration"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 9,
+          "bbox": [
+            0.08,
+            0.46,
+            0.8,
+            0.88
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "(b) In which case : (i) is aerobic respiration taking place ? (ii) is fermentation taking place ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "In which case :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "(i)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "is aerobic respiration taking place ?"
+              }
+            ]
+          },
+          {
+            "label": "(ii)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "is fermentation taking place ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Respiration"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Giving two examples, justify the statement that the sex of the offspring in all animals is not always genetically determined. (b) Differentiate between the sex chromosomes of male and female human beings.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "(a)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Giving two examples, justify the statement that the sex of the offspring in all animals is not always genetically determined."
+              }
+            ]
+          },
+          {
+            "label": "(b)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Differentiate between the sex chromosomes of male and female human beings."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Sex determination"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "Attempt either (a) or (b) : (a) (i) Name an organ that helps in the formation of male germ cells in humans and also mention the condition that favours the formation of male germ cells. (ii) In male reproductive system, write the pathway followed to deliver male germ cells to the site of fertilisation. (iii) Mention the main physical feature of the male germ cell that helps it move towards the female germ cell. OR (b) Radha has three children. She does not want to have more children. Radha visits a nearby hospital, to know the methods to prevent pregnancy. (i) Mention the name of any two ways other than the surgical methods, following which Radha can avoid unwanted pregnancies. (ii) Name the surgical methods to prevent pregnancy. (iii) Give one example each of sexually transmitted diseases caused by bacteria and virus.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "marks": 5,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Name an organ that helps in the formation of male germ cells in humans and also mention the condition that favours the formation of male germ cells."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) In male reproductive system, write the pathway followed to deliver male germ cells to the site of fertilisation."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Mention the main physical feature of the male germ cell that helps it move towards the female germ cell."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 5,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Radha has three children. She does not want to have more children. Radha visits a nearby hospital, to know the methods to prevent pregnancy."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Mention the name of any two ways other than the surgical methods, following which Radha can avoid unwanted pregnancies."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Name the surgical methods to prevent pregnancy."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Give one example each of sexually transmitted diseases caused by bacteria and virus."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Male Reproductive System",
+        "Reproductive Health"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "A middle-aged person is facing some cognitive changes in himself. His early symptoms included mild forgetfulness. For example, forgetting where he left his mobile or failing to find words to complete his sentences. He was facing problems in driving a car, climbing up and down the stairs, inserting a plug into an outlet. He slowly developed a sad mood and anxiety.\\n(a) What are voluntary actions ?\\n(b) Which part of the brain is responsible for precision of voluntary actions ?\\n(c) (i) Explain the role of the medulla.\\nOR\\n(ii) How do the animal muscles move ?",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "A middle-aged person is facing some cognitive changes in himself. His early symptoms included mild forgetfulness. For example, forgetting where he left his mobile or failing to find words to complete his sentences. He was facing problems in driving a car, climbing up and down the stairs, inserting a plug into an outlet. He slowly developed a sad mood and anxiety."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What are voluntary actions ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Which part of the brain is responsible for precision of voluntary actions ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) Explain the role of the medulla.\\nOR\\n(ii) How do the animal muscles move ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Voluntary actions",
+        "Brain structure",
+        "Medulla",
+        "Muscle movement"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Tamarind is a natural source of which acid ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Acetic acid"
+        },
+        {
+          "label": "B",
+          "text": "Tartaric acid"
+        },
+        {
+          "label": "C",
+          "text": "Oxalic acid"
+        },
+        {
+          "label": "D",
+          "text": "Citric acid"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Tamarind is a natural source of which acid ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Acetic acid"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Tartaric acid"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Oxalic acid"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Citric acid"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Acids in nature"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Rain water is called \u2018acid rain\u2019 when its :",
+      "options": [
+        {
+          "label": "A",
+          "text": "pH falls below 7.2."
+        },
+        {
+          "label": "B",
+          "text": "pH falls below 14."
+        },
+        {
+          "label": "C",
+          "text": "pH is above 7."
+        },
+        {
+          "label": "D",
+          "text": "pH falls below 5.6."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Rain water is called \u2018acid rain\u2019 when its :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "pH falls below 7.2."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "pH falls below 14."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "pH is above 7."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "pH falls below 5.6."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "R",
+      "topic_names": [
+        "pH of acid rain"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following are combination reactions ?\n(i) 2KClO3 \u2014\u2014\u2192 2KCl + 3O2\n(ii) MgO + H2O \u2014\u2014\u2192 Mg(OH)2\n(iii) 4Al + 3O2 \u2014\u2014\u2192 2Al2O3\n(iv) Zn + FeSO4 \u2014\u2014\u2192 ZnSO4 + Fe\n\nOptions :\n(A) (i) and (iii)\n(B) (iii) and (iv)\n(C) (ii) and (iv)\n(D) (ii) and (iii)",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i) and (iii)"
+        },
+        {
+          "label": "B",
+          "text": "(iii) and (iv)"
+        },
+        {
+          "label": "C",
+          "text": "(ii) and (iv)"
+        },
+        {
+          "label": "D",
+          "text": "(ii) and (iii)"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following are combination reactions ?"
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) 2KClO3 ---> 2KCl + 3O2",
+            "latex": "\\text{(i) } 2\\text{KClO}_3 \\longrightarrow 2\\text{KCl} + 3\\text{O}_2"
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) MgO + H2O ---> Mg(OH)2",
+            "latex": "\\text{(ii) } \\text{MgO} + \\text{H}_2\\text{O} \\longrightarrow \\text{Mg(OH)}_2"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) 4Al + 3O2 ---> 2Al2O3",
+            "latex": "\\text{(iii) } 4\\text{Al} + 3\\text{O}_2 \\longrightarrow 2\\text{Al}_2\\text{O}_3"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iv) Zn + FeSO4 ---> ZnSO4 + Fe",
+            "latex": "\\text{(iv) } \\text{Zn} + \\text{FeSO}_4 \\longrightarrow \\text{ZnSO}_4 + \\text{Fe}"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (iii)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(iii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii) and (iii)"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Combination reaction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "A metal carbonate reacts with a solution X which forms a salt, water and a gas Y. What are X and Y ?\n(A) X \u2013 Sodium hydroxide, Y \u2013 Carbon dioxide\n(B) X \u2013 Sodium hydroxide, Y \u2013 Hydrogen\n(C) X \u2013 Hydrochloric acid, Y \u2013 Carbon dioxide\n(D) X \u2013 Hydrochloric acid, Y \u2013 Hydrogen",
+      "options": [
+        {
+          "label": "A",
+          "text": "X \u2013 Sodium hydroxide, Y \u2013 Carbon dioxide"
+        },
+        {
+          "label": "B",
+          "text": "X \u2013 Sodium hydroxide, Y \u2013 Hydrogen"
+        },
+        {
+          "label": "C",
+          "text": "X \u2013 Hydrochloric acid, Y \u2013 Carbon dioxide"
+        },
+        {
+          "label": "D",
+          "text": "X \u2013 Hydrochloric acid, Y \u2013 Hydrogen"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "A metal carbonate reacts with a solution X which forms a salt, water and a gas Y. What are X and Y ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "X \u2013 Sodium hydroxide, Y \u2013 Carbon dioxide"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "X \u2013 Sodium hydroxide, Y \u2013 Hydrogen"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "X \u2013 Hydrochloric acid, Y \u2013 Carbon dioxide"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "X \u2013 Hydrochloric acid, Y \u2013 Hydrogen"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Reaction of metal carbonates and metal hydrogencarbonates with acids"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "When Mg metal is treated with hot water, it starts floating on the surface of the water. The reason for its different behaviour is :\n(A) Mg is a lighter element than water.\n(B) Mg reacts with water to produce H2 gas which helps in floating.\n(C) Mg reacts with water to produce N2 gas which helps in floating.\n(D) Mg reacts with water to form CO2 gas which helps in floating.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Mg is a lighter element than water."
+        },
+        {
+          "label": "B",
+          "text": "Mg reacts with water to produce H2 gas which helps in floating."
+        },
+        {
+          "label": "C",
+          "text": "Mg reacts with water to produce N2 gas which helps in floating."
+        },
+        {
+          "label": "D",
+          "text": "Mg reacts with water to form CO2 gas which helps in floating."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "When Mg metal is treated with hot water, it starts floating on the surface of the water. The reason for its different behaviour is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Mg is a lighter element than water."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Mg reacts with water to produce H2 gas which helps in floating.",
+                "latex": "\\text{Mg reacts with water to produce H}_2\\text{ gas which helps in floating.}"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Mg reacts with water to produce N2 gas which helps in floating.",
+                "latex": "\\text{Mg reacts with water to produce N}_2\\text{ gas which helps in floating.}"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Mg reacts with water to form CO2 gas which helps in floating.",
+                "latex": "\\text{Mg reacts with water to form CO}_2\\text{ gas which helps in floating.}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Reaction of metals with water"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "A student notices that her silver jewellery turned dull and had a grey-black coating over it after wearing for a few months. What results in the change in colour of the silver metal ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "The polish over the jewellery was removed after wearing for a few months."
+        },
+        {
+          "label": "B",
+          "text": "The jewellery comes in contact with air, moisture and acids and corrodes."
+        },
+        {
+          "label": "C",
+          "text": "Dust particles over the jewellery change its colour."
+        },
+        {
+          "label": "D",
+          "text": "Its colour changes due to rusting."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "A student notices that her silver jewellery turned dull and had a grey-black coating over it after wearing for a few months. What results in the change in colour of the silver metal ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The polish over the jewellery was removed after wearing for a few months."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The jewellery comes in contact with air, moisture and acids and corrodes."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Dust particles over the jewellery change its colour."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Its colour changes due to rusting."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Corrosion"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "When ferrous sulphate crystals are heated in a test tube, we observe that :",
+      "options": [
+        {
+          "label": "A",
+          "text": "A colourless gas with no smell is evolved."
+        },
+        {
+          "label": "B",
+          "text": "A brown gas is evolved."
+        },
+        {
+          "label": "C",
+          "text": "The green colour of the salt fades and a gas with the smell of burning sulphur is evolved."
+        },
+        {
+          "label": "D",
+          "text": "The green colour of the salt fades and no gas is evolved."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "When ferrous sulphate crystals are heated in a test tube, we observe that :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "A colourless gas with no smell is evolved."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "A brown gas is evolved."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The green colour of the salt fades and a gas with the smell of burning sulphur is evolved."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The green colour of the salt fades and no gas is evolved."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Decomposition Reaction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Carbon shows the property of catenation.\nReason (R) : C \u2013 C bond is weak due to its small size.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Carbon shows the property of catenation."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "C \u2013 C bond is weak due to its small size.",
+            "latex": "\\text{C}-\\text{C}"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Catenation",
+        "Versatile Nature of Carbon"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Answer the following : (a) Why should chemical equations be balanced ? (b) Name the oxidising and reducing agent in the following equation : 4Na + O2 -> 2Na2O",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Answer the following :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why should chemical equations be balanced ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Name the oxidising and reducing agent in the following equation :"
+              },
+              {
+                "type": "equation",
+                "latex": "4\\text{Na} + \\text{O}_2 \\longrightarrow 2\\text{Na}_2\\text{O}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Balancing Chemical Equations",
+        "Oxidation and Reduction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Answer the following : (a) Why can the oxides of highly reactive metals not be reduced by carbon ? (b) Why do ionic compounds have high melting and boiling points ? (c) Why is a solder, an alloy of lead and tin, used for welding electrical wires together ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Answer the following :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why can the oxides of highly reactive metals not be reduced by carbon ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why do ionic compounds have high melting and boiling points ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why is a solder, an alloy of lead and tin, used for welding electrical wires together ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Properties of Ionic Compounds",
+        "Reduction of Metal Oxides",
+        "Alloys"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "internal_choice",
+      "marks": 3,
+      "text": "Attempt either (a) or (b) : (a) (i) Write one example each of one metal that is so soft that it can be cut with a knife, and one non-metal that is a good conductor of electricity. (ii) Using the electronic configuration, explain how Mg atom combines with oxygen to form magnesium oxide by transfer of electrons. [Atomic number : Mg = 12, O = 8] OR (b) Give reasons : (i) Metal sulphides and carbonates should be converted to their metal oxides in the process of extraction of metals. (ii) Aluminium oxide is considered as an amphoteric oxide. (iii) Metals like Na, K, Ca and Mg are never found in their free state in nature.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "marks": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Write one example each of one metal that is so soft that it can be cut with a knife, and one non-metal that is a good conductor of electricity."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Using the electronic configuration, explain how Mg atom combines with oxygen to form magnesium oxide by transfer of electrons. [Atomic number : Mg = 12, O = 8]"
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Give reasons :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Metal sulphides and carbonates should be converted to their metal oxides in the process of extraction of metals."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Aluminium oxide is considered as an amphoteric oxide."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Metals like Na, K, Ca and Mg are never found in their free state in nature."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Properties of Metals and Non-metals",
+        "Ionic Bond Formation",
+        "Extraction of Metals",
+        "Amphoteric Oxides"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "In the given diagram, when electricity is passed through an aqueous solution of a common salt, a substance \u2018Z\u2019 is produced, along with the evolution of gases \u2018X\u2019 and \u2018Y\u2019. When a burning matchstick is brought near the gas \u2018Y\u2019, it burns with a pop sound, whereas \u2018X\u2019 is used for disinfecting drinking water. When \u2018X\u2019 is passed through slaked lime, an insoluble substance \u2018A\u2019 is produced.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "In the given diagram, when electricity is passed through an aqueous solution of a common salt, a substance \u2018Z\u2019 is produced, along with the evolution of gases \u2018X\u2019 and \u2018Y\u2019. When a burning matchstick is brought near the gas \u2018Y\u2019, it burns with a pop sound, whereas \u2018X\u2019 is used for disinfecting drinking water. When \u2018X\u2019 is passed through slaked lime, an insoluble substance \u2018A\u2019 is produced."
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/775cc2b2-0.png"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write the names of the gases \u2018X\u2019 and \u2018Y\u2019."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write the balanced chemical equation for the formation of substance \u2018Z\u2019."
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) What happens :"
+              },
+              {
+                "type": "paragraph",
+                "text": "(I) If a drop of red litmus solution is added to the aqueous solution of substance \u2018Z\u2019 ?"
+              },
+              {
+                "type": "paragraph",
+                "text": "(II) If CO\u2082 gas is passed through ammoniacal solution of aqueous NaCl ?",
+                "latex": "\\text{(II) If CO}_2\\text{ gas is passed through ammoniacal solution of aqueous NaCl ?}"
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) Identify the substance \u2018A\u2019 and write the balanced chemical equation of the reaction which takes place in its preparation."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Chlor-alkali process",
+        "Preparation of Bleaching Powder"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 21,
+          "bbox": [
+            0.08,
+            0.23,
+            0.85,
+            0.63
+          ],
+          "region": "passage"
+        }
+      ]
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "Attempt either (a) or (b) :\n(a) A carbon compound \u2018P\u2019 of molecular formula C2H6O is found to be neutral when tested with red and blue litmus. A gas that burns with a pop sound is produced when sodium metal reacts with compound \u2018P\u2019.\n(i) Identify the compound \u2018P\u2019.\n(ii) The carbon compound \u2018P\u2019 is heated with conc. H2SO4 at 443 K to produce compound \u2018Q\u2019.\n(I) Write the chemical equation for the reaction.\n(II) What is the role of conc. H2SO4 in this reaction ?\n(iii) What is likely to be observed on heating compound \u2018P\u2019 with ethanoic acid with an acid as a catalyst ? Write the chemical equation for the reaction.\nOR\n(b) (i) Write the structural formula of benzene.\n(ii) State the reason why carbon can neither form C4+ cation nor C4- anion.\n(iii) What type of bond is formed between carbon and hydrogen ?\n(iv) How is ethanol converted to ethanoic acid ?\n(v) Complete the following chemical equation :\nCH3COOC2H5 + NaOH --->",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "marks": 5,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "A carbon compound \u2018P\u2019 of molecular formula C2H6O is found to be neutral when tested with red and blue litmus. A gas that burns with a pop sound is produced when sodium metal reacts with compound \u2018P\u2019.",
+                    "latex": "A carbon compound \u2018P\u2019 of molecular formula \\text{C}_2\\text{H}_6\\text{O} is found to be neutral when tested with red and blue litmus. A gas that burns with a pop sound is produced when sodium metal reacts with compound \u2018P\u2019."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Identify the compound \u2018P\u2019."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) The carbon compound \u2018P\u2019 is heated with conc. H2SO4 at 443 K to produce compound \u2018Q\u2019.",
+                    "latex": "The carbon compound \u2018P\u2019 is heated with conc. \\text{H}_2\\text{SO}_4 at 443 K to produce compound \u2018Q\u2019."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) Write the chemical equation for the reaction."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) What is the role of conc. H2SO4 in this reaction ?",
+                    "latex": "What is the role of conc. \\text{H}_2\\text{SO}_4 in this reaction ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) What is likely to be observed on heating compound \u2018P\u2019 with ethanoic acid with an acid as a catalyst ? Write the chemical equation for the reaction."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 5,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Write the structural formula of benzene."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) State the reason why carbon can neither form C4+ cation nor C4- anion.",
+                    "latex": "State the reason why carbon can neither form \\text{C}^{4+} cation nor \\text{C}^{4-} anion."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) What type of bond is formed between carbon and hydrogen ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iv) How is ethanol converted to ethanoic acid ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(v) Complete the following chemical equation :"
+                  },
+                  {
+                    "type": "equation",
+                    "text": "CH3COOC2H5 + NaOH --->",
+                    "latex": "\\text{CH}_3\\text{COOC}_2\\text{H}_5 + \\text{NaOH} \\longrightarrow"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Chemical properties of carbon compounds",
+        "Ethanol and Ethanoic acid",
+        "Covalent bonding in carbon"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "A thin beam of white light falls on a face of a glass prism and a spectrum is obtained on a screen. Which of the following options is the correct sequence of colours from top to bottom on the screen ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Red, Green, Yellow, Violet, Blue"
+        },
+        {
+          "label": "B",
+          "text": "Red, Yellow, Green, Blue, Violet"
+        },
+        {
+          "label": "C",
+          "text": "Violet, Blue, Green, Yellow, Red"
+        },
+        {
+          "label": "D",
+          "text": "Violet, Red, Green, Yellow, Blue"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "A thin beam of white light falls on a face of a glass prism and a spectrum is obtained on a screen. Which of the following options is the correct sequence of colours from top to bottom on the screen ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Red, Green, Yellow, Violet, Blue"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Red, Yellow, Green, Blue, Violet"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Violet, Blue, Green, Yellow, Red"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Violet, Red, Green, Yellow, Blue"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Dispersion of white light by a glass prism"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "From the following options choose the one which gives negative magnification greater than one :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Concave mirror; Nature of image \u2013 real"
+        },
+        {
+          "label": "B",
+          "text": "Concave mirror; Nature of image \u2013 virtual"
+        },
+        {
+          "label": "C",
+          "text": "Convex mirror; Nature of image \u2013 real"
+        },
+        {
+          "label": "D",
+          "text": "Convex mirror; Nature of image \u2013 virtual"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "From the following options choose the one which gives negative magnification greater than one :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Concave mirror; Nature of image \u2013 real"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Concave mirror; Nature of image \u2013 virtual"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Convex mirror; Nature of image \u2013 real"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Convex mirror; Nature of image \u2013 virtual"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Magnification by spherical mirrors"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Direction of force exerted on a current-carrying conductor placed in a magnetic field remains same if the directions of both magnetic field and current flowing through the conductor are reversed. Reason (R) : The direction of force exerted on a current-carrying conductor placed in an external magnetic field can be determined by using magnetic compass.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Direction of force exerted on a current-carrying conductor placed in a magnetic field remains same if the directions of both magnetic field and current flowing through the conductor are reversed."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "The direction of force exerted on a current-carrying conductor placed in an external magnetic field can be determined by using magnetic compass."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Force on a current-carrying conductor in a magnetic field"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Use the above given ray diagram to calculate the angle of incidence. Given that the refractive index of Medium 2 with respect to the Medium 1 is \\sqrt{3}.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/9ceee659-0.png"
+          },
+          {
+            "type": "paragraph",
+            "text": "Use the above given ray diagram to calculate the angle of incidence. Given that the refractive index of Medium 2 with respect to the Medium 1 is "
+          },
+          {
+            "type": "equation",
+            "latex": "\\sqrt{3}"
+          },
+          {
+            "type": "paragraph",
+            "text": "."
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Refraction of Light",
+        "Refractive Index"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 27,
+          "bbox": [
+            0.1,
+            0.04,
+            0.52,
+            0.36
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "Attempt either (a) or (b) :\n(a) How does the focal length of eye lens change as the distance of the object from the eyes is altered ? Explain.\nOR\n(b) Why is the concave lens used as a corrective lens for a myopic eye ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "How does the focal length of eye lens change as the distance of the object from the eyes is altered ? Explain."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Why is the concave lens used as a corrective lens for a myopic eye ?"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Power of Accommodation",
+        "Defects of Vision and their Correction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) State the laws which help to find out the angle of incidence and angle of reflection in the ray diagram given above.\n(b) Find out the angle of incidence and angle of reflection in the given ray diagram.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/673637a6-0.png"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "State the laws which help to find out the angle of incidence and angle of reflection in the ray diagram given above."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Find out the angle of incidence and angle of reflection in the given ray diagram."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Reflection of Light",
+        "Laws of Reflection"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 27,
+          "bbox": [
+            0.1,
+            0.64,
+            0.5,
+            0.82
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "The values of current I flowing in a given resistor for the corresponding values of potential difference V applied across the ends of resistor are given below in the table :\n\nI (Amperes) 0.4 0.8 1.2 1.6 2.0\nV (Volts) 1.2 2.4 3.6 4.8 6.0\n\nPlot a graph between V and I and calculate the resistance of that resistor.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The values of current I flowing in a given resistor for the corresponding values of potential difference V applied across the ends of resistor are given below in the table :",
+            "latex": "The values of current $I$ flowing in a given resistor for the corresponding values of potential difference $V$ applied across the ends of resistor are given below in the table :"
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/1e8dc4d7-0.png"
+          },
+          {
+            "type": "paragraph",
+            "text": "Plot a graph between V and I and calculate the resistance of that resistor.",
+            "latex": "Plot a graph between $V$ and $I$ and calculate the resistance of that resistor."
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Ohm's Law",
+        "Resistance"
+      ],
+      "primary_form": "table_based",
+      "figures": [
+        {
+          "page": 29,
+          "bbox": [
+            0.13,
+            0.13,
+            0.89,
+            0.21
+          ],
+          "region": "stem",
+          "label": "table"
+        }
+      ]
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "What is scattering of light ? How is scattering of light different from reflection of light ? Explain.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "What is scattering of light ? How is scattering of light different from reflection of light ? Explain."
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Scattering of Light"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Swati, a class 10 student, observes that when she passes close to the refrigerator in her kitchen, she feels the heat, although the things kept inside the refrigerator are cool.\n(a) Describe the cause of heating in the above-mentioned case.\n(b) A current I flows through a resistor of resistance R when the potential difference across it is V. Applying Ohm\u2019s law, write the formula for amount of heat produced by the resistor in time t.\n(c) (i) Write any two practical applications of heating effect of electric current.\nOR\n(ii) Define the commercial unit of electric energy and express it in Joules (J).",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "Swati, a class 10 student, observes that when she passes close to the refrigerator in her kitchen, she feels the heat, although the things kept inside the refrigerator are cool."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Describe the cause of heating in the above-mentioned case."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "A current I flows through a resistor of resistance R when the potential difference across it is V. Applying Ohm's law, write the formula for amount of heat produced by the resistor in time t.",
+                "latex": "A current $I$ flows through a resistor of resistance $R$ when the potential difference across it is $V$. Applying Ohm's law, write the formula for amount of heat produced by the resistor in time $t$."
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) Write any two practical applications of heating effect of electric current."
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) Define the commercial unit of electric energy and express it in Joules (J)."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Heating Effect of Electric Current",
+        "Electric Energy"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "long_answer",
+      "marks": 5,
+      "text": "(a) (i) State the rules to determine the following :\n(I) Direction of magnetic field produced around a current-carrying straight conductor.\n(II) Direction of force experienced by a current-carrying straight conductor placed in a magnetic field which is perpendicular to it.\n(ii) (I) Draw the magnetic field lines due to a current-carrying solenoid.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "(a) (i) State the rules to determine the following :"
+          },
+          {
+            "type": "paragraph",
+            "text": "(I) Direction of magnetic field produced around a current-carrying straight conductor."
+          },
+          {
+            "type": "paragraph",
+            "text": "(II) Direction of force experienced by a current-carrying straight conductor placed in a magnetic field which is perpendicular to it."
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) (I) Draw the magnetic field lines due to a current-carrying solenoid."
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Right Hand Thumb Rule",
+        "Fleming's Left Hand Rule",
+        "Solenoid"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "Three points A, B and C are marked in the above given diagram of the current-carrying solenoid. Out of the three points A, B and C, at which point is the magnetic field strength maximum and at which point is it minimum ?\n\nOR\n\n(b) (i) (I) In the given circuit diagram, a battery B, a key K, a resistance R and a thick copper wire XY are connected in series and a compass is placed near the wire. What is the purpose of this arrangement ?\n(II) What conclusion do you draw from it ?\n(ii) Give reasons :\n(I) There is either a convergence or a divergence of magnetic field lines near the ends of a current-carrying straight solenoid.\n(II) The current-carrying solenoid, when suspended freely, aligns along a particular direction.\n(III) The burnt-out fuse should be replaced by another fuse of identical rating.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "image_placeholder",
+                    "text": "Solenoid diagram with points A, B, and C"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) Three points A, B and C are marked in the above given diagram of the current-carrying solenoid. Out of the three points A, B and C, at which point is the magnetic field strength maximum and at which point is it minimum ?"
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) (I) In the given circuit diagram, a battery B, a key K, a resistance R and a thick copper wire XY are connected in series and a compass is placed near the wire. What is the purpose of this arrangement ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) What conclusion do you draw from it ?"
+                  },
+                  {
+                    "type": "image_placeholder",
+                    "text": "Circuit diagram containing battery B, key K, resistance R, thick wire XY, and a compass"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Give reasons :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) There is either a convergence or a divergence of magnetic field lines near the ends of a current-carrying straight solenoid."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) The current-carrying solenoid, when suspended freely, aligns along a particular direction."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(III) The burnt-out fuse should be replaced by another fuse of identical rating."
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/b70162fa-0.png"
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/b70162fa-1.png"
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Magnetic field due to a current in a solenoid",
+        "Magnetic field due to a current through a straight conductor",
+        "Electric fuse"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 31,
+          "bbox": [
+            0.28,
+            0.05,
+            0.7,
+            0.18
+          ],
+          "region": "stem",
+          "label": "a"
+        },
+        {
+          "page": 31,
+          "bbox": [
+            0.3,
+            0.45,
+            0.95,
+            0.69
+          ],
+          "region": "stem",
+          "label": "b"
+        }
+      ]
+    }
+  ]
+}

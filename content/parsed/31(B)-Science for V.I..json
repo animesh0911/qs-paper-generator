@@ -1,0 +1,2475 @@
+{
+  "source_pdf": "science_2026/31(B)-Science for V.I..pdf",
+  "questions": [
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Select the gland that secretes digestive enzymes as well as hormones.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Thyroid"
+        },
+        {
+          "label": "B",
+          "text": "Pituitary"
+        },
+        {
+          "label": "C",
+          "text": "Pancreas"
+        },
+        {
+          "label": "D",
+          "text": "Adrenal"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Select the gland that secretes digestive enzymes as well as hormones."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Thyroid"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Pituitary"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Pancreas"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Adrenal"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Endocrine Glands",
+        "Pancreas"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Choose the option that indicates the common structure between the basic filtration unit of kidneys and in the walls of alveoli of lungs.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Thin-walled veins poorly supplied with blood."
+        },
+        {
+          "label": "B",
+          "text": "Thick-walled arteries richly supplied with blood."
+        },
+        {
+          "label": "C",
+          "text": "A cluster of thin-walled capillaries richly supplied with blood."
+        },
+        {
+          "label": "D",
+          "text": "Thick-walled capillaries poorly supplied with blood."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Choose the option that indicates the common structure between the basic filtration unit of kidneys and in the walls of alveoli of lungs."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Thin-walled veins poorly supplied with blood."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Thick-walled arteries richly supplied with blood."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "A cluster of thin-walled capillaries richly supplied with blood."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Thick-walled capillaries poorly supplied with blood."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Excretion",
+        "Respiration"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Given below a set of statements regarding blood circulation in humans.\nIdentify the correct statement.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Oxygenated blood from lungs comes to the right auricle through pulmonary veins."
+        },
+        {
+          "label": "B",
+          "text": "Vena cavas take oxygenated blood from body parts to right auricle."
+        },
+        {
+          "label": "C",
+          "text": "Pulmonary artery takes oxygenated blood from heart to lungs."
+        },
+        {
+          "label": "D",
+          "text": "Aorta takes oxygenated blood from heart to body parts."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Given below a set of statements regarding blood circulation in humans."
+          },
+          {
+            "type": "paragraph",
+            "text": "Identify the correct statement."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Oxygenated blood from lungs comes to the right auricle through pulmonary veins."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Vena cavas take oxygenated blood from body parts to right auricle."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Pulmonary artery takes oxygenated blood from heart to lungs."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Aorta takes oxygenated blood from heart to body parts."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Transportation in Human Beings"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Why do green plants occupy the first trophic level of any food chain ?\nPick out the right option from the following.",
+      "options": [
+        {
+          "label": "A",
+          "text": "They are fixed at one place in the soil so they cannot move from place to place."
+        },
+        {
+          "label": "B",
+          "text": "They are widely distributed."
+        },
+        {
+          "label": "C",
+          "text": "There are more herbivores than carnivores."
+        },
+        {
+          "label": "D",
+          "text": "They have the ability to make food using sunlight, by photosynthesis."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Why do green plants occupy the first trophic level of any food chain ?"
+          },
+          {
+            "type": "paragraph",
+            "text": "Pick out the right option from the following."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "They are fixed at one place in the soil so they cannot move from place to place."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "They are widely distributed."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "There are more herbivores than carnivores."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "They have the ability to make food using sunlight, by photosynthesis."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Ecosystem \u2014 What Are Its Components?"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Decomposers play an important role in the nature. Which role do they not perform ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Convert simple inorganic substances into complex organic substances using radiant energy of the Sun."
+        },
+        {
+          "label": "B",
+          "text": "Act on the garbage and reduce it."
+        },
+        {
+          "label": "C",
+          "text": "Natural replenishment of the soil."
+        },
+        {
+          "label": "D",
+          "text": "Breakdown of complex organic matter of dead animals and plants into simple form."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Decomposers play an important role in the nature. Which role do they not perform ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Convert simple inorganic substances into complex organic substances using radiant energy of the Sun."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Act on the garbage and reduce it."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Natural replenishment of the soil."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Breakdown of complex organic matter of dead animals and plants into simple form."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Role of Decomposers"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Round, green seeded pea plant (RRyy) was crossed with wrinkled, yellow seeded pea plant (rrYY), and F1 progeny is produced. All plants of F1 progeny will have :",
+      "options": [
+        {
+          "label": "A",
+          "text": "round and green seeds"
+        },
+        {
+          "label": "B",
+          "text": "round and yellow seeds"
+        },
+        {
+          "label": "C",
+          "text": "wrinkled and green seeds"
+        },
+        {
+          "label": "D",
+          "text": "wrinkled and yellow seeds"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Round, green seeded pea plant (RRyy) was crossed with wrinkled, yellow seeded pea plant (rrYY), and F1 progeny is produced.",
+            "latex": "\\text{Round, green seeded pea plant (RRyy) was crossed with wrinkled, yellow seeded pea plant (rrYY), and } F_1 \\text{ progeny is produced.}"
+          },
+          {
+            "type": "paragraph",
+            "text": "All plants of F1 progeny will have :",
+            "latex": "\\text{All plants of } F_1 \\text{ progeny will have :}"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "round and green seeds"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "round and yellow seeds"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "wrinkled and green seeds"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "wrinkled and yellow seeds"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Dihybrid Cross",
+        "Mendelian Inheritance"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Select the option which illustrates the correct method of asexual reproduction in Spirogyra.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Budding"
+        },
+        {
+          "label": "B",
+          "text": "Regeneration"
+        },
+        {
+          "label": "C",
+          "text": "Fragmentation"
+        },
+        {
+          "label": "D",
+          "text": "Spore formation"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Select the option which illustrates the correct method of asexual reproduction in Spirogyra."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Budding"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Regeneration"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Fragmentation"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Spore formation"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Fragmentation",
+        "Asexual Reproduction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Mammals and birds have efficient supply of oxygen to the body.\nReason (R) : Mammals and birds have four-chambered heart.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Mammals and birds have efficient supply of oxygen to the body."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Mammals and birds have four-chambered heart."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Transportation in Human Beings"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Oxygen at the higher levels of the atmosphere is a product of UV radiation.\nReason (R) : At higher levels of the atmosphere, ozone shields the surface of the Earth from UV radiation from the Sun.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Oxygen at the higher levels of the atmosphere is a product of UV radiation."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "At higher levels of the atmosphere, ozone shields the surface of the Earth from UV radiation from the Sun."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Ozone Layer"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "\u201cThe sex of the children in the human beings will be determined by what they inherit from their father.\u201d Explain this statement.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "\u201cThe sex of the children in the human beings will be determined by what they inherit from their father.\u201d Explain this statement."
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Sex Determination"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "Attempt either subpart (a) or (b) :\n(a) Electrical impulses are an excellent means to respond to stimuli in animal bodies. List any two limitations to the use of electrical impulses.\nOR\n(b) Explain how the pea plant climbs up the support by means of tendrils.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either subpart (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Electrical impulses are an excellent means to respond to stimuli in animal bodies. List any two limitations to the use of electrical impulses."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Explain how the pea plant climbs up the support by means of tendrils."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Nervous Tissue",
+        "Coordination in Plants"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "Describe why do food chains generally consist of a few steps.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Describe why do food chains generally consist of a few steps."
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Food chains and webs",
+        "Flow of energy"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "A tall pea plant (TT) is crossed with a dwarf pea plant (tt). Find out F1 and F2 progeny. Also mention the processes that lead to the formation of F1 and F2 progeny during the cross.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "A tall pea plant (TT) is crossed with a dwarf pea plant (tt). Find out "
+          },
+          {
+            "type": "paragraph",
+            "text": " progeny. Also mention the processes that lead to the formation of ",
+            "latex": "F_1 \\text{ and } F_2"
+          },
+          {
+            "type": "paragraph",
+            "text": " progeny during the cross.",
+            "latex": "F_1 \\text{ and } F_2"
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Monohybrid cross",
+        "Mendel's experiments"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Name the organ that helps in the digestion of fats in human beings. Also describe its complete digestion into simple form. Where does absorption of food take place in the humans ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Name the organ that helps in the digestion of fats in human beings. Also describe its complete digestion into simple form. Where does absorption of food take place in the humans ?"
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Nutrition in human beings",
+        "Digestion of fats"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Read the following passage and answer the questions that follow :\nIn many animals including humans, adrenaline hormone prepares for scary situation. The target organs on which it acts include the heart. The blood to the digestive system and skin is reduced, but the heart beats faster and breathing rate also increases. All these responses together enable the animal body to deal with such scary situation.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "In many animals including humans, adrenaline hormone prepares for scary situation. The target organs on which it acts include the heart. The blood to the digestive system and skin is reduced, but the heart beats faster and breathing rate also increases. All these responses together enable the animal body to deal with such scary situation."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Attempt either subpart (i) or (ii) :"
+              },
+              {
+                "type": "paragraph",
+                "text": "(i) Name the gland that secretes adrenaline hormone. How does it enable the animal body to deal with a scary situation ?"
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) Why is the blood to the digestive system and skin reduced ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why is it important for us to have iodised salt in our diet ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why does a doctor advise some persons to take less sugar in their diet ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Hormones in animals",
+        "Adrenaline",
+        "Thyroxine",
+        "Insulin"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "Attempt either subpart (a) or (b) :",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either subpart (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Sugarcane and roses are mostly grown by vegetative propagation. Define this mode of reproduction. (ii) List two advantages of vegetative propagation. (iii) Distinguish between unisexual and bisexual flowers. Give one example of each kind."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Differentiate between self-pollination and cross-pollination. (two points) (ii) Explain how does pollination lead to fertilisation in flowering plants. (iii) Name the end-products of sexual reproduction in plants."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Vegetative Propagation",
+        "Sexual Reproduction in Flowering Plants"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following is not an exothermic reaction ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Decomposition of vegetable matter into compost"
+        },
+        {
+          "label": "B",
+          "text": "Reaction of water with quick lime"
+        },
+        {
+          "label": "C",
+          "text": "Respiration process taking place in the cells of our body"
+        },
+        {
+          "label": "D",
+          "text": "Decomposition of calcium carbonate to calcium oxide and carbon dioxide"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following is not an exothermic reaction ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Decomposition of vegetable matter into compost"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Reaction of water with quick lime"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Respiration process taking place in the cells of our body"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Decomposition of calcium carbonate to calcium oxide and carbon dioxide"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Exothermic and Endothermic Reactions"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Electrolysis of water is an example of :",
+      "options": [
+        {
+          "label": "A",
+          "text": "thermal decomposition reaction"
+        },
+        {
+          "label": "B",
+          "text": "photochemical decomposition reaction"
+        },
+        {
+          "label": "C",
+          "text": "double-displacement reaction"
+        },
+        {
+          "label": "D",
+          "text": "electrolytic decomposition reaction"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Electrolysis of water is an example of :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "thermal decomposition reaction"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "photochemical decomposition reaction"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "double-displacement reaction"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "electrolytic decomposition reaction"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Decomposition Reaction",
+        "Electrolysis of Water"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The acid presents in nettle sting is :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Tartaric acid"
+        },
+        {
+          "label": "B",
+          "text": "Oxalic acid"
+        },
+        {
+          "label": "C",
+          "text": "Methanoic acid"
+        },
+        {
+          "label": "D",
+          "text": "Acetic acid"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The acid presents in nettle sting is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Tartaric acid"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Oxalic acid"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Methanoic acid"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Acetic acid"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Naturally occurring acids"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which one of the following non-metals exists as liquid at room temperature ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Bromine"
+        },
+        {
+          "label": "B",
+          "text": "Sulphur"
+        },
+        {
+          "label": "C",
+          "text": "Iodine"
+        },
+        {
+          "label": "D",
+          "text": "Chlorine"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which one of the following non-metals exists as liquid at room temperature ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Bromine"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Sulphur"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Iodine"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Chlorine"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Physical properties of non-metals"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which one among the following alloys has mercury as one of its constituents ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Stainless steel"
+        },
+        {
+          "label": "B",
+          "text": "Brass"
+        },
+        {
+          "label": "C",
+          "text": "Zinc amalgam"
+        },
+        {
+          "label": "D",
+          "text": "Bronze"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which one among the following alloys has mercury as one of its constituents ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Stainless steel"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Brass"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Zinc amalgam"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Bronze"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Alloys"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "When ethanoic acid is treated with sodium hydrogen carbonate, the gas evolved is :",
+      "options": [
+        {
+          "label": "A",
+          "text": "CO2"
+        },
+        {
+          "label": "B",
+          "text": "CH4"
+        },
+        {
+          "label": "C",
+          "text": "CO"
+        },
+        {
+          "label": "D",
+          "text": "H2"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "When ethanoic acid is treated with sodium hydrogen carbonate, the gas evolved is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "CO2",
+                "latex": "CO_2"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "CH4",
+                "latex": "CH_4"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "CO",
+                "latex": "CO"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "H2",
+                "latex": "H_2"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Chemical properties of ethanoic acid"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The second member of alkyne homologous series is :",
+      "options": [
+        {
+          "label": "A",
+          "text": "propene"
+        },
+        {
+          "label": "B",
+          "text": "ethyne"
+        },
+        {
+          "label": "C",
+          "text": "ethene"
+        },
+        {
+          "label": "D",
+          "text": "propyne"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The second member of alkyne homologous series is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "propene"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "ethyne"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "ethene"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "propyne"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Homologous series",
+        "Alkynes"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : It is advised that while diluting a concentrated acid, acid should be added slowly to water and not water to acid. Reason (R) : The process of dissolving an acid in water is endothermic.",
+      "options": [
+        {
+          "label": "a",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "b",
+          "text": "Both Assertion (A) and Reason (R) are true but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "c",
+          "text": "Assertion (A) is true but Reason (R) is false."
+        },
+        {
+          "label": "d",
+          "text": "Assertion (A) is false but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "It is advised that while diluting a concentrated acid, acid should be added slowly to water and not water to acid."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "The process of dissolving an acid in water is endothermic."
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Dilution of concentrated acid"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Give reasons for the following : (a) Dry HCl gas does not change the colour of a dry blue litmus paper. (b) Copper sulphate crystals turn white on heating.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Give reasons for the following :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Dry HCl gas does not change the colour of a dry blue litmus paper."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Copper sulphate crystals turn white on heating."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Action of acid on litmus",
+        "Water of crystallisation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "What happens when : (a) silver chloride is kept in sunlight ? (b) lead nitrate solution is added to potassium iodide solution ? (c) food materials containing fats and oils are left for a long time ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "What happens when :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "silver chloride is kept in sunlight ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "lead nitrate solution is added to potassium iodide solution ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "food materials containing fats and oils are left for a long time ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Photolytic decomposition",
+        "Precipitation reaction",
+        "Rancidity"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "internal_choice",
+      "marks": 3,
+      "text": "Attempt either subpart (a) or (b) : (a) During electrolysis of brine solution, a gas (A) is liberated at the anode. When the gas (A) is passed through slaked lime, a compound (B) is formed which is used for disinfecting drinking water. (i) Write the names of (A) and (B). (ii) Write the chemical equation involved. (iii) Write one use of compound (B) other than disinfecting water. OR (b) Define the following terms with an example : (i) Olfactory indicators (ii) Water of crystallisation (iii) Basic salt",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either subpart (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "marks": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "During electrolysis of brine solution, a gas (A) is liberated at the anode. When the gas (A) is passed through slaked lime, a compound (B) is formed which is used for disinfecting drinking water."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Write the names of (A) and (B)."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Write the chemical equation involved."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Write one use of compound (B) other than disinfecting water."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 3,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Define the following terms with an example :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Olfactory indicators"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Water of crystallisation"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Basic salt"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Chlor-alkali process",
+        "Bleaching powder",
+        "Olfactory indicators",
+        "Water of crystallisation",
+        "Types of salts"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Read the following passage and answer the questions that follow :\nWhen metals are burnt in air, they form oxides. Metal oxides are generally basic in nature. But some metal oxides show both acidic as well as basic behaviour. Most metal oxides are insoluble in water, but some of these dissolve in water to form alkalis. Different metals show different reactivities towards oxygen. Metals such as sodium and potassium react vigorously whereas metals like silver and gold do not react with oxygen even at high temperature.\n(a) Why are metals like sodium and potassium kept immersed in kerosene oil ?\n(b) Why does copper metal turn black on heating ?\n(c) (i) What are the amphoteric oxides ? Give two examples.\nOR\n(c) (ii) (I) Name a water soluble metal oxide. Write the chemical equation for its reaction with water.\n(II) Why do silver and gold not react with oxygen even at high temperature ?",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "When metals are burnt in air, they form oxides. Metal oxides are generally basic in nature. But some metal oxides show both acidic as well as basic behaviour. Most metal oxides are insoluble in water, but some of these dissolve in water to form alkalis. Different metals show different reactivities towards oxygen. Metals such as sodium and potassium react vigorously whereas metals like silver and gold do not react with oxygen even at high temperature."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why are metals like sodium and potassium kept immersed in kerosene oil ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why does copper metal turn black on heating ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) What are the amphoteric oxides ? Give two examples."
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) (I) Name a water soluble metal oxide. Write the chemical equation for its reaction with water."
+              },
+              {
+                "type": "paragraph",
+                "text": "(II) Why do silver and gold not react with oxygen even at high temperature ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Chemical properties of metals",
+        "Amphoteric oxides",
+        "Reactivity of metals with oxygen"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "Attempt either subpart (a) or (b) :\n(a) (i) Define catenation. Why does carbon show catenation ?\n(ii) Define homologous series. Give examples of two homologues whose molecular mass differ by 14 amu.\n(iii) Why do soaps not work well in hard water ?\nOR\n(b) (i) Why do covalent compounds have low melting and boiling points ?\n(ii) Name the reagent that can convert ethanol to ethanoic acid.\n(iii) Why is ethanoic acid a weaker acid than mineral acids ?\n(iv) Define esterification reaction.\n(v) What are 'Micelles' ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either subpart (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "marks": 5,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Define catenation. Why does carbon show catenation ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Define homologous series. Give examples of two homologues whose molecular mass differ by 14 amu."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Why do soaps not work well in hard water ?"
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 5,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Why do covalent compounds have low melting and boiling points ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Name the reagent that can convert ethanol to ethanoic acid."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Why is ethanoic acid a weaker acid than mineral acids ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iv) Define esterification reaction."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(v) What are 'Micelles' ?"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Catenation",
+        "Homologous series",
+        "Soaps and detergents",
+        "Properties of covalent compounds",
+        "Ethanol and Ethanoic acid",
+        "Esterification"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Work done in displacing an electron between two points having potential difference of 1 V, is :",
+      "options": [
+        {
+          "label": "A",
+          "text": "\u2013 1.6 \u00d7 10\u201319 C"
+        },
+        {
+          "label": "B",
+          "text": "\u2013 1.6 \u00d7 10\u201319 J"
+        },
+        {
+          "label": "C",
+          "text": "+ 1.6 \u00d7 10\u201319 J"
+        },
+        {
+          "label": "D",
+          "text": "\u2013 1.6 \u00d7 10\u201319 V"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Work done in displacing an electron between two points having potential difference of 1 V, is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "\u2013 1.6 \u00d7 10\u201319 C",
+                "latex": "-1.6 \\times 10^{-19}\\text{ C}"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "\u2013 1.6 \u00d7 10\u201319 J",
+                "latex": "-1.6 \\times 10^{-19}\\text{ J}"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "+ 1.6 \u00d7 10\u201319 J",
+                "latex": "+1.6 \\times 10^{-19}\\text{ J}"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "\u2013 1.6 \u00d7 10\u201319 V",
+                "latex": "-1.6 \\times 10^{-19}\\text{ V}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Electric Potential and Potential Difference"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Angle of deviation in refraction of light through a glass prism is the :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Angle between the normal at the face on the emerging side of the prism and the emergent ray."
+        },
+        {
+          "label": "B",
+          "text": "Angle between the normal at the face on the emerging side of the prism and the incident ray."
+        },
+        {
+          "label": "C",
+          "text": "Angle between the incident ray and the refracted ray."
+        },
+        {
+          "label": "D",
+          "text": "Angle between the directions of incident ray and emergent ray."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Angle of deviation in refraction of light through a glass prism is the :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Angle between the normal at the face on the emerging side of the prism and the emergent ray."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Angle between the normal at the face on the emerging side of the prism and the incident ray."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Angle between the incident ray and the refracted ray."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Angle between the directions of incident ray and emergent ray."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Refraction of light through a prism"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : When light passes from one medium to another medium, the speed of light may increase or decrease.\nReason (R) : Refractive index of one medium with respect to the other medium may be greater or less than 1.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "When light passes from one medium to another medium, the speed of light may increase or decrease."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Refractive index of one medium with respect to the other medium may be greater or less than 1."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Refraction of Light",
+        "Refractive Index"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "Write any two differences between the images formed by convex mirror and plane mirror.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Write any two differences between the images formed by convex mirror and plane mirror."
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Spherical Mirrors",
+        "Plane Mirror"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "Attempt either subpart (a) or (b) :\n(a) Name the phenomenon due to which a prism splits the incident white light into a band of colours. State the reason of the phenomenon also.\nOR\n(b) When a ray of light passes from water to air (I) will the angle of refraction in air (r) be greater than the angle of incidence in water (i) or less than it ? (II) and when we increase the angle of incidence in water, will the angle of refraction in air increase or decrease ? What is the limiting value for \u2220r ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either subpart (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Name the phenomenon due to which a prism splits the incident white light into a band of colours. State the reason of the phenomenon also."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "When a ray of light passes from water to air (I) will the angle of refraction in air (r) be greater than the angle of incidence in water (i) or less than it ? (II) and when we increase the angle of incidence in water, will the angle of refraction in air increase or decrease ? What is the limiting value for \\angle r ?"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Refraction of light through a prism",
+        "Dispersion of white light"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Explain the Tyndall effect with the help of one suitable example. \n(b) What happens when a white light gets scattered from (i) very fine particles (ii) larger size particles ?",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Explain the Tyndall effect with the help of one suitable example."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What happens when a white light gets scattered from (i) very fine particles (ii) larger size particles ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Scattering of light",
+        "Tyndall Effect"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Optical device | Object distance (cm) | Focal length (cm) | Height of object (cm)\nConvex lens | 20 | 10 | 6\nConcave mirror | 30 | 10 | 6\nBy using the data given in the table, compare the properties of images formed by convex lens and concave mirror in terms of the positions and nature of images formed.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/55e7a086-0.png"
+          },
+          {
+            "type": "paragraph",
+            "text": "By using the data given in the table, compare the properties of images formed by convex lens and concave mirror in terms of the positions and nature of images formed."
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Image formation by lenses",
+        "Image formation by spherical mirrors"
+      ],
+      "primary_form": "table_based",
+      "figures": [
+        {
+          "page": 23,
+          "bbox": [
+            0.11,
+            0.62,
+            0.9,
+            0.75
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "State the role of fuse and earthing in domestic electric circuit. Suggest any two precautions to be taken to avoid electrical accidents.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "State the role of fuse and earthing in domestic electric circuit. Suggest any two precautions to be taken to avoid electrical accidents."
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Domestic electric circuits"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Read the following passage and answer the questions that follow :\nH.C. Oersted demonstrated that every current-carrying wire produces magnetic field around it. The pattern of the magnetic field depends upon the geometrical structure the current carrying wire is folded into. When a current-carrying wire is kept in a magnetic field, it experiences a force. Magnitude of this force is maximum when direction of magnetic field is at right angles to the current-carrying wire. Some rules to determine the direction of magnetic field and force were given by scientists Maxwell and Fleming.\n(a) What is the direction of magnetic field inside and outside a solenoid ?\n(b) Same electric current is flowing through three identical wires A, B and C. If wires A, B and C are making respectively angles 30\u00b0, 60\u00b0 and 270\u00b0 with the magnetic field, which of the wires will experience maximum force and why ?\n(c) (i) Name and state the law which is required to find out the direction of force acting on a current carrying wire, kept in a magnetic field.\nOR\n(ii) Name and state the law which is required to find out the direction of magnetic field around the current carrying straight conductor.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "H.C. Oersted demonstrated that every current-carrying wire produces magnetic field around it. The pattern of the magnetic field depends upon the geometrical structure the current carrying wire is folded into. When a current-carrying wire is kept in a magnetic field, it experiences a force. Magnitude of this force is maximum when direction of magnetic field is at right angles to the current-carrying wire. Some rules to determine the direction of magnetic field and force were given by scientists Maxwell and Fleming."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What is the direction of magnetic field inside and outside a solenoid ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Same electric current is flowing through three identical wires A, B and C. If wires A, B and C are making respectively angles 30\u00b0, 60\u00b0 and 270\u00b0 with the magnetic field, which of the wires will experience maximum force and why ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) Name and state the law which is required to find out the direction of force acting on a current carrying wire, kept in a magnetic field."
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) Name and state the law which is required to find out the direction of magnetic field around the current carrying straight conductor."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Magnetic field due to a solenoid",
+        "Force on a current-carrying conductor in a magnetic field"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "internal_choice",
+      "marks": 4,
+      "text": "Attempt either subpart (a) or (b) :\n(a) (i) In a house, 5 fans, rated 100 W; 220 V each are used for 4 hours daily and an electric heater rated 1000 W; 220 V is used for 5 hours daily. Calculate the cost of electrical energy consumed by the fans and the electric heater in a month of 30 days if the cost of 1 unit of electrical energy is \u20b9 5.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either subpart (a) or (b) :"
+          }
+        ],
+        "choices": [
+          {
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) In a house, 5 fans, rated 100 W; 220 V each are used for 4 hours daily and an electric heater rated 1000 W; 220 V is used for 5 hours daily. Calculate the cost of electrical energy consumed by the fans and the electric heater in a month of 30 days if the cost of 1 unit of electrical energy is \u20b9 5."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Electric energy and power",
+        "Commercial unit of electrical energy"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(ii) You have two fuse wires X and Y with electric current rating 5 A and 10 A respectively. Which of the two would you use with a heater rated 2000 W; 220 V ? Justify your answer.\n\nOR\n\n(b) (i) State the relationship of the resistance (R) of a wire with its area of cross-section (A) and its length (l). With the help of this relation, define resistivity of the material of the wire.\n(ii) In an electric circuit, 2 A electric current flows through a 40 \u03a9 resistor for 50 seconds. (I) Calculate the heat produced in the wire. (II) If another 40 \u03a9 resistor is connected in parallel to the given 40 \u03a9 resistor, calculate the heat produced in the circuit in 50 seconds.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "Option A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) You have two fuse wires X and Y with electric current rating 5 A and 10 A respectively. Which of the two would you use with a heater rated 2000 W; 220 V ? Justify your answer."
+                  }
+                ]
+              },
+              {
+                "label": "Option B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(b) (i) State the relationship of the resistance (R) of a wire with its area of cross-section (A) and its length (l). With the help of this relation, define resistivity of the material of the wire.",
+                    "latex": "(b) (i) State the relationship of the resistance (R) of a wire with its area of cross-section (A) and its length (l). With the help of this relation, define resistivity of the material of the wire."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) In an electric circuit, 2 A electric current flows through a 40 \u03a9 resistor for 50 seconds. (I) Calculate the heat produced in the wire. (II) If another 40 \u03a9 resistor is connected in parallel to the given 40 \u03a9 resistor, calculate the heat produced in the circuit in 50 seconds.",
+                    "latex": "(ii) In an electric circuit, 2\\text{ A} electric current flows through a 40\\ \\Omega resistor for 50 seconds. (I) Calculate the heat produced in the wire. (II) If another 40\\ \\Omega resistor is connected in parallel to the given 40\\ \\Omega resistor, calculate the heat produced in the circuit in 50 seconds."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Electric Fuse",
+        "Factors affecting Resistance",
+        "Joule's Law of Heating",
+        "Resistors in Parallel"
+      ],
+      "primary_form": "none",
+      "figures": []
+    }
+  ]
+}
