@@ -12,7 +12,10 @@ import type { Block } from '@blocknote/core';
 import { mockPaperDocumentV1 } from '@/mocks';
 import {
   assertPaperDocument,
+  getQuestion,
+  getSlotOverridesById,
   normalizePaperDocument,
+  type NormalizedPaperDocument,
   reorderSlotWithinOrderZone,
   setSlotSelectedQuestion,
   setSlotRegionOverride,
@@ -21,6 +24,12 @@ import {
   blockNoteBlocksToContentItems,
   buildEditorPaperView,
 } from './editor-paper';
+
+function question(state: NormalizedPaperDocument, questionId: string) {
+  const value = getQuestion(state, questionId);
+  expect(value).toBeDefined();
+  return value!;
+}
 
 describe('editor paper view model', () => {
   it('loads the mocked PaperDocumentV1 into a CBSE paper canvas model', () => {
@@ -256,11 +265,11 @@ describe('editor paper view model', () => {
     ]);
 
     const view = buildEditorPaperView(document, {
-      slotEditsById: nextState.slotEditsById,
+      slotEditsById: getSlotOverridesById(nextState),
     });
     const firstSlot = view.sections[0].slots[0];
 
-    expect(nextState.questionsById.q_mcq_heredity_001.rawText).toBe(
+    expect(question(nextState, 'q_mcq_heredity_001').rawText).toBe(
       'What is the phenotypic ratio in the F2 generation of a monohybrid cross?',
     );
     expect(firstSlot.modifiedFromSource).toBe(true);
@@ -325,7 +334,7 @@ describe('editor paper view model', () => {
     ]);
 
     const view = buildEditorPaperView(document, {
-      slotEditsById: nextState.slotEditsById,
+      slotEditsById: getSlotOverridesById(nextState),
     });
     const stemRegion = view.sections[0].slots[0].questionBlockTree.children[0];
 

@@ -17,21 +17,10 @@
  *
  * @module EditorPage
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  closestCenter,
-  DndContext,
-  KeyboardSensor,
-  pointerWithin,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type CollisionDetection,
-} from '@dnd-kit/core';
+import { useMemo } from 'react';
+import { DndContext } from '@dnd-kit/core';
 import {
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import {
@@ -51,21 +40,8 @@ import {
   getPaperFormatRendererResult,
   type PaperFormatRenderer,
 } from '@/lib/paper-format-renderers';
-import {
-  assertPaperDocument,
-  buildOrderZones,
-  commitStructuredPaperAction,
-  normalizePaperDocument,
-  reorderSlotWithinOrderZone,
-  removePaperChromeBlock,
-  restoreSlotSource,
-  setPaperChromeText,
-  setSlotLockState,
-  setSlotSelectedQuestion,
-  setSlotRegionOverride,
-  undoStructuredPaperAction,
-  type StructuredPaperUndoEntry,
-} from '@/lib/paper-document';
+import { assertPaperDocument } from '@/lib/paper-document';
+import { useEditorWorkspace } from '@/hooks/useEditorWorkspace.hook';
 import {
   EditorAlternativesOverlay,
   EditorInspector,
@@ -74,16 +50,10 @@ import {
   QuestionActionRail,
   QuestionRegionEditor,
   SortableQuestionSlot,
-  type AlternativesIntent,
-  type InspectorMode,
 } from '@/components/editor';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { ContentItem, PaperDocument } from '@/types';
-
-function contentItemsEqual(left: ContentItem[], right: ContentItem[]) {
-  return JSON.stringify(left) === JSON.stringify(right);
-}
+import type { PaperDocument } from '@/types';
 
 function toRoman(value: number) {
   const numerals = [
@@ -153,324 +123,48 @@ function EditorPageWorkspace({
   renderer: PaperFormatRenderer;
   selectedFixtureId: string;
 }) {
-  const initialPaperState = useMemo(
-    () => normalizePaperDocument(document),
-    [document],
-  );
-  const [paperState, setPaperState] = useState(initialPaperState);
-  const [undoEntry, setUndoEntry] = useState<StructuredPaperUndoEntry | null>(
-    null,
-  );
-  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
-  const [activeRailSlotId, setActiveRailSlotId] = useState<string | null>(null);
-  const [selectedChromeBlockId, setSelectedChromeBlockId] = useState<
-    string | null
-  >(null);
-  const [inspectorMode, setInspectorMode] = useState<InspectorMode>('info');
-  const [inspectorHighlighted, setInspectorHighlighted] = useState(false);
-  const [alternativesIntent, setAlternativesIntent] =
-    useState<AlternativesIntent>('swap');
-  const [alternativesOverlayOpen, setAlternativesOverlayOpen] = useState(false);
-  const [chatValue, setChatValue] = useState('');
-  const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
-  const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
-  const [dragNotice, setDragNotice] = useState<string | null>(null);
-  const chatInputRef = useRef<HTMLInputElement>(null);
-  const alternativesOpenerRef = useRef<HTMLElement | null>(null);
-  const inspectorHighlightTimeoutRef = useRef<number | null>(null);
-  const blockedCrossSectionDropRef = useRef(false);
-  const dragSensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 6,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-  const view = useMemo(
-    () =>
-      renderer.buildEditorPaperView(paperState.document, {
-        slotEditsById: paperState.slotEditsById,
-        alternativesIntentBySlotId: selectedSlotId
-          ? { [selectedSlotId]: alternativesIntent }
-          : undefined,
-      }),
-    [alternativesIntent, paperState, renderer, selectedSlotId],
-  );
-  const orderZones = useMemo(() => buildOrderZones(paperState), [paperState]);
-  const slotZoneById = useMemo(
-    () =>
-      Object.fromEntries(
-        orderZones.flatMap((zone) =>
-          zone.orderedItemIds.map((slotId) => [String(slotId), zone.zoneId]),
-        ),
-      ),
-    [orderZones],
-  );
-  const sameSectionCollisionDetection = useMemo<CollisionDetection>(
-    () => (args) => {
-      const activeZoneId = slotZoneById[String(args.active.id)];
-      if (!activeZoneId) return closestCenter(args);
-
-      const pointerCollision = pointerWithin(args).find(
-        (collision) => collision.id !== args.active.id,
-      );
-      const pointerZoneId = pointerCollision
-        ? slotZoneById[String(pointerCollision.id)]
-        : undefined;
-      if (pointerZoneId && pointerZoneId !== activeZoneId) {
-        blockedCrossSectionDropRef.current = true;
-        return [];
-      }
-
-      blockedCrossSectionDropRef.current = false;
-      return closestCenter({
-        ...args,
-        droppableContainers: args.droppableContainers.filter(
-          (container) => slotZoneById[String(container.id)] === activeZoneId,
-        ),
-      });
-    },
-    [slotZoneById],
-  );
-
-  const selectedSlot = view.sections
-    .flatMap((section) => section.slots)
-    .find((slot) => slot.slotId === selectedSlotId);
-  const selectedQuestion = selectedSlot?.questionBlockTree.questionId
-    ? paperState.questionsById[selectedSlot.questionBlockTree.questionId]
-    : undefined;
-
-  useEffect(() => {
-    setPaperState(initialPaperState);
-    setUndoEntry(null);
-    setSelectedSlotId(null);
-    setActiveRailSlotId(null);
-    setSelectedChromeBlockId(null);
-    setInspectorMode('info');
-    setAlternativesOverlayOpen(false);
-  }, [initialPaperState, selectedFixtureId]);
-
-  useEffect(() => {
-    function handleOutsidePointerDown(event: PointerEvent) {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      if (
-        target.closest(
-          '[data-question-slot], .qpg-question-action-rail, .editor-inspector, .editor-alternatives-overlay, .editor-chat-footer, .editor-left-rail, header',
-        )
-      ) {
-        return;
-      }
-      if (window.document.activeElement instanceof HTMLElement) {
-        window.document.activeElement.blur();
-      }
-      setActiveRailSlotId(null);
-      setSelectedSlotId(null);
-      setSelectedChromeBlockId(null);
-    }
-
-    window.document.addEventListener('pointerdown', handleOutsidePointerDown);
-    return () => {
-      window.document.removeEventListener(
-        'pointerdown',
-        handleOutsidePointerDown,
-      );
-    };
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (inspectorHighlightTimeoutRef.current !== null) {
-        window.clearTimeout(inspectorHighlightTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!dragNotice) return undefined;
-    const timeoutId = window.setTimeout(() => setDragNotice(null), 2400);
-    return () => window.clearTimeout(timeoutId);
-  }, [dragNotice]);
-
-  function commitStructuredAction(nextState: typeof paperState) {
-    const result = commitStructuredPaperAction(paperState, nextState);
-    setPaperState(result.state);
-    setUndoEntry(result.undoEntry);
-  }
-
-  function handleUndo() {
-    const result = undoStructuredPaperAction(paperState, undoEntry);
-    setPaperState(result.state);
-    setUndoEntry(result.undoEntry);
-  }
-
-  function handleRegionChange(
-    slotId: string,
-    regionKey: string,
-    currentContent: ContentItem[],
-    content: ContentItem[],
-  ) {
-    if ((paperState.slotsById[slotId]?.can?.editText ?? true) === false) {
-      return;
-    }
-    if (contentItemsEqual(currentContent, content)) return;
-    commitStructuredAction(
-      setSlotRegionOverride(paperState, slotId, regionKey, content),
-    );
-  }
-
-  function handlePaperChromeChange(regionKey: string, text: string) {
-    commitStructuredAction(setPaperChromeText(paperState, regionKey, text));
-  }
-
-  function handleDeletePaperChrome(regionKey: string) {
-    const nextState = removePaperChromeBlock(paperState, regionKey);
-    if (nextState === paperState) return;
-    commitStructuredAction(nextState);
-    setSelectedChromeBlockId(null);
-  }
-
-  function handleRestoreSelectedSlot() {
-    if (!selectedSlotId) return;
-    const slotId = selectedSlotId;
-    const nextState = restoreSlotSource(paperState, slotId);
-    commitStructuredAction(nextState);
-  }
-
-  function handleSelectSlot(slotId: string) {
-    setSelectedChromeBlockId(null);
-    setSelectedSlotId(slotId);
-    setActiveRailSlotId(slotId);
-  }
-
-  function handleSelectChromeBlock(regionKey: string) {
-    setSelectedSlotId(null);
-    setActiveRailSlotId(null);
-    setSelectedChromeBlockId(regionKey);
-  }
-
-  function handleShowInfo(slotId: string) {
-    handleSelectSlot(slotId);
-    setInspectorMode('info');
-    setInspectorHighlighted(true);
-    if (inspectorHighlightTimeoutRef.current !== null) {
-      window.clearTimeout(inspectorHighlightTimeoutRef.current);
-    }
-    inspectorHighlightTimeoutRef.current = window.setTimeout(() => {
-      setInspectorHighlighted(false);
-      inspectorHighlightTimeoutRef.current = null;
-    }, 900);
-  }
-
-  function handleShowAlternatives(slotId: string, intent: AlternativesIntent) {
-    if ((paperState.slotsById[slotId]?.can?.swap ?? true) === false) {
-      return;
-    }
-    handleSelectSlot(slotId);
-    setAlternativesIntent(intent);
-    setInspectorMode('alternatives');
-    openAlternativesOverlay();
-  }
-
-  function handleToggleLock(slotId: string, locked: boolean) {
-    if ((paperState.slotsById[slotId]?.can?.lock ?? true) === false) {
-      return;
-    }
-    handleSelectSlot(slotId);
-    const nextState = setSlotLockState(paperState, slotId, !locked);
-    commitStructuredAction(nextState);
-  }
-
-  function handleUseAlternative(slotId: string, questionId: string) {
-    if ((paperState.slotsById[slotId]?.can?.swap ?? true) === false) {
-      return;
-    }
-    const slot = view.sections
-      .flatMap((section) => section.slots)
-      .find((candidate) => candidate.slotId === slotId);
-    if (!slot) return;
-
-    if (
-      slot.modifiedFromSource &&
-      !window.confirm(
-        'Replacing this question will clear manual edits for this slot. Continue?',
-      )
-    ) {
-      return;
-    }
-
-    handleSelectSlot(slotId);
-    const nextState = setSlotSelectedQuestion(paperState, slotId, questionId);
-    commitStructuredAction(nextState);
-    setAlternativesIntent('swap');
-    setAlternativesOverlayOpen(false);
-  }
-
-  function handleDragStart() {
-    blockedCrossSectionDropRef.current = false;
-    setDragNotice(null);
-  }
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over) {
-      if (blockedCrossSectionDropRef.current) {
-        setDragNotice('Questions can only be reordered within their section.');
-      }
-      blockedCrossSectionDropRef.current = false;
-      return;
-    }
-    if (active.id === over.id) return;
-
-    const slotId = String(active.id);
-    const activePosition = getSlotOrderPosition(slotId);
-    const overPosition = getSlotOrderPosition(String(over.id));
-    if (!activePosition || !overPosition) return;
-
-    const result = reorderSlotWithinOrderZone(paperState, {
-      slotId,
-      fromZoneId: activePosition.zone.zoneId,
-      toZoneId: overPosition.zone.zoneId,
-      toIndex: overPosition.index,
-    });
-    if (result.success) {
-      handleSelectSlot(slotId);
-      commitStructuredAction(result.state);
-    } else {
-      setDragNotice(result.error);
-    }
-    blockedCrossSectionDropRef.current = false;
-  }
-
-  function getSlotOrderPosition(slotId: string) {
-    for (const zone of orderZones) {
-      const index = zone.orderedItemIds.indexOf(slotId);
-      if (index !== -1) return { zone, index };
-    }
-    return undefined;
-  }
-
-  function handleAskQuestion(slotId: string, displayNumber: string) {
-    handleSelectSlot(slotId);
-    setChatValue(`Question ${displayNumber}: `);
-    window.setTimeout(() => chatInputRef.current?.focus(), 0);
-  }
-
-  function openAlternativesOverlay() {
-    alternativesOpenerRef.current =
-      window.document.activeElement instanceof HTMLElement
-        ? window.document.activeElement
-        : null;
-    setAlternativesOverlayOpen(true);
-  }
-
-  function closeAlternativesOverlay() {
-    setAlternativesOverlayOpen(false);
-    window.setTimeout(() => alternativesOpenerRef.current?.focus(), 0);
-  }
+  const {
+    activeRailSlotId,
+    alternativesIntent,
+    alternativesOverlayOpen,
+    chatInputRef,
+    chatValue,
+    closeAlternativesOverlay,
+    dragNotice,
+    dragSensors,
+    handleAskQuestion,
+    handleDeletePaperChrome,
+    handleDragEnd,
+    handleDragStart,
+    handlePaperChromeChange,
+    handleRegionChange,
+    handleRestoreSelectedSlot,
+    handleSelectChromeBlock,
+    handleSelectSlot,
+    handleShowAlternatives,
+    handleShowInfo,
+    handleToggleLock,
+    handleUndo,
+    handleUseAlternative,
+    hoveredSectionId,
+    hoveredSlotId,
+    inspectorHighlighted,
+    inspectorMode,
+    openAlternativesOverlay,
+    paperState,
+    sameSectionCollisionDetection,
+    selectedChromeBlockId,
+    selectedQuestion,
+    selectedSlot,
+    selectedSlotId,
+    setAlternativesIntent,
+    setChatValue,
+    setHoveredSectionId,
+    setHoveredSlotId,
+    setInspectorMode,
+    undoEntry,
+    view,
+  } = useEditorWorkspace({ document, renderer, selectedFixtureId });
 
   function handleDownloadPdf() {
     openMockPrintDocument(paperState);
@@ -558,7 +252,7 @@ function EditorPageWorkspace({
         </div>
       </header>
 
-      <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:hidden max-lg:[&_.editor-left-rail]:static max-sm:px-3">
+      <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:order-2 max-lg:[&_.editor-left-rail]:static max-sm:px-3">
         <EditorOutlineRail view={view} />
 
         <main className="flex justify-center max-lg:order-1">

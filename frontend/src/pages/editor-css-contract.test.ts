@@ -20,6 +20,17 @@ const questionActionRailSource = readFileSync(
   ),
   'utf8',
 );
+const editorPageSource = readFileSync(
+  resolve(process.cwd(), 'src/pages/editor.page.tsx'),
+  'utf8',
+);
+const editorInspectorSource = readFileSync(
+  resolve(
+    process.cwd(),
+    'src/components/editor/editor-inspector.component.tsx',
+  ),
+  'utf8',
+);
 
 describe('editor CSS contracts', () => {
   it('keeps section overflow visible so the question action rail is not clipped', () => {
@@ -36,6 +47,13 @@ describe('editor CSS contracts', () => {
 
     expect(sectionBreakRule).toMatch(/\bbreak-before\s*:\s*page\b/);
     expect(sectionBreakRule).toMatch(/\bpage-break-before\s*:\s*always\b/);
+  });
+
+  it('keeps the inspector available in the single-column editor layout', () => {
+    expect(editorPageSource).not.toContain('[&_.editor-inspector]:hidden');
+    expect(editorPageSource).toContain('[&_.editor-inspector]:order-2');
+    expect(editorInspectorSource).toContain('max-lg:static');
+    expect(editorInspectorSource).toContain('max-lg:h-auto');
   });
 });
 

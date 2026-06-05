@@ -14,7 +14,7 @@
  */
 import { z } from 'zod';
 
-const contentItemSchema = z
+export const contentItemSchema = z
   .object({
     type: z.string(),
     text: z.string().optional(),
@@ -25,9 +25,9 @@ const contentItemSchema = z
   })
   .passthrough();
 
-const contentItemArraySchema = z.array(contentItemSchema);
+export const contentItemArraySchema = z.array(contentItemSchema);
 
-const choiceOptionSchema = z
+export const choiceOptionSchema = z
   .object({
     label: z.string(),
     marks: z.number().optional(),
@@ -35,7 +35,7 @@ const choiceOptionSchema = z
   })
   .passthrough();
 
-const subQuestionSchema = z
+export const subQuestionSchema = z
   .object({
     label: z.string(),
     marks: z.number().optional(),
@@ -43,7 +43,7 @@ const subQuestionSchema = z
   })
   .passthrough();
 
-const choiceGroupSchema = z
+export const choiceGroupSchema = z
   .object({
     displayStyle: z.enum(['or', 'choose_any']),
     chooseCount: z.number(),
@@ -51,7 +51,7 @@ const choiceGroupSchema = z
   })
   .passthrough();
 
-const editableTextBlockSchema = z
+export const editableTextBlockSchema = z
   .object({
     id: z.string(),
     role: z.string(),
@@ -66,7 +66,7 @@ const editableTextBlockSchema = z
   })
   .passthrough();
 
-const docQuestionContentSchema = z
+export const docQuestionContentSchema = z
   .object({
     stem: contentItemArraySchema.optional(),
     assertion: contentItemArraySchema.optional(),
@@ -78,7 +78,7 @@ const docQuestionContentSchema = z
   })
   .passthrough();
 
-const questionTypeSchema = z.enum([
+export const questionTypeSchema = z.enum([
   'mcq',
   'assertion_reason',
   'very_short_answer',
@@ -91,7 +91,7 @@ const questionTypeSchema = z.enum([
   'custom',
 ]);
 
-const questionMetadataSchema = z
+export const questionMetadataSchema = z
   .object({
     classLevel: z.string(),
     subject: z.string(),
@@ -113,7 +113,7 @@ const questionMetadataSchema = z
   })
   .passthrough();
 
-const questionSourceSchema = z
+export const questionSourceSchema = z
   .object({
     type: z.string(),
     name: z.string(),
@@ -123,14 +123,14 @@ const questionSourceSchema = z
   })
   .passthrough();
 
-const slotOverridesSchema = z
+export const slotOverridesSchema = z
   .object({
     modified: z.boolean(),
     regions: z.record(z.string(), contentItemArraySchema),
   })
   .passthrough();
 
-const docQuestionSchema = z
+export const docQuestionSchema = z
   .object({
     id: z.string(),
     language: z.string(),
@@ -143,7 +143,7 @@ const docQuestionSchema = z
   })
   .passthrough();
 
-const docSlotSchema = z
+export const docSlotSchema = z
   .object({
     id: z.string(),
     number: z.string(),
@@ -166,7 +166,7 @@ const docSlotSchema = z
   })
   .passthrough();
 
-const docSectionSchema = z
+export const docSectionSchema = z
   .object({
     id: z.string(),
     title: z.string(),
@@ -177,7 +177,7 @@ const docSectionSchema = z
   })
   .passthrough();
 
-const docPaperSchema = z
+export const docPaperSchema = z
   .object({
     id: z.string(),
     title: z.string(),
@@ -191,7 +191,7 @@ const docPaperSchema = z
   })
   .passthrough();
 
-const paperRequestSchema = z
+export const paperRequestSchema = z
   .object({
     id: z.string(),
     language: z.string(),
@@ -209,7 +209,7 @@ const paperRequestSchema = z
   })
   .passthrough();
 
-const paperTemplateSchema = z
+export const paperTemplateSchema = z
   .object({
     id: z.string(),
     name: z.string(),
@@ -223,7 +223,7 @@ const paperTemplateSchema = z
   })
   .passthrough();
 
-const paperFormatSchema = z
+export const paperFormatSchema = z
   .object({
     id: z.string(),
     page: z
@@ -330,3 +330,22 @@ export const paperDocumentSchema = z
   });
 
 export type PaperDocumentParsed = z.infer<typeof paperDocumentSchema>;
+export type QuestionType = z.infer<typeof questionTypeSchema>;
+export type ContentItem = z.infer<typeof contentItemSchema>;
+export type ChoiceOption = z.infer<typeof choiceOptionSchema>;
+export type ChoiceGroup = z.infer<typeof choiceGroupSchema>;
+export type SubQuestion = z.infer<typeof subQuestionSchema>;
+export type DocQuestionContent = z.infer<typeof docQuestionContentSchema>;
+export type QuestionMetadata = z.infer<typeof questionMetadataSchema>;
+export type QuestionSource = z.infer<typeof questionSourceSchema>;
+export type DocQuestion = z.infer<typeof docQuestionSchema>;
+export type SlotOverrides = z.infer<typeof slotOverridesSchema>;
+export type SlotEditCapabilities = z.infer<typeof docSlotSchema>['can'];
+export type DocSlot = z.infer<typeof docSlotSchema>;
+export type DocSection = z.infer<typeof docSectionSchema>;
+export type DocPaper = z.infer<typeof docPaperSchema>;
+export type PaperRequest = z.infer<typeof paperRequestSchema>;
+export type PaperTemplate = z.infer<typeof paperTemplateSchema>;
+export type PaperFormat = z.infer<typeof paperFormatSchema>;
+export type EditableTextBlock = z.infer<typeof editableTextBlockSchema>;
+export type PaperDocument = PaperDocumentParsed;

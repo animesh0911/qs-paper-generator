@@ -8,7 +8,7 @@
  *
  * Patterns:
  * - `questions[]` remains source content; slot-level edits live in
- *   `slotEditsById`.
+ *   `slotStateById`.
  * - Unknown optional contract fields are preserved by the schema and carried in
  *   the original parsed document.
  *
@@ -32,13 +32,20 @@ import { paperDocumentSchema } from '@/types/paper-document.schema';
 
 export interface NormalizedPaperDocument {
   document: PaperDocument;
-  questionsById: Record<string, DocQuestion>;
-  slotsById: Record<string, DocSlot>;
   sectionOrder: string[];
   slotOrderBySection: Record<string, string[]>;
-  slotEditsById: Record<string, SlotOverrides>;
-  lockStateBySlotId: Record<string, boolean>;
   formatRules: PaperFormat;
+  index: {
+    questionsById: Record<string, DocQuestion>;
+    slotsById: Record<string, DocSlot>;
+  };
+  slotStateById: Record<
+    string,
+    {
+      locked: boolean;
+      overrides: SlotOverrides;
+    }
+  >;
 }
 
 export interface PaperOrderZone {
@@ -126,14 +133,91 @@ export function normalizePaperDocument(
 
   return {
     document,
-    questionsById,
-    slotsById,
     sectionOrder: document.paper.sections.map((section) => section.id),
     slotOrderBySection,
-    slotEditsById,
-    lockStateBySlotId,
     formatRules: document.format,
+    index: {
+      questionsById,
+      slotsById,
+    },
+    slotStateById: Object.fromEntries(
+      Object.keys(slotsById).map((slotId) => [
+        slotId,
+        {
+          locked: lockStateBySlotId[slotId],
+          overrides: slotEditsById[slotId],
+        },
+      ]),
+    ),
   };
+}
+
+export function getQuestion(
+  state: NormalizedPaperDocument,
+  questionId: string,
+): DocQuestion | undefined {
+  return state.index.questionsById[questionId];
+}
+
+export function getSlot(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): DocSlot | undefined {
+  const slot = state.index.slotsById[slotId];
+  return slot ? slotWithCurrentState(state, slotId) : undefined;
+}
+
+export function getSlotOverrides(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): SlotOverrides | undefined {
+  return state.slotStateById[slotId]?.overrides;
+}
+
+export function getSlotOverridesById(
+  state: NormalizedPaperDocument,
+): Record<string, SlotOverrides> {
+  return Object.fromEntries(
+    Object.entries(state.slotStateById).map(([slotId, slotState]) => [
+      slotId,
+      slotState.overrides,
+    ]),
+  );
+}
+
+export function getSlotLockState(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): boolean | undefined {
+  return state.slotStateById[slotId]?.locked;
+}
+
+export function canEditSlotText(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): boolean {
+  return getSlot(state, slotId)?.can?.editText ?? true;
+}
+
+export function canSwapSlot(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): boolean {
+  return getSlot(state, slotId)?.can?.swap ?? true;
+}
+
+export function canLockSlot(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): boolean {
+  return getSlot(state, slotId)?.can?.lock ?? true;
+}
+
+export function canReorderSlot(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): boolean {
+  return getSlot(state, slotId)?.can?.reorder ?? true;
 }
 
 export function setSlotRegionOverride(
@@ -142,10 +226,10 @@ export function setSlotRegionOverride(
   regionKey: string,
   content: ContentItem[],
 ): NormalizedPaperDocument {
-  const slot = state.slotsById[slotId];
-  if (!slot || (slot.can?.editText ?? true) === false) return state;
+  const slot = getSlot(state, slotId);
+  if (!slot || !canEditSlotText(state, slotId)) return state;
 
-  const currentEdits = state.slotEditsById[slotId] ?? {
+  const currentEdits = getSlotOverrides(state, slotId) ?? {
     modified: false,
     regions: {},
   };
@@ -157,48 +241,21 @@ export function setSlotRegionOverride(
     },
   };
 
-  return {
-    ...state,
-    slotEditsById: {
-      ...state.slotEditsById,
-      [slotId]: nextOverrides,
-    },
-    slotsById: {
-      ...state.slotsById,
-      [slotId]: {
-        ...state.slotsById[slotId],
-        overrides: nextOverrides,
-      },
-    },
-    document: {
-      ...state.document,
-      paper: {
-        ...state.document.paper,
-        sections: state.document.paper.sections.map((section) => ({
-          ...section,
-          slots: section.slots.map((slot) =>
-            slot.id === slotId ? { ...slot, overrides: nextOverrides } : slot,
-          ),
-        })),
-      },
-    },
-  };
+  return updatePaperSlot(state, slotId, { overrides: nextOverrides });
 }
 
 export function restoreSlotSource(
   state: NormalizedPaperDocument,
   slotId: string,
 ): NormalizedPaperDocument {
-  return {
-    ...state,
-    slotEditsById: {
-      ...state.slotEditsById,
-      [slotId]: {
-        modified: false,
-        regions: {},
-      },
+  if (!getSlot(state, slotId)) return state;
+
+  return updatePaperSlot(state, slotId, {
+    overrides: {
+      modified: false,
+      regions: {},
     },
-  };
+  });
 }
 
 export function setSlotLockState(
@@ -206,34 +263,9 @@ export function setSlotLockState(
   slotId: string,
   locked: boolean,
 ): NormalizedPaperDocument {
-  if ((state.slotsById[slotId]?.can?.lock ?? true) === false) return state;
+  if (!canLockSlot(state, slotId)) return state;
 
-  return {
-    ...state,
-    lockStateBySlotId: {
-      ...state.lockStateBySlotId,
-      [slotId]: locked,
-    },
-    slotsById: {
-      ...state.slotsById,
-      [slotId]: {
-        ...state.slotsById[slotId],
-        locked,
-      },
-    },
-    document: {
-      ...state.document,
-      paper: {
-        ...state.document.paper,
-        sections: state.document.paper.sections.map((section) => ({
-          ...section,
-          slots: section.slots.map((slot) =>
-            slot.id === slotId ? { ...slot, locked } : slot,
-          ),
-        })),
-      },
-    },
-  };
+  return updatePaperSlot(state, slotId, { locked });
 }
 
 export function setSlotSelectedQuestion(
@@ -241,9 +273,9 @@ export function setSlotSelectedQuestion(
   slotId: string,
   selectedQuestionId: string,
 ): NormalizedPaperDocument {
-  const currentSlot = state.slotsById[slotId];
+  const currentSlot = getSlot(state, slotId);
   if (!currentSlot) return state;
-  if ((currentSlot.can?.swap ?? true) === false) return state;
+  if (!canSwapSlot(state, slotId)) return state;
 
   const alternateQuestionIds = rotateSlotAlternativeQuestionIds(
     currentSlot,
@@ -254,41 +286,11 @@ export function setSlotSelectedQuestion(
     regions: {},
   };
 
-  return {
-    ...state,
-    slotEditsById: {
-      ...state.slotEditsById,
-      [slotId]: resetOverrides,
-    },
-    slotsById: {
-      ...state.slotsById,
-      [slotId]: {
-        ...currentSlot,
-        selectedQuestionId,
-        alternateQuestionIds,
-        overrides: resetOverrides,
-      },
-    },
-    document: {
-      ...state.document,
-      paper: {
-        ...state.document.paper,
-        sections: state.document.paper.sections.map((section) => ({
-          ...section,
-          slots: section.slots.map((slot) =>
-            slot.id === slotId
-              ? {
-                  ...slot,
-                  selectedQuestionId,
-                  alternateQuestionIds,
-                  overrides: resetOverrides,
-                }
-              : slot,
-          ),
-        })),
-      },
-    },
-  };
+  return updatePaperSlot(state, slotId, {
+    selectedQuestionId,
+    alternateQuestionIds,
+    overrides: resetOverrides,
+  });
 }
 
 function rotateSlotAlternativeQuestionIds(
@@ -494,7 +496,7 @@ export function materializePaperDocument(
 export function buildOrderZones(
   input: PaperDocument | NormalizedPaperDocument,
 ): PaperOrderZone[] {
-  const document = 'document' in input ? input.document : input;
+  const document = isNormalizedPaperDocument(input) ? input.document : input;
 
   return document.paper.sections.map((section) => ({
     zoneId: `section:${section.id}`,
@@ -506,6 +508,17 @@ export function buildOrderZones(
       allowedTargetZoneIds: [`section:${section.id}`],
     },
   }));
+}
+
+function isNormalizedPaperDocument(
+  input: PaperDocument | NormalizedPaperDocument,
+): input is NormalizedPaperDocument {
+  return (
+    typeof input === 'object' &&
+    input !== null &&
+    'index' in input &&
+    'slotStateById' in input
+  );
 }
 
 export function reorderSlotWithinOrderZone(
@@ -539,7 +552,7 @@ export function reorderSlotWithinOrderZone(
       error: 'Reorder is disabled for this zone',
     };
   }
-  if ((state.slotsById[params.slotId]?.can?.reorder ?? true) === false) {
+  if (!canReorderSlot(state, params.slotId)) {
     return {
       success: false,
       state,
@@ -634,11 +647,62 @@ function slotWithCurrentState(
   state: NormalizedPaperDocument,
   slotId: string,
 ): DocSlot {
-  const slot = state.slotsById[slotId];
+  const slot = state.index.slotsById[slotId];
 
   return {
     ...slot,
-    locked: state.lockStateBySlotId[slotId] ?? slot.locked,
-    overrides: state.slotEditsById[slotId] ?? slot.overrides,
+    locked: state.slotStateById[slotId]?.locked ?? slot.locked,
+    overrides: state.slotStateById[slotId]?.overrides ?? slot.overrides,
+  };
+}
+
+function updatePaperSlot(
+  state: NormalizedPaperDocument,
+  slotId: string,
+  patch: Partial<DocSlot>,
+): NormalizedPaperDocument {
+  const currentSlot = getSlot(state, slotId);
+  if (!currentSlot) return state;
+
+  const nextSlot: DocSlot = {
+    ...currentSlot,
+    ...patch,
+  };
+
+  return {
+    ...state,
+    slotStateById: {
+      ...state.slotStateById,
+      [slotId]: {
+        locked:
+          patch.locked ?? state.slotStateById[slotId]?.locked ?? nextSlot.locked,
+        overrides:
+          patch.overrides ??
+          state.slotStateById[slotId]?.overrides ??
+          nextSlot.overrides ?? {
+            modified: false,
+            regions: {},
+          },
+      },
+    },
+    index: {
+      ...state.index,
+      slotsById: {
+        ...state.index.slotsById,
+        [slotId]: nextSlot,
+      },
+    },
+    document: {
+      ...state.document,
+      paper: {
+        ...state.document.paper,
+        sections: state.document.paper.sections.map((section) => ({
+          ...section,
+          slots: section.slots.map((slot) =>
+            slot.id === slotId ? nextSlot : slot,
+          ),
+        })),
+      },
+    },
   };
 }

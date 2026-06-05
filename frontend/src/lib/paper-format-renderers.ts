@@ -15,15 +15,18 @@
  *
  * @module paperFormatRenderers
  */
-import { buildSimplePaperView } from '@/components/coverage/paper-document-view/build-simple-paper-view';
 import {
   buildEditorPaperView,
   type BuildEditorPaperViewOptions,
 } from './editor-paper';
+import type { buildSimplePaperView } from '@/components/coverage/paper-document-view/build-simple-paper-view';
+import {
+  CBSE_COMPACT_FORMAT_ID,
+  cbseCompactRenderer,
+} from './paper-format-renderers/cbse-compact-renderer';
 import type { PaperDocument } from '@/types';
 
-export const CBSE_COMPACT_FORMAT_ID =
-  'cbse_science_class_10_board_compact_2026_v1';
+export { CBSE_COMPACT_FORMAT_ID };
 
 export interface PaperFormatRenderer {
   formatId: string;
@@ -44,13 +47,6 @@ export class UnsupportedPaperFormatError extends Error {
     this.name = 'UnsupportedPaperFormatError';
   }
 }
-
-const cbseCompactRenderer: PaperFormatRenderer = {
-  formatId: CBSE_COMPACT_FORMAT_ID,
-  label: 'CBSE Class 10 Science compact',
-  buildEditorPaperView,
-  buildPrintPaperView: buildSimplePaperView,
-};
 
 const rendererByFormatId: Record<string, PaperFormatRenderer> = {
   [CBSE_COMPACT_FORMAT_ID]: cbseCompactRenderer,

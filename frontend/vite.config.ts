@@ -11,6 +11,28 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (
+            id.includes('/@blocknote/') ||
+            id.includes('/prosemirror-') ||
+            id.includes('/yjs/')
+          ) {
+            return 'editor-rich-text';
+          }
+          if (id.includes('/@dnd-kit/')) return 'editor-dnd';
+          if (id.includes('/@mantine/')) return 'mantine';
+          if (id.includes('/react') || id.includes('/react-dom')) {
+            return 'react-vendor';
+          }
+          return undefined;
+        },
+      },
+    },
+  },
   server: {
     host: true,
     port: 5173,

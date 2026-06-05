@@ -11,7 +11,12 @@ import { mockPaperDocumentV1 } from '@/mocks';
 import {
   assertPaperDocument,
   getPaperDocumentErrorMessage,
+  getQuestion,
+  getSlot,
+  getSlotLockState,
+  getSlotOverrides,
   normalizePaperDocument,
+  type NormalizedPaperDocument,
   PaperDocumentContractError,
   parsePaperDocument,
   restoreSlotSource,
@@ -26,6 +31,28 @@ import {
   renumberPaperSlots,
   undoStructuredPaperAction,
 } from './paper-document';
+
+function question(state: NormalizedPaperDocument, questionId: string) {
+  const value = getQuestion(state, questionId);
+  expect(value).toBeDefined();
+  return value!;
+}
+
+function slot(state: NormalizedPaperDocument, slotId: string) {
+  const value = getSlot(state, slotId);
+  expect(value).toBeDefined();
+  return value!;
+}
+
+function overrides(state: NormalizedPaperDocument, slotId: string) {
+  const value = getSlotOverrides(state, slotId);
+  expect(value).toBeDefined();
+  return value!;
+}
+
+function lockState(state: NormalizedPaperDocument, slotId: string) {
+  return getSlotLockState(state, slotId);
+}
 
 describe('PaperDocumentV1 validation', () => {
   it('rejects slot question references that are missing or incompatible', () => {
@@ -97,22 +124,22 @@ describe('PaperDocumentV1 normalization', () => {
     const firstSection = parsed.data.paper.sections[0];
     const firstSlot = firstSection.slots[0];
 
-    expect(state.questionsById[firstSlot.selectedQuestionId ?? '']).toBe(
+    expect(getQuestion(state, firstSlot.selectedQuestionId ?? '')).toBe(
       parsed.data.questions.find(
         (question) => question.id === firstSlot.selectedQuestionId,
       ),
     );
-    expect(state.slotsById[firstSlot.id]).toEqual(firstSlot);
+    expect(getSlot(state, firstSlot.id)).toEqual(firstSlot);
     expect(state.sectionOrder).toEqual(
       parsed.data.paper.sections.map((section) => section.id),
     );
     expect(state.slotOrderBySection[firstSection.id]).toEqual(
       firstSection.slots.map((slot) => slot.id),
     );
-    expect(state.slotEditsById[firstSlot.id]).toEqual(
+    expect(getSlotOverrides(state, firstSlot.id)).toEqual(
       firstSlot.overrides ?? { modified: false, regions: {} },
     );
-    expect(state.lockStateBySlotId[firstSlot.id]).toBe(firstSlot.locked);
+    expect(getSlotLockState(state, firstSlot.id)).toBe(firstSlot.locked);
     expect(state.formatRules).toBe(parsed.data.format);
   });
 
@@ -126,7 +153,7 @@ describe('PaperDocumentV1 normalization', () => {
       },
     ]);
 
-    expect(editedState.slotEditsById.slot_A_01).toEqual({
+    expect(overrides(editedState, 'slot_A_01')).toEqual({
       modified: true,
       regions: {
         stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
@@ -138,18 +165,28 @@ describe('PaperDocumentV1 normalization', () => {
         stem: [{ type: 'paragraph', text: 'Paper-specific stem text.' }],
       },
     });
-    expect(editedState.questionsById.q_mcq_heredity_001).toBe(
-      state.questionsById.q_mcq_heredity_001,
+    expect(question(editedState, 'q_mcq_heredity_001')).toBe(
+      question(state, 'q_mcq_heredity_001'),
     );
 
     const restoredState = restoreSlotSource(editedState, 'slot_A_01');
 
-    expect(restoredState.slotEditsById.slot_A_01).toEqual({
+    expect(overrides(restoredState, 'slot_A_01')).toEqual({
       modified: false,
       regions: {},
     });
-    expect(restoredState.questionsById.q_mcq_heredity_001.rawText).toBe(
-      state.questionsById.q_mcq_heredity_001.rawText,
+    expect(slot(restoredState, 'slot_A_01').overrides).toEqual({
+      modified: false,
+      regions: {},
+    });
+    expect(restoredState.document.paper.sections[0].slots[0].overrides).toEqual(
+      {
+        modified: false,
+        regions: {},
+      },
+    );
+    expect(question(restoredState, 'q_mcq_heredity_001').rawText).toBe(
+      question(state, 'q_mcq_heredity_001').rawText,
     );
   });
 
@@ -169,7 +206,7 @@ describe('PaperDocumentV1 normalization', () => {
     ]);
 
     expect(editedState).toBe(state);
-    expect(editedState.slotEditsById.slot_A_01).toEqual({
+    expect(overrides(editedState, 'slot_A_01')).toEqual({
       modified: false,
       regions: {},
     });
@@ -187,8 +224,8 @@ describe('PaperDocumentV1 normalization', () => {
     expect(editedState.document.paper.sections[0].instructions).toBe(
       'Edited Biology section directions.',
     );
-    expect(editedState.questionsById.q_mcq_heredity_001).toBe(
-      state.questionsById.q_mcq_heredity_001,
+    expect(question(editedState, 'q_mcq_heredity_001')).toBe(
+      question(state, 'q_mcq_heredity_001'),
     );
   });
 
@@ -227,8 +264,8 @@ describe('PaperDocumentV1 normalization', () => {
       ),
     ).toBe(false);
     expect(nextState.document.questions).toBe(state.document.questions);
-    expect(nextState.questionsById.q_mcq_heredity_001.rawText).toBe(
-      state.questionsById.q_mcq_heredity_001.rawText,
+    expect(question(nextState, 'q_mcq_heredity_001').rawText).toBe(
+      question(state, 'q_mcq_heredity_001').rawText,
     );
   });
 
@@ -254,11 +291,11 @@ describe('PaperDocumentV1 normalization', () => {
     const state = normalizePaperDocument(document);
     const lockedState = setSlotLockState(state, 'slot_A_01', true);
 
-    expect(lockedState.lockStateBySlotId.slot_A_01).toBe(true);
-    expect(lockedState.slotsById.slot_A_01.locked).toBe(true);
+    expect(lockState(lockedState, 'slot_A_01')).toBe(true);
+    expect(slot(lockedState, 'slot_A_01').locked).toBe(true);
     expect(lockedState.document.paper.sections[0].slots[0].locked).toBe(true);
-    expect(lockedState.questionsById.q_mcq_heredity_001).toBe(
-      state.questionsById.q_mcq_heredity_001,
+    expect(question(lockedState, 'q_mcq_heredity_001')).toBe(
+      question(state, 'q_mcq_heredity_001'),
     );
   });
 
@@ -276,7 +313,7 @@ describe('PaperDocumentV1 normalization', () => {
     const lockedState = setSlotLockState(state, 'slot_A_01', true);
 
     expect(lockedState).toBe(state);
-    expect(lockedState.slotsById.slot_A_01.locked).toBe(false);
+    expect(slot(lockedState, 'slot_A_01').locked).toBe(false);
   });
 
   it('replaces a slot selected question without changing slot placement or source questions', () => {
@@ -294,11 +331,11 @@ describe('PaperDocumentV1 normalization', () => {
       'slot_A_01',
       'q_mcq_heredity_002',
     );
-    const replacedSlot = replacedState.slotsById.slot_A_01;
+    const replacedSlot = slot(replacedState, 'slot_A_01');
     const canonicalSlot = replacedState.document.paper.sections[0].slots[0];
 
     expect(replacedSlot).toEqual({
-      ...state.slotsById.slot_A_01,
+      ...slot(state, 'slot_A_01'),
       selectedQuestionId: 'q_mcq_heredity_002',
       alternateQuestionIds: [
         'q_mcq_heredity_001',
@@ -313,13 +350,15 @@ describe('PaperDocumentV1 normalization', () => {
       },
     });
     expect(canonicalSlot).toEqual(replacedSlot);
-    expect(replacedState.slotEditsById.slot_A_01).toEqual({
+    expect(overrides(replacedState, 'slot_A_01')).toEqual({
       modified: false,
       regions: {},
     });
-    expect(replacedState.questionsById).toBe(editedState.questionsById);
-    expect(replacedState.questionsById.q_mcq_heredity_001.rawText).toBe(
-      state.questionsById.q_mcq_heredity_001.rawText,
+    expect(question(replacedState, 'q_mcq_heredity_001')).toBe(
+      question(editedState, 'q_mcq_heredity_001'),
+    );
+    expect(question(replacedState, 'q_mcq_heredity_001').rawText).toBe(
+      question(state, 'q_mcq_heredity_001').rawText,
     );
   });
 
@@ -341,7 +380,7 @@ describe('PaperDocumentV1 normalization', () => {
     );
 
     expect(replacedState).toBe(state);
-    expect(replacedState.slotsById.slot_A_01.selectedQuestionId).toBe(
+    expect(slot(replacedState, 'slot_A_01').selectedQuestionId).toBe(
       'q_mcq_heredity_001',
     );
   });
@@ -355,10 +394,10 @@ describe('PaperDocumentV1 normalization', () => {
       'slot_E_02',
       'q_table_metals_002',
     );
-    const replacedSlot = replacedState.slotsById.slot_E_02;
+    const replacedSlot = slot(replacedState, 'slot_E_02');
     const canonicalSlot = replacedState.document.paper.sections[1].slots[0];
 
-    expect(state.slotsById.slot_E_02.alternateQuestionIds).toEqual([
+    expect(slot(state, 'slot_E_02').alternateQuestionIds).toEqual([
       'q_table_metals_002',
     ]);
     expect(replacedSlot.selectedQuestionId).toBe('q_table_metals_002');
@@ -381,10 +420,10 @@ describe('PaperDocumentV1 normalization', () => {
       'q_table_metals_001',
     );
 
-    expect(secondSwap.slotsById.slot_E_02.selectedQuestionId).toBe(
+    expect(slot(secondSwap, 'slot_E_02').selectedQuestionId).toBe(
       'q_table_metals_001',
     );
-    expect(secondSwap.slotsById.slot_E_02.alternateQuestionIds).toEqual([
+    expect(slot(secondSwap, 'slot_E_02').alternateQuestionIds).toEqual([
       'q_table_metals_002',
     ]);
   });
@@ -515,7 +554,7 @@ describe('PaperDocumentV1 ordering', () => {
 
     expect(undone.state).toBe(firstCommit.state);
     expect(undone.undoEntry).toBeNull();
-    expect(undone.state.lockStateBySlotId.slot_A_01).toBe(true);
+    expect(lockState(undone.state, 'slot_A_01')).toBe(true);
     expect(undone.state.slotOrderBySection.A.slice(0, 2)).toEqual([
       'slot_A_01',
       'slot_A_02',
@@ -543,12 +582,12 @@ describe('PaperDocumentV1 ordering', () => {
       committed.undoEntry,
     );
 
-    expect(committed.state.slotEditsById.slot_A_01).toMatchObject({
+    expect(overrides(committed.state, 'slot_A_01')).toMatchObject({
       modified: true,
     });
     expect(undone.state).toBe(initialState);
     expect(undone.undoEntry).toBeNull();
-    expect(undone.state.slotEditsById.slot_A_01).toEqual({
+    expect(overrides(undone.state, 'slot_A_01')).toEqual({
       modified: false,
       regions: {},
     });

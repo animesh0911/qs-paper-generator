@@ -42,7 +42,7 @@ export function EditorInspector({
     <aside
       data-editor-chrome
       className={cn(
-        'editor-inspector sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-4 transition-shadow duration-200',
+        'editor-inspector sticky top-[4.5rem] h-[calc(100vh-6rem)] overflow-auto rounded-lg border bg-background p-4 transition-shadow duration-200 max-lg:static max-lg:h-auto max-lg:max-h-[70vh]',
         highlighted && 'ring-2 ring-ring ring-offset-2 ring-offset-secondary',
       )}
     >
