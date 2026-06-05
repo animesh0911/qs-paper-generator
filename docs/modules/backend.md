@@ -53,9 +53,8 @@ Django project root.
 
 | File | Purpose |
 |---|---|
-| `settings.py` | Settings (DB, Redis, DRF, CORS). |
+| `settings.py` | Settings (DB, Postgres-backed cache, DRF, CORS). |
 | `urls.py` | Top-level URL routing. |
-| `celery.py` | Celery app (unused until Slice 7). |
 | `asgi.py` / `wsgi.py` | Standard Django entry points. |
 
 ## Reading order for a new dev

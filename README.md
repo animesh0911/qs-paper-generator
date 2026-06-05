@@ -6,8 +6,8 @@ design and [`PRD.md`](PRD.md) for the product requirements.
 ## Slice 1 — Walking skeleton
 
 A thin end-to-end path: log in → assemble a paper from seeded questions → view it →
-export a PDF. Backend (Django + DRF + Celery), frontend (React + Vite + Tailwind +
-shadcn/ui), Postgres, and Redis, all via Docker Compose.
+export a PDF. Backend (Django + DRF), frontend (React + Vite + Tailwind +
+shadcn/ui), and Postgres, all via Docker Compose.
 
 ### Run
 
@@ -27,8 +27,8 @@ account, and a handful of Class 10 Science questions.
 | Layer | Tech |
 |-------|------|
 | Frontend | React 19, Vite, TypeScript, Tailwind, shadcn/ui |
-| Backend | Django 5, DRF (token auth), Celery |
-| Data | PostgreSQL, Redis (broker) |
+| Backend | Django 5, DRF (token auth) |
+| Data | PostgreSQL (also backs the Django cache) |
 | Packaging | Docker Compose |
 
 Chosen to stay framework-compatible with the Apptension SaaS boilerplate so its

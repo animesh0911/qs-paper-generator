@@ -1,0 +1,2751 @@
+{
+  "source_pdf": "science_2026/1190-1_31-4-1_Science.pdf",
+  "questions": [
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Observe the given figure and select the statement that correctly states how these fungi obtain nutrition.",
+      "options": [
+        {
+          "label": "A",
+          "text": "By eating the bread on which it is growing."
+        },
+        {
+          "label": "B",
+          "text": "By using nutrients from the bread to prepare their own food."
+        },
+        {
+          "label": "C",
+          "text": "By breaking down the nutrients of bread outside the body and then absorbing them."
+        },
+        {
+          "label": "D",
+          "text": "By allowing other organisms to grow on the bread and then consuming them."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Observe the given figure and select the statement that correctly states how these fungi obtain nutrition."
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/8c37675e-0.png"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By eating the bread on which it is growing."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By using nutrients from the bread to prepare their own food."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By breaking down the nutrients of bread outside the body and then absorbing them."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By allowing other organisms to grow on the bread and then consuming them."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Saprophytic nutrition",
+        "Heterotrophic nutrition"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 5,
+          "bbox": [
+            0.3,
+            0.2,
+            0.65,
+            0.35
+          ],
+          "region": "stem",
+          "label": "bread_mould"
+        }
+      ]
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "If the part \u2018P\u2019 of the flower is removed, which of the following processes will not take place ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Formation of pollens"
+        },
+        {
+          "label": "B",
+          "text": "Formation of flower"
+        },
+        {
+          "label": "C",
+          "text": "Formation of fruit"
+        },
+        {
+          "label": "D",
+          "text": "Formation of seed"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "If the part \u2018P\u2019 of the flower is removed, which of the following processes will not take place ?"
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/df90fd68-0.png"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Formation of pollens"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Formation of flower"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Formation of fruit"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Formation of seed"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Sexual reproduction in flowering plants",
+        "Structure of a flower"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 5,
+          "bbox": [
+            0.3,
+            0.57,
+            0.65,
+            0.76
+          ],
+          "region": "stem",
+          "label": "flower_part_p"
+        }
+      ]
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Given below are some of the statements regarding our environment : (i) Change in our life-styles have resulted in greater amounts of waste material generation. (ii) Changes in attitude have resulted in use of more disposable things. (iii) Changes in packaging has resulted in much of our waste becoming non-biodegradable. (iv) Organic farming. Which amongst these is not leading to any damage of environment ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i), (ii), (iii)"
+        },
+        {
+          "label": "B",
+          "text": "(iv)"
+        },
+        {
+          "label": "C",
+          "text": "(i) and (iii)"
+        },
+        {
+          "label": "D",
+          "text": "(ii) and (iv)"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Given below are some of the statements regarding our environment :"
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) Change in our life-styles have resulted in greater amounts of waste material generation."
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) Changes in attitude have resulted in use of more disposable things."
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) Changes in packaging has resulted in much of our waste becoming non-biodegradable."
+          },
+          {
+            "type": "paragraph",
+            "text": "(iv) Organic farming."
+          },
+          {
+            "type": "paragraph",
+            "text": "Which amongst these is not leading to any damage of environment ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i), (ii), (iii)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(iv)"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (iii)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii) and (iv)"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Environmental problems",
+        "Waste generation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Identify the traits that cannot be transmitted from parents to the off springs : (i) Swimming technique (ii) Blood group (iii) Eye colour (iv) Dancing skills Options :",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i) and (ii)"
+        },
+        {
+          "label": "B",
+          "text": "(i) and (iv)"
+        },
+        {
+          "label": "C",
+          "text": "(iii) and (iv)"
+        },
+        {
+          "label": "D",
+          "text": "(ii) and (iii)"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Identify the traits that cannot be transmitted from parents to the off springs :"
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) Swimming technique"
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) Blood group"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) Eye colour"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iv) Dancing skills"
+          },
+          {
+            "type": "paragraph",
+            "text": "Options :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (ii)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(iii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii) and (iii)"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Acquired and Inherited traits"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Following are the statements about the different parts of the brain. Select the correct statements. (i) The thinking part of the brain is the forebrain. (ii) Centres for smell, hearing, memory, sight are located in forebrain. (iii) Salivation, vomiting, blood pressure are controlled by medulla in the hind brain. (iv) Cerebellum does not control the posture and balance of the body.",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i), (ii) and (iii)"
+        },
+        {
+          "label": "B",
+          "text": "(ii), (iii) and (iv)"
+        },
+        {
+          "label": "C",
+          "text": "(i), (ii) and (iv)"
+        },
+        {
+          "label": "D",
+          "text": "(i), (iii) and (iv)"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Following are the statements about the different parts of the brain. Select the correct statements."
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) The thinking part of the brain is the forebrain."
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) Centres for smell, hearing, memory, sight are located in forebrain."
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) Salivation, vomiting, blood pressure are controlled by medulla in the hind brain."
+          },
+          {
+            "type": "paragraph",
+            "text": "(iv) Cerebellum does not control the posture and balance of the body."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i), (ii) and (iii)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii), (iii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i), (ii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i), (iii) and (iv)"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Human Brain",
+        "Structure and Functions of Brain"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Two pea plants, one with round green seeds (RRyy) and another with wrinkled yellow (rrYY) seeds were crossed with each other which produced F1 progeny that have only round yellow (RrYy) seeds. When F1 plants are self-pollinated, the F2 progeny will have which new combination of characters, as compared to the parents : (i) Round, yellow (ii) Round, green (iii) Wrinkled, yellow (iv) Wrinkled, green Correct options are :",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i) and (ii)"
+        },
+        {
+          "label": "B",
+          "text": "(i) and (iv)"
+        },
+        {
+          "label": "C",
+          "text": "(ii) and (iv)"
+        },
+        {
+          "label": "D",
+          "text": "(i) and (iii)"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Two pea plants, one with round green seeds (RRyy) and another with wrinkled yellow (rrYY) seeds were crossed with each other which produced F1 progeny that have only round yellow (RrYy) seeds. When F1 plants are self-pollinated, the F2 progeny will have which new combination of characters, as compared to the parents :"
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) Round, yellow"
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) Round, green"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) Wrinkled, yellow"
+          },
+          {
+            "type": "paragraph",
+            "text": "(iv) Wrinkled, green"
+          },
+          {
+            "type": "paragraph",
+            "text": "Correct options are :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (ii)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii) and (iv)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (iii)"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Dihybrid Cross",
+        "Mendelian Inheritance"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "In human beings the oxygen rich blood is pumped out to the body by :",
+      "options": [
+        {
+          "label": "A",
+          "text": "contraction of right atrium"
+        },
+        {
+          "label": "B",
+          "text": "relaxation of left ventricle"
+        },
+        {
+          "label": "C",
+          "text": "contraction of right ventricle"
+        },
+        {
+          "label": "D",
+          "text": "contraction of left ventricle"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "In human beings the oxygen rich blood is pumped out to the body by :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "contraction of right atrium"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "relaxation of left ventricle"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "contraction of right ventricle"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "contraction of left ventricle"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Human Circulatory System",
+        "Double Circulation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Variations are not often seen in off-springs produced by asexual reproduction. Reason (R) : DNA molecule generated by replication is not similar to the original DNA.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Variations are not often seen in off-springs produced by asexual reproduction."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "DNA molecule generated by replication is not similar to the original DNA."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "how-do-organisms-reproduce",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Asexual Reproduction",
+        "DNA Replication",
+        "Importance of Variation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Highest percentage of pesticides is found in tertiary consumers in a food chain. \nReason (R) : Chemicals / pesticides get accumulated progressively at each trophic level.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both (A) and (R) are true and (R) is the correct explanation of (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both (A) and (R) are true but (R) is not the correct explanation of (A)."
+        },
+        {
+          "label": "C",
+          "text": "(A) is true but (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "(A) is false but (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Highest percentage of pesticides is found in tertiary consumers in a food chain."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Chemicals / pesticides get accumulated progressively at each trophic level."
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Biological Magnification",
+        "Food Chain"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "\u201cTranspiration in plants is a necessary evil.\u201d \nComment on the statement giving two reasons.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "\u201cTranspiration in plants is a necessary evil.\u201d"
+          },
+          {
+            "type": "paragraph",
+            "text": "Comment on the statement giving two reasons."
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Transpiration",
+        "Transportation in Plants"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Explain why food chains generally consist of three or four steps.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Explain why food chains generally consist of three or four steps."
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Flow of Energy",
+        "Food Chain"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "(A) Varun is diabetic. His latest ultrasound reports showed a blockage in his pancreatic duct. How will this affect the dual functioning of the pancreas ?\nOR\n(B) Sunil unconsciously touched the hot iron rod and immediately withdrew his hand. Which type of action is involved ? Also define this action. Draw a flow chart to show the path followed for this action.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Varun is diabetic. His latest ultrasound reports showed a blockage in his pancreatic duct. How will this affect the dual functioning of the pancreas ?"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Sunil unconsciously touched the hot iron rod and immediately withdrew his hand. Which type of action is involved ? Also define this action. Draw a flow chart to show the path followed for this action."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Hormones in Animals",
+        "Reflex Action"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Give reasons for the following :",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Give reasons for the following :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Adrenal gland is known as the stress gland of the body."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Prenatal sex determination is banned in India."
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Vegetative propagation is advantageous in some plants."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Hormones in Animals",
+        "Reproductive Health",
+        "Vegetative Propagation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Study the given table and answer the following questions : Parents: A pea plant with red flowers was crossed with a pea plant with white flowers. F1: 30 seeds were sown and all bore plants with red flowers. F2: 44 seeds were sown, 33 plants bore red flowers and 11 plants bore white flowers. (a) Depict the information given in the table in the form of a cross. (b) Deduce the F2 phenotypic ratio/F2 ratio showing external look as well as genotypic /genetic makeup, ratio.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Study the given table and answer the following questions :"
+          },
+          {
+            "type": "image",
+            "assetId": "diagrams/083e1f7d-0.png"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Depict the information given in the table in the form of a cross."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Deduce the F2 phenotypic ratio/F2 ratio showing external look as well as genotypic /genetic makeup, ratio.",
+                "latex": "Deduce the F_2 phenotypic ratio/F_2 ratio showing external look as well as genotypic /genetic makeup, ratio."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Monohybrid cross",
+        "Mendelian inheritance"
+      ],
+      "primary_form": "table_based",
+      "figures": [
+        {
+          "page": 13,
+          "bbox": [
+            0.14,
+            0.115,
+            0.86,
+            0.225
+          ],
+          "region": "stem",
+          "label": "table"
+        }
+      ]
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Plants exhibit movements in response to various environmental stimuli to adopt and survive in their surroundings. These movements, influenced by external factors such as light, gravity, water and chemicals are regulated by specific plant hormones. For example, the differential growth of plant parts allows them to bend, grow or orient themselves in particular directions. Roots and shoots often show contrasting response to the same stimulus, highlighting the complex mechanisms involved in plant growth and development. (a) Why is hydrotropism essential for plants ? (b) What role does auxin play in the growth of plants ? (c) Differentiate between movement shown by the sensitive plant and tropic movement by plants (Two points). OR (c) How does movement of roots differ from that of shoots in response to gravity and light ?",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "Plants exhibit movements in response to various environmental stimuli to adopt and survive in their surroundings. These movements, influenced by external factors such as light, gravity, water and chemicals are regulated by specific plant hormones. For example, the differential growth of plant parts allows them to bend, grow or orient themselves in particular directions. Roots and shoots often show contrasting response to the same stimulus, highlighting the complex mechanisms involved in plant growth and development."
+          }
+        ],
+        "choices": [
+          {
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "Option 1",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Why is hydrotropism essential for plants ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) What role does auxin play in the growth of plants ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(c) Differentiate between movement shown by the sensitive plant and tropic movement by plants (Two points)."
+                  }
+                ]
+              },
+              {
+                "label": "Option 2",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Why is hydrotropism essential for plants ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) What role does auxin play in the growth of plants ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(c) How does movement of roots differ from that of shoots in response to gravity and light ?"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Plant movements",
+        "Plant hormones",
+        "Tropic movements"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(A) (a) Draw a labelled diagram showing open and closed stomatal pore. (b) List the main events that occur during the process of photo synthesis. (c) Write a balanced chemical equation showing photo-synthesis in plants. OR (B) (a) Draw a well-labelled diagram of nephron and label atleast 4 of its parts. (b) Write the role of capillary cluster inside Bowman's capsule. (c) What is meant by selective reabsorption ?",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "(A)",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Draw a labelled diagram showing open and closed stomatal pore."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) List the main events that occur during the process of photo synthesis."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(c) Write a balanced chemical equation showing photo-synthesis in plants."
+                  }
+                ]
+              },
+              {
+                "label": "(B)",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Draw a well-labelled diagram of nephron and label atleast 4 of its parts."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) Write the role of capillary cluster inside Bowman's capsule."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(c) What is meant by selective reabsorption ?"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "life-processes",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Photosynthesis",
+        "Stomata",
+        "Excretion in humans",
+        "Nephron structure and function"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The volume ratio of hydrogen and oxygen gases liberated during electrolysis of water is\n(A) 1 : 1\n(B) 2 : 1\n(C) 4 : 1\n(D) 1 : 2",
+      "options": [
+        {
+          "label": "A",
+          "text": "1 : 1"
+        },
+        {
+          "label": "B",
+          "text": "2 : 1"
+        },
+        {
+          "label": "C",
+          "text": "4 : 1"
+        },
+        {
+          "label": "D",
+          "text": "1 : 2"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The volume ratio of hydrogen and oxygen gases liberated during electrolysis of water is"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "1 : 1"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "2 : 1"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "4 : 1"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "1 : 2"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Electrolysis of water"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "C6H12O6(aq) + 6O2(g) -> 6CO2(g) + 6H2O(l).\nThe above reaction is an example of -\n(A) Displacement Reaction\n(B) Endothermic Reaction\n(C) Exothermic Reaction\n(D) Neutralisation Reaction",
+      "options": [
+        {
+          "label": "A",
+          "text": "Displacement Reaction"
+        },
+        {
+          "label": "B",
+          "text": "Endothermic Reaction"
+        },
+        {
+          "label": "C",
+          "text": "Exothermic Reaction"
+        },
+        {
+          "label": "D",
+          "text": "Neutralisation Reaction"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "equation",
+            "latex": "\\text{C}_6\\text{H}_{12}\\text{O}_{6(\\text{aq})} + 6\\text{O}_{2(\\text{g})} \\rightarrow 6\\text{CO}_{2(\\text{g})} + 6\\text{H}_2\\text{O}_{(\\text{l})}"
+          },
+          {
+            "type": "paragraph",
+            "text": "The above reaction is an example of -"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Displacement Reaction"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Endothermic Reaction"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Exothermic Reaction"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Neutralisation Reaction"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Exothermic reactions"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "An aqueous solution turns red litmus blue. Excess addition of which of the following solution would reverse the change ?\n(A) Sodium hydroxide\n(B) Hydrochloric acid\n(C) Baking soda\n(D) Slaked lime",
+      "options": [
+        {
+          "label": "A",
+          "text": "Sodium hydroxide"
+        },
+        {
+          "label": "B",
+          "text": "Hydrochloric acid"
+        },
+        {
+          "label": "C",
+          "text": "Baking soda"
+        },
+        {
+          "label": "D",
+          "text": "Slaked lime"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "An aqueous solution turns red litmus blue. Excess addition of which of the following solution would reverse the change ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Sodium hydroxide"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Hydrochloric acid"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Baking soda"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Slaked lime"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Indicators",
+        "Acid-base indicators"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "While washing dirty clothes by soap, micelles are formed. Select the correct statement about micelles.\n(A) The hydrophobic tail of the soap molecule is in the interior of the cluster, whereas hydrophilic end is on the surface of the cluster.\n(B) The hydrophobic tail is on the surface of the cluster, whereas hydrophilic end is in the interior of cluster.\n(C) Both hydrophobic tail and hydrophilic end are in the interior of the cluster.\n(D) Both hydrophobic tail and hydrophilic end are on the surface of the cluster.",
+      "options": [
+        {
+          "label": "A",
+          "text": "The hydrophobic tail of the soap molecule is in the interior of the cluster, whereas hydrophilic end is on the surface of the cluster."
+        },
+        {
+          "label": "B",
+          "text": "The hydrophobic tail is on the surface of the cluster, whereas hydrophilic end is in the interior of cluster."
+        },
+        {
+          "label": "C",
+          "text": "Both hydrophobic tail and hydrophilic end are in the interior of the cluster."
+        },
+        {
+          "label": "D",
+          "text": "Both hydrophobic tail and hydrophilic end are on the surface of the cluster."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "While washing dirty clothes by soap, micelles are formed. Select the correct statement about micelles."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The hydrophobic tail of the soap molecule is in the interior of the cluster, whereas hydrophilic end is on the surface of the cluster."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The hydrophobic tail is on the surface of the cluster, whereas hydrophilic end is in the interior of cluster."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both hydrophobic tail and hydrophilic end are in the interior of the cluster."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both hydrophobic tail and hydrophilic end are on the surface of the cluster."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Soaps and detergents",
+        "Micelle formation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which one of the following metals does not react with cold water ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Sodium"
+        },
+        {
+          "label": "B",
+          "text": "Potassium"
+        },
+        {
+          "label": "C",
+          "text": "Calcium"
+        },
+        {
+          "label": "D",
+          "text": "Magnesium"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which one of the following metals does not react with cold water ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Sodium"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Potassium"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Calcium"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Magnesium"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Reaction of metals with water"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Alloys are homogeneous mixture of metal with a metal or non-metal. Which among the following alloys contain non-metal as one of its constituents ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Brass"
+        },
+        {
+          "label": "B",
+          "text": "Bronze"
+        },
+        {
+          "label": "C",
+          "text": "Amalgam"
+        },
+        {
+          "label": "D",
+          "text": "Steel"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Alloys are homogeneous mixture of metal with a metal or non-metal. Which among the following alloys contain non-metal as one of its constituents ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Brass"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Bronze"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Amalgam"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Steel"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Alloys"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "How will you protect yourself from the heat generated while diluting a concentrated acid ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "By adding acid to water with constant stirring."
+        },
+        {
+          "label": "B",
+          "text": "By adding water to acid with constant stirring."
+        },
+        {
+          "label": "C",
+          "text": "By adding water to acid followed by base."
+        },
+        {
+          "label": "D",
+          "text": "By adding base to acid with constant stirring."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "How will you protect yourself from the heat generated while diluting a concentrated acid ?"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By adding acid to water with constant stirring."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By adding water to acid with constant stirring."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By adding water to acid followed by base."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By adding base to acid with constant stirring."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Dilution of acids"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Pure ethanoic acid is also known as glacial acetic acid. Reason (R) : Pure ethanoic acid often freezes during winter due to its low melting point of 290 K.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Pure ethanoic acid is also known as glacial acetic acid."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Pure ethanoic acid often freezes during winter due to its low melting point of 290 K."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Properties of Ethanoic Acid"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "(a) A compound 'A' is used in soda-lime fire-extinguisher and decomposes on heating to form compound 'B'. Compound 'B' is used for removing permanent hardness of water. Identify 'A' and 'B'. (b) Write chemical formula of Plaster of Paris. At what temperature gypsum is heated to obtain Plaster of Paris ?",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "A compound 'A' is used in soda-lime fire-extinguisher and decomposes on heating to form compound 'B'. Compound 'B' is used for removing permanent hardness of water. Identify 'A' and 'B'."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write chemical formula of Plaster of Paris. At what temperature gypsum is heated to obtain Plaster of Paris ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Sodium Hydrogen Carbonate",
+        "Plaster of Paris"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Account for the following : (a) White silver chloride turns grey when exposed to sunlight. (b) Lead (II) nitrate on heating releases brown fumes. (c) Bags of oil and fat containing food items are flushed with nitrogen gas.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Account for the following :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "White silver chloride turns grey when exposed to sunlight."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Lead (II) nitrate on heating releases brown fumes."
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Bags of oil and fat containing food items are flushed with nitrogen gas."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Decomposition Reaction",
+        "Effects of Oxidation in Everyday Life"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "internal_choice",
+      "marks": 3,
+      "text": "Attempt either option (A) or (B). (A) (i) Which method will be used to convert each of them to their respective metal oxides ? (a) Carbonate ore (b) Sulphide ore",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Which method will be used to convert each of them to their respective metal oxides ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(a) Carbonate ore"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(b) Sulphide ore"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Extraction of Metals"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "internal_choice",
+      "marks": 3,
+      "text": "(ii) Write a chemical reaction to illustrate the use of aluminium for joining cracked railway tracks.\n(iii) During extraction of metals, electrolytic refining is used to obtain pure metals. Which material will be used as anode and cathode for the refining of copper metal by this process ?\nOR\n(B) (i) Write all the reactions involved in the extraction of Zn from ZnS.\n(ii) Hydrogen gas is not evolved when most of the metals react with nitric acid. Give reason.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Write a chemical reaction to illustrate the use of aluminium for joining cracked railway tracks."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) During extraction of metals, electrolytic refining is used to obtain pure metals. Which material will be used as anode and cathode for the refining of copper metal by this process ?"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Write all the reactions involved in the extraction of Zn from ZnS."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Hydrogen gas is not evolved when most of the metals react with nitric acid. Give reason."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Thermit reaction",
+        "Electrolytic refining of copper",
+        "Extraction of Zinc",
+        "Reaction of metals with nitric acid"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "The pH plays an important role in our daily life. Strength of acids and bases depends on the number of H+ ions and OH\u2013 ions produced by these respectively. pH scale helps in predicting the strength of acids and bases by measuring hydrogen ion concentration in a solution.\nAnswer the following :\n(a) What type of indicator is used to predict how strong an acid or base is ?\n(b) Three solutions A, B and C showed pH as 3, 5 and 7. Which solution has the highest concentration of H+ ions ?\n(c) What are strong acids and weak acids ?\nOR\n(c) (i) Under what condition is rainwater called acid rain ?\n(ii) In the following acids, identify weak acids :\nNitric acid, hydrochloric acid, acetic acid, sulphuric acid, formic acid.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "The pH plays an important role in our daily life. Strength of acids and bases depends on the number of H+ ions and OH- ions produced by these respectively. pH scale helps in predicting the strength of acids and bases by measuring hydrogen ion concentration in a solution."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What type of indicator is used to predict how strong an acid or base is ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "marks": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Three solutions A, B and C showed pH as 3, 5 and 7. Which solution has the highest concentration of H+ ions ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "marks": 2,
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What are strong acids and weak acids ?"
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(i) Under what condition is rainwater called acid rain ?"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) In the following acids, identify weak acids :\nNitric acid, hydrochloric acid, acetic acid, sulphuric acid, formic acid."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "An",
+      "topic_names": [
+        "pH in everyday life",
+        "Strength of acids and bases",
+        "Acid rain",
+        "Weak and strong acids"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "Attempt either option (A) or (B) :\n(A) (i) Carbon cannot form C4+ cation and C4\u2013 anion. Explain.\n(ii) Define homologous series of carbon compounds. Why are the melting and boiling points of C4H10 higher than C3H8 or C2H6 ?\n(iii) What happens when ethanol is heated with acidified potassium dichromate ?\nOR\n(B) (i) How would you name the following :\nI. CH3 \u2013 CH2 \u2013 C(=O)H\nII. CH3 \u2013 C \u2261 CH\n(ii) When ethanol reacts with ethanoic acid in the presence of conc. H2SO4, a substance with sweet smell is produced. Answer the following :\nI. State the class of compounds to which the sweet smelling compounds belong.\nII. Write the chemical equation for the reaction.\n(iii) Why soaps do not produce foam with hard water ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Attempt either option (A) or (B) :"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Carbon cannot form C4+ cation and C4\u2013 anion. Explain.",
+                    "latex": "(i) \\text{Carbon cannot form } C^{4+} \\text{ cation and } C^{4-} \\text{ anion. Explain.}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Define homologous series of carbon compounds. Why are the melting and boiling points of C4H10 higher than C3H8 or C2H6 ?",
+                    "latex": "(ii) \\text{Define homologous series of carbon compounds. Why are the melting and boiling points of } C_4H_{10} \\text{ higher than } C_3H_8 \\text{ or } C_2H_6 ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) What happens when ethanol is heated with acidified potassium dichromate ?"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) How would you name the following :"
+                  },
+                  {
+                    "type": "image_placeholder",
+                    "text": "I. CH3 - CH2 - C(=O)H"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "II. CH3 \u2013 C \u2261 CH",
+                    "latex": "\\text{II. } CH_3 - C \\equiv CH"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) When ethanol reacts with ethanoic acid in the presence of conc. H2SO4, a substance with sweet smell is produced. Answer the following :",
+                    "latex": "(ii) \\text{When ethanol reacts with ethanoic acid in the presence of conc. } H_2SO_4\\text{, a substance with sweet smell is produced. Answer the following :}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "I. State the class of compounds to which the sweet smelling compounds belong."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "II. Write the chemical equation for the reaction."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Why soaps do not produce foam with hard water ?"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Chemical properties of carbon compounds",
+        "Homologous series",
+        "Soaps and detergents"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 23,
+          "bbox": [
+            0.24,
+            0.43,
+            0.49,
+            0.51
+          ],
+          "region": "subparts",
+          "label": "B",
+          "caption": "Chemical structure for naming"
+        }
+      ]
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The pair of eye parts responsible for admitting different amount of light in to the eyes is\n(A) Iris and pupil\n(B) Ciliary muscles and pupil\n(C) Retina and Iris\n(D) Ciliary muscles and cornea",
+      "options": [
+        {
+          "label": "A",
+          "text": "Iris and pupil"
+        },
+        {
+          "label": "B",
+          "text": "Ciliary muscles and pupil"
+        },
+        {
+          "label": "C",
+          "text": "Retina and Iris"
+        },
+        {
+          "label": "D",
+          "text": "Ciliary muscles and cornea"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The pair of eye parts responsible for admitting different amount of light in to the eyes is"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Iris and pupil"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Ciliary muscles and pupil"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Retina and Iris"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Ciliary muscles and cornea"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Structure and functioning of human eye"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The vision defect which arises due to gradual weakening of the ciliary muscles and diminishing flexibility of eye lens is :\n(A) Myopia\n(B) Hypermetropia\n(C) Presbyopia\n(D) Myopia and hypermetropia both",
+      "options": [
+        {
+          "label": "A",
+          "text": "Myopia"
+        },
+        {
+          "label": "B",
+          "text": "Hypermetropia"
+        },
+        {
+          "label": "C",
+          "text": "Presbyopia"
+        },
+        {
+          "label": "D",
+          "text": "Myopia and hypermetropia both"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The vision defect which arises due to gradual weakening of the ciliary muscles and diminishing flexibility of eye lens is :"
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Myopia"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Hypermetropia"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Presbyopia"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Myopia and hypermetropia both"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "R",
+      "topic_names": [
+        "Defects of vision and their correction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : With the help of compass, magnetic field lines can be traced outside the bar magnet.\nReason (R) : The north pole of a compass needle always points towards the south pole of the magnet when brought close to it.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "With the help of compass, magnetic field lines can be traced outside the bar magnet."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "The north pole of a compass needle always points towards the south pole of the magnet when brought close to it."
+          }
+        ],
+        "options": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Magnetic field lines",
+        "Bar magnet"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "(A) A fuse in electric circuit is rated 4 A. Can it be used with an electric heater of rating 2 kW, 200 V ? Explain your answer.\nOR\n(B) How is an electromagnet made ? Write any two ways by which the strength of electromagnet can be increased.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "A fuse in electric circuit is rated 4 A. Can it be used with an electric heater of rating 2 kW, 200 V ? Explain your answer."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "How is an electromagnet made ? Write any two ways by which the strength of electromagnet can be increased."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Electric fuse",
+        "Electromagnet"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "(a) Define volt, the unit of potential difference.\n(b) Calculate the work done required to move an electron between two points A and B located at a potential difference of 100 V in an electric field.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Define volt, the unit of potential difference."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Calculate the work done required to move an electron between two points A and B located at a potential difference of 100 V in an electric field."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Potential difference",
+        "Electric field"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Observe the given ray diagram and compare : (i) the speed of light in medium A and the speed of light in medium B. (ii) the optical densities of medium B and medium C. (b) Draw a ray diagram for refraction where the optical density of medium \u2018A\u2019 becomes equal to the optical density of medium \u2018C\u2019 and optical density of medium \u2018B\u2019 is greater than the optical density of medium \u2018A\u2019 and medium \u2018C\u2019.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/cebfd22e-0.png"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Observe the given ray diagram and compare :"
+              },
+              {
+                "type": "paragraph",
+                "text": "(i) the speed of light in medium A and the speed of light in medium B."
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) the optical densities of medium B and medium C."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Draw a ray diagram for refraction where the optical density of medium \u2018A\u2019 becomes equal to the optical density of medium \u2018C\u2019 and optical density of medium \u2018B\u2019 is greater than the optical density of medium \u2018A\u2019 and medium \u2018C\u2019."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Refraction of light",
+        "Refractive index"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 27,
+          "bbox": [
+            0.12,
+            0.08,
+            0.46,
+            0.28
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Explain the phenomenon of rainbow formation in the sky. Draw the labelled ray diagram in support of your explanation.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Explain the phenomenon of rainbow formation in the sky. Draw the labelled ray diagram in support of your explanation."
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Dispersion of light",
+        "Rainbow formation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "37.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/a5bfc9e0-0.png"
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Force on a current-carrying conductor in a magnetic field"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 27,
+          "bbox": [
+            0.15,
+            0.55,
+            0.55,
+            0.82
+          ],
+          "region": "stem"
+        }
+      ]
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "On the basis of the given circuit arrangement, answer the following questions :\n(a) What happens to the rod AB when the key K is closed and why ?\n(b) Name and state the rule that determines this behaviour of the rod AB in the above situation.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "On the basis of the given circuit arrangement, answer the following questions :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What happens to the rod AB when the key K is closed and why ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Name and state the rule that determines this behaviour of the rod AB in the above situation."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Force on a current-carrying conductor in a magnetic field"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "The above ray diagram is to show image formation by a reflecting telescope. Reflecting telescope revolutionized our way of looking into the sky. Reflecting telescopes employ large mirrors to gather and focus light rather than relying solely on lenses as we do in the refracting telescopes. These telescopes utilize precisely shaped and polished mirrors to capture incoming light and reflect it to a focal point, where the telescope forms an image for observation.\n(a) What kind of image of a star is seen by the observer in the eye-piece ?\n(b) What kind of mirror is used in this reflecting telescope ?\n(c) Explain with the reason, what kind of optical device (type of lens or mirror) is used at the eye-piece.\nOR\n(c) What is the role of plane mirror in image formation by this telescope ?",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "image",
+            "assetId": "diagrams/d977546b-0.png"
+          },
+          {
+            "type": "paragraph",
+            "text": "The above ray diagram is to show image formation by a reflecting telescope. Reflecting telescope revolutionized our way of looking into the sky. Reflecting telescopes employ large mirrors to gather and focus light rather than relying solely on lenses as we do in the refracting telescopes. These telescopes utilize precisely shaped and polished mirrors to capture incoming light and reflect it to a focal point, where the telescope forms an image for observation."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What kind of image of a star is seen by the observer in the eye-piece ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What kind of mirror is used in this reflecting telescope ?"
+              }
+            ]
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "c",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Explain with the reason, what kind of optical device (type of lens or mirror) is used at the eye-piece."
+                  }
+                ]
+              },
+              {
+                "label": "c",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "What is the role of plane mirror in image formation by this telescope ?"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Reflecting telescope",
+        "Spherical mirrors"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 29,
+          "bbox": [
+            0.14,
+            0.24,
+            0.68,
+            0.46
+          ],
+          "region": "passage"
+        }
+      ]
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(A) (i) The given electric circuit is a part of an electrical device. Use the information given in the electric circuit diagram to calculate :\n(I) Potential difference across the ends of resistor R2.\n(II) Value of resistor R2.\n(III) Value of resistor R1.\n(ii) Write the factors on which resistance of a conductor depends and derive the formula for resistance of a given conductor.\nOR\n(B) (i) How much electric current will an electric iron draw from 220 V source if the resistance of its heating element when hot, is 55 \u03a9? Calculate the power consumed by the electric iron when it is operated at 220 V.\n(ii) In a house, 3 bulbs of 100 watt each, are lit for 5 hours daily and an electric heater of 1.0 kW is used for half an hour daily. Calculate the total energy consumed in a month of 30 days and its cost at the rate of \u2005 3.60 per kWh.\n(iii) With reason explain, why are alloys commonly used to make elements of electrical heating devices.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "image",
+            "assetId": "diagrams/7f27d474-0.png"
+          }
+        ],
+        "choices": [
+          {
+            "displayStyle": "or",
+            "chooseCount": 1,
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) The given electric circuit is a part of an electrical device. Use the information given in the electric circuit diagram to calculate :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) Potential difference across the ends of resistor R2.",
+                    "latex": "R_2"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) Value of resistor R2.",
+                    "latex": "R_2"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(III) Value of resistor R1.",
+                    "latex": "R_1"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Write the factors on which resistance of a conductor depends and derive the formula for resistance of a given conductor."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) How much electric current will an electric iron draw from 220 V source if the resistance of its heating element when hot, is 55 \u03a9? Calculate the power consumed by the electric iron when it is operated at 220 V."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) In a house, 3 bulbs of 100 watt each, are lit for 5 hours daily and an electric heater of 1.0 kW is used for half an hour daily. Calculate the total energy consumed in a month of 30 days and its cost at the rate of \u2005 3.60 per kWh."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) With reason explain, why are alloys commonly used to make elements of electrical heating devices."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Ohm's Law",
+        "Factors affecting resistance",
+        "Electric energy and power"
+      ],
+      "primary_form": "diagram_based",
+      "figures": [
+        {
+          "page": 31,
+          "bbox": [
+            0.18,
+            0.08,
+            0.75,
+            0.33
+          ],
+          "region": "stem"
+        }
+      ]
+    }
+  ]
+}

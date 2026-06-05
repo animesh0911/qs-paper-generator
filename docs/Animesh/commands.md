@@ -3,14 +3,12 @@
 Reference for building, running, and operating the Question Paper Generator
 locally. All paths are relative to the repo root unless noted.
 
-The whole stack runs in Docker Compose. Five services:
+The whole stack runs in Docker Compose. Three services:
 
 | service    | image / build      | port  | role                                 |
 | ---------- | ------------------ | ----- | ------------------------------------ |
 | `db`       | `postgres:16`      | —     | Postgres 16, volume `pgdata`         |
-| `redis`    | `redis:7`          | —     | Celery broker + Django cache backend |
 | `web`      | `./backend`        | 8000  | Django + DRF (gunicorn-less dev)     |
-| `worker`   | `./backend`        | —     | Celery worker                        |
 | `frontend` | `./frontend`       | 5173  | Vite dev server (React + Tailwind)   |
 
 ---
@@ -45,7 +43,6 @@ Seeded demo credentials:
 docker compose up -d              # start (background)
 docker compose ps                 # status of all services
 docker compose logs -f web        # tail Django logs
-docker compose logs -f worker     # tail Celery logs
 docker compose logs -f frontend   # tail Vite logs
 docker compose stop               # stop, keep containers
 docker compose down               # stop + remove containers (keeps pgdata)
@@ -132,44 +129,25 @@ inside a container the host is `db`.
 
 ---
 
-## Redis (cache + Celery broker)
+## Cache (Postgres-backed)
+
+The Django cache is `DatabaseCache` — it lives in the Postgres `qpg_cache`
+table (created by the `papers.0009_create_cache_table` migration), so no extra
+service is needed. The PDF cache (`paper-pdf:{id}`) sits here with a 1-day TTL;
+clear it if you ever change `render_paper_pdf` and want to see new output for an
+existing paper.
 
 ```bash
-# Open redis-cli
-docker compose exec redis redis-cli
+# Inspect cached keys
+docker compose exec db psql -U qpg -d qpg -c "SELECT cache_key, expires FROM qpg_cache;"
 
-# One-shot commands
-docker compose exec redis redis-cli PING                    # -> PONG
-docker compose exec redis redis-cli KEYS '*'                # list all keys
-docker compose exec redis redis-cli KEYS 'paper-pdf:*'      # cached PDFs
-docker compose exec redis redis-cli FLUSHDB                 # drop all keys
-```
-
-The PDF cache (`paper-pdf:{id}`) lives here with a 1-day TTL; flush it if you
-ever change `render_paper_pdf` and want to see new output for an existing
-paper.
-
----
-
-## Celery
-
-The worker container starts automatically with the stack. It's currently
-idle — `assemble_paper` and PDF rendering still run synchronously inside the
-request handler. The plumbing is in place for future slices to offload work.
-
-```bash
-# Tail worker logs
-docker compose logs -f worker
-
-# Restart just the worker (after editing tasks)
-docker compose restart worker
-
-# Fire the built-in debug task from a Django shell
+# Clear all cached entries (Django API — respects the backend)
 docker compose exec web python manage.py shell -c \
-  "from config.celery import debug_task; debug_task.delay()"
+  "from django.core.cache import cache; cache.clear()"
 
-# Run a task synchronously (skips the broker) — useful in tests
-docker compose exec -e CELERY_TASK_ALWAYS_EAGER=1 web python manage.py shell
+# Or drop just the PDF rows directly
+docker compose exec db psql -U qpg -d qpg -c \
+  "DELETE FROM qpg_cache WHERE cache_key LIKE '%paper-pdf:%';"
 ```
 
 ---
@@ -249,7 +227,7 @@ MCP-driven browser flow (see `.mcp.json`).
 | -------------------------------- | -------------------------------------------- |
 | Stop everything                  | `docker compose down`                        |
 | Stop + drop the Postgres volume  | `docker compose down -v`                     |
-| Drop only the Redis cache        | `docker compose exec redis redis-cli FLUSHDB` |
+| Clear only the cache             | `docker compose exec web python manage.py shell -c "from django.core.cache import cache; cache.clear()"` |
 | Rebuild all images               | `docker compose build --no-cache`            |
 | Remove node_modules from image   | `docker compose down && docker volume rm $(docker volume ls -q | grep node_modules)` |
 | Wipe Playwright session artifacts | `rm -rf .playwright-mcp/`                   |

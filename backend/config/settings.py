@@ -146,16 +146,12 @@ CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", DEBUG)
 # non-Docker runs can override to http://localhost:5173.
 PAPER_PRINT_BASE_URL = env("PAPER_PRINT_BASE_URL", "http://frontend:5173")
 
-# Celery / Redis
-REDIS_URL = env("REDIS_URL", "redis://redis:6379/0")
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
-CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER", False)
-
-# Cache — Redis-backed so PDF bytes can be memoised across requests.
+# Cache — Postgres-backed (Django DatabaseCache) so PDF bytes survive
+# restarts and are shared across processes. The ``qpg_cache`` table is created
+# by the papers ``createcachetable`` migration.
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": REDIS_URL,
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "qpg_cache",
     }
 }
