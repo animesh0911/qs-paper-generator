@@ -555,12 +555,15 @@ class Ingestor:
         *,
         source_file_name: str = "",
         source_type: str = "",
+        school=None,
     ) -> IngestResult:
         """Send a paper PDF to the extractor and persist Question rows.
 
         ``source_file_name`` (the uploaded filename) and ``source_type`` (one of
         the contract's source kinds, e.g. ``previous_year_paper``) record where a
         batch came from. ``source_name`` is derived from the filename stem.
+        ``school`` scopes the created rows to the uploading teacher's tenant (the
+        live HTTP path); the committed-JSON CLI path leaves it ``None``.
         """
         raw_questions = self.extractor.extract(pdf_bytes)
         if not raw_questions:
@@ -601,6 +604,7 @@ class Ingestor:
             primary_assets,
             chapter_by_slug,
             provenance,
+            school,
         )
         return IngestResult(created=created, skipped_duplicates=skipped)
 
@@ -611,6 +615,7 @@ class Ingestor:
         primary_assets: list[str | None],
         chapter_by_slug: dict[str, Chapter],
         provenance: _Provenance,
+        school=None,
     ) -> int:
         rows: list[Question] = []
         for i, q in enumerate(tagged):
@@ -625,6 +630,7 @@ class Ingestor:
             )
 
             row = Question(
+                school=school,
                 chapter=chapter_by_slug.get(q.get("chapter_slug")),
                 section=q["section"],
                 qtype=q["qtype"],
