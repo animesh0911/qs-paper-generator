@@ -142,6 +142,12 @@ def resolve_chapter_slug(emitted, canonical) -> tuple[str | None, bool]:
 
 _BARE_NUMBER_RE = re.compile(r"^\s*\d{1,3}[.):]?\s*$")
 _CONTINUATION_RE = re.compile(r"continued\s+(?:on|from)\b", re.I)
+# A stem that *begins* at a non-first sub-part label — "(b)", "(c)", … (never
+# "(a)" or roman "(i)") — is an orphaned OR/sub-part half the model split into
+# its own entry. This is the residual segmentation defect the no-split prompt
+# doesn't fully prevent (validated on 31-2-3: the 4 spurious rows all start
+# "(b)"); flagging it names the specific rows, not just the paper-level drift.
+_ORPHAN_LABEL_RE = re.compile(r"^\s*\(\s*([b-z])\s*\)", re.IGNORECASE)
 
 
 def _derive_options(content: dict) -> list[dict]:
@@ -165,11 +171,21 @@ def _derive_options(content: dict) -> list[dict]:
 
 
 def _stem_flag(text) -> str | None:
-    """Flag a lost/continued stem: empty, a bare question number, or a continuation."""
+    """Flag a lost/continued/split stem.
+
+    ``empty_stem`` for an empty stem or a bare question number ("37."); otherwise
+    ``possible_split`` for a "continued on/from" placeholder or a stem that begins
+    at an orphaned non-first sub-part label ("(b) …") — the OR-half segmentation
+    defect. Returns ``None`` for a normal stem (incl. a legitimate "(a) …" first
+    part and roman "(i)").
+    """
     stripped = (text or "").strip()
     if not stripped or _BARE_NUMBER_RE.match(stripped):
         return FLAG_EMPTY_STEM
     if _CONTINUATION_RE.search(stripped):
+        return FLAG_POSSIBLE_SPLIT
+    orphan = _ORPHAN_LABEL_RE.match(stripped)
+    if orphan and orphan.group(1).lower() != "i":
         return FLAG_POSSIBLE_SPLIT
     return None
 
