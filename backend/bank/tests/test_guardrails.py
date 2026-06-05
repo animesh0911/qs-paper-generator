@@ -153,6 +153,23 @@ def test_gate_flags_lost_or_continued_stem():
     assert FLAG_POSSIBLE_SPLIT in cont["review_flags"]
 
 
+def test_gate_flags_orphan_subpart_label_as_split():
+    """A stem starting at "(b)" is an OR-half the model split out (validated on
+    31-2-3) → possible_split; a legitimate "(a)" first part or roman "(i)" is not.
+
+    Why: the no-split prompt doesn't fully stop the model splitting an OR's
+    second alternative into its own entry. Naming the specific row (not just the
+    paper-level blueprint drift) is what makes it reviewable."""
+    split = _q(text="(b) Write the balanced chemical equation for the reaction.")
+    apply_guardrails([split], CANONICAL)
+    assert FLAG_POSSIBLE_SPLIT in split["review_flags"]
+
+    for ok_text in ("(a) Draw a diagram of the human eye.", "(i) Define refraction."):
+        q = _q(text=ok_text)
+        apply_guardrails([q], CANONICAL)
+        assert q["review_flags"] == [], ok_text
+
+
 def test_gate_flags_blueprint_drift_only_for_board_sized_batch():
     """A 40-question board-paper-shaped batch that drifts from 39 flags every row;
     a teacher's 5-question worksheet (sub-board size) is left clean.
