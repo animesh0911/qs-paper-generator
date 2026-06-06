@@ -159,9 +159,8 @@
     white-space: nowrap;
   }
 
-  .qpg-question-blocknote,
-  .qpg-question-blocknote .bn-container,
-  .qpg-question-blocknote .bn-editor {
+  .qpg-question-blocknote .bn-editor,
+  .qpg-question-blocknote.bn-container {
     background: transparent;
     color: inherit;
     font-family: inherit;

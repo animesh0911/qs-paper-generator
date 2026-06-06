@@ -55,6 +55,14 @@ describe('editor CSS contracts', () => {
     expect(editorInspectorSource).toContain('max-lg:static');
     expect(editorInspectorSource).toContain('max-lg:h-auto');
   });
+
+  it('keeps Question typography stable when BlockNote activates', () => {
+    const activeQuestionRule = cssRule('.qpg-question-blocknote.bn-container');
+
+    expect(activeQuestionRule).toMatch(/\bfont-family\s*:\s*inherit\b/);
+    expect(activeQuestionRule).toMatch(/\bfont-size\s*:\s*inherit\b/);
+    expect(activeQuestionRule).toMatch(/\bline-height\s*:\s*inherit\b/);
+  });
 });
 
 function cssRule(selector: string) {
