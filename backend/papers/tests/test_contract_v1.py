@@ -1,20 +1,17 @@
 """Contract compliance tests for paper_document.v1 (issue #46 — Phase 8 verify).
 
 Assembles a paper via the API and validates the response against every required
-field in contracts/v1_contract.md. These tests run against whatever the bank
-has — seed data, or a real loaded bank.
-
-NOTE on #46/#87 Step 1: content/parsed/ exists but has no committed JSON yet
-(JSON production requires a Gemini API key — run the ingestor against the source
-PDFs, then commit the output). load_questions compliance against real ingested
-data is deferred until that JSON is committed. These tests cover acceptance
-criteria 2 and 3 (contract shape + structured content rendering) against the
-seed bank.
+field in contracts/v1_contract.md. The ``document`` fixture is parametrized over
+two banks — a synthetic ``seeded_bank`` (fast, exact slot coverage) and the real
+committed corpus loaded from ``content/parsed/`` via ``load_questions`` — so
+every assertion in this module guards both the synthetic and the real path
+(issue #135).
 """
 
 from __future__ import annotations
 
 import pytest
+from django.core.management import call_command
 from rest_framework import status
 
 # Legacy field names that must NOT appear in any paper_document.v1 response.
@@ -49,7 +46,22 @@ def _all_keys(obj) -> set[str]:
 
 
 @pytest.fixture
-def document(api_client, seeded_bank):
+def loaded_bank(db, tmp_path, settings):
+    """Load the committed 2026 corpus (content/parsed/) into the bank.
+
+    Rehydrates assets into a throwaway MEDIA_ROOT — same isolation as
+    test_load_questions.test_rehydrates_committed_assets_into_storage — so the
+    run doesn't write crops into the developer's real backend/media/diagrams/.
+    """
+    settings.MEDIA_ROOT = str(tmp_path / "media")
+    parsed_dir = settings.BASE_DIR.parent / "content" / "parsed"
+    call_command("load_questions", str(parsed_dir))
+
+
+@pytest.fixture(params=["seeded_bank", "loaded_bank"])
+def document(request, api_client):
+    """A document assembled against each bank in turn (contract guards both)."""
+    request.getfixturevalue(request.param)
     resp = api_client.post("/api/papers/assemble", {}, format="json")
     assert resp.status_code == status.HTTP_201_CREATED
     return resp.data
@@ -302,3 +314,38 @@ def test_content_is_region_keyed_dict(document):
                 f"question {q['id']} content region '{region}' is "
                 f"{type(value).__name__}, expected list"
             )
+
+
+def _image_asset_ids(content) -> set[str]:
+    """Collect every `assetId` under an `image`-typed content item, recursively."""
+    ids: set[str] = set()
+    if isinstance(content, dict):
+        if content.get("type") == "image" and "assetId" in content:
+            ids.add(content["assetId"])
+        for v in content.values():
+            ids |= _image_asset_ids(v)
+    elif isinstance(content, list):
+        for item in content:
+            ids |= _image_asset_ids(item)
+    return ids
+
+
+@pytest.mark.django_db
+def test_image_assets_resolve_in_storage(document):
+    """Every image assetId in question content resolves to a stored file (§9, §135 task 6).
+
+    A stale or mismatched assetId would pass every shape assertion above yet
+    404 in the renderer — this is the check that actually proves the asset is
+    reachable, not just present-shaped.
+    """
+    from django.core.files.storage import default_storage
+
+    asset_ids = {
+        asset_id
+        for q in document["questions"]
+        for asset_id in _image_asset_ids(q["content"])
+    }
+    for asset_id in asset_ids:
+        assert default_storage.exists(
+            asset_id
+        ), f"image assetId {asset_id!r} does not resolve in default_storage"
