@@ -46,10 +46,14 @@ def _all_keys(obj) -> set[str]:
 
 
 @pytest.fixture
-def loaded_bank(db):
-    """Load the committed 2026 corpus (content/parsed/) into the bank."""
-    from django.conf import settings
+def loaded_bank(db, tmp_path, settings):
+    """Load the committed 2026 corpus (content/parsed/) into the bank.
 
+    Rehydrates assets into a throwaway MEDIA_ROOT — same isolation as
+    test_load_questions.test_rehydrates_committed_assets_into_storage — so the
+    run doesn't write crops into the developer's real backend/media/diagrams/.
+    """
+    settings.MEDIA_ROOT = str(tmp_path / "media")
     parsed_dir = settings.BASE_DIR.parent / "content" / "parsed"
     call_command("load_questions", str(parsed_dir))
 
@@ -310,3 +314,38 @@ def test_content_is_region_keyed_dict(document):
                 f"question {q['id']} content region '{region}' is "
                 f"{type(value).__name__}, expected list"
             )
+
+
+def _image_asset_ids(content) -> set[str]:
+    """Collect every `assetId` under an `image`-typed content item, recursively."""
+    ids: set[str] = set()
+    if isinstance(content, dict):
+        if content.get("type") == "image" and "assetId" in content:
+            ids.add(content["assetId"])
+        for v in content.values():
+            ids |= _image_asset_ids(v)
+    elif isinstance(content, list):
+        for item in content:
+            ids |= _image_asset_ids(item)
+    return ids
+
+
+@pytest.mark.django_db
+def test_image_assets_resolve_in_storage(document):
+    """Every image assetId in question content resolves to a stored file (§9, §135 task 6).
+
+    A stale or mismatched assetId would pass every shape assertion above yet
+    404 in the renderer — this is the check that actually proves the asset is
+    reachable, not just present-shaped.
+    """
+    from django.core.files.storage import default_storage
+
+    asset_ids = {
+        asset_id
+        for q in document["questions"]
+        for asset_id in _image_asset_ids(q["content"])
+    }
+    for asset_id in asset_ids:
+        assert default_storage.exists(
+            asset_id
+        ), f"image assetId {asset_id!r} does not resolve in default_storage"
