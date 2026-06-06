@@ -38,3 +38,7 @@ old region-only drafts remain valid.
 - Backend PDF fallback test was added. Local pytest collection is blocked
   because the existing venv lacks `fitz`; `compileall` passes for the changed
   renderer and test modules.
+- Antigravity review found and Codex accepted two issues: required-region
+  deletion was being restored silently, and subpart region keys had drifted.
+  Required deletions now fail loud, canonical `subpart:<label>` keys are used,
+  and legacy `subquestion:<label>` overrides remain readable.

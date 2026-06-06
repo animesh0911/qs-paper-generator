@@ -83,7 +83,7 @@ describe('schema-aware Question editing', () => {
       ...optionA,
       props: {
         ...optionA.props,
-        regionKey: 'option:-1:C',
+        regionKey: 'option:C',
         label: 'C',
         itemJson: JSON.stringify({ type: 'paragraph', text: 'Graphite' }),
       },
@@ -133,7 +133,7 @@ describe('schema-aware Question editing', () => {
       ...blocks.find((block) => block.props.label === 'A')!,
       props: {
         ...blocks.find((block) => block.props.label === 'A')!.props,
-        regionKey: 'option:-1:C',
+        regionKey: 'option:C',
         label: 'C',
         itemJson: JSON.stringify({ type: 'paragraph', text: '' }),
       },
@@ -163,6 +163,35 @@ describe('schema-aware Question editing', () => {
     expect(
       questionToSemanticBlocks(source).map((block) => block.props.region),
     ).toEqual(['passage', 'stem', 'subpart']);
+  });
+
+  it('rejects deleting required question text instead of restoring it silently', () => {
+    const source = question('short_answer', {
+      stem: [{ type: 'paragraph', text: 'Explain the observation.' }],
+    });
+
+    expect(
+      semanticBlocksToQuestionContent(source.type, [], source.content),
+    ).toEqual({
+      ok: false,
+      message: 'Keep the question text before using this question.',
+    });
+  });
+
+  it('uses canonical region keys for labelled Question content', () => {
+    const source = question('case_based', {
+      passage: [{ type: 'paragraph', text: 'Case passage.' }],
+      subparts: [
+        {
+          label: 'a',
+          content: [{ type: 'paragraph', text: 'First subpart.' }],
+        },
+      ],
+    });
+
+    expect(
+      questionToSemanticBlocks(source).map((block) => block.props.regionKey),
+    ).toEqual(['passage', 'subpart:a']);
   });
 
   it.each([

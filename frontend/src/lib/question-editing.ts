@@ -106,10 +106,16 @@ export function semanticBlocksToQuestionContent(
 
   const content = structuredClone(originalContent);
   const grouped = groupBlocksByRegionKey(blocks);
+  const editableRegions = editableRegionsByType[questionType];
 
   for (const region of ['stem', 'passage', 'assertion', 'reason'] as const) {
     const regionBlocks = grouped.get(region);
-    if (regionBlocks) content[region] = regionBlocks.map(blockToContentItem);
+    if (
+      editableRegions.some((editableRegion) => editableRegion === region) &&
+      (region in originalContent || regionBlocks)
+    ) {
+      content[region] = regionBlocks?.map(blockToContentItem) ?? [];
+    }
   }
 
   const options = labelledBlocks(blocks, 'option');
@@ -163,9 +169,13 @@ function pushLabelledItems(
 ) {
   entries?.forEach((entry) => {
     entry.content.forEach((item) => {
+      const regionKey =
+        region === 'choice'
+          ? `choice:${groupIndex}:${entry.label}`
+          : `${region}:${entry.label}`;
       blocks.push(
         toSemanticBlock(
-          `${region}:${groupIndex}:${entry.label}`,
+          regionKey,
           region,
           entry.label,
           groupIndex,
@@ -284,6 +294,22 @@ function validateQuestionContent(
   questionType: QuestionType,
   content: DocQuestionContent,
 ): QuestionContentConversionResult {
+  if (
+    [
+      'mcq',
+      'very_short_answer',
+      'short_answer',
+      'long_answer',
+      'diagram_based',
+      'table_based',
+    ].includes(questionType) &&
+    !hasContent(content.stem ?? [])
+  ) {
+    return {
+      ok: false,
+      message: 'Keep the question text before using this question.',
+    };
+  }
   if (questionType === 'mcq' && (content.options?.length ?? 0) < 2) {
     return {
       ok: false,
@@ -301,17 +327,30 @@ function validateQuestionContent(
   }
   if (
     questionType === 'assertion_reason' &&
-    (!content.assertion?.length || !content.reason?.length)
+    (!hasContent(content.assertion ?? []) ||
+      !hasContent(content.reason ?? []))
   ) {
     return {
       ok: false,
       message: 'Keep both the assertion and reason before using this question.',
     };
   }
-  if (questionType === 'case_based' && !content.passage?.length) {
+  if (
+    questionType === 'case_based' &&
+    !hasContent(content.passage ?? [])
+  ) {
     return {
       ok: false,
       message: 'Keep the case passage before using this question.',
+    };
+  }
+  if (
+    questionType === 'case_based' &&
+    (content.subparts?.length ?? 0) === 0
+  ) {
+    return {
+      ok: false,
+      message: 'Keep at least one subpart before using this question.',
     };
   }
   if (content.subparts?.some((subpart) => !hasContent(subpart.content))) {

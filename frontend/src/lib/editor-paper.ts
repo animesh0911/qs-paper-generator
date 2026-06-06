@@ -601,7 +601,7 @@ function pushSubQuestionRegions(
     blocks.push(
       regionBlock(
         'subQuestionBlock',
-        `subquestion:${subpart.label}`,
+        `subpart:${subpart.label}`,
         subpart.content,
         overrides,
         `${subpart.label}. `,

@@ -126,7 +126,10 @@ export function QuestionEditOverlay({
     const block: QuestionSemanticBlock = {
       type: collection.type,
       props: {
-        regionKey: `${collection.region}:${groupIndex}:${label}`,
+        regionKey:
+          collection.region === 'choice'
+            ? `choice:${groupIndex}:${label}`
+            : `${collection.region}:${label}`,
         region: collection.region,
         label,
         groupIndex,

@@ -16,7 +16,7 @@ next steps only.
 
 ### 2026-06-06 — Schema-Aware Question Edit Overlay
 
-Commit: PENDING
+Commit: `2b4e66b`
 Owner: Varad / Codex
 
 Changed: issue #112 adds a focused QPG BlockNote overlay, round-trip conversion

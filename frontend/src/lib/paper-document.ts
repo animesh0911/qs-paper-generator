@@ -285,7 +285,7 @@ function applyRegionOverride(
     if (option) option.content = items;
     return;
   }
-  if (kind === 'subquestion') {
+  if (kind === 'subpart' || kind === 'subquestion') {
     const subpart = content.subparts?.find((entry) => entry.label === first);
     if (subpart) subpart.content = items;
     return;
