@@ -15,9 +15,9 @@ Each input file is one source PDF's worth of questions::
                       primary_form, parse_quality?}, ... ]
     }
 
-``parse_quality`` is set here from the question's structure via
-``question_shape.compute_parse_quality`` (no source-text verification pass —
-ADR-0004). A
+``parse_quality`` is set from the question's structure by the same
+``Ingestor._ingest_raw`` tail the live Gemini path runs (no source-text
+verification pass — ADR-0004). A
 legacy ``source_text`` field, if present, is ignored. ``source_pdf`` feeds
 ``_parse_source_filename`` for provenance (year from the parent dir name).
 
@@ -35,15 +35,8 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
-from bank.guardrails import apply_guardrails
-from bank.ingestor import (
-    Ingestor,
-    _fingerprint,
-    _parse_source_filename,
-    _Provenance,
-)
-from bank.models import Chapter, Question
-from bank.question_shape import compute_parse_quality
+from bank.ingestor import Ingestor, _parse_source_filename, _Provenance
+from bank.models import Chapter
 
 
 class Command(BaseCommand):
@@ -125,12 +118,14 @@ class Command(BaseCommand):
     def _load_file(path: Path, chapter_by_slug: dict[str, Chapter]) -> tuple[int, int]:
         """Load one committed JSON file into Question rows. Returns (created, skipped).
 
-        Mirrors ``Ingestor.ingest`` from ``parse_quality`` onward: extraction and
-        tagging already happened offline, so this picks up the reviewed dicts,
-        sets parse_quality from structure, then dedups and persists. Files are
-        processed one at a time and persisted before the next, so cross-file
-        duplicates are caught via the DB ``source_hash`` lookup just like
-        within-file ones.
+        Reads the reviewed dicts (extraction and tagging already happened
+        offline) and hands them to ``Ingestor._ingest_raw`` — the same
+        quality/guardrail/dedup/persist tail the live Gemini path runs
+        (``pdf_bytes=None``: no PDF in hand, so no cropping; committed content
+        keeps whatever image/image_placeholder items it already carries).
+        Files are processed one at a time and persisted before the next, so
+        cross-file duplicates are caught via the DB ``source_hash`` lookup
+        just like within-file ones.
         """
         data = json.loads(path.read_text())
         if not isinstance(data, dict):
@@ -140,15 +135,6 @@ class Command(BaseCommand):
         if not isinstance(questions, list):
             raise ValueError("'questions' must be a list")
 
-        # Structural self-assessment — no source-text verification (ADR-0004).
-        for q in questions:
-            q["parse_quality"] = compute_parse_quality(q, q.get("qtype", ""))
-
-        # Same Layer-2 guardrails the live path runs: resolve chapters toward the
-        # taxonomy and flag structural defects in this (possibly pre-Layer-1)
-        # committed JSON before persisting.
-        apply_guardrails(questions, set(chapter_by_slug))
-
         prov = _parse_source_filename(Path(source_pdf))
         provenance = _Provenance(
             source_type=prov["source_type"],
@@ -156,31 +142,11 @@ class Command(BaseCommand):
             source_file_name=prov["source_file_name"],
         )
 
-        # De-duplication: skip questions already in the bank AND repeats within
-        # this file — identical to Ingestor.ingest.
-        all_fingerprints = [_fingerprint(q["text"]) for q in questions]
-        seen = set(
-            Question.objects.filter(source_hash__in=all_fingerprints).values_list(
-                "source_hash", flat=True
-            )
+        result = Ingestor()._ingest_raw(
+            questions,
+            provenance=provenance,
+            school=None,
+            pdf_bytes=None,
+            chapter_by_slug=chapter_by_slug,
         )
-        unique_indices: list[int] = []
-        for i, fp in enumerate(all_fingerprints):
-            if fp in seen:
-                continue
-            seen.add(fp)
-            unique_indices.append(i)
-        skipped = len(questions) - len(unique_indices)
-        rows = [questions[i] for i in unique_indices]
-        fingerprints = [all_fingerprints[i] for i in unique_indices]
-        if not rows:
-            return 0, skipped
-
-        # No PDF in hand → no diagram cropping; committed content keeps whatever
-        # image/image_placeholder items it already carries. _persist still flags
-        # has_diagram from primary_form, the question text, and those items.
-        primary_assets: list[str | None] = [None] * len(rows)
-        created = Ingestor._persist(
-            rows, fingerprints, primary_assets, chapter_by_slug, provenance
-        )
-        return created, skipped
+        return result.created, result.skipped_duplicates

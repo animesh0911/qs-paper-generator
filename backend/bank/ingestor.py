@@ -610,6 +610,42 @@ class Ingestor:
         if not raw_questions:
             return IngestResult(created=0)
 
+        chapter_by_slug = {c.slug: c for c in Chapter.objects.all()}
+        provenance = _Provenance.from_filename(source_file_name, source_type)
+        return self._ingest_raw(
+            raw_questions,
+            provenance=provenance,
+            school=school,
+            pdf_bytes=pdf_bytes,
+            chapter_by_slug=chapter_by_slug,
+        )
+
+    def _ingest_raw(
+        self,
+        raw_questions: list[dict],
+        *,
+        provenance: _Provenance,
+        school,
+        pdf_bytes: bytes | None,
+        chapter_by_slug: dict[str, Chapter],
+    ) -> IngestResult:
+        """Shared tail of both ingestion front doors.
+
+        Runs structural self-assessment, Layer-2 guardrails, de-duplication,
+        figure cropping, and persistence over a batch of raw question dicts —
+        regardless of whether they came from a live Gemini extraction
+        (``ingest``) or committed, reviewed JSON (``load_questions``); both
+        front doors must run identical guard/dedup/persist logic to produce
+        the same row shapes (#54).
+
+        ``pdf_bytes=None`` means there is no source PDF to crop figures from
+        (the committed-JSON path) — every row's primary asset is ``None`` and
+        whatever ``image``/``image_placeholder`` items the JSON already
+        carries are kept as-is.
+        """
+        if not raw_questions:
+            return IngestResult(created=0)
+
         # Structural self-assessment — no source-text verification (ADR-0004).
         for q in raw_questions:
             q["parse_quality"] = compute_parse_quality(q, q["qtype"])
@@ -620,11 +656,10 @@ class Ingestor:
         # check. Imported here to keep the ingestor↔guardrails dependency acyclic.
         from .guardrails import apply_guardrails
 
-        chapter_by_slug = {c.slug: c for c in Chapter.objects.all()}
         apply_guardrails(raw_questions, set(chapter_by_slug))
 
         # De-duplication: skip questions already in the bank AND repeats within
-        # this PDF.
+        # this batch.
         all_fingerprints = [_fingerprint(q["text"]) for q in raw_questions]
         seen = set(
             Question.objects.filter(source_hash__in=all_fingerprints).values_list(
@@ -644,9 +679,13 @@ class Ingestor:
         if not raw_questions:
             return IngestResult(created=0, skipped_duplicates=skipped)
 
-        provenance = _Provenance.from_filename(source_file_name, source_type)
-        # Crop figure boxes to media assets and rewrite content image references.
-        primary_assets = self.cropper.crop(pdf_bytes, raw_questions, fingerprints)
+        if pdf_bytes is not None:
+            # Crop figure boxes (post-dedup, so duplicates aren't cropped) to
+            # media assets and rewrite content image references.
+            primary_assets = self.cropper.crop(pdf_bytes, raw_questions, fingerprints)
+        else:
+            primary_assets = [None] * len(raw_questions)
+
         created = self._persist(
             raw_questions,
             fingerprints,
