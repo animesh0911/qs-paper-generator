@@ -93,16 +93,16 @@ No page break map is required in V1. Editor pagination and download pagination f
 }
 ```
 
-| Field | Required | Purpose |
-| --- | ---: | --- |
-| `id` | Yes | Stable ID for this generated paper. |
-| `title` | Yes | Main paper title. |
-| `totalMarks` | Yes | Total marks for display and validation. |
-| `durationMinutes` | Yes | Exam duration for display and validation. |
-| `language` | Yes | Paper language. |
-| `chromeBlocks` | Optional | Visible paper chrome such as series, set, QP code, roll number line, time, max marks, and footer labels. |
-| `instructionBlocks` | Optional | Editable note/general instruction text. |
-| `sections` | Yes | Ordered section-wise slots. |
+| Field               | Required | Purpose                                                                                                  |
+| ------------------- | -------: | -------------------------------------------------------------------------------------------------------- |
+| `id`                |      Yes | Stable ID for this generated paper.                                                                      |
+| `title`             |      Yes | Main paper title.                                                                                        |
+| `totalMarks`        |      Yes | Total marks for display and validation.                                                                  |
+| `durationMinutes`   |      Yes | Exam duration for display and validation.                                                                |
+| `language`          |      Yes | Paper language.                                                                                          |
+| `chromeBlocks`      | Optional | Visible paper chrome such as series, set, QP code, roll number line, time, max marks, and footer labels. |
+| `instructionBlocks` | Optional | Editable note/general instruction text.                                                                  |
+| `sections`          |      Yes | Ordered section-wise slots.                                                                              |
 
 ## 5. Editable Text Blocks
 
@@ -191,7 +191,8 @@ A Slot is a position in the paper. It owns visible numbering, marks, selected qu
   },
   "overrides": {
     "modified": false,
-    "regions": {}
+    "regions": {},
+    "content": null
   }
 }
 ```
@@ -207,6 +208,14 @@ Every selected or alternate question must exist in `questions[]` and match the S
 - `language`
 
 When a slot swaps to an alternate question, preserve Slot marks by default and clear slot-level text overrides.
+
+`overrides.regions` stores simple replacement content for stable region keys.
+Schema-aware collection edits that add, remove, or reorder options, subparts,
+or internal-choice options use optional `overrides.content` with the same shape
+as `question.content`. When present, `overrides.content` is the paper-local
+Question content and takes precedence over source `question.content`;
+`questions[]` remains unchanged. Existing documents that only contain
+`overrides.regions` remain valid.
 
 ## 8. Questions
 
@@ -259,7 +268,10 @@ Question content should be structured but simple.
 ```
 
 ```json
-{ "type": "image_placeholder", "text": "Diagram present in source PDF, extraction pending." }
+{
+  "type": "image_placeholder",
+  "text": "Diagram present in source PDF, extraction pending."
+}
 ```
 
 ```json
@@ -278,15 +290,15 @@ A content item is `{ type, text?, latex?, assetId?, caption?, rows? }`. Images r
 
 `question.content` is an object keyed by semantic region, not a flat array. Each region holds content items (or option/subpart objects). Regions are optional; include only those the question type uses. A type the frontend does not model still renders from `rawText`.
 
-| Region | Shape | Used by |
-| --- | --- | --- |
-| `stem` | `ContentItem[]` | all types |
-| `assertion` | `ContentItem[]` | `assertion_reason` |
-| `reason` | `ContentItem[]` | `assertion_reason` |
-| `passage` | `ContentItem[]` | `case_based` |
-| `options` | `ChoiceOption[]` | `mcq`, `assertion_reason` |
-| `subparts` | `SubQuestion[]` | `case_based`, multi-part answers |
-| `choices` | `ChoiceGroup[]` | `internal_choice` |
+| Region      | Shape            | Used by                          |
+| ----------- | ---------------- | -------------------------------- |
+| `stem`      | `ContentItem[]`  | all types                        |
+| `assertion` | `ContentItem[]`  | `assertion_reason`               |
+| `reason`    | `ContentItem[]`  | `assertion_reason`               |
+| `passage`   | `ContentItem[]`  | `case_based`                     |
+| `options`   | `ChoiceOption[]` | `mcq`, `assertion_reason`        |
+| `subparts`  | `SubQuestion[]`  | `case_based`, multi-part answers |
+| `choices`   | `ChoiceGroup[]`  | `internal_choice`                |
 
 ```text
 ChoiceOption = { label, marks?, content: ContentItem[] }
@@ -298,7 +310,12 @@ Example `mcq` content:
 
 ```json
 {
-  "stem": [{ "type": "paragraph", "text": "What is the ratio of GG, Gg and gg in F2 progeny?" }],
+  "stem": [
+    {
+      "type": "paragraph",
+      "text": "What is the ratio of GG, Gg and gg in F2 progeny?"
+    }
+  ],
   "options": [
     { "label": "A", "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }] },
     { "label": "B", "content": [{ "type": "paragraph", "text": "3 : 1 : 0" }] }

@@ -78,7 +78,7 @@ export const docQuestionContentSchema = z
   })
   .passthrough();
 
-export const questionTypeSchema = z.enum([
+export const knownQuestionTypes = [
   'mcq',
   'assertion_reason',
   'very_short_answer',
@@ -89,7 +89,9 @@ export const questionTypeSchema = z.enum([
   'diagram_based',
   'table_based',
   'custom',
-]);
+] as const;
+
+export const questionTypeSchema = z.string().min(1);
 
 export const questionMetadataSchema = z
   .object({
@@ -127,6 +129,7 @@ export const slotOverridesSchema = z
   .object({
     modified: z.boolean(),
     regions: z.record(z.string(), contentItemArraySchema),
+    content: docQuestionContentSchema.optional(),
   })
   .passthrough();
 
@@ -332,6 +335,7 @@ export const paperDocumentSchema = z
 
 export type PaperDocumentParsed = z.infer<typeof paperDocumentSchema>;
 export type QuestionType = z.infer<typeof questionTypeSchema>;
+export type KnownQuestionType = (typeof knownQuestionTypes)[number];
 export type ContentItem = z.infer<typeof contentItemSchema>;
 export type ChoiceOption = z.infer<typeof choiceOptionSchema>;
 export type ChoiceGroup = z.infer<typeof choiceGroupSchema>;

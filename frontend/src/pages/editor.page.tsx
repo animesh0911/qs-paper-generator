@@ -53,6 +53,7 @@ import {
   EditorOutlineRail,
   PaperChromeEditor,
   QuestionActionRail,
+  QuestionEditOverlay,
   QuestionRegionEditor,
   SortableQuestionSlot,
 } from '@/components/editor';
@@ -218,6 +219,8 @@ function EditorPageWorkspace({
     handleDeletePaperChrome,
     handleDragEnd,
     handleDragStart,
+    handleEditQuestion,
+    handleApplyQuestionContent,
     handlePaperChromeChange,
     handleRegionChange,
     handleRestoreSelectedSlot,
@@ -234,9 +237,11 @@ function EditorPageWorkspace({
     inspectorMode,
     openAlternativesOverlay,
     paperState,
+    questionEditorOpen,
     sameSectionCollisionDetection,
     selectedChromeBlockId,
     selectedQuestion,
+    selectedQuestionContent,
     selectedSlot,
     selectedSlotId,
     setAlternativesIntent,
@@ -244,6 +249,7 @@ function EditorPageWorkspace({
     setHoveredSectionId,
     setHoveredSlotId,
     setInspectorMode,
+    setQuestionEditorOpen,
     undoEntry,
     view,
   } = useEditorWorkspace({ document, renderer, selectedFixtureId });
@@ -850,8 +856,10 @@ function EditorPageWorkspace({
                               {activeRailSlotId === slot.slotId && (
                                 <QuestionActionRail
                                   locked={slot.locked}
+                                  editEnabled={slot.editCapabilities.editText}
                                   lockEnabled={slot.editCapabilities.lock}
                                   swapEnabled={slot.editCapabilities.swap}
+                                  onEdit={() => handleEditQuestion(slot.slotId)}
                                   onInfo={() => handleShowInfo(slot.slotId)}
                                   onAlternatives={(intent) =>
                                     handleShowAlternatives(slot.slotId, intent)
@@ -906,6 +914,21 @@ function EditorPageWorkspace({
           />
         </div>
       )}
+
+      {questionEditorOpen &&
+        selectedSlot &&
+        selectedQuestion &&
+        selectedQuestionContent && (
+          <QuestionEditOverlay
+            displayNumber={selectedSlot.displayNumber}
+            question={selectedQuestion}
+            content={selectedQuestionContent}
+            onApply={(content) =>
+              handleApplyQuestionContent(selectedSlot.slotId, content)
+            }
+            onClose={() => setQuestionEditorOpen(false)}
+          />
+        )}
 
       {dragNotice && (
         <div

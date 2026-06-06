@@ -20,6 +20,7 @@
  */
 import type {
   ContentItem,
+  DocQuestionContent,
   EditableTextBlock,
   DocQuestion,
   DocSlot,
@@ -185,6 +186,24 @@ export function getSlotOverridesById(
   );
 }
 
+export function getSlotQuestionContent(
+  state: NormalizedPaperDocument,
+  slotId: string,
+): DocQuestionContent | undefined {
+  const slot = getSlot(state, slotId);
+  const question = slot?.selectedQuestionId
+    ? getQuestion(state, slot.selectedQuestionId)
+    : undefined;
+  if (!question) return undefined;
+
+  const overrides = getSlotOverrides(state, slotId);
+  const content = structuredClone(overrides?.content ?? question.content);
+  for (const [regionKey, items] of Object.entries(overrides?.regions ?? {})) {
+    applyRegionOverride(content, regionKey, items);
+  }
+  return content;
+}
+
 export function getSlotLockState(
   state: NormalizedPaperDocument,
   slotId: string,
@@ -234,6 +253,7 @@ export function setSlotRegionOverride(
     regions: {},
   };
   const nextOverrides = {
+    ...currentEdits,
     modified: true,
     regions: {
       ...currentEdits.regions,
@@ -242,6 +262,55 @@ export function setSlotRegionOverride(
   };
 
   return updatePaperSlot(state, slotId, { overrides: nextOverrides });
+}
+
+function applyRegionOverride(
+  content: DocQuestionContent,
+  regionKey: string,
+  items: ContentItem[],
+) {
+  if (
+    regionKey === 'stem' ||
+    regionKey === 'passage' ||
+    regionKey === 'assertion' ||
+    regionKey === 'reason'
+  ) {
+    content[regionKey] = items;
+    return;
+  }
+
+  const [kind, first, second] = regionKey.split(':');
+  if (kind === 'option') {
+    const option = content.options?.find((entry) => entry.label === first);
+    if (option) option.content = items;
+    return;
+  }
+  if (kind === 'subquestion') {
+    const subpart = content.subparts?.find((entry) => entry.label === first);
+    if (subpart) subpart.content = items;
+    return;
+  }
+  if (kind === 'choice') {
+    const group = content.choices?.[Number(first)];
+    const option = group?.options.find((entry) => entry.label === second);
+    if (option) option.content = items;
+  }
+}
+
+export function setSlotContentOverride(
+  state: NormalizedPaperDocument,
+  slotId: string,
+  content: DocQuestionContent,
+): NormalizedPaperDocument {
+  if (!getSlot(state, slotId) || !canEditSlotText(state, slotId)) return state;
+
+  return updatePaperSlot(state, slotId, {
+    overrides: {
+      modified: true,
+      regions: {},
+      content,
+    },
+  });
 }
 
 export function restoreSlotSource(

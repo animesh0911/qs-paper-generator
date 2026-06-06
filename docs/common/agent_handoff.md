@@ -14,6 +14,26 @@ next steps only.
 
 ## Log
 
+### 2026-06-06 — Schema-Aware Question Edit Overlay
+
+Commit: PENDING
+Owner: Varad / Codex
+
+Changed: issue #112 adds a focused QPG BlockNote overlay, round-trip conversion
+for current Question types, safe read-only handling for future types, and
+paper-local full-content overrides for collection edits.
+
+Files: `frontend/src/lib/question-editing.ts`,
+`frontend/src/lib/question-blocknote-schema.tsx`,
+`frontend/src/components/editor/question-edit-overlay.component.tsx`,
+`frontend/src/lib/paper-document.ts`, `backend/papers/pdf.py`
+
+Boundary: this issue does not remove existing inline paper-canvas editing or add
+instruction/answer overlays; those remain #120 and #113.
+
+Next: implement #113 after its answer-document dependencies, then #120 should
+make focused actions the only V1 manual-edit entry points.
+
 ### 2026-05-30 — Backend PaperDocumentV1 Assemble Gap
 
 Commit: PENDING

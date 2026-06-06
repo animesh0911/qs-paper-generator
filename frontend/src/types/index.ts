@@ -25,6 +25,7 @@ export type {
   QuestionMetadata,
   QuestionSource,
   QuestionType,
+  KnownQuestionType,
   SlotEditCapabilities,
   SlotOverrides,
   SubQuestion,

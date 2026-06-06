@@ -93,14 +93,14 @@ slot-level override.
 }
 ```
 
-| Field | Required | Purpose |
-|---|---:|---|
-| `schemaVersion` | Yes | Identifies the contract version. Must be `paper_document.v1`. |
-| `request` | Yes | Teacher/user input that produced the paper. |
-| `template` | Yes | Expected paper format and constraints. |
-| `format` | Yes | Format intent shared by the editor and print renderer. |
-| `paper` | Yes | Actual assembled paper with sections and slots. |
-| `questions` | Yes | Every selected and alternate question referenced by slots. |
+| Field           | Required | Purpose                                                       |
+| --------------- | -------: | ------------------------------------------------------------- |
+| `schemaVersion` |      Yes | Identifies the contract version. Must be `paper_document.v1`. |
+| `request`       |      Yes | Teacher/user input that produced the paper.                   |
+| `template`      |      Yes | Expected paper format and constraints.                        |
+| `format`        |      Yes | Format intent shared by the editor and print renderer.        |
+| `paper`         |      Yes | Actual assembled paper with sections and slots.               |
+| `questions`     |      Yes | Every selected and alternate question referenced by slots.    |
 
 ---
 
@@ -128,15 +128,15 @@ The `request` object records the teacher's input.
 }
 ```
 
-| Field | Required | Notes |
-|---|---:|---|
-| `requestId` | Yes | Stable ID for this generation request. |
-| `language` | Yes | For V1 this is usually `en`. |
-| `classLevel` | Yes | Example: `10`. |
-| `subject` | Yes | Example: `Science`. |
-| `examType` | Yes | Example: `unit_test`, `half_term`, `full_term`, `homework`. |
-| `filters` | Yes | User-selected chapters/topics/rules. |
-| `filters.englishOnly` | Yes | Required for the English-only MVP flow. |
+| Field                 | Required | Notes                                                       |
+| --------------------- | -------: | ----------------------------------------------------------- |
+| `requestId`           |      Yes | Stable ID for this generation request.                      |
+| `language`            |      Yes | For V1 this is usually `en`.                                |
+| `classLevel`          |      Yes | Example: `10`.                                              |
+| `subject`             |      Yes | Example: `Science`.                                         |
+| `examType`            |      Yes | Example: `unit_test`, `half_term`, `full_term`, `homework`. |
+| `filters`             |      Yes | User-selected chapters/topics/rules.                        |
+| `filters.englishOnly` |      Yes | Required for the English-only MVP flow.                     |
 
 ---
 
@@ -158,17 +158,17 @@ The `template` object describes the expected paper format.
 }
 ```
 
-| Field | Required | Notes |
-|---|---:|---|
-| `templateId` | Yes | Stable ID for the paper format. |
-| `templateName` | Yes | Human-readable name. |
-| `classLevel` | Yes | Example: `10`. |
-| `subject` | Yes | Example: `Science`. |
-| `examType` | Yes | Example: `full_term`. |
-| `totalMarks` | Yes | Example: `80`. |
-| `durationMinutes` | Yes | Example: `180`. |
-| `language` | Yes | Example: `en`. |
-| `board` | Optional | Example: `CBSE`. |
+| Field             | Required | Notes                           |
+| ----------------- | -------: | ------------------------------- |
+| `templateId`      |      Yes | Stable ID for the paper format. |
+| `templateName`    |      Yes | Human-readable name.            |
+| `classLevel`      |      Yes | Example: `10`.                  |
+| `subject`         |      Yes | Example: `Science`.             |
+| `examType`        |      Yes | Example: `full_term`.           |
+| `totalMarks`      |      Yes | Example: `80`.                  |
+| `durationMinutes` |      Yes | Example: `180`.                 |
+| `language`        |      Yes | Example: `en`.                  |
+| `board`           | Optional | Example: `CBSE`.                |
 
 Frontend must not hardcode one board pattern forever. It should render from `paper.sections[]` and `paper.sections[].slots[]`.
 
@@ -241,20 +241,20 @@ one layer.
 }
 ```
 
-| Field | Required | Notes |
-|---|---:|---|
-| `id` | Yes | Stable ID selecting a known frontend renderer. |
-| `page.size` | Yes | Example: `CBSE_COMPACT`. |
-| `page.orientation` | Yes | Example: `portrait`. |
-| `page.widthPt` | Optional | Compact page width when known from an observed source paper. |
-| `page.heightPt` | Optional | Compact page height when known from an observed source paper. |
-| `page.marginPt` | Optional | Renderer hint for compact print margins. |
-| `layout.marks` | Yes | Example: `right_column`. |
-| `layout.questionNumbers` | Yes | Example: `left_column`. |
-| `layout.mcqOptions` | Yes | Example: `two_column`. |
-| `layout.instructions` | Yes | Example: `note_table_then_general`. |
-| `layout.masthead` | Yes | Example: `cbse_compact`. |
-| `layout.footer` | Yes | Example: `code_page_pto`. |
+| Field                    | Required | Notes                                                         |
+| ------------------------ | -------: | ------------------------------------------------------------- |
+| `id`                     |      Yes | Stable ID selecting a known frontend renderer.                |
+| `page.size`              |      Yes | Example: `CBSE_COMPACT`.                                      |
+| `page.orientation`       |      Yes | Example: `portrait`.                                          |
+| `page.widthPt`           | Optional | Compact page width when known from an observed source paper.  |
+| `page.heightPt`          | Optional | Compact page height when known from an observed source paper. |
+| `page.marginPt`          | Optional | Renderer hint for compact print margins.                      |
+| `layout.marks`           |      Yes | Example: `right_column`.                                      |
+| `layout.questionNumbers` |      Yes | Example: `left_column`.                                       |
+| `layout.mcqOptions`      |      Yes | Example: `two_column`.                                        |
+| `layout.instructions`    |      Yes | Example: `note_table_then_general`.                           |
+| `layout.masthead`        |      Yes | Example: `cbse_compact`.                                      |
+| `layout.footer`          |      Yes | Example: `code_page_pto`.                                     |
 
 For V1, this object is expected to be hardcoded to the CBSE format. Later
 versions may add typography, margins, page breaks, two-column options, diagram
@@ -284,17 +284,17 @@ The `paper` object is the assembled paper.
 }
 ```
 
-| Field | Required | Purpose |
-|---|---:|---|
-| `paperId` | Yes | Stable ID for this generated paper. |
-| `title` | Yes | Main paper title. |
-| `totalMarks` | Yes | Total marks for display and validation. |
-| `durationMinutes` | Yes | Exam duration for display and validation. |
-| `language` | Yes | Paper language. |
-| `sections` | Yes | Ordered section-wise slots. |
-| `subtitle` | Optional | Example: `Class X`. |
-| `headerBlocks` | Optional | Editable paper header lines. |
-| `instructionBlocks` | Optional | Editable general instructions. |
+| Field               | Required | Purpose                                   |
+| ------------------- | -------: | ----------------------------------------- |
+| `paperId`           |      Yes | Stable ID for this generated paper.       |
+| `title`             |      Yes | Main paper title.                         |
+| `totalMarks`        |      Yes | Total marks for display and validation.   |
+| `durationMinutes`   |      Yes | Exam duration for display and validation. |
+| `language`          |      Yes | Paper language.                           |
+| `sections`          |      Yes | Ordered section-wise slots.               |
+| `subtitle`          | Optional | Example: `Class X`.                       |
+| `headerBlocks`      | Optional | Editable paper header lines.              |
+| `instructionBlocks` | Optional | Editable general instructions.            |
 
 ---
 
@@ -320,12 +320,12 @@ Header and instruction text should also be editable. Backend can send simple tex
 }
 ```
 
-| Field | Required | Notes |
-|---|---:|---|
-| `blockId` | Yes | Stable block ID. |
-| `blockType` | Yes | Example: `paper_header`, `instruction`, `direction`. |
-| `text` | Yes | Rendered text. |
-| `editable` | Optional | Defaults to `true`. |
+| Field       | Required | Notes                                                |
+| ----------- | -------: | ---------------------------------------------------- |
+| `blockId`   |      Yes | Stable block ID.                                     |
+| `blockType` |      Yes | Example: `paper_header`, `instruction`, `direction`. |
+| `text`      |      Yes | Rendered text.                                       |
+| `editable`  | Optional | Defaults to `true`.                                  |
 
 ---
 
@@ -344,13 +344,13 @@ Each section contains section metadata and ordered slots.
 }
 ```
 
-| Field | Required | Notes |
-|---|---:|---|
-| `sectionId` | Yes | Stable ID, e.g. `A`, `B`, `C`. |
-| `title` | Yes | Example: `Section A`. |
-| `marks` | Yes | Total section marks. |
-| `slots` | Yes | Question slots in display order. |
-| `subtitle` | Optional | Example: `Biology`. |
+| Field          | Required | Notes                              |
+| -------------- | -------: | ---------------------------------- |
+| `sectionId`    |      Yes | Stable ID, e.g. `A`, `B`, `C`.     |
+| `title`        |      Yes | Example: `Section A`.              |
+| `marks`        |      Yes | Total section marks.               |
+| `slots`        |      Yes | Question slots in display order.   |
+| `subtitle`     | Optional | Example: `Biology`.                |
 | `instructions` | Optional | Section-specific instruction text. |
 
 ---
@@ -370,21 +370,22 @@ A slot is a position in the paper. It defines what kind of question belongs ther
   "locked": false,
   "overrides": {
     "modifiedFromSource": false,
-    "regions": {}
+    "regions": {},
+    "content": null
   }
 }
 ```
 
-| Field | Required | Purpose |
-|---|---:|---|
-| `slotId` | Yes | Stable slot ID for editing, locking, swapping, and save operations. |
-| `displayNumber` | Yes | Visible number, e.g. `1`, `16`, `16(a)`. |
-| `marks` | Yes | Marks expected for this slot. |
-| `questionType` | Yes | Expected type for this slot. |
-| `selectedQuestionId` | Yes | Question currently selected for this slot. Field is required; value may be `null` for an unfilled best-effort slot. |
-| `alternateQuestionIds` | Yes | Enables instant frontend swap. Use `[]` when no safe alternates exist. |
-| `locked` | Yes | If true, replacement/regeneration actions are disabled until unlocked. Manual paper-slot edits remain allowed. |
-| `overrides` | Optional | Paper-specific edited regions for this slot. Initial backend generation may omit it or send an empty object. |
+| Field                  | Required | Purpose                                                                                                             |
+| ---------------------- | -------: | ------------------------------------------------------------------------------------------------------------------- |
+| `slotId`               |      Yes | Stable slot ID for editing, locking, swapping, and save operations.                                                 |
+| `displayNumber`        |      Yes | Visible number, e.g. `1`, `16`, `16(a)`.                                                                            |
+| `marks`                |      Yes | Marks expected for this slot.                                                                                       |
+| `questionType`         |      Yes | Expected type for this slot.                                                                                        |
+| `selectedQuestionId`   |      Yes | Question currently selected for this slot. Field is required; value may be `null` for an unfilled best-effort slot. |
+| `alternateQuestionIds` |      Yes | Enables instant frontend swap. Use `[]` when no safe alternates exist.                                              |
+| `locked`               |      Yes | If true, replacement/regeneration actions are disabled until unlocked. Manual paper-slot edits remain allowed.      |
+| `overrides`            | Optional | Paper-specific edited regions for this slot. Initial backend generation may omit it or send an empty object.        |
 
 `slot.marks` is the paper-slot mark value used for display, validation, save,
 and PDF export. `question.marks` is the source question's original/default mark
@@ -428,10 +429,11 @@ paper only.
 }
 ```
 
-| Field | Required | Notes |
-|---|---:|---|
-| `overrides.modifiedFromSource` | Yes when `overrides` exists | Whether this slot renders any paper-specific content instead of source content. |
-| `overrides.regions` | Yes when `overrides` exists | Map from stable `regionKey` to replacement content items. |
+| Field                          |                    Required | Notes                                                                                            |
+| ------------------------------ | --------------------------: | ------------------------------------------------------------------------------------------------ |
+| `overrides.modifiedFromSource` | Yes when `overrides` exists | Whether this slot renders any paper-specific content instead of source content.                  |
+| `overrides.regions`            | Yes when `overrides` exists | Map from stable `regionKey` to replacement content items.                                        |
+| `overrides.content`            |                    Optional | Full paper-local Question content used when an edit adds, removes, or reorders labelled entries. |
 
 The original source question in `questions[]` must remain unchanged. Swapping a
 slot to a different `selectedQuestionId` should clear old overrides after user
@@ -456,16 +458,16 @@ Every selected or alternate question must appear in the `questions` array.
 }
 ```
 
-| Field | Required | Purpose |
-|---|---:|---|
-| `questionId` | Yes | Stable ID. |
-| `language` | Yes | For V1, usually `en`. |
-| `marks` | Yes | Question marks. |
-| `questionType` | Yes | MCQ / short answer / long answer / case-based etc. |
-| `rawText` | Yes | Fallback text for display, search, unsupported types, and debugging. |
-| `content` | Yes | Structured editable content. |
-| `metadata` | Yes | Chapter/topic/difficulty/classification. |
-| `source` | Yes | Where the question came from. |
+| Field          | Required | Purpose                                                              |
+| -------------- | -------: | -------------------------------------------------------------------- |
+| `questionId`   |      Yes | Stable ID.                                                           |
+| `language`     |      Yes | For V1, usually `en`.                                                |
+| `marks`        |      Yes | Question marks.                                                      |
+| `questionType` |      Yes | MCQ / short answer / long answer / case-based etc.                   |
+| `rawText`      |      Yes | Fallback text for display, search, unsupported types, and debugging. |
+| `content`      |      Yes | Structured editable content.                                         |
+| `metadata`     |      Yes | Chapter/topic/difficulty/classification.                             |
+| `source`       |      Yes | Where the question came from.                                        |
 
 Question content in `questions[]` is treated as source content. The frontend may
 allow manual paper-slot edits, but those edits are saved through slot overrides,
@@ -506,14 +508,14 @@ deterministically from `content`.
 
 Use these V1 region-key conventions:
 
-| Content region | `regionKey` |
-|---|---|
-| Stem | `stem` |
-| Assertion | `assertion` |
-| Reason | `reason` |
-| MCQ option A | `option:A` |
-| Passage | `passage` |
-| Subpart a | `subpart:a` |
+| Content region           | `regionKey`  |
+| ------------------------ | ------------ |
+| Stem                     | `stem`       |
+| Assertion                | `assertion`  |
+| Reason                   | `reason`     |
+| MCQ option A             | `option:A`   |
+| Passage                  | `passage`    |
+| Subpart a                | `subpart:a`  |
 | Choice group 1, option A | `choice:1:A` |
 
 If a future question shape cannot be mapped cleanly, frontend should use
@@ -591,10 +593,22 @@ Use this when asset extraction is not ready.
       }
     ],
     "options": [
-      { "label": "A", "content": [{ "type": "paragraph", "text": "2 : 1 : 1" }] },
-      { "label": "B", "content": [{ "type": "paragraph", "text": "3 : 1 : 0" }] },
-      { "label": "C", "content": [{ "type": "paragraph", "text": "1 : 1 : 2" }] },
-      { "label": "D", "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }] }
+      {
+        "label": "A",
+        "content": [{ "type": "paragraph", "text": "2 : 1 : 1" }]
+      },
+      {
+        "label": "B",
+        "content": [{ "type": "paragraph", "text": "3 : 1 : 0" }]
+      },
+      {
+        "label": "C",
+        "content": [{ "type": "paragraph", "text": "1 : 1 : 2" }]
+      },
+      {
+        "label": "D",
+        "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }]
+      }
     ]
   },
   "metadata": {
@@ -628,16 +642,48 @@ Use this when asset extraction is not ready.
   "rawText": "Assertion and reason question...",
   "content": {
     "assertion": [
-      { "type": "paragraph", "text": "Assertion (A): Blood plasma transports carbon dioxide in dissolved form." }
+      {
+        "type": "paragraph",
+        "text": "Assertion (A): Blood plasma transports carbon dioxide in dissolved form."
+      }
     ],
     "reason": [
-      { "type": "paragraph", "text": "Reason (R): Carbon dioxide is more soluble in water than oxygen." }
+      {
+        "type": "paragraph",
+        "text": "Reason (R): Carbon dioxide is more soluble in water than oxygen."
+      }
     ],
     "options": [
-      { "label": "A", "content": [{ "type": "paragraph", "text": "Both A and R are true and R is the correct explanation of A." }] },
-      { "label": "B", "content": [{ "type": "paragraph", "text": "Both A and R are true but R is not the correct explanation of A." }] },
-      { "label": "C", "content": [{ "type": "paragraph", "text": "A is true but R is false." }] },
-      { "label": "D", "content": [{ "type": "paragraph", "text": "A is false but R is true." }] }
+      {
+        "label": "A",
+        "content": [
+          {
+            "type": "paragraph",
+            "text": "Both A and R are true and R is the correct explanation of A."
+          }
+        ]
+      },
+      {
+        "label": "B",
+        "content": [
+          {
+            "type": "paragraph",
+            "text": "Both A and R are true but R is not the correct explanation of A."
+          }
+        ]
+      },
+      {
+        "label": "C",
+        "content": [
+          { "type": "paragraph", "text": "A is true but R is false." }
+        ]
+      },
+      {
+        "label": "D",
+        "content": [
+          { "type": "paragraph", "text": "A is false but R is true." }
+        ]
+      }
     ]
   },
   "metadata": {
@@ -667,9 +713,7 @@ Use this when asset extraction is not ready.
   "questionType": "short_answer",
   "rawText": "State two functions of stomata.",
   "content": {
-    "stem": [
-      { "type": "paragraph", "text": "State two functions of stomata." }
-    ]
+    "stem": [{ "type": "paragraph", "text": "State two functions of stomata." }]
   },
   "metadata": {
     "classLevel": "10",
@@ -761,7 +805,10 @@ Case-based questions need a passage and subparts.
         "label": "b",
         "marks": 1,
         "content": [
-          { "type": "paragraph", "text": "Which part of the brain controls precision of voluntary actions?" }
+          {
+            "type": "paragraph",
+            "text": "Which part of the brain controls precision of voluntary actions?"
+          }
         ]
       },
       {
@@ -811,14 +858,20 @@ For questions with internal OR choice, use `choices` instead of hiding the choic
             "label": "A",
             "marks": 5,
             "content": [
-              { "type": "paragraph", "text": "Explain the process of digestion in human beings." }
+              {
+                "type": "paragraph",
+                "text": "Explain the process of digestion in human beings."
+              }
             ]
           },
           {
             "label": "B",
             "marks": 5,
             "content": [
-              { "type": "paragraph", "text": "Explain the mechanism of breathing in humans." }
+              {
+                "type": "paragraph",
+                "text": "Explain the mechanism of breathing in humans."
+              }
             ]
           }
         ]
@@ -892,19 +945,19 @@ For V1, if asset handling is not ready, backend should still include `rawText` a
 }
 ```
 
-| Field | Required | Why |
-|---|---:|---|
-| `classLevel` | Yes | Filtering and display. |
-| `subject` | Yes | Filtering and display. |
-| `chapterNames` | Yes | Teacher-facing chapter display. |
-| `difficulty` | Yes | Easier/harder swap and validation. |
-| `topicNames` | Strongly recommended | Topic-level swap/change. |
-| `subjectArea` | Recommended | Useful for CBSE Science sections. |
-| `cbseRelevance` | Optional | Useful for inspector display and review. Can be an enum such as `low`, `medium`, `high` or a numeric rating. |
-| `cognitiveLevel` | Optional | Useful for review and difficulty analysis. |
-| `chapterIds` | Optional | Stable backend filtering. |
-| `topicIds` | Optional | Stable backend filtering. |
-| `keywords` | Optional | Search and duplicate detection. |
+| Field            |             Required | Why                                                                                                          |
+| ---------------- | -------------------: | ------------------------------------------------------------------------------------------------------------ |
+| `classLevel`     |                  Yes | Filtering and display.                                                                                       |
+| `subject`        |                  Yes | Filtering and display.                                                                                       |
+| `chapterNames`   |                  Yes | Teacher-facing chapter display.                                                                              |
+| `difficulty`     |                  Yes | Easier/harder swap and validation.                                                                           |
+| `topicNames`     | Strongly recommended | Topic-level swap/change.                                                                                     |
+| `subjectArea`    |          Recommended | Useful for CBSE Science sections.                                                                            |
+| `cbseRelevance`  |             Optional | Useful for inspector display and review. Can be an enum such as `low`, `medium`, `high` or a numeric rating. |
+| `cognitiveLevel` |             Optional | Useful for review and difficulty analysis.                                                                   |
+| `chapterIds`     |             Optional | Stable backend filtering.                                                                                    |
+| `topicIds`       |             Optional | Stable backend filtering.                                                                                    |
+| `keywords`       |             Optional | Search and duplicate detection.                                                                              |
 
 V1 does not include answer-key mutation in this paper editor contract. If answer
 keys are returned later, they should be added as a separate, permissioned
@@ -926,13 +979,13 @@ Teachers trust questions more when they can see where they came from.
 }
 ```
 
-| Field | Required | Notes |
-|---|---:|---|
-| `sourceType` | Yes | Example: `previous_year_paper`, `sample_paper`, `question_bank`, `textbook_exercise`. |
-| `sourceName` | Yes | Human-readable source. |
-| `fileName` | Recommended | Useful for traceability. |
-| `pageNumber` | Recommended | Useful for audits/debugging. |
-| `originalQuestionNumber` | Recommended | Useful for teacher trust. |
+| Field                    |    Required | Notes                                                                                 |
+| ------------------------ | ----------: | ------------------------------------------------------------------------------------- |
+| `sourceType`             |         Yes | Example: `previous_year_paper`, `sample_paper`, `question_bank`, `textbook_exercise`. |
+| `sourceName`             |         Yes | Human-readable source.                                                                |
+| `fileName`               | Recommended | Useful for traceability.                                                              |
+| `pageNumber`             | Recommended | Useful for audits/debugging.                                                          |
+| `originalQuestionNumber` | Recommended | Useful for teacher trust.                                                             |
 
 ---
 
@@ -1245,10 +1298,22 @@ Frontend sends canonical edited paper state after teacher edits.
           }
         ],
         "options": [
-          { "label": "A", "content": [{ "type": "paragraph", "text": "2 : 1 : 1" }] },
-          { "label": "B", "content": [{ "type": "paragraph", "text": "3 : 1 : 0" }] },
-          { "label": "C", "content": [{ "type": "paragraph", "text": "1 : 1 : 2" }] },
-          { "label": "D", "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }] }
+          {
+            "label": "A",
+            "content": [{ "type": "paragraph", "text": "2 : 1 : 1" }]
+          },
+          {
+            "label": "B",
+            "content": [{ "type": "paragraph", "text": "3 : 1 : 0" }]
+          },
+          {
+            "label": "C",
+            "content": [{ "type": "paragraph", "text": "1 : 1 : 2" }]
+          },
+          {
+            "label": "D",
+            "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }]
+          }
         ]
       },
       "metadata": {
@@ -1281,10 +1346,22 @@ Frontend sends canonical edited paper state after teacher edits.
           }
         ],
         "options": [
-          { "label": "A", "content": [{ "type": "paragraph", "text": "1 : 1" }] },
-          { "label": "B", "content": [{ "type": "paragraph", "text": "3 : 1" }] },
-          { "label": "C", "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }] },
-          { "label": "D", "content": [{ "type": "paragraph", "text": "9 : 3 : 3 : 1" }] }
+          {
+            "label": "A",
+            "content": [{ "type": "paragraph", "text": "1 : 1" }]
+          },
+          {
+            "label": "B",
+            "content": [{ "type": "paragraph", "text": "3 : 1" }]
+          },
+          {
+            "label": "C",
+            "content": [{ "type": "paragraph", "text": "1 : 2 : 1" }]
+          },
+          {
+            "label": "D",
+            "content": [{ "type": "paragraph", "text": "9 : 3 : 3 : 1" }]
+          }
         ]
       },
       "metadata": {

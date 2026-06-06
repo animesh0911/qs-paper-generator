@@ -210,6 +210,68 @@
     height: 0;
   }
 
+  .qpg-question-edit-overlay .bn-editor {
+    min-height: 24rem;
+    max-width: 72ch;
+    margin: 0 auto;
+    padding: 0.5rem 0;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  .qpg-semantic-block {
+    display: grid;
+    grid-template-columns: minmax(5rem, auto) minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+    border-bottom: 1px solid hsl(var(--border));
+    padding: 0.75rem 0.25rem;
+  }
+
+  .qpg-semantic-block-label {
+    color: hsl(var(--muted-foreground));
+    font-family: system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+  }
+
+  .qpg-semantic-block-content {
+    min-width: 0;
+    color: hsl(var(--foreground));
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    line-height: 1.35;
+  }
+
+  .qpg-semantic-atomic {
+    border-bottom: 1px solid hsl(var(--border));
+    overflow-x: auto;
+    padding: 0.75rem 0.25rem;
+  }
+
+  .qpg-semantic-atomic table {
+    margin-top: 0.5rem;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .qpg-semantic-atomic td {
+    border: 1px solid hsl(var(--border));
+    padding: 0.375rem 0.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .qpg-semantic-block {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .qpg-question-edit-overlay .bn-editor {
+      min-height: 18rem;
+    }
+  }
+
   .qpg-paper-chrome-hit {
     padding: 1px 2px;
   }
