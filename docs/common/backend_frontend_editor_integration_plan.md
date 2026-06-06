@@ -43,9 +43,7 @@ Target editor draft payload:
       "slot_C_03": {
         "slotId": "slot_C_03",
         "questionId": "q_45",
-        "content": [
-          { "type": "paragraph", "text": "Model answer text." }
-        ],
+        "content": [{ "type": "paragraph", "text": "Model answer text." }],
         "source": "source",
         "modified": false
       }
@@ -250,6 +248,46 @@ message such as:
 
 Then discard the unsupported overlay draft. Do not silently flatten, drop
 content, or save partial output.
+
+### Question Edit Capability Policy
+
+Question editing is opt-in by `QuestionType`. Each supported type registers:
+
+- the semantic regions it exposes;
+- whether labelled collections may add, remove, or reorder entries;
+- the validation needed before mapping the overlay draft back to canonical
+  `question.content`.
+
+Adding a future `QuestionType` therefore requires one registry entry and its
+round-trip tests. It must not require a new overlay shell or a fallback through
+`custom`.
+
+If a document contains a type without a registered edit policy, the editor
+shows the question read-only with:
+
+> This question can be reviewed, but editing is not available for this type
+> yet.
+
+Unknown types and unsupported drafts preserve their original canonical content.
+The editor must never flatten them into paragraphs.
+
+| `QuestionType`      | Editable regions                                                            | Collection operations                                                                                                                                           |
+| ------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mcq`               | Stem and option content                                                     | Add, remove, and reorder options; keep stable option identity while the overlay is open and normalize display labels on apply                                   |
+| `assertion_reason`  | Stem when present, assertion, reason, and option content                    | Add, remove, and reorder options under the same rules as MCQ                                                                                                    |
+| `very_short_answer` | Stem and attached image/table items                                         | Existing image items may move or be deleted; no new asset upload                                                                                                |
+| `short_answer`      | Stem, subpart content when present, and attached image/table items          | Add, remove, and reorder subparts; existing image items may move or be deleted                                                                                  |
+| `long_answer`       | Stem, subpart content when present, and attached image/table items          | Add, remove, and reorder subparts; existing image items may move or be deleted                                                                                  |
+| `case_based`        | Passage, stem when present, subpart content, and attached image/table items | Add, remove, and reorder subparts; existing image items may move or be deleted                                                                                  |
+| `internal_choice`   | Stem when present and choice-option content                                 | Add, remove, and reorder options inside an existing choice group; preserve each group's `displayStyle` and `chooseCount`; adding or removing groups is deferred |
+| `diagram_based`     | Stem and surrounding text plus existing image items                         | Existing image items may move or be deleted; upload and replacement are deferred                                                                                |
+| `table_based`       | Stem, surrounding text, and table cell content                              | Existing tables may be edited and moved; adding or deleting a whole table is deferred                                                                           |
+| `custom`            | No V1 manual editing                                                        | Read-only fallback; preserve canonical content exactly                                                                                                          |
+
+The overlay does not expose arbitrary conversion between question types,
+freeform flattening, new choice groups, asset upload/replacement, or a generic
+"edit anyway" escape hatch in V1. User-facing errors describe the unsupported
+action without using contract terms such as "structured content".
 
 ## Risks
 
