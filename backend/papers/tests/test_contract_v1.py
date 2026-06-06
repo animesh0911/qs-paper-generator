@@ -1,20 +1,17 @@
 """Contract compliance tests for paper_document.v1 (issue #46 — Phase 8 verify).
 
 Assembles a paper via the API and validates the response against every required
-field in contracts/v1_contract.md. These tests run against whatever the bank
-has — seed data, or a real loaded bank.
-
-NOTE on #46/#87 Step 1: content/parsed/ exists but has no committed JSON yet
-(JSON production requires a Gemini API key — run the ingestor against the source
-PDFs, then commit the output). load_questions compliance against real ingested
-data is deferred until that JSON is committed. These tests cover acceptance
-criteria 2 and 3 (contract shape + structured content rendering) against the
-seed bank.
+field in contracts/v1_contract.md. The ``document`` fixture is parametrized over
+two banks — a synthetic ``seeded_bank`` (fast, exact slot coverage) and the real
+committed corpus loaded from ``content/parsed/`` via ``load_questions`` — so
+every assertion in this module guards both the synthetic and the real path
+(issue #135).
 """
 
 from __future__ import annotations
 
 import pytest
+from django.core.management import call_command
 from rest_framework import status
 
 # Legacy field names that must NOT appear in any paper_document.v1 response.
@@ -49,7 +46,18 @@ def _all_keys(obj) -> set[str]:
 
 
 @pytest.fixture
-def document(api_client, seeded_bank):
+def loaded_bank(db):
+    """Load the committed 2026 corpus (content/parsed/) into the bank."""
+    from django.conf import settings
+
+    parsed_dir = settings.BASE_DIR.parent / "content" / "parsed"
+    call_command("load_questions", str(parsed_dir))
+
+
+@pytest.fixture(params=["seeded_bank", "loaded_bank"])
+def document(request, api_client):
+    """A document assembled against each bank in turn (contract guards both)."""
+    request.getfixturevalue(request.param)
     resp = api_client.post("/api/papers/assemble", {}, format="json")
     assert resp.status_code == status.HTTP_201_CREATED
     return resp.data
