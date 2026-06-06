@@ -258,18 +258,19 @@ function EditorPageWorkspace({
 
   async function runAction(action: 'save' | 'approve' | 'download') {
     if (!persisted) return;
+    const documentSnapshot = structuredClone(paperState.document);
     setActionError('');
     setActionState(action === 'approve' ? 'approving' : 'saving');
     try {
       if (action === 'approve') {
-        await approvePaper(paperState.document);
-        setLastSavedDocument(paperState.document);
+        await approvePaper(documentSnapshot);
+        setLastSavedDocument(documentSnapshot);
         setActionState('approved');
       } else {
-        await persistDraft(paperState.document);
-        setLastSavedDocument(paperState.document);
+        await persistDraft(documentSnapshot);
+        setLastSavedDocument(documentSnapshot);
         setActionState('saved');
-        if (action === 'download') await downloadPaperPdf(paperState.document);
+        if (action === 'download') await downloadPaperPdf(documentSnapshot);
       }
     } catch (reason) {
       setActionError((reason as Error).message);
@@ -977,8 +978,7 @@ export function EditorActionBar({
     unavailable || warnings.length > 0 || dirty || busy || approved;
   const status = unavailable
     ? 'Demo paper · actions unavailable'
-    : actionError ||
-      (dirty ? 'Unsaved changes' : actionState === 'idle' ? 'Saved' : actionState);
+    : actionStatus(actionState, actionError, dirty);
 
   return (
     <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
@@ -986,13 +986,19 @@ export function EditorActionBar({
         {status}
       </span>
       {warnings.length > 0 && (
-        <span
-          title={warnings.join('\n')}
+        <details
           className="flex items-center gap-1 text-xs text-destructive"
         >
-          <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-          {warnings.length} validation warning{warnings.length === 1 ? '' : 's'}
-        </span>
+          <summary className="flex cursor-pointer list-none items-center gap-1">
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+            {warnings.length} validation warning{warnings.length === 1 ? '' : 's'}
+          </summary>
+          <ul className="absolute right-4 top-14 z-30 max-w-md space-y-1 rounded-md border bg-background p-3 text-foreground shadow-lg">
+            {warnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
+        </details>
       )}
       <Button variant="outline" size="sm" disabled={!canUndo} onClick={onUndo}>
         <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -1035,4 +1041,17 @@ export function EditorActionBar({
       </Button>
     </div>
   );
+}
+
+function actionStatus(
+  actionState: 'idle' | 'saving' | 'saved' | 'approving' | 'approved' | 'error',
+  actionError: string,
+  dirty: boolean,
+) {
+  if (actionState === 'saving') return 'Saving...';
+  if (actionState === 'approving') return 'Approving...';
+  if (dirty) return 'Unsaved changes';
+  if (actionState === 'approved') return 'Approved';
+  if (actionState === 'error') return actionError;
+  return 'Saved';
 }

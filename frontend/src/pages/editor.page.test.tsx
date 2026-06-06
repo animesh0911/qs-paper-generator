@@ -64,7 +64,25 @@ describe('editor action bar', () => {
 
     expect(html).toContain('1 validation warning');
     expect(html).toContain('Slot 1 has no selected question.');
+    expect(html).toContain('<details');
     expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*Approve/);
+  });
+
+  it('shows saving state while dirty changes are being persisted', () => {
+    const html = renderToStaticMarkup(
+      <EditorActionBar
+        persisted
+        dirty
+        actionState="saving"
+        actionError=""
+        warnings={[]}
+        canUndo={false}
+        {...callbacks}
+      />,
+    );
+
+    expect(html).toContain('Saving...');
+    expect(html).not.toContain('Unsaved changes');
   });
 
   it('clearly disables production actions for demo papers', () => {
