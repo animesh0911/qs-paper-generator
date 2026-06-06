@@ -87,3 +87,34 @@ If you genuinely think a convention is harmful, surface it. Don't fork silently.
 "Completed" is wrong if anything was skipped silently.
 "Tests pass" is wrong if any were skipped.
 Default to surfacing uncertainty, not hiding it.
+
+## Rule 13 — Never invoke a paid LLM API without explicit consent
+Any action that calls an LLM API costs real money. STOP and ask for explicit
+consent before running ANYTHING that hits an LLM API — extraction, answer
+generation, management commands, scripts, tests, or live endpoints that call
+Gemini / OpenAI / Anthropic / any model provider.
+This includes re-runs, retries, and "just to verify" calls. One run = one
+charge; assume nothing is free.
+Do NOT decide on your own that a run is worth it. Present what will run, how
+many API calls it makes, and which model, then wait for a yes.
+Also surface any config that changes model/cost (e.g. `GEMINI_MODEL` in `.env`)
+the moment you notice it conflicts with stated intent — never silently proceed.
+
+## Rule 14 — Sync before you branch
+Before creating a branch or opening a PR, fetch and fast-forward the base
+(`git fetch origin` then `git pull --ff-only`, or branch directly from
+`origin/main`). Never branch off stale local state — the session's starting
+commit may already be behind the remote.
+After a merge, verify against the *integrated* result on the updated base, not
+just your branch — your pre-merge test run proves nothing about what landed.
+
+## Rule 15 — Antigravity-review every PR before merge
+After opening a PR and before merging it, run the `agy-code-review` skill
+against the PR's head commit (pass `-` as the issue when the PR has no linked
+issue). This gate is mandatory on EVERY PR — feature, refactor, docs, or chore
+— and applies to every agent (Codex and Claude alike).
+Evaluate the findings, apply every accepted one as fixes (a separate commit),
+push, and only THEN merge. Never merge a PR that still has unaddressed accepted
+findings. If no findings are accepted, say so explicitly and merge.
+If the `agy` CLI is missing, install it (`brew install --cask antigravity-cli`)
+rather than skipping the gate.

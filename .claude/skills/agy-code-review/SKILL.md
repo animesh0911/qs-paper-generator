@@ -1,25 +1,47 @@
 ---
 name: agy-code-review
-description: Review an already-committed change against its GitHub issue using a scoped packet plus a clean full-repository snapshot, then independently evaluate and fix justified findings. Use after Codex commits issue-driven implementation work or when the user asks for an Antigravity review of a commit.
+description: Review an already-committed change against its GitHub issue using a scoped packet plus a clean full-repository snapshot, then independently evaluate and fix justified findings. Use after any agent (Codex or Claude) commits implementation work, after opening a PR and before merging it, or when the user asks for an Antigravity review of a commit.
 ---
 
 # Antigravity Code Review
 
 Review committed work through an issue/patch handoff plus a clean full-repository
-snapshot at the reviewed commit. Antigravity owns the deep inspection pass;
-Codex owns final judgment and fixes.
+snapshot at the reviewed commit. Antigravity owns the deep inspection pass; the
+**driving agent** (Codex or Claude — whichever invoked this skill) owns final
+judgment and fixes. Throughout this document "the driving agent" means you, the
+agent running the skill, regardless of which one you are.
 
 ## Inputs
 
 Identify:
 
 - The commit to review. Default to `HEAD` only when it is the commit just created for the task.
-- The GitHub issue number or URL the commit implements.
+- The GitHub issue number or URL the commit implements. If the change has **no
+  linked issue** (a refactor, docs, or chore PR), pass `-` as the issue argument
+  — the review then judges the commit against its own stated intent and general
+  engineering correctness instead of issue acceptance criteria.
 - Optional context paths worth highlighting to Antigravity. The full repository
   is already available, so these are hints rather than required evidence.
 
-Do not guess the issue from unrelated open issues. If it is not explicit in the conversation,
-commit message, or branch name, ask the user.
+Do not guess the issue from unrelated open issues. Take it only from the
+conversation, commit message, PR body, or branch name. If a change plausibly has
+an issue but you cannot find it, ask the user; if the change is genuinely
+issue-less, pass `-`.
+
+## When To Run This (PR gate)
+
+Per the project's CLAUDE.md / AGENTS.md, this review is a **required gate on
+every PR**: after the PR is created and before it is merged. The flow:
+
+1. Push the branch and open the PR.
+2. Run the review against the PR's head commit (below). Use the linked issue if
+   the PR has one, otherwise `-`.
+3. Evaluate findings, apply accepted fixes as a separate commit, push.
+4. Re-run only if a fix is non-trivial or changes the reviewed surface.
+5. Merge **only after** accepted fixes have landed. If no findings are accepted,
+   merge as-is.
+
+This holds regardless of which agent drove the change — Codex or Claude.
 
 ## Run The Review
 
