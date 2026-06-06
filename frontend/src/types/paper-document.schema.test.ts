@@ -10,6 +10,7 @@ describe('PaperDocumentV1 mock contract', () => {
     expect(parsed.format.id).toBe(
       'cbse_science_class_10_board_compact_2026_v1',
     );
+    expect(parsed.request.filters.formatId).toBe(parsed.format.id);
   });
 
   it('carries renderer selection and semantic layout roles', () => {

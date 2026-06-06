@@ -10,7 +10,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockPaperDocumentV1 } from '@/mocks';
 import {
+  assemblePaper,
   clearToken,
+  fetchPaperFormats,
   fetchPaperDocument,
   getToken,
   login,
@@ -26,6 +28,48 @@ beforeEach(() => {
     getItem: (key: string) => storage.get(key) ?? null,
     setItem: (key: string, value: string) => storage.set(key, value),
     removeItem: (key: string) => storage.delete(key),
+  });
+});
+
+describe('paper formats', () => {
+  it('loads backend-owned formats for the generation form', async () => {
+    const formats = [
+      {
+        format_id: 'cbse_science_class_10_board_compact_2026_v1',
+        name: 'CBSE End Term Exam',
+      },
+    ];
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(formats)));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(fetchPaperFormats()).resolves.toEqual(formats);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/formats',
+      expect.objectContaining({ method: 'GET' }),
+    );
+  });
+
+  it('sends the selected format as the only paper-layout choice', async () => {
+    const fetchMock = vi.fn(
+      async () => new Response(JSON.stringify(mockPaperDocumentV1)),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await assemblePaper({
+      format_id: 'cbse_science_class_10_board_compact_2026_v1',
+      difficulty: 'standard',
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/assemble',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          format_id: 'cbse_science_class_10_board_compact_2026_v1',
+          difficulty: 'standard',
+        }),
+      }),
+    );
   });
 });
 

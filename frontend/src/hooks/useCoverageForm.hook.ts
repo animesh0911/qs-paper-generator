@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fetchChapters } from '@/lib/api';
-import type { AssembleRequest, Chapter } from '@/types';
+import { fetchChapters, fetchPaperFormats } from '@/lib/api';
+import type { AssembleRequest, Chapter, PaperFormatSummary } from '@/types';
 
 type Difficulty = NonNullable<AssembleRequest['difficulty']>;
 export const DIFFICULTIES: Difficulty[] = ['easy', 'standard', 'hard'];
 
 export interface CoverageForm {
   chapters: Chapter[];
+  formats: PaperFormatSummary[];
+  selectedFormatId: string;
   chapterNameBySlug: Record<string, string>;
   selectedSlugs: Set<string>;
   weights: Record<string, string>;
@@ -14,6 +16,7 @@ export interface CoverageForm {
   toggleChapter: (slug: string) => void;
   setWeight: (slug: string, value: string) => void;
   setDifficulty: (d: Difficulty) => void;
+  setSelectedFormatId: (formatId: string) => void;
   toAssemblePayload: () => AssembleRequest;
 }
 
@@ -24,6 +27,8 @@ export interface CoverageForm {
  */
 export function useCoverageForm(): CoverageForm {
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [formats, setFormats] = useState<PaperFormatSummary[]>([]);
+  const [selectedFormatId, setSelectedFormatId] = useState('');
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());
   const [weights, setWeights] = useState<Record<string, string>>({});
   const [difficulty, setDifficulty] = useState<Difficulty>('standard');
@@ -32,6 +37,12 @@ export function useCoverageForm(): CoverageForm {
     fetchChapters()
       .then(setChapters)
       .catch(() => setChapters([]));
+    fetchPaperFormats()
+      .then((nextFormats) => {
+        setFormats(nextFormats);
+        setSelectedFormatId((current) => current || nextFormats[0]?.format_id || '');
+      })
+      .catch(() => setFormats([]));
   }, []);
 
   function toggleChapter(slug: string) {
@@ -49,6 +60,7 @@ export function useCoverageForm(): CoverageForm {
 
   function toAssemblePayload(): AssembleRequest {
     return {
+      ...(selectedFormatId ? { format_id: selectedFormatId } : {}),
       difficulty,
       chapter_slugs: Array.from(selectedSlugs),
       weights: Object.fromEntries(
@@ -68,6 +80,8 @@ export function useCoverageForm(): CoverageForm {
 
   return {
     chapters,
+    formats,
+    selectedFormatId,
     chapterNameBySlug,
     selectedSlugs,
     weights,
@@ -75,6 +89,7 @@ export function useCoverageForm(): CoverageForm {
     toggleChapter,
     setWeight,
     setDifficulty,
+    setSelectedFormatId,
     toAssemblePayload,
   };
 }

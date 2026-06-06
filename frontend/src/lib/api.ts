@@ -13,7 +13,12 @@
  *
  * @module api
  */
-import type { AssembleRequest, Chapter, PaperDocument } from '@/types';
+import type {
+  AssembleRequest,
+  Chapter,
+  PaperDocument,
+  PaperFormatSummary,
+} from '@/types';
 import { paperDocumentSchema } from '@/types/paper-document.schema';
 
 const TOKEN_KEY = 'qpg_token';
@@ -123,6 +128,11 @@ export async function fetchMetadata(): Promise<Metadata> {
 
 export async function fetchChapters(): Promise<Chapter[]> {
   const res = await request('/bank/chapters/');
+  return res.json();
+}
+
+export async function fetchPaperFormats(): Promise<PaperFormatSummary[]> {
+  const res = await request('/papers/formats', { method: 'GET' });
   return res.json();
 }
 

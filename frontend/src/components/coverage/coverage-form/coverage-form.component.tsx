@@ -29,16 +29,42 @@ export function CoverageFormView({
 }: CoverageFormProps) {
   const {
     chapters,
+    formats,
+    selectedFormatId,
     selectedSlugs,
     weights,
     difficulty,
     toggleChapter,
     setWeight,
     setDifficulty,
+    setSelectedFormatId,
   } = form;
 
   return (
     <div className="space-y-4">
+      <div>
+        <label htmlFor="paper-format" className="text-sm font-medium mb-2 block">
+          Format
+        </label>
+        <select
+          id="paper-format"
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          value={selectedFormatId}
+          onChange={(event) => setSelectedFormatId(event.target.value)}
+          disabled={formats.length === 0}
+        >
+          {formats.length === 0 ? (
+            <option value="">No formats available</option>
+          ) : (
+            formats.map((format) => (
+              <option key={format.format_id} value={format.format_id}>
+                {format.name}
+              </option>
+            ))
+          )}
+        </select>
+      </div>
+
       <div>
         <p className="text-sm font-medium mb-2">Difficulty</p>
         <div className="flex gap-2">
@@ -96,7 +122,7 @@ export function CoverageFormView({
       </div>
 
       <div className="flex items-center gap-3">
-        <Button onClick={onGenerate} disabled={busy}>
+        <Button onClick={onGenerate} disabled={busy || !selectedFormatId}>
           {busy ? 'Generating…' : 'Generate paper'}
         </Button>
         {trailing}

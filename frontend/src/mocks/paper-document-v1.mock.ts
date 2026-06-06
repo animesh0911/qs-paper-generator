@@ -9,6 +9,7 @@ export const mockPaperDocumentV1 = {
     subject: 'Science',
     examType: 'full_term',
     filters: {
+      formatId: 'cbse_science_class_10_board_compact_2026_v1',
       chapters: [
         'Heredity',
         'Life Processes',

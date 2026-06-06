@@ -203,6 +203,7 @@ export const paperRequestSchema = z
         chapters: z.array(z.string()),
         topics: z.array(z.string()).optional(),
         englishOnly: z.boolean(),
+        formatId: z.string().optional(),
         difficultyMix: z.record(z.string(), z.number()).optional(),
       })
       .passthrough(),

@@ -39,8 +39,13 @@ export interface Chapter {
 
 export interface AssembleRequest {
   title?: string;
-  preset?: string;
+  format_id?: string;
   chapter_slugs?: string[];
   weights?: Record<string, number>;
   difficulty?: 'easy' | 'standard' | 'hard';
+}
+
+export interface PaperFormatSummary {
+  format_id: string;
+  name: string;
 }
