@@ -2,7 +2,8 @@
 set -eu
 
 if [ "$#" -lt 2 ]; then
-  echo "usage: $0 <commit> <issue-number-or-url> [context-path ...]" >&2
+  echo "usage: $0 <commit> <issue-number-or-url|-> [context-path ...]" >&2
+  echo "  pass '-' (or 'none') as the issue when the PR/commit has no linked issue" >&2
   exit 2
 fi
 
@@ -14,14 +15,12 @@ command -v git >/dev/null 2>&1 || {
   echo "git is not installed or not on PATH" >&2
   exit 127
 }
-command -v gh >/dev/null 2>&1 || {
-  echo "gh is not installed or not on PATH" >&2
-  exit 127
-}
 command -v agy >/dev/null 2>&1 || {
   echo "agy is not installed or not on PATH" >&2
   exit 127
 }
+# `gh` is required only to fetch issue metadata; checked lazily below so an
+# issue-less review (issue arg '-'/'none') runs without it.
 
 repo_root=$(git rev-parse --show-toplevel)
 commit_sha=$(git rev-parse --verify "${commit}^{commit}")
@@ -41,8 +40,28 @@ git -C "$repo_root" diff-tree --root --no-commit-id --name-only -r "$commit_sha"
   > "$packet_dir/changed-files.txt"
 git -C "$repo_root" show --format=fuller --find-renames --find-copies "$commit_sha" \
   > "$packet_dir/changes.patch"
-gh issue view "$issue" --json number,title,state,labels,body,comments \
-  --template '# Issue #{{.number}}: {{.title}}
+case "$issue" in
+  -|none|NONE|"")
+    # No linked issue (e.g. a refactor/docs PR). Review against the commit's own
+    # stated intent plus general engineering correctness, not an issue's criteria.
+    cat > "$packet_dir/issue.md" <<'NOISSUE'
+# No linked issue
+
+This change has no linked GitHub issue. Review the commit against its own stated
+intent (its commit message and PR description) and general engineering
+correctness: regressions, correctness bugs, security problems, and missing
+intent-level tests within the changed-file scope. There are no external
+acceptance criteria to audit — treat the commit message as the intent anchor.
+NOISSUE
+    ;;
+  *)
+    command -v gh >/dev/null 2>&1 || {
+      echo "gh is required to view issue $issue but is not installed or on PATH" >&2
+      echo "  pass '-' as the issue to review without GitHub issue metadata" >&2
+      exit 127
+    }
+    gh issue view "$issue" --json number,title,state,labels,body,comments \
+      --template '# Issue #{{.number}}: {{.title}}
 
 State: {{.state}}
 Labels: {{range .labels}}{{.name}} {{end}}
@@ -58,6 +77,8 @@ Labels: {{range .labels}}{{.name}} {{end}}
 {{.body}}
 {{end}}
 ' > "$packet_dir/issue.md"
+    ;;
+esac
 
 if [ ! -s "$packet_dir/changed-files.txt" ]; then
   echo "commit has no changed files: $commit_sha" >&2
