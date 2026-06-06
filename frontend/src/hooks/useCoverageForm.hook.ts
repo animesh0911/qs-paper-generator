@@ -20,6 +20,31 @@ export interface CoverageForm {
   toAssemblePayload: () => AssembleRequest;
 }
 
+export function buildCoverageAssemblePayload({
+  selectedFormatId,
+  difficulty,
+  selectedSlugs,
+  weights,
+}: {
+  selectedFormatId: string;
+  difficulty: Difficulty;
+  selectedSlugs: Set<string>;
+  weights: Record<string, string>;
+}): AssembleRequest {
+  return {
+    ...(selectedFormatId ? { format_id: selectedFormatId } : {}),
+    difficulty,
+    chapter_slugs: Array.from(selectedSlugs),
+    weights: Object.fromEntries(
+      Array.from(selectedSlugs).flatMap((slug) => {
+        const raw = weights[slug];
+        const value = raw === undefined || raw === '' ? 1 : Number(raw);
+        return Number.isFinite(value) ? [[slug, value]] : [];
+      }),
+    ),
+  };
+}
+
 /**
  * Owns the Slice 3 coverage form: chapter selection, per-chapter weights, and
  * the difficulty profile. Builds the payload sent to /papers/assemble so the
@@ -59,18 +84,12 @@ export function useCoverageForm(): CoverageForm {
   }
 
   function toAssemblePayload(): AssembleRequest {
-    return {
-      ...(selectedFormatId ? { format_id: selectedFormatId } : {}),
+    return buildCoverageAssemblePayload({
+      selectedFormatId,
       difficulty,
-      chapter_slugs: Array.from(selectedSlugs),
-      weights: Object.fromEntries(
-        Array.from(selectedSlugs).flatMap((slug) => {
-          const raw = weights[slug];
-          const value = raw === undefined || raw === '' ? 1 : Number(raw);
-          return Number.isFinite(value) ? [[slug, value]] : [];
-        }),
-      ),
-    };
+      selectedSlugs,
+      weights,
+    });
   }
 
   const chapterNameBySlug = useMemo(
