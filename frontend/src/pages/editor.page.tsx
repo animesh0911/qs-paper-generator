@@ -23,6 +23,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import {
+  AlertTriangle,
   CheckCircle2,
   Download,
   FileCheck2,
@@ -34,8 +35,12 @@ import {
 import { useParams, useSearchParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
 import { resolveEditorFixture } from '@/mocks';
-import { openMockPrintDocument } from '@/lib/editor-print';
-import { fetchPaperDocument } from '@/lib/api';
+import {
+  approvePaper,
+  downloadPaperPdf,
+  fetchPaperDocument,
+  persistDraft,
+} from '@/lib/api';
 import {
   getPaperFormatRendererResult,
   type PaperFormatRenderer,
@@ -150,6 +155,7 @@ function ResolvedEditorPage({
       document={document}
       renderer={rendererResult.renderer}
       selectedFixtureId={documentKey}
+      persisted={!documentKey.startsWith('fixture:')}
     />
   );
 }
@@ -192,10 +198,12 @@ function EditorPageWorkspace({
   document,
   renderer,
   selectedFixtureId,
+  persisted,
 }: {
   document: PaperDocument;
   renderer: PaperFormatRenderer;
   selectedFixtureId: string;
+  persisted: boolean;
 }) {
   const {
     activeRailSlotId,
@@ -239,9 +247,34 @@ function EditorPageWorkspace({
     undoEntry,
     view,
   } = useEditorWorkspace({ document, renderer, selectedFixtureId });
+  const [lastSavedDocument, setLastSavedDocument] = useState(document);
+  const [actionState, setActionState] = useState<
+    'idle' | 'saving' | 'saved' | 'approving' | 'approved' | 'error'
+  >('idle');
+  const [actionError, setActionError] = useState('');
+  const dirty =
+    JSON.stringify(paperState.document) !== JSON.stringify(lastSavedDocument);
+  const warnings = view.validationSummary.warnings;
 
-  function handleDownloadPdf() {
-    openMockPrintDocument(paperState);
+  async function runAction(action: 'save' | 'approve' | 'download') {
+    if (!persisted) return;
+    setActionError('');
+    setActionState(action === 'approve' ? 'approving' : 'saving');
+    try {
+      if (action === 'approve') {
+        await approvePaper(paperState.document);
+        setLastSavedDocument(paperState.document);
+        setActionState('approved');
+      } else {
+        await persistDraft(paperState.document);
+        setLastSavedDocument(paperState.document);
+        setActionState('saved');
+        if (action === 'download') await downloadPaperPdf(paperState.document);
+      }
+    } catch (reason) {
+      setActionError((reason as Error).message);
+      setActionState('error');
+    }
   }
 
   const seriesBlock = view.chromeBlocks.find(
@@ -282,48 +315,18 @@ function EditorPageWorkspace({
             {view.paperMeta.join(' · ')}
           </p>
         </div>
-        <div className="flex max-w-full flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
-            aria-label="Undo last action"
-            disabled={!undoEntry}
-            onClick={handleUndo}
-          >
-            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-            Undo
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
-          >
-            <Save className="mr-2 h-4 w-4" aria-hidden="true" />
-            Save draft
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
-          >
-            <FileCheck2 className="mr-2 h-4 w-4" aria-hidden="true" />
-            Review paper
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="max-sm:flex-1 max-sm:basis-[calc(50%-0.25rem)]"
-            onClick={handleDownloadPdf}
-          >
-            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-            Download PDF
-          </Button>
-          <Button size="sm" className="max-sm:flex-1 max-sm:basis-full">
-            <CheckCircle2 className="mr-2 h-4 w-4" aria-hidden="true" />
-            Approve
-          </Button>
-        </div>
+        <EditorActionBar
+          persisted={persisted}
+          dirty={dirty}
+          actionState={actionState}
+          actionError={actionError}
+          warnings={warnings}
+          canUndo={Boolean(undoEntry)}
+          onUndo={handleUndo}
+          onSave={() => void runAction('save')}
+          onDownload={() => void runAction('download')}
+          onApprove={() => void runAction('approve')}
+        />
       </header>
 
       <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:order-2 max-lg:[&_.editor-left-rail]:static max-sm:px-3">
@@ -940,6 +943,96 @@ function EditorPageWorkspace({
           <Button size="sm">Ask</Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function EditorActionBar({
+  persisted,
+  dirty,
+  actionState,
+  actionError,
+  warnings,
+  canUndo,
+  onUndo,
+  onSave,
+  onDownload,
+  onApprove,
+}: {
+  persisted: boolean;
+  dirty: boolean;
+  actionState: 'idle' | 'saving' | 'saved' | 'approving' | 'approved' | 'error';
+  actionError: string;
+  warnings: string[];
+  canUndo: boolean;
+  onUndo: () => void;
+  onSave: () => void;
+  onDownload: () => void;
+  onApprove: () => void;
+}) {
+  const busy = actionState === 'saving' || actionState === 'approving';
+  const unavailable = !persisted;
+  const approved = actionState === 'approved';
+  const approvalBlocked =
+    unavailable || warnings.length > 0 || dirty || busy || approved;
+  const status = unavailable
+    ? 'Demo paper · actions unavailable'
+    : actionError ||
+      (dirty ? 'Unsaved changes' : actionState === 'idle' ? 'Saved' : actionState);
+
+  return (
+    <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
+      <span role="status" className="text-xs text-muted-foreground">
+        {status}
+      </span>
+      {warnings.length > 0 && (
+        <span
+          title={warnings.join('\n')}
+          className="flex items-center gap-1 text-xs text-destructive"
+        >
+          <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+          {warnings.length} validation warning{warnings.length === 1 ? '' : 's'}
+        </span>
+      )}
+      <Button variant="outline" size="sm" disabled={!canUndo} onClick={onUndo}>
+        <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
+        Undo
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={unavailable || !dirty || busy || approved}
+        onClick={onSave}
+      >
+        <Save className="mr-2 h-4 w-4" aria-hidden="true" />
+        Save draft
+      </Button>
+      <Button variant="outline" size="sm" disabled title="Review is unavailable">
+        <FileCheck2 className="mr-2 h-4 w-4" aria-hidden="true" />
+        Review paper
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={unavailable || busy}
+        onClick={onDownload}
+      >
+        <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+        Download PDF
+      </Button>
+      <Button
+        size="sm"
+        disabled={approvalBlocked}
+        title={
+          approvalBlocked
+            ? 'Save changes and resolve validation warnings before approval'
+            : undefined
+        }
+        onClick={onApprove}
+      >
+        <CheckCircle2 className="mr-2 h-4 w-4" aria-hidden="true" />
+        Approve
+      </Button>
     </div>
   );
 }

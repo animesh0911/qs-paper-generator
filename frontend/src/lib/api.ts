@@ -115,6 +115,12 @@ export async function persistDraft(paper: PaperDocument): Promise<void> {
   });
 }
 
+export async function approvePaper(paper: PaperDocument): Promise<void> {
+  await persistDraft(paper);
+  const id = paper.paper.id.replace(/^paper_/, '');
+  await request(`/papers/${id}/approve/`, { method: 'POST' });
+}
+
 export interface Metadata {
   sections: { code: string; label: string }[];
   question_types: { code: string; label: string }[];
@@ -137,7 +143,6 @@ export async function fetchPaperFormats(): Promise<PaperFormatSummary[]> {
 }
 
 export async function downloadPaperPdf(paper: PaperDocument) {
-  await persistDraft(paper);
   const paperId = paper.paper.id;
   const id = paperId.replace(/^paper_/, '');
   const res = await request(`/papers/${id}/pdf/`, { method: 'GET' });

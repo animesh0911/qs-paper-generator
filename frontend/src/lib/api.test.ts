@@ -10,6 +10,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockPaperDocumentV1 } from '@/mocks';
 import {
+  approvePaper,
   assemblePaper,
   clearToken,
   fetchPaperFormats,
@@ -150,6 +151,26 @@ describe('paper persistence', () => {
         method: 'PATCH',
         body: JSON.stringify({ document: persistedDocument }),
       }),
+    );
+  });
+
+  it('saves the canonical draft before approving the backend paper', async () => {
+    const persistedDocument = structuredClone(mockPaperDocumentV1);
+    persistedDocument.paper.id = 'paper_123';
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({})));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await approvePaper(persistedDocument);
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      '/api/papers/123/',
+      expect.objectContaining({ method: 'PATCH' }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/papers/123/approve/',
+      expect.objectContaining({ method: 'POST' }),
     );
   });
 });
