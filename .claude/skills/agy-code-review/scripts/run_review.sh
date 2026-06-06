@@ -15,14 +15,12 @@ command -v git >/dev/null 2>&1 || {
   echo "git is not installed or not on PATH" >&2
   exit 127
 }
-command -v gh >/dev/null 2>&1 || {
-  echo "gh is not installed or not on PATH" >&2
-  exit 127
-}
 command -v agy >/dev/null 2>&1 || {
   echo "agy is not installed or not on PATH" >&2
   exit 127
 }
+# `gh` is required only to fetch issue metadata; checked lazily below so an
+# issue-less review (issue arg '-'/'none') runs without it.
 
 repo_root=$(git rev-parse --show-toplevel)
 commit_sha=$(git rev-parse --verify "${commit}^{commit}")
@@ -57,6 +55,11 @@ acceptance criteria to audit — treat the commit message as the intent anchor.
 NOISSUE
     ;;
   *)
+    command -v gh >/dev/null 2>&1 || {
+      echo "gh is required to view issue $issue but is not installed or on PATH" >&2
+      echo "  pass '-' as the issue to review without GitHub issue metadata" >&2
+      exit 127
+    }
     gh issue view "$issue" --json number,title,state,labels,body,comments \
       --template '# Issue #{{.number}}: {{.title}}
 
