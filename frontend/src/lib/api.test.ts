@@ -125,6 +125,17 @@ describe('paper persistence', () => {
     );
   });
 
+  it('rejects an invalid persisted paper instead of opening a broken editor', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ paper: { id: 'paper_1' } }))),
+    );
+
+    await expect(fetchPaperDocument('paper_1')).rejects.toThrow(
+      'Backend returned an unexpected PaperDocument shape',
+    );
+  });
+
   it('persists canonical PaperDocument drafts instead of editor document JSON', async () => {
     const persistedDocument = structuredClone(mockPaperDocumentV1);
     persistedDocument.paper.id = 'paper_123';

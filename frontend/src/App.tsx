@@ -1,9 +1,9 @@
 /**
  * Top-level router for the app shell.
  *
- * `/editor` stays directly accessible so the paper editor can be opened as a
- * standalone workspace. `/` remains the authenticated dashboard entrypoint,
- * and `/editor/:paperId/print` serves the print view.
+ * `/editor` is the explicit fixture-backed demo workspace. Persisted papers
+ * load through authenticated `/editor/:paperId`; `/editor/:paperId/print`
+ * remains the print-only route used by backend PDF rendering.
  *
  * @module App
  */
@@ -35,6 +35,22 @@ export default function App() {
           >
             <EditorPage />
           </Suspense>
+        }
+      />
+      <Route
+        path="/editor/:paperId"
+        element={
+          <RequireAuth>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-secondary p-6 text-sm">
+                  Loading editor...
+                </div>
+              }
+            >
+              <EditorPage />
+            </Suspense>
+          </RequireAuth>
         }
       />
       <Route path="/editor/:paperId/print" element={<PrintPaperPage />} />

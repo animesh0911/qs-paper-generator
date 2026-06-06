@@ -1,23 +1,22 @@
 /**
- * Mock-backed PaperDocumentV1 editor shell.
+ * PaperDocumentV1 editor shell for persisted papers and explicit demo fixtures.
  *
- * This page loads the issue #21 mock, maps it into a print-faithful paper
- * view model, and renders the V1 shell around the paper: top bar, outline
- * rail, inspector, BlockNote-backed question regions, and bottom chat.
+ * `/editor/:paperId` fetches and validates the authenticated teacher's saved
+ * paper. `/editor` remains the explicit fixture-backed development/demo route.
  *
  * Patterns:
- * - The mocked `PaperDocumentV1` is canonical; BlockNote only renders editable
+ * - The loaded `PaperDocumentV1` is canonical; BlockNote only renders editable
  *   region surfaces for the shell.
  * - Editor chrome is marked with `data-editor-chrome` so print/export styling
  *   can remove it without hiding paper content.
  *
  * Where it fits:
- * - Used by: `src/App.tsx` at `/editor`.
- * - Uses: `src/lib/editor-paper.ts`, `src/mocks/paper-document-v1.mock.ts`.
+ * - Used by: `src/App.tsx` at `/editor` and `/editor/:paperId`.
+ * - Uses: `src/lib/api.ts`, `src/lib/editor-paper.ts`, `src/mocks`.
  *
  * @module EditorPage
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -32,10 +31,11 @@ import {
   RotateCcw,
   Save,
 } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
 import { resolveEditorFixture } from '@/mocks';
 import { openMockPrintDocument } from '@/lib/editor-print';
+import { fetchPaperDocument } from '@/lib/api';
 import {
   getPaperFormatRendererResult,
   type PaperFormatRenderer,
@@ -72,6 +72,46 @@ function toRoman(value: number) {
 }
 
 export default function EditorPage() {
+  const { paperId } = useParams();
+
+  if (paperId) {
+    return <PersistedEditorPage paperId={paperId} />;
+  }
+
+  return <DemoEditorPage />;
+}
+
+function PersistedEditorPage({ paperId }: { paperId: string }) {
+  const [document, setDocument] = useState<PaperDocument | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    setDocument(null);
+    setError('');
+    fetchPaperDocument(paperId)
+      .then((nextDocument) => {
+        if (active) setDocument(nextDocument);
+      })
+      .catch((reason) => {
+        if (active) setError((reason as Error).message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [paperId]);
+
+  if (error) {
+    return <EditorDocumentStatus state="error" message={error} />;
+  }
+  if (!document) {
+    return <EditorDocumentStatus state="loading" />;
+  }
+
+  return <ResolvedEditorPage document={document} documentKey={document.paper.id} />;
+}
+
+function DemoEditorPage() {
   const [searchParams] = useSearchParams();
   const selectedFixture = useMemo(
     () => resolveEditorFixture(searchParams.get('fixture')),
@@ -81,6 +121,21 @@ export default function EditorPage() {
     () => assertPaperDocument(selectedFixture.paper),
     [selectedFixture],
   );
+  return (
+    <ResolvedEditorPage
+      document={document}
+      documentKey={`fixture:${selectedFixture.id}`}
+    />
+  );
+}
+
+function ResolvedEditorPage({
+  document,
+  documentKey,
+}: {
+  document: PaperDocument;
+  documentKey: string;
+}) {
   const rendererResult = useMemo(
     () => getPaperFormatRendererResult(document.format.id),
     [document.format.id],
@@ -94,8 +149,27 @@ export default function EditorPage() {
     <EditorPageWorkspace
       document={document}
       renderer={rendererResult.renderer}
-      selectedFixtureId={selectedFixture.id}
+      selectedFixtureId={documentKey}
     />
+  );
+}
+
+export function EditorDocumentStatus({
+  state,
+  message,
+}: {
+  state: 'loading' | 'error';
+  message?: string;
+}) {
+  return (
+    <main className="grid min-h-screen place-items-center bg-secondary px-4 text-foreground">
+      <section className="w-full max-w-xl rounded-md border bg-background p-6">
+        <h1 className="text-base font-semibold">
+          {state === 'loading' ? 'Loading saved paper...' : 'Unable to open paper'}
+        </h1>
+        {message && <p className="mt-2 text-sm text-muted-foreground">{message}</p>}
+      </section>
+    </main>
   );
 }
 
