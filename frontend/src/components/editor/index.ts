@@ -8,7 +8,6 @@
  */
 export { EditorInspector } from './editor-inspector.component';
 export { EditorAlternativesOverlay } from './editor-alternatives-overlay.component';
-export { QuestionEditOverlay } from './question-edit-overlay.component';
 export { EditorOutlineRail } from './editor-outline-rail.component';
 export { PaperChromeEditor } from './paper-chrome-editor.component';
 export { QuestionActionRail } from './question-action-rail.component';

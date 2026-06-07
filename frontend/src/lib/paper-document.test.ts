@@ -15,7 +15,6 @@ import {
   getSlot,
   getSlotLockState,
   getSlotOverrides,
-  getSlotQuestionContent,
   normalizePaperDocument,
   type NormalizedPaperDocument,
   PaperDocumentContractError,
@@ -24,7 +23,6 @@ import {
   removePaperChromeBlock,
   setPaperChromeText,
   setSlotLockState,
-  setSlotContentOverride,
   setSlotSelectedQuestion,
   setSlotRegionOverride,
   buildOrderZones,
@@ -114,19 +112,6 @@ describe('PaperDocumentV1 validation', () => {
       emphasis: 'normal',
     });
   });
-
-  it('loads a future Question type for safe read-only rendering', () => {
-    const document = structuredClone(mockPaperDocumentV1);
-    const firstSlot = document.paper.sections[0].slots[0];
-    const firstQuestion = document.questions.find(
-      (candidate) => candidate.id === firstSlot.selectedQuestionId,
-    )!;
-    firstSlot.type = 'source_analysis';
-    firstSlot.alternateQuestionIds = [];
-    firstQuestion.type = 'source_analysis';
-
-    expect(parsePaperDocument(document).success).toBe(true);
-  });
 });
 
 describe('PaperDocumentV1 normalization', () => {
@@ -203,55 +188,6 @@ describe('PaperDocumentV1 normalization', () => {
     expect(question(restoredState, 'q_mcq_heredity_001').rawText).toBe(
       question(state, 'q_mcq_heredity_001').rawText,
     );
-  });
-
-  it('stores collection edits in a full paper-local content override', () => {
-    const document = assertPaperDocument(mockPaperDocumentV1);
-    const state = normalizePaperDocument(document);
-    const sourceQuestion = question(state, 'q_mcq_heredity_001');
-    const content = structuredClone(sourceQuestion.content);
-    content.options = content.options ? [...content.options].reverse() : [];
-
-    const editedState = setSlotContentOverride(state, 'slot_A_01', content);
-
-    expect(overrides(editedState, 'slot_A_01')).toEqual({
-      modified: true,
-      regions: {},
-      content,
-    });
-    expect(question(editedState, sourceQuestion.id)).toBe(sourceQuestion);
-  });
-
-  it('materializes region edits over full paper-local Question content', () => {
-    const document = assertPaperDocument(mockPaperDocumentV1);
-    const state = normalizePaperDocument(document);
-    const sourceQuestion = question(state, 'q_mcq_heredity_001');
-    const content = structuredClone(sourceQuestion.content);
-    content.options = content.options ? [...content.options].reverse() : [];
-    const contentEditedState = setSlotContentOverride(
-      state,
-      'slot_A_01',
-      content,
-    );
-
-    const regionEditedState = setSlotRegionOverride(
-      contentEditedState,
-      'slot_A_01',
-      'option:A',
-      [{ type: 'paragraph', text: 'Paper-local option A.' }],
-    );
-
-    expect(overrides(regionEditedState, 'slot_A_01').content).toEqual(content);
-    expect(
-      getSlotQuestionContent(regionEditedState, 'slot_A_01')?.options?.map(
-        (option) => [option.label, option.content[0]?.text],
-      ),
-    ).toEqual([
-      ['D', '9 : 3 : 3 : 1'],
-      ['C', '1 : 2 : 1'],
-      ['B', '3 : 1'],
-      ['A', 'Paper-local option A.'],
-    ]);
   });
 
   it('does not store slot text overrides when can.editText is false', () => {

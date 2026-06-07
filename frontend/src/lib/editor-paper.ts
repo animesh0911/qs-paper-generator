@@ -493,20 +493,19 @@ function questionToBlockTree(
   questionRegionRules: QuestionRegionRules,
 ): EditorQuestionContainerBlock {
   const children: EditorQuestionRegionBlock[] = [];
-  const content = overrides?.content ?? question.content;
 
   pushRegionBlocks(
     children,
     'passageBlock',
     'passage',
-    content.passage,
+    question.content.passage,
     overrides,
   );
   pushRegionBlocks(
     children,
     'questionStemBlock',
     'assertion',
-    content.assertion,
+    question.content.assertion,
     overrides,
     'Assertion: ',
   );
@@ -514,7 +513,7 @@ function questionToBlockTree(
     children,
     'questionStemBlock',
     'reason',
-    content.reason,
+    question.content.reason,
     overrides,
     'Reason: ',
   );
@@ -522,12 +521,12 @@ function questionToBlockTree(
     children,
     'questionStemBlock',
     'stem',
-    content.stem,
+    question.content.stem,
     overrides,
   );
-  pushOptionRegions(children, content.options, overrides);
-  pushSubQuestionRegions(children, content.subparts, overrides);
-  pushInternalChoiceRegions(children, content.choices, overrides);
+  pushOptionRegions(children, question.content.options, overrides);
+  pushSubQuestionRegions(children, question.content.subparts, overrides);
+  pushInternalChoiceRegions(children, question.content.choices, overrides);
 
   if (children.length === 0) {
     children.push(
@@ -601,7 +600,7 @@ function pushSubQuestionRegions(
     blocks.push(
       regionBlock(
         'subQuestionBlock',
-        `subpart:${subpart.label}`,
+        `subquestion:${subpart.label}`,
         subpart.content,
         overrides,
         `${subpart.label}. `,

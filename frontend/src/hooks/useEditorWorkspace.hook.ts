@@ -14,13 +14,11 @@ import {
   commitStructuredPaperAction,
   getQuestion,
   getSlotOverridesById,
-  getSlotQuestionContent,
   normalizePaperDocument,
   removePaperChromeBlock,
   restoreSlotSource,
   setPaperChromeText,
   setSlotLockState,
-  setSlotContentOverride,
   setSlotRegionOverride,
   setSlotSelectedQuestion,
   undoStructuredPaperAction,
@@ -31,7 +29,7 @@ import { useEditorAlternatives } from './useEditorAlternatives.hook';
 import { useEditorDragOrdering } from './useEditorDragOrdering.hook';
 import { useEditorSelection } from './useEditorSelection.hook';
 import type { AlternativesIntent } from '@/components/editor';
-import type { ContentItem, DocQuestionContent, PaperDocument } from '@/types';
+import type { ContentItem, PaperDocument } from '@/types';
 
 function contentItemsEqual(left: ContentItem[], right: ContentItem[]) {
   return JSON.stringify(left) === JSON.stringify(right);
@@ -57,7 +55,6 @@ export function useEditorWorkspace({
   const [chatValue, setChatValue] = useState('');
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
-  const [questionEditorOpen, setQuestionEditorOpen] = useState(false);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const {
     activeRailSlotId,
@@ -96,10 +93,6 @@ export function useEditorWorkspace({
   const selectedQuestion = selectedSlot?.questionBlockTree.questionId
     ? getQuestion(paperState, selectedSlot.questionBlockTree.questionId)
     : undefined;
-  const selectedQuestionContent =
-    selectedSlotId && selectedQuestion
-      ? getSlotQuestionContent(paperState, selectedSlotId)
-      : undefined;
 
   function commitStructuredAction(nextState: typeof paperState) {
     const result = commitStructuredPaperAction(paperState, nextState);
@@ -124,7 +117,6 @@ export function useEditorWorkspace({
     setUndoEntry(null);
     resetSelection();
     resetAlternatives();
-    setQuestionEditorOpen(false);
   }, [initialPaperState, resetAlternatives, resetSelection, selectedFixtureId]);
 
   function handleUndo() {
@@ -146,20 +138,6 @@ export function useEditorWorkspace({
     commitStructuredAction(
       setSlotRegionOverride(paperState, slotId, regionKey, content),
     );
-  }
-
-  function handleEditQuestion(slotId: string) {
-    if (!canEditSlotText(paperState, slotId)) return;
-    handleSelectSlot(slotId);
-    setQuestionEditorOpen(true);
-  }
-
-  function handleApplyQuestionContent(
-    slotId: string,
-    content: DocQuestionContent,
-  ) {
-    commitStructuredAction(setSlotContentOverride(paperState, slotId, content));
-    setQuestionEditorOpen(false);
   }
 
   function handlePaperChromeChange(regionKey: string, text: string) {
@@ -241,8 +219,6 @@ export function useEditorWorkspace({
     handleDeletePaperChrome,
     handleDragEnd,
     handleDragStart,
-    handleEditQuestion,
-    handleApplyQuestionContent,
     handlePaperChromeChange,
     handleRegionChange,
     handleRestoreSelectedSlot,
@@ -260,11 +236,9 @@ export function useEditorWorkspace({
     openAlternativesOverlay,
     closeAlternativesOverlay,
     paperState,
-    questionEditorOpen,
     sameSectionCollisionDetection,
     selectedChromeBlockId,
     selectedQuestion,
-    selectedQuestionContent,
     selectedSlot,
     selectedSlotId,
     setAlternativesIntent,
@@ -272,7 +246,6 @@ export function useEditorWorkspace({
     setHoveredSectionId,
     setHoveredSlotId,
     setInspectorMode,
-    setQuestionEditorOpen,
     undoEntry,
     view,
   };

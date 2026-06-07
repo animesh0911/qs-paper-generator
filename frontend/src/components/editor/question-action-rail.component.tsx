@@ -10,14 +10,7 @@
  *
  * @module QuestionActionRail
  */
-import {
-  Info,
-  Lock,
-  MessageSquareText,
-  Pencil,
-  Shuffle,
-  Unlock,
-} from 'lucide-react';
+import { Info, Lock, MessageSquareText, Shuffle, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AlternativesIntent } from './editor-types';
 
@@ -25,8 +18,6 @@ export function QuestionActionRail({
   locked,
   lockEnabled = true,
   swapEnabled = true,
-  editEnabled = true,
-  onEdit,
   onInfo,
   onAlternatives,
   onToggleLock,
@@ -35,8 +26,6 @@ export function QuestionActionRail({
   locked: boolean;
   lockEnabled?: boolean;
   swapEnabled?: boolean;
-  editEnabled?: boolean;
-  onEdit: () => void;
   onInfo: () => void;
   onAlternatives: (intent: AlternativesIntent) => void;
   onToggleLock: () => void;
@@ -52,23 +41,6 @@ export function QuestionActionRail({
       className="qpg-question-action-rail absolute right-[calc(100%+0.5rem)] top-3 z-10 flex w-28 flex-col gap-1 rounded-lg border bg-background p-1 shadow-[0_8px_24px_rgba(15,23,42,0.12)] max-lg:left-auto max-lg:right-3"
       onClick={(event) => event.stopPropagation()}
     >
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="justify-start px-2 text-xs"
-        title={
-          editEnabled
-            ? 'Edit this question'
-            : 'Editing is disabled for this slot.'
-        }
-        aria-label="Edit question"
-        disabled={!editEnabled}
-        onClick={onEdit}
-      >
-        <Pencil className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-        Edit
-      </Button>
       <Button
         type="button"
         variant="ghost"
