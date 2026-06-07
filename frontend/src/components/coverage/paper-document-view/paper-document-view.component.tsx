@@ -459,11 +459,7 @@ function PrintSubQuestion({
       <span>{subpart.label}.</span>
       <div className="paper-subquestion-body">
         <PaperContentItems
-          items={
-            overrides[`subpart:${subpart.label}`] ??
-            overrides[`subquestion:${subpart.label}`] ??
-            subpart.content
-          }
+          items={overrides[`subquestion:${subpart.label}`] ?? subpart.content}
         />
         {!useRightColumnMarks && subpart.marks && (
           <span className="paper-inline-marks">

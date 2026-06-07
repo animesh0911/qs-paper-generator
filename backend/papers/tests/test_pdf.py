@@ -89,34 +89,6 @@ def test_render_uses_slot_override_instead_of_stale_question_text():
     assert "What is water?" not in text
 
 
-def test_render_uses_full_content_override_for_collection_edits():
-    """Added or removed options must print from the paper-local Question draft."""
-    document = _doc()
-    document["paper"]["sections"][0]["slots"][0]["overrides"] = {
-        "modified": True,
-        "regions": {},
-        "content": {
-            "stem": [{"type": "paragraph", "text": "Choose the compound."}],
-            "options": [
-                {
-                    "label": "C",
-                    "content": [{"type": "paragraph", "text": "NaCl"}],
-                },
-                {
-                    "label": "A",
-                    "content": [{"type": "paragraph", "text": "H2O"}],
-                },
-            ],
-        },
-    }
-
-    text = _pdf_text(render_paper_pdf(document))
-
-    assert "Choose the compound." in text
-    assert "NaCl" in text
-    assert "CO2" not in text
-
-
 def test_branding_renders_school_identity_in_paper_pdf():
     """Branding must reach the PDF — a per-school name/header is the deliverable.
 

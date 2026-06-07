@@ -370,8 +370,7 @@ A slot is a position in the paper. It defines what kind of question belongs ther
   "locked": false,
   "overrides": {
     "modifiedFromSource": false,
-    "regions": {},
-    "content": null
+    "regions": {}
   }
 }
 ```
@@ -429,11 +428,10 @@ paper only.
 }
 ```
 
-| Field                          |                    Required | Notes                                                                                            |
-| ------------------------------ | --------------------------: | ------------------------------------------------------------------------------------------------ |
-| `overrides.modifiedFromSource` | Yes when `overrides` exists | Whether this slot renders any paper-specific content instead of source content.                  |
-| `overrides.regions`            | Yes when `overrides` exists | Map from stable `regionKey` to replacement content items.                                        |
-| `overrides.content`            |                    Optional | Full paper-local Question content used when an edit adds, removes, or reorders labelled entries. |
+| Field                          |                    Required | Notes                                                                           |
+| ------------------------------ | --------------------------: | ------------------------------------------------------------------------------- |
+| `overrides.modifiedFromSource` | Yes when `overrides` exists | Whether this slot renders any paper-specific content instead of source content. |
+| `overrides.regions`            | Yes when `overrides` exists | Map from stable `regionKey` to replacement content items.                       |
 
 The original source question in `questions[]` must remain unchanged. Swapping a
 slot to a different `selectedQuestionId` should clear old overrides after user

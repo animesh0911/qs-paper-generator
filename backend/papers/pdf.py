@@ -120,12 +120,10 @@ def _render_reportlab_pdf(document: dict) -> bytes:
             # Slot overrides are the teacher's post-assembly edits; the contract
             # makes them canonical, so they win over the stored question content
             # region-by-region (v1_contract.md §7/§9).
-            overrides = slot.get("overrides") or {}
-            regions = overrides.get("regions") or {}
-            content = overrides.get("content") or question.get("content", {})
+            regions = (slot.get("overrides") or {}).get("regions") or {}
             stem_text = flatten_text(
                 regions.get("stem")
-                or content.get("stem")
+                or question.get("content", {}).get("stem")
                 or [{"text": question["rawText"]}]
             )
             story.append(
@@ -137,7 +135,7 @@ def _render_reportlab_pdf(document: dict) -> bytes:
             )
             options = (
                 regions.get("options")
-                or content.get("options")
+                or question.get("content", {}).get("options")
                 or []
             )
             if options:

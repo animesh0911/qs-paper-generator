@@ -191,8 +191,7 @@ A Slot is a position in the paper. It owns visible numbering, marks, selected qu
   },
   "overrides": {
     "modified": false,
-    "regions": {},
-    "content": null
+    "regions": {}
   }
 }
 ```
@@ -208,14 +207,6 @@ Every selected or alternate question must exist in `questions[]` and match the S
 - `language`
 
 When a slot swaps to an alternate question, preserve Slot marks by default and clear slot-level text overrides.
-
-`overrides.regions` stores simple replacement content for stable region keys.
-Schema-aware collection edits that add, remove, or reorder options, subparts,
-or internal-choice options use optional `overrides.content` with the same shape
-as `question.content`. When present, `overrides.content` is the paper-local
-Question content and takes precedence over source `question.content`;
-`questions[]` remains unchanged. Existing documents that only contain
-`overrides.regions` remain valid.
 
 ## 8. Questions
 

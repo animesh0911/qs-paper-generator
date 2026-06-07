@@ -53,7 +53,6 @@ import {
   EditorOutlineRail,
   PaperChromeEditor,
   QuestionActionRail,
-  QuestionEditOverlay,
   QuestionRegionEditor,
   SortableQuestionSlot,
 } from '@/components/editor';
@@ -114,7 +113,9 @@ function PersistedEditorPage({ paperId }: { paperId: string }) {
     return <EditorDocumentStatus state="loading" />;
   }
 
-  return <ResolvedEditorPage document={document} documentKey={document.paper.id} />;
+  return (
+    <ResolvedEditorPage document={document} documentKey={document.paper.id} />
+  );
 }
 
 function DemoEditorPage() {
@@ -172,9 +173,13 @@ export function EditorDocumentStatus({
     <main className="grid min-h-screen place-items-center bg-secondary px-4 text-foreground">
       <section className="w-full max-w-xl rounded-md border bg-background p-6">
         <h1 className="text-base font-semibold">
-          {state === 'loading' ? 'Loading saved paper...' : 'Unable to open paper'}
+          {state === 'loading'
+            ? 'Loading saved paper...'
+            : 'Unable to open paper'}
         </h1>
-        {message && <p className="mt-2 text-sm text-muted-foreground">{message}</p>}
+        {message && (
+          <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+        )}
       </section>
     </main>
   );
@@ -219,8 +224,6 @@ function EditorPageWorkspace({
     handleDeletePaperChrome,
     handleDragEnd,
     handleDragStart,
-    handleEditQuestion,
-    handleApplyQuestionContent,
     handlePaperChromeChange,
     handleRegionChange,
     handleRestoreSelectedSlot,
@@ -237,11 +240,9 @@ function EditorPageWorkspace({
     inspectorMode,
     openAlternativesOverlay,
     paperState,
-    questionEditorOpen,
     sameSectionCollisionDetection,
     selectedChromeBlockId,
     selectedQuestion,
-    selectedQuestionContent,
     selectedSlot,
     selectedSlotId,
     setAlternativesIntent,
@@ -249,7 +250,6 @@ function EditorPageWorkspace({
     setHoveredSectionId,
     setHoveredSlotId,
     setInspectorMode,
-    setQuestionEditorOpen,
     undoEntry,
     view,
   } = useEditorWorkspace({ document, renderer, selectedFixtureId });
@@ -856,10 +856,8 @@ function EditorPageWorkspace({
                               {activeRailSlotId === slot.slotId && (
                                 <QuestionActionRail
                                   locked={slot.locked}
-                                  editEnabled={slot.editCapabilities.editText}
                                   lockEnabled={slot.editCapabilities.lock}
                                   swapEnabled={slot.editCapabilities.swap}
-                                  onEdit={() => handleEditQuestion(slot.slotId)}
                                   onInfo={() => handleShowInfo(slot.slotId)}
                                   onAlternatives={(intent) =>
                                     handleShowAlternatives(slot.slotId, intent)
@@ -914,21 +912,6 @@ function EditorPageWorkspace({
           />
         </div>
       )}
-
-      {questionEditorOpen &&
-        selectedSlot &&
-        selectedQuestion &&
-        selectedQuestionContent && (
-          <QuestionEditOverlay
-            displayNumber={selectedSlot.displayNumber}
-            question={selectedQuestion}
-            content={selectedQuestionContent}
-            onApply={(content) =>
-              handleApplyQuestionContent(selectedSlot.slotId, content)
-            }
-            onClose={() => setQuestionEditorOpen(false)}
-          />
-        )}
 
       {dragNotice && (
         <div
@@ -1009,12 +992,11 @@ export function EditorActionBar({
         {status}
       </span>
       {warnings.length > 0 && (
-        <details
-          className="flex items-center gap-1 text-xs text-destructive"
-        >
+        <details className="flex items-center gap-1 text-xs text-destructive">
           <summary className="flex cursor-pointer list-none items-center gap-1">
             <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-            {warnings.length} validation warning{warnings.length === 1 ? '' : 's'}
+            {warnings.length} validation warning
+            {warnings.length === 1 ? '' : 's'}
           </summary>
           <ul className="absolute right-4 top-14 z-30 max-w-md space-y-1 rounded-md border bg-background p-3 text-foreground shadow-lg">
             {warnings.map((warning) => (
@@ -1036,7 +1018,12 @@ export function EditorActionBar({
         <Save className="mr-2 h-4 w-4" aria-hidden="true" />
         Save draft
       </Button>
-      <Button variant="outline" size="sm" disabled title="Review is unavailable">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled
+        title="Review is unavailable"
+      >
         <FileCheck2 className="mr-2 h-4 w-4" aria-hidden="true" />
         Review paper
       </Button>
