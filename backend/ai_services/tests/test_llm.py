@@ -205,6 +205,34 @@ def test_make_chat_model_builds_from_config_and_attaches_observer(clean_llm_env)
     assert any(isinstance(cb, LlmCallObserver) for cb in callbacks)
 
 
+@pytest.mark.parametrize(
+    "provider,model,key_env,expected_cls",
+    [
+        ("anthropic", "claude-haiku-4-5", "ANTHROPIC_API_KEY", "ChatAnthropic"),
+        ("ollama", "llama3.2", None, "ChatOllama"),  # local-capable, no API key
+    ],
+)
+def test_make_chat_model_constructs_swapped_provider(
+    clean_llm_env, provider, model, key_env, expected_cls
+):
+    """Real construction (no invoke, so no API call) for a swapped provider.
+
+    Why this matters: this is the acceptance criterion "swappable... verified
+    with at least two providers, one local-capable". A config-only test would
+    pass even if the integration package were missing — the swap would then be a
+    lie that only surfaces as an ImportError at runtime. Building the real model
+    here proves the dependency is installed and the seam wires it up.
+    """
+    clean_llm_env.setenv("LLM_PROVIDER", provider)
+    clean_llm_env.setenv(f"{provider.upper()}_MODEL", model)
+    if key_env:
+        clean_llm_env.setenv(key_env, "test-key-not-used")
+
+    model_obj = make_chat_model(ModelPurpose.ANSWER_GENERATION)
+
+    assert type(model_obj).__name__ == expected_cls
+
+
 def test_observer_logs_latency_and_tokens_at_seam(caplog):
     """Every call through the seam emits one telemetry line. Why this matters:
     observability is the documented reason the seam exists (ADR-0005); a call
