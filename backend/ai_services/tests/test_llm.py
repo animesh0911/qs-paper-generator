@@ -110,6 +110,8 @@ _SEAM_ENV = [
     "OLLAMA_MODEL",
     "LLM_ANSWER_GENERATION_PROVIDER",
     "LLM_ANSWER_GENERATION_MODEL",
+    "LLM_EXTRACTION_PROVIDER",
+    "LLM_EXTRACTION_MODEL",
 ]
 
 
@@ -130,6 +132,30 @@ def test_config_defaults_to_gemini_extraction_model(clean_llm_env):
     assert cfg.provider == "google_genai"
     assert cfg.model == "gemini-3.5-flash"
     assert cfg.init_kwargs["max_retries"] == 2
+
+
+def test_config_extraction_defaults_to_gemini_extraction_model(clean_llm_env):
+    """Extraction rode the bespoke native-PDF path until #156 put it on the seam;
+    with nothing configured it must resolve to the SAME Gemini model the bespoke
+    path used (gemini-3.5-flash) — a different default would silently change which
+    model (and bill) ingestion hits."""
+    cfg = resolve_chat_model_config(ModelPurpose.EXTRACTION)
+    assert cfg.provider == "google_genai"
+    assert cfg.model == "gemini-3.5-flash"
+
+
+def test_config_extraction_swaps_provider_independently(clean_llm_env):
+    """LLM_EXTRACTION_* moves extraction to another provider without touching the
+    call site or other purposes — the seam's promise applied to ingestion (#134:
+    a local model could replace Gemini extraction by config alone)."""
+    clean_llm_env.setenv("LLM_EXTRACTION_PROVIDER", "ollama")
+    clean_llm_env.setenv("LLM_EXTRACTION_MODEL", "chandra-ocr-2")
+
+    cfg = resolve_chat_model_config(ModelPurpose.EXTRACTION)
+
+    assert cfg.provider == "ollama"
+    assert cfg.model == "chandra-ocr-2"
+    assert "api_key" not in cfg.init_kwargs  # local model needs no key
 
 
 def test_config_swaps_provider_by_env(clean_llm_env):

@@ -8,12 +8,12 @@ Two patterns live here, by design (ADR-0005):
   text-generation surface (answer generation today; verification/editor later)
   swaps Gemini↔Claude↔OpenAI↔local by config without touching call sites.
 
-- **native-PDF extraction** (``LLMClient`` / ``GeminiClient``) — the ingestion
-  path sends the source PDF straight to a multimodal model and gets back
-  structured questions via a provider-enforced response schema (ADR-0004). It
-  stays on the bespoke ``google-genai`` SDK until a benchmark proves
-  ``with_structured_output`` parity (ADR-0005, Consequences), so it is *not* yet
-  on the seam.
+- **native-PDF extraction** (``LLMClient`` / ``GeminiClient``) — the bespoke
+  ``google-genai`` ingestion path: sends the source PDF straight to a multimodal
+  model and gets back structured questions via a provider-enforced response
+  schema (ADR-0004). Extraction now also rides the seam (``SeamExtractor`` in
+  ``bank.ingestor``, via ``with_structured_output`` — #156); this bespoke client
+  is kept revertable until the benchmark parity run is accepted (ADR-0005).
 """
 
 from __future__ import annotations
@@ -148,14 +148,16 @@ def _load_default_generate(api_key: str | None) -> GenerateFunc:
 class ModelPurpose(StrEnum):
     """The logical role a chat model is built for.
 
-    A purpose lets one surface (answer generation today; verification and the
-    editor later) resolve to its own provider/model via env, falling back to the
-    global default — without other surfaces noticing. Extraction is deliberately
-    absent: it stays on the bespoke native-PDF path (ADR-0005) until a benchmark
-    proves ``with_structured_output`` parity.
+    A purpose lets one surface (answer generation, extraction today;
+    verification and the editor later) resolve to its own provider/model via env,
+    falling back to the global default — without other surfaces noticing.
     """
 
     ANSWER_GENERATION = "answer_generation"
+    # Bank ingestion. Moved onto the seam (#156) via LangChain
+    # ``with_structured_output``; gated behind a benchmark-proven parity run
+    # (ADR-0005). Resolves to the Gemini extraction model by default.
+    EXTRACTION = "extraction"
 
 
 @dataclass(frozen=True)
