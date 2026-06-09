@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "accounts",
     "bank",
     "papers",
+    "workflows",
 ]
 
 MIDDLEWARE = [
