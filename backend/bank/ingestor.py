@@ -388,7 +388,17 @@ def _as_nullable(node: dict) -> dict:
     A bare ``anyOf:[{…,enum},{null}]`` loses the enum and ``{…,nullable:true}``
     loses nullability; hoisting ``enum`` beside an ``anyOf:[{type},{type:"null"}]``
     keeps both. The parent marks the field optional with a ``default`` afterwards.
+
+    Only primitive nodes are supported: this rewrite keeps just ``type``/``enum``,
+    so applying it to an object/array would silently drop ``properties``/``items``.
+    The current schema only nullables ``chapter_slug`` (a string); rather than
+    grow speculative nested handling, fail loud (Rule 12) if that ever changes.
     """
+    if "properties" in node or "items" in node:
+        raise ValueError(
+            "genai_to_json_schema supports `nullable` only on primitive nodes; "
+            f"got a {node.get('type')!r} node with nested structure."
+        )
     nullable: dict = {"anyOf": [{"type": node["type"]}, {"type": "null"}]}
     if "enum" in node:
         nullable["enum"] = node["enum"]

@@ -5,7 +5,7 @@ uploaded PDF and creates an ``IngestionJob`` row with ``status=pending`` — it
 makes no Gemini call inside the request. This command is the drainer: run it on
 the platform's cron (Render Cron Jobs / Railway / VPS crontab — no Celery, no
 Redis, no always-on worker), it picks up pending jobs and runs each through the
-same ``GeminiExtractor`` + ``Ingestor`` the CLI path uses, scoping the created
+same ``SeamExtractor`` + ``Ingestor`` the CLI path uses, scoping the created
 ``Question`` rows to the job's ``school``.
 
 ~1-minute pickup latency is irrelevant: extraction itself takes minutes.

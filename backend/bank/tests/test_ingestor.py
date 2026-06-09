@@ -180,6 +180,28 @@ def test_genai_to_json_schema_preserves_constraints_through_langchain_converter(
     assert set(question.properties["cognitive_level"].enum) == {"R", "U", "Ap", "An"}
 
 
+def test_genai_to_json_schema_rejects_nullable_non_primitive():
+    """A ``nullable`` object/array fails loud instead of silently losing structure.
+
+    Why this matters: the nullable rewrite keeps only ``type``/``enum``, so a
+    future schema marking an object or array nullable would silently drop its
+    ``properties``/``items`` and ship a structurally wrong schema to the model.
+    The current schema only nullables a string (``chapter_slug``); guarding the
+    boundary turns a silent mistranslation into an obvious error (Rule 12)."""
+    schema = {
+        "type": "OBJECT",
+        "properties": {
+            "blob": {
+                "type": "OBJECT",
+                "nullable": True,
+                "properties": {"x": {"type": "STRING"}},
+            }
+        },
+    }
+    with pytest.raises(ValueError, match="only on primitive nodes"):
+        genai_to_json_schema(schema)
+
+
 @pytest.mark.django_db
 def test_ingestor_unresolvable_chapter_slug_is_flagged_not_silent():
     """An unresolvable slug → chapter null but LOUD: flagged + parse_quality down.
