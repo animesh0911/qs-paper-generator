@@ -8,3 +8,6 @@ pytest-django>=4.8
 factory-boy>=3.3
 playwright>=1.52
 google-genai>=1.0,<2.0
+langgraph>=0.3,<0.7
+langchain>=0.3,<0.4
+langgraph-checkpoint-postgres>=2.0,<3.0
