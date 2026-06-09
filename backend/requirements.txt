@@ -10,4 +10,12 @@ playwright>=1.52
 google-genai>=1.0,<2.0
 langgraph>=0.3,<0.7
 langchain>=0.3,<0.4
+# Provider integrations for the model seam (ADR-0005). Gemini is the default;
+# the others let LLM_PROVIDER swap to Claude/OpenAI/local without code changes.
+# Pinned to the 0.3 line so they stay on langchain-core 0.3 (the 1.x lines pull
+# core 1.x, which conflicts with langchain 0.3).
+langchain-google-genai>=2.0,<3.0
+langchain-anthropic>=0.3,<0.4
+langchain-openai>=0.3,<0.4
+langchain-ollama>=0.3,<0.4
 langgraph-checkpoint-postgres>=2.0,<3.0

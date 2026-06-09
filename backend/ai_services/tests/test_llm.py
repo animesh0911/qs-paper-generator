@@ -1,19 +1,36 @@
-"""Tests for the Gemini native-PDF LLM gateway.
+"""Tests for the shared LLM module: the native-PDF extraction adapter and the
+provider-agnostic model seam.
 
-`GeminiClient.extract` is exercised through an injected `generate_func`, so the
-suite never imports google-genai or hits the network.
+The extraction adapter is exercised through an injected ``generate_func`` and the
+seam through an injected ``init``/a ``GenericFakeChatModel``, so the suite never
+imports a provider integration or hits the network.
 """
 
 from __future__ import annotations
 
 import json
+import logging
+
+import pytest
+from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
+from langchain_core.messages import AIMessage
 
 from ai_services.llm import (
     _DEFAULT_THINKING_BUDGET,
+    ChatModelConfig,
     GeminiClient,
+    LlmCallObserver,
+    ModelPurpose,
     _thinking_budget,
+    make_chat_model,
     make_llm_client,
+    resolve_chat_model_config,
 )
+
+# ---------------------------------------------------------------------------
+# Native-PDF extraction adapter (ADR-0004) — stays on the bespoke google-genai
+# path, off the seam.
+# ---------------------------------------------------------------------------
 
 
 def test_extract_sends_pdf_prompt_schema_and_parses_json():
@@ -42,36 +59,6 @@ def test_extract_sends_pdf_prompt_schema_and_parses_json():
     assert call["prompt"] == "extract section A"
     assert call["response_schema"] is schema
     assert call["timeout"] == 12
-
-
-def test_generate_text_sends_prompt_schema_and_parses_json():
-    """generate_text passes the prompt + schema through (no PDF) and parses JSON.
-
-    Why this matters: answer generation rides this seam. If the arg contract or
-    JSON parsing drifts, every generated answer breaks."""
-    calls = []
-
-    def fake_generate_text(**kwargs):
-        calls.append(kwargs)
-        return json.dumps({"answer": "Oxygen."})
-
-    schema = {"type": "OBJECT"}
-    client = GeminiClient(
-        model="gemini-3.5-flash",
-        generate_text_func=fake_generate_text,
-        timeout=12,
-    )
-
-    result = client.generate_text("answer this question", schema)
-
-    assert result == {"answer": "Oxygen."}
-    assert len(calls) == 1
-    call = calls[0]
-    assert call["model"] == "gemini-3.5-flash"
-    assert call["prompt"] == "answer this question"
-    assert call["response_schema"] is schema
-    assert call["timeout"] == 12
-    assert "pdf_bytes" not in call
 
 
 def test_model_defaults_to_gemini_3_5_flash(monkeypatch):
@@ -104,3 +91,171 @@ def test_thinking_budget_invalid_env_falls_back(monkeypatch):
     """A non-integer env value falls back to the default, not a crash."""
     monkeypatch.setenv("GEMINI_THINKING_BUDGET", "lots")
     assert _thinking_budget() == _DEFAULT_THINKING_BUDGET
+
+
+# ---------------------------------------------------------------------------
+# Model seam (ADR-0005) — provider/model/key/retry resolved in one place so
+# call sites are provider-blind.
+# ---------------------------------------------------------------------------
+
+_SEAM_ENV = [
+    "LLM_PROVIDER",
+    "LLM_MAX_RETRIES",
+    "GEMINI_MODEL",
+    "GEMINI_API_KEY",
+    "ANTHROPIC_MODEL",
+    "ANTHROPIC_API_KEY",
+    "OPENAI_MODEL",
+    "OPENAI_API_KEY",
+    "OLLAMA_MODEL",
+    "LLM_ANSWER_GENERATION_PROVIDER",
+    "LLM_ANSWER_GENERATION_MODEL",
+]
+
+
+@pytest.fixture
+def clean_llm_env(monkeypatch):
+    """Strip every env var the seam reads so config resolution is hermetic
+    regardless of what the container/compose injected."""
+    for key in _SEAM_ENV:
+        monkeypatch.delenv(key, raising=False)
+    return monkeypatch
+
+
+def test_config_defaults_to_gemini_extraction_model(clean_llm_env):
+    """With nothing configured the seam defaults to Gemini on the same model as
+    extraction — answer generation rides the existing provider, not a surprise
+    one. Why this matters: a wrong default silently changes who gets billed."""
+    cfg = resolve_chat_model_config(ModelPurpose.ANSWER_GENERATION)
+    assert cfg.provider == "google_genai"
+    assert cfg.model == "gemini-3.5-flash"
+    assert cfg.init_kwargs["max_retries"] == 2
+
+
+def test_config_swaps_provider_by_env(clean_llm_env):
+    """LLM_PROVIDER swaps the provider without any call site changing — the whole
+    point of the seam (ADR-0005)."""
+    clean_llm_env.setenv("LLM_PROVIDER", "anthropic")
+    clean_llm_env.setenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+    clean_llm_env.setenv("ANTHROPIC_API_KEY", "sk-test")
+
+    cfg = resolve_chat_model_config(ModelPurpose.ANSWER_GENERATION)
+
+    assert cfg.provider == "anthropic"
+    assert cfg.model == "claude-sonnet-4-6"
+    assert cfg.init_kwargs["api_key"] == "sk-test"
+
+
+def test_config_swaps_to_local_provider(clean_llm_env):
+    """A local-capable provider (ollama) swaps in by config with no API key —
+    proving the seam isn't tied to a hosted vendor (#134)."""
+    clean_llm_env.setenv("LLM_PROVIDER", "ollama")
+    clean_llm_env.setenv("OLLAMA_MODEL", "llama3.2")
+
+    cfg = resolve_chat_model_config(ModelPurpose.ANSWER_GENERATION)
+
+    assert cfg.provider == "ollama"
+    assert cfg.model == "llama3.2"
+    assert "api_key" not in cfg.init_kwargs  # local model needs no key
+
+
+def test_config_purpose_override_beats_global(clean_llm_env):
+    """A purpose-specific override wins over the global default, so one surface
+    can move providers without dragging the others."""
+    clean_llm_env.setenv("LLM_PROVIDER", "gemini")
+    clean_llm_env.setenv("LLM_ANSWER_GENERATION_PROVIDER", "anthropic")
+    clean_llm_env.setenv("LLM_ANSWER_GENERATION_MODEL", "claude-haiku-4-5")
+
+    cfg = resolve_chat_model_config(ModelPurpose.ANSWER_GENERATION)
+
+    assert cfg.provider == "anthropic"
+    assert cfg.model == "claude-haiku-4-5"
+
+
+def test_config_unknown_provider_fails_loud(clean_llm_env):
+    clean_llm_env.setenv("LLM_PROVIDER", "wishful")
+    with pytest.raises(ValueError, match="Unknown LLM provider"):
+        resolve_chat_model_config(ModelPurpose.ANSWER_GENERATION)
+
+
+def test_config_missing_model_fails_loud(clean_llm_env):
+    """A provider with no built-in default and no <PREFIX>_MODEL must fail loud,
+    not silently construct an unintended model (Rule 12)."""
+    clean_llm_env.setenv("LLM_PROVIDER", "anthropic")  # no default model
+    with pytest.raises(ValueError, match="No model configured"):
+        resolve_chat_model_config(ModelPurpose.ANSWER_GENERATION)
+
+
+def test_make_chat_model_builds_from_config_and_attaches_observer(clean_llm_env):
+    """make_chat_model hands the resolved config to init_chat_model and attaches
+    the seam observer — that wiring is what makes every call observable."""
+    captured = {}
+
+    def fake_init(model, **kwargs):
+        captured["model"] = model
+        captured["kwargs"] = kwargs
+        return GenericFakeChatModel(messages=iter([AIMessage(content="ok")]))
+
+    make_chat_model(ModelPurpose.ANSWER_GENERATION, init=fake_init)
+
+    assert captured["model"] == "gemini-3.5-flash"
+    assert captured["kwargs"]["model_provider"] == "google_genai"
+    assert captured["kwargs"]["max_retries"] == 2
+    callbacks = captured["kwargs"]["callbacks"]
+    assert any(isinstance(cb, LlmCallObserver) for cb in callbacks)
+
+
+@pytest.mark.parametrize(
+    "provider,model,key_env,expected_cls",
+    [
+        ("anthropic", "claude-haiku-4-5", "ANTHROPIC_API_KEY", "ChatAnthropic"),
+        ("ollama", "llama3.2", None, "ChatOllama"),  # local-capable, no API key
+    ],
+)
+def test_make_chat_model_constructs_swapped_provider(
+    clean_llm_env, provider, model, key_env, expected_cls
+):
+    """Real construction (no invoke, so no API call) for a swapped provider.
+
+    Why this matters: this is the acceptance criterion "swappable... verified
+    with at least two providers, one local-capable". A config-only test would
+    pass even if the integration package were missing — the swap would then be a
+    lie that only surfaces as an ImportError at runtime. Building the real model
+    here proves the dependency is installed and the seam wires it up.
+    """
+    clean_llm_env.setenv("LLM_PROVIDER", provider)
+    clean_llm_env.setenv(f"{provider.upper()}_MODEL", model)
+    if key_env:
+        clean_llm_env.setenv(key_env, "test-key-not-used")
+
+    model_obj = make_chat_model(ModelPurpose.ANSWER_GENERATION)
+
+    assert type(model_obj).__name__ == expected_cls
+
+
+def test_observer_logs_latency_and_tokens_at_seam(caplog):
+    """Every call through the seam emits one telemetry line. Why this matters:
+    observability is the documented reason the seam exists (ADR-0005); a call
+    that doesn't log is a blind spot for cost/latency."""
+    model = GenericFakeChatModel(
+        messages=iter([AIMessage(content="hi")]),
+        callbacks=[LlmCallObserver(ModelPurpose.ANSWER_GENERATION)],
+    )
+
+    with caplog.at_level(logging.INFO, logger="ai_services.llm"):
+        model.invoke("anything")
+
+    records = [r for r in caplog.records if r.message.startswith("llm_call ")]
+    assert len(records) == 1
+    msg = records[0].getMessage()
+    assert "purpose=answer_generation" in msg
+    assert "latency_ms=" in msg
+    # A fake model reports no usage; the observer must degrade to {} not crash.
+    assert "tokens={}" in msg
+
+
+def test_chat_model_config_is_immutable():
+    """The resolved recipe is frozen so a caller can't mutate shared config."""
+    cfg = ChatModelConfig(provider="google_genai", model="m", init_kwargs={})
+    with pytest.raises(Exception):
+        cfg.model = "other"  # type: ignore[misc]
