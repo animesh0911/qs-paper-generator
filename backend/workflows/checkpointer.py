@@ -29,14 +29,22 @@ from contextlib import contextmanager
 
 from django.db import connection
 from langgraph.checkpoint.postgres import PostgresSaver
+from psycopg.conninfo import make_conninfo
 
 
 def conn_string(settings_dict: dict) -> str:
-    """Build a ``postgresql://`` URI from a Django DB ``settings_dict``."""
-    return (
-        f"postgresql://{settings_dict['USER']}:{settings_dict['PASSWORD']}"
-        f"@{settings_dict['HOST']}:{settings_dict['PORT']}"
-        f"/{settings_dict['NAME']}"
+    """Build a libpq conninfo string from a Django DB ``settings_dict``.
+
+    Uses ``make_conninfo`` rather than hand-formatting a URI so credentials with
+    special characters (``@ : / ?`` — common in generated production passwords)
+    are escaped correctly instead of corrupting the host/password boundary.
+    """
+    return make_conninfo(
+        host=settings_dict["HOST"],
+        port=settings_dict["PORT"],
+        user=settings_dict["USER"],
+        password=settings_dict["PASSWORD"],
+        dbname=settings_dict["NAME"],
     )
 
 
