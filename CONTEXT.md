@@ -137,3 +137,41 @@ These mirror `.claude/skills/improve-codebase-architecture/LANGUAGE.md`. Reuse t
 - **Adapter** — a concrete thing satisfying an interface at a seam.
 - **Depth** — leverage at the interface (a lot of behaviour, small interface).
 - **Locality** — change, bugs, knowledge concentrated in one place.
+
+## LLM orchestration terms
+
+Vocabulary for the LangGraph migration. Names the design in ADR-0005 (orchestration
+layer) and ADR-0006 (durability). These are the agreed terms; implementation is
+sequenced, not yet built — use them in code/PRs as the migration lands.
+
+**LLM workflow**
+A multi-step LLM-judgment orchestration — one that branches on model output, loops
+with retries, or pauses for review. Expressed as **one compiled LangGraph
+`StateGraph`** (the single workflow idiom), living in the `workflows/` package and
+invoked uniformly. The "altitude 2" pattern; it composes **model seam** calls in
+its nodes and persists via the **checkpointer**. The deterministic engine
+(`QuestionPicker`, `PaperBuilder`, …) is *not* an LLM workflow — it is plain Python
+the graphs call. See ADR-0005.
+_Avoid_: agent, chain, pipeline (for this).
+
+**model seam** (chat-model factory)
+The "altitude 1" pattern — *call the model once*. `make_chat_model(purpose)` in
+`ai_services.llm` is the one place that constructs a provider-agnostic LangChain
+chat model and owns provider/model/key/tracing/retry. Successor to the `LLMClient`
+adapter (ADR-0004). Tests inject a fake factory, not a patched module. See ADR-0005.
+_Avoid_: LLM gateway, model wrapper.
+
+**job ledger**
+The queryable Postgres lifecycle record of an async workflow (`IngestionJob`;
+planned `GenerationBatch`): `status`, `school`, owner, result counts, the poll
+endpoint, and a `thread_id` pointer to the **checkpointer**. The business record the
+API reads — distinct from execution state. See ADR-0006.
+_Avoid_: job queue, task record.
+
+**checkpointer**
+LangGraph's `PostgresSaver`, persisting an **LLM workflow**'s in-flight execution
+state keyed by `thread_id` — the engine-internal record that makes a workflow
+resumable after a crash and lets it pause for human review and resume from a
+separate process (the cron-drain). The complement to the **job ledger**: ledger =
+"what/who/status", checkpointer = "where in the graph". See ADR-0006.
+_Avoid_: cache, session store.
