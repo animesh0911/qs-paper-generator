@@ -20,7 +20,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from bank.models import Question
+from bank.models import AnswerSource, Question
 from bank.serializers import AnswerKeySerializer
 
 from .builder import PaperBuilder
@@ -161,7 +161,7 @@ class PaperAnswerKeyPdfView(APIView):
         return {
             f"q_{row['id']}": row["answer"]
             for row in rows
-            if row["answer_source"] != "generated_unverified"
+            if row["answer_source"] != AnswerSource.GENERATED_UNVERIFIED
         }
 
 
