@@ -2,14 +2,16 @@
 
 Covers the teacher upload endpoint (202 + queued ``IngestionJob``, school
 scoping, caller-supplied ``source_type``, permission gate), the status-poll
-endpoint (own-school only), the ``drain_ingestion_jobs`` command (stub
-Extractor — no live Gemini), and that the ``Ingestor`` scopes persisted rows to
-``school``. WHY each test matters is in its docstring.
+endpoint (own-school only), the ``drain_ingestion_jobs`` command (a fake
+``make_chat_model`` at the seam — no live Gemini; the drain runs the real
+extraction graph against the real checkpointer, #157), and that the
+``Ingestor`` scopes persisted rows to ``school``. WHY each test matters is in
+its docstring. Resume/idempotency mechanics of the graph itself live in
+``workflows.tests.test_extraction``.
 """
 
 from __future__ import annotations
 
-import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from rest_framework.test import APIClient
@@ -54,11 +56,32 @@ class StubExtractor:
         return [dict(q) for q in self._questions]
 
 
-class BoomExtractor:
-    """Raises — exercises the drain failure path."""
+class SeamFake:
+    """``make_chat_model`` stand-in at the drain seam — acts as both the chat
+    model and its structured runnable; each invoke pops one canned page
+    payload (``boom=True`` raises instead). No provider package, no network."""
 
-    def extract(self, pdf_bytes):
-        raise RuntimeError("extraction blew up")
+    def __init__(self, payloads=(), boom=False):
+        self._payloads = list(payloads)
+        self.boom = boom
+        self.calls = 0
+
+    def __call__(self, purpose):
+        return self
+
+    def with_structured_output(self, schema, method=None):
+        return self
+
+    def invoke(self, messages):
+        self.calls += 1
+        if self.boom:
+            raise RuntimeError("extraction blew up")
+        return self._payloads.pop(0) if self._payloads else {"questions": []}
+
+
+def _page_payload(text="What is photosynthesis?"):
+    """One raw per-page model payload (pre-coercion shape)."""
+    return {"questions": [{"qtype": "short_answer", "marks": 3, "rawText": text}]}
 
 
 class StubCropper:
@@ -171,6 +194,22 @@ def test_status_returns_own_jobs_progress(api_client, user):
     assert resp.data["skipped_count"] == 2
 
 
+def test_status_does_not_expose_thread_id(api_client, user):
+    """``thread_id`` is the execution-state pointer (ADR-0006) — checkpointer
+    internals, not job status. The poll shape must stay a plain ledger read, so
+    adding the field (#157) must not leak it to clients."""
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        source_file_name="31-2-1.pdf",
+        thread_id="abc123",
+    )
+    resp = api_client.get(f"/api/bank/ingest/{job.pk}/")
+    assert resp.status_code == 200
+    assert "thread_id" not in resp.data
+
+
 def test_status_hides_other_schools_jobs_as_404(api_client):
     """Tenancy: a teacher must not even learn another school's job exists, so a
     cross-school id is 404 (not 403)."""
@@ -189,26 +228,12 @@ def test_status_hides_other_schools_jobs_as_404(api_client):
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture
-def _stub_drain(monkeypatch):
-    """Replace the command's ``Ingestor`` with one wired to stub adapters so the
-    drain runs end-to-end against the DB without a paid Gemini call."""
-
-    def _factory(extractor):
-        monkeypatch.setattr(
-            drain_mod,
-            "Ingestor",
-            lambda: Ingestor(extractor=extractor, cropper=StubCropper()),
-        )
-
-    return _factory
-
-
-def test_drain_processes_pending_job_into_bank(db, user, _stub_drain):
+def test_drain_processes_pending_job_into_bank(db, user, monkeypatch):
     """The drain is the only place questions actually enter the bank on the HTTP
-    path. A drained job must persist rows scoped to its school and record the
-    result counts the teacher polls for."""
-    _stub_drain(StubExtractor([_q()]))
+    path. A drained job must persist rows scoped to its school, record the
+    result counts the teacher polls for, and gain the ``thread_id`` pointer
+    that makes a later resume possible (ADR-0006)."""
+    monkeypatch.setattr(drain_mod, "make_chat_model", SeamFake([_page_payload()]))
     job = IngestionJob.objects.create(
         school=user.school,
         created_by=user,
@@ -222,16 +247,17 @@ def test_drain_processes_pending_job_into_bank(db, user, _stub_drain):
     job.refresh_from_db()
     assert job.status == IngestionJobStatus.DONE
     assert job.created_count == 1
+    assert job.thread_id  # the ledger now points at its graph thread
     q = Question.objects.get()
     assert q.school == user.school
     assert q.source_type == SourceType.SAMPLE_PAPER
     assert q.verified is False
 
 
-def test_drain_records_failure_without_aborting(db, user, _stub_drain):
+def test_drain_records_failure_without_aborting(db, user, monkeypatch):
     """One bad PDF must not crash the whole cron run — the job is marked failed
     with the error so the teacher sees why, and the drain stays drainable."""
-    _stub_drain(BoomExtractor())
+    monkeypatch.setattr(drain_mod, "make_chat_model", SeamFake(boom=True))
     job = IngestionJob.objects.create(
         school=user.school, pdf=_pdf_upload(), source_file_name="bad.pdf"
     )
@@ -245,13 +271,14 @@ def test_drain_records_failure_without_aborting(db, user, _stub_drain):
 
 
 def test_drain_dry_run_makes_no_changes(db, user, monkeypatch):
-    """``--dry-run`` is the Rule 13 safety valve: it must never construct the
-    Gemini-backed Ingestor nor touch the job."""
+    """``--dry-run`` is the Rule 13 safety valve: it must never build a model,
+    never open the checkpointer, and never touch the job."""
 
-    def _boom():
-        raise AssertionError("dry-run must not build an Ingestor")
+    def _boom(*args, **kwargs):
+        raise AssertionError("dry-run must not touch the graph runtime")
 
-    monkeypatch.setattr(drain_mod, "Ingestor", _boom)
+    monkeypatch.setattr(drain_mod, "make_chat_model", _boom)
+    monkeypatch.setattr(drain_mod, "get_checkpointer", _boom)
     job = IngestionJob.objects.create(
         school=user.school, pdf=_pdf_upload(), source_file_name="x.pdf"
     )
