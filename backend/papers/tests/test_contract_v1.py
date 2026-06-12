@@ -332,7 +332,7 @@ def _image_asset_ids(content) -> set[str]:
 
 @pytest.mark.django_db
 def test_image_assets_resolve_in_storage(document):
-    """Every image assetId in question content resolves to a stored file (§9, §135 task 6).
+    """Every image assetId in content resolves to a stored file (§9, §135 task 6).
 
     A stale or mismatched assetId would pass every shape assertion above yet
     404 in the renderer — this is the check that actually proves the asset is
