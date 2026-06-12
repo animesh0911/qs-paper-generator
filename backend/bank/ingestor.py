@@ -565,7 +565,7 @@ def _coerce_question(obj: dict) -> dict:
     }
 
 
-def _split_pages(pdf_bytes: bytes) -> list[bytes]:
+def split_pages(pdf_bytes: bytes) -> list[bytes]:
     """Split a PDF into one single-page PDF per page (in document order).
 
     Each slice is fed to the model alone so it reads one page deeply rather than
@@ -591,7 +591,54 @@ def _split_pages(pdf_bytes: bytes) -> list[bytes]:
         src.close()
 
 
-def _coerce_and_merge(page_payloads: Iterable[dict]) -> list[dict]:
+def count_pages(pdf_bytes: bytes) -> int:
+    """Page count with ``split_pages``'s fallback semantics: never less than 1.
+
+    An unparseable or empty PDF counts as one page — the whole-document slice
+    ``slice_page`` falls back to — so a caller iterating ``range(count_pages())``
+    over ``slice_page`` visits exactly the slices ``split_pages`` would return.
+    """
+    import fitz
+
+    try:
+        src = fitz.open(stream=pdf_bytes, filetype="pdf")
+    except Exception:  # noqa: BLE001 — unparseable PDF: one whole-document call
+        return 1
+    try:
+        return src.page_count or 1
+    finally:
+        src.close()
+
+
+def slice_page(pdf_bytes: bytes, index: int) -> bytes:
+    """One single-page PDF slice, copying only that page (O(1) per call).
+
+    The per-step counterpart to ``split_pages`` for the extraction workflow
+    (#157), whose ``extract_page`` node re-reads the PDF each super-step:
+    slicing just the wanted page keeps a paper's total split work O(pages)
+    instead of O(pages²). Same fallback as ``split_pages``: an unparseable or
+    empty PDF yields the whole document (its only slice, index 0).
+    """
+    import fitz
+
+    try:
+        src = fitz.open(stream=pdf_bytes, filetype="pdf")
+    except Exception:  # noqa: BLE001 — unparseable PDF: the whole-document slice
+        return pdf_bytes
+    try:
+        if src.page_count == 0:
+            return pdf_bytes
+        one = fitz.open()
+        try:
+            one.insert_pdf(src, from_page=index, to_page=index)
+            return one.tobytes()
+        finally:
+            one.close()
+    finally:
+        src.close()
+
+
+def merge_page_payloads(page_payloads: Iterable[dict]) -> list[dict]:
     """Coerce, page-rewrite, and de-duplicate per-page extraction payloads.
 
     Shared by both Extractors: ``page_payloads`` yields one ``{"questions": [...]}``
@@ -639,9 +686,9 @@ class GeminiExtractor:
         # Close chapter_slug to the live taxonomy so the model can only emit a
         # canonical slug (or null) — built once per paper, not per page.
         schema = build_question_schema(Chapter.objects.values_list("slug", flat=True))
-        return _coerce_and_merge(
+        return merge_page_payloads(
             self.client.extract(page_bytes, prompt, schema)
-            for page_bytes in _split_pages(pdf_bytes)
+            for page_bytes in split_pages(pdf_bytes)
         )
 
 
@@ -681,27 +728,41 @@ class SeamExtractor:
     schema's closed ``chapter_slug`` enum and ``nullable``/``required`` constraints
     survive the JSON-Schema translation (``genai_to_json_schema``). Page-at-a-time
     extraction, coercion, figure page-rewrite, and dedup are shared with
-    ``GeminiExtractor`` (``_coerce_and_merge``). ``make_model`` is injectable so
+    ``GeminiExtractor`` (``merge_page_payloads``). ``make_model`` is injectable so
     tests pass a fake factory — no module patching (Rules 9/11).
     """
 
     def __init__(self, make_model: MakeChatModel = make_chat_model):
         self._make_model = make_model
 
-    def extract(self, pdf_bytes: bytes) -> list[dict]:
+    def _structured(self):
         # Close chapter_slug to the live taxonomy, then translate to the standard
-        # JSON Schema LangChain's structured-output converter speaks — built once
-        # per paper, not per page.
+        # JSON Schema LangChain's structured-output converter speaks.
         json_schema = genai_to_json_schema(
             build_question_schema(Chapter.objects.values_list("slug", flat=True))
         )
-        structured = self._make_model(ModelPurpose.EXTRACTION).with_structured_output(
+        return self._make_model(ModelPurpose.EXTRACTION).with_structured_output(
             json_schema, method="json_mode"
         )
+
+    def extract_page(self, page_bytes: bytes) -> dict:
+        """One page slice → one raw ``{"questions": [...]}`` payload (one paid call).
+
+        The page-sized unit the extraction workflow checkpoints (#157): each
+        call is exactly one model invocation, so a resumed graph thread never
+        re-pays for a page it already extracted. Coercion, figure page-rewrite,
+        and dedup happen later over the accumulated payloads
+        (``merge_page_payloads``) — the payload is checkpointed verbatim.
+        """
+        return self._structured().invoke(_page_message(_page_prompt(), page_bytes))
+
+    def extract(self, pdf_bytes: bytes) -> list[dict]:
+        # Structured model built once per paper, not per page.
+        structured = self._structured()
         prompt = _page_prompt()
-        return _coerce_and_merge(
+        return merge_page_payloads(
             structured.invoke(_page_message(prompt, page_bytes))
-            for page_bytes in _split_pages(pdf_bytes)
+            for page_bytes in split_pages(pdf_bytes)
         )
 
 
@@ -774,7 +835,33 @@ class Ingestor:
         ``school`` scopes the created rows to the uploading teacher's tenant (the
         live HTTP path); the committed-JSON CLI path leaves it ``None``.
         """
-        raw_questions = self.extractor.extract(pdf_bytes)
+        return self.ingest_extracted(
+            self.extractor.extract(pdf_bytes),
+            source_file_name=source_file_name,
+            source_type=source_type,
+            school=school,
+            pdf_bytes=pdf_bytes,
+        )
+
+    def ingest_extracted(
+        self,
+        raw_questions: list[dict],
+        *,
+        source_file_name: str = "",
+        source_type: str = "",
+        school=None,
+        pdf_bytes: bytes | None = None,
+    ) -> IngestResult:
+        """Persist already-extracted question dicts through the shared tail.
+
+        The model-free half of ``ingest``: the extraction workflow
+        (``workflows.extraction``) extracts pages itself — one checkpointed
+        model call per page (#157) — then hands the merged dicts here so the
+        live graph path runs the exact same quality/guardrail/dedup/persist
+        tail as both existing front doors. The ``source_hash`` dedup against
+        the bank is what makes a resumed persist step idempotent: re-running
+        it can only skip, never duplicate.
+        """
         if not raw_questions:
             return IngestResult(created=0)
 

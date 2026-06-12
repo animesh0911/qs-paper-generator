@@ -220,8 +220,11 @@ class IngestionJobStatus(models.TextChoices):
     """Lifecycle of an out-of-request PDF ingestion (no upfront review, V1).
 
     ``pending`` rows are picked up by ``drain_ingestion_jobs`` (cron), flipped
-    to ``running`` while Gemini extracts, then ``done`` (with result counts) or
-    ``failed`` (with ``error``)."""
+    to ``running`` while the extraction graph runs, then ``done`` (with result
+    counts) or ``failed`` (with ``error``). A ``running`` row whose process
+    died is not stuck: the next drain pass resumes its graph thread from the
+    last per-page checkpoint (#157), so re-picking ``running`` never re-bills
+    already-extracted pages."""
 
     PENDING = "pending", "Pending"
     RUNNING = "running", "Running"
@@ -236,10 +239,11 @@ class IngestionJob(models.Model):
     and creates one of these rows with ``status=pending``, returning 202 + the
     job id immediately — no Gemini call inside the request. A scheduled
     ``drain_ingestion_jobs`` management command (platform cron, no Celery /
-    Redis / worker daemon) processes pending rows via the same
-    ``SeamExtractor`` + ``Ingestor`` the CLI path uses, scoping the created
-    ``Question`` rows to ``school``. The frontend polls ``GET
-    /api/bank/ingest/{id}/`` for status and result counts.
+    Redis / worker daemon) runs each job's extraction ``StateGraph``
+    (``workflows.extraction``) — checkpointed per page, resumed by
+    ``thread_id`` (ADR-0006) — scoping the created ``Question`` rows to
+    ``school``. The frontend polls ``GET /api/bank/ingest/{id}/`` for status
+    and result counts.
 
     See the two-front-door note in CONTEXT.md ``Ingestor``: this is the live
     HTTP path for teachers; the committed-JSON CLI path is the developer one.
@@ -273,6 +277,12 @@ class IngestionJob(models.Model):
         default=IngestionJobStatus.PENDING,
         db_index=True,
     )
+    # Pointer into the LangGraph checkpointer (ADR-0006): the graph thread that
+    # owns this job's in-flight extraction state. Assigned on first drain
+    # pickup; later passes resume the same thread instead of restarting it.
+    # Ledger-internal — never exposed by the poll serializer. 64 leaves margin
+    # over both id conventions in play (uuid4().hex = 32, str(uuid4()) = 36).
+    thread_id = models.CharField(max_length=64, blank=True, default="")
     # Result counts, populated on success (mirror IngestResult).
     created_count = models.PositiveIntegerField(default=0)
     skipped_count = models.PositiveIntegerField(default=0)

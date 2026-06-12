@@ -300,7 +300,7 @@ def test_gemini_extractor_calls_client_once_per_page_and_merges(monkeypatch):
 
     Why this matters: per-page extraction is what gives deep reads on long
     scanned papers — the coordinator must call once per page, not once per doc."""
-    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2", b"p3"])
+    monkeypatch.setattr("bank.ingestor.split_pages", lambda b: [b"p1", b"p2", b"p3"])
     client = SequenceLLMClient()
     out = GeminiExtractor(client=client).extract(b"%PDF")
 
@@ -403,7 +403,7 @@ def test_gemini_extractor_dedups_question_spanning_pages(monkeypatch):
 
     Why this matters: a question straddling a page break is seen on both pages;
     the fingerprint dedup keeps the bank from carrying duplicates."""
-    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2"])
+    monkeypatch.setattr("bank.ingestor.split_pages", lambda b: [b"p1", b"p2"])
 
     class RepeatClient:
         def extract(self, pdf_bytes, prompt, response_schema):
@@ -427,7 +427,7 @@ def test_gemini_extractor_rewrites_figure_page_to_absolute(monkeypatch):
 
     Why this matters: the cropper clips from the full document, so a per-page
     figure ref of 1 must become the real page or the wrong page gets cropped."""
-    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2", b"p3"])
+    monkeypatch.setattr("bank.ingestor.split_pages", lambda b: [b"p1", b"p2", b"p3"])
 
     class FigureOnEachPage:
         def __init__(self):
@@ -532,7 +532,7 @@ def test_seam_extractor_sends_each_page_as_inline_pdf_and_merges(monkeypatch):
     Why this matters: extraction parity isn't just the schema — the multimodal
     message (PDF in, not OCR text) and per-page fan-out are what give recall on
     long scanned papers, so they must survive the move to LangChain messages."""
-    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2"])
+    monkeypatch.setattr("bank.ingestor.split_pages", lambda b: [b"p1", b"p2"])
     payloads = [
         {"questions": [{"qtype": "short_answer", "marks": 2, "rawText": "Q1"}]},
         {"questions": [{"qtype": "short_answer", "marks": 2, "rawText": "Q2"}]},
