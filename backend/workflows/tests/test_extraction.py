@@ -74,9 +74,9 @@ def _cfg(thread_id: str) -> dict:
 @pytest.fixture
 def three_pages(monkeypatch):
     """Make the stub PDF split into three pages — three checkpointed steps."""
-    monkeypatch.setattr(
-        "workflows.extraction.split_pages", lambda b: [b"p1", b"p2", b"p3"]
-    )
+    pages = [b"p1", b"p2", b"p3"]
+    monkeypatch.setattr("workflows.extraction.count_pages", lambda b: len(pages))
+    monkeypatch.setattr("workflows.extraction.slice_page", lambda b, i: pages[i])
 
 
 def _crash_mid_paper(job, thread_id):

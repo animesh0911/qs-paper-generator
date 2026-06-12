@@ -280,8 +280,9 @@ class IngestionJob(models.Model):
     # Pointer into the LangGraph checkpointer (ADR-0006): the graph thread that
     # owns this job's in-flight extraction state. Assigned on first drain
     # pickup; later passes resume the same thread instead of restarting it.
-    # Ledger-internal — never exposed by the poll serializer.
-    thread_id = models.CharField(max_length=32, blank=True, default="")
+    # Ledger-internal — never exposed by the poll serializer. 64 leaves margin
+    # over both id conventions in play (uuid4().hex = 32, str(uuid4()) = 36).
+    thread_id = models.CharField(max_length=64, blank=True, default="")
     # Result counts, populated on success (mirror IngestResult).
     created_count = models.PositiveIntegerField(default=0)
     skipped_count = models.PositiveIntegerField(default=0)

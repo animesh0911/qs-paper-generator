@@ -21,19 +21,21 @@ Patterns / invariants:
   arguments (the injection seams — no module globals), mirroring
   ``build_skeleton_graph`` and ``Ingestor(extractor=...)`` (Rules 9/11).
 - State carries the ``job_id`` and the raw page payloads, never the PDF bytes:
-  nodes re-read the PDF from the job row so checkpoints stay small. The
-  ``payloads`` list is ordered by page (``operator.add`` over a single
-  sequential branch), which ``merge_page_payloads`` relies on for figure
-  page-rewrite.
-- ``split_pages`` never returns an empty list (whole-PDF fallback), so the
-  ``plan`` → ``extract_page`` edge needs no guard.
+  nodes re-read the PDF from the job row each step so checkpoints stay small
+  and a resumed process reads the same durable source — scratch files would
+  die with the killed process. Each step slices only its own page
+  (``slice_page``), keeping total split work O(pages). The ``payloads`` list
+  is ordered by page (``operator.add`` over a single sequential branch),
+  which ``merge_page_payloads`` relies on for figure page-rewrite.
+- ``count_pages`` never returns less than 1 (whole-PDF fallback, mirroring
+  ``slice_page``), so the ``plan`` → ``extract_page`` edge needs no guard.
 
 Where it fits:
 - Called by: ``bank.management.commands.drain_ingestion_jobs`` via
   ``graph.invoke(state, {thread_id})`` (fresh) or ``graph.invoke(None, ...)``
   (resume).
 - Calls into: ``bank.ingestor`` (``SeamExtractor``, ``Ingestor``,
-  ``split_pages``, ``merge_page_payloads``).
+  ``count_pages``, ``slice_page``, ``merge_page_payloads``).
 - Persisted via: LangGraph ``PostgresSaver`` (``workflows.checkpointer``).
 """
 
@@ -50,8 +52,9 @@ from bank.ingestor import (
     Ingestor,
     MakeChatModel,
     SeamExtractor,
+    count_pages,
     merge_page_payloads,
-    split_pages,
+    slice_page,
 )
 from bank.models import IngestionJob
 
@@ -85,11 +88,11 @@ def build_extraction_graph(
 
     def plan(state: ExtractionState) -> dict:
         _, pdf_bytes = _load_job_pdf(state["job_id"])
-        return {"total_pages": len(split_pages(pdf_bytes)), "next_page": 0}
+        return {"total_pages": count_pages(pdf_bytes), "next_page": 0}
 
     def extract_page(state: ExtractionState) -> dict:
         _, pdf_bytes = _load_job_pdf(state["job_id"])
-        page = split_pages(pdf_bytes)[state["next_page"]]
+        page = slice_page(pdf_bytes, state["next_page"])
         return {
             "payloads": [extractor.extract_page(page)],
             "next_page": state["next_page"] + 1,
