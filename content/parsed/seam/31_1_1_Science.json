@@ -1,0 +1,2782 @@
+{
+  "source_pdf": "science_2026/31_1_1_Science.pdf",
+  "questions": [
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which structure in a leaf is mainly responsible for gaseous exchange ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Xylem"
+        },
+        {
+          "label": "B",
+          "text": "Stomata"
+        },
+        {
+          "label": "C",
+          "text": "Phloem"
+        },
+        {
+          "label": "D",
+          "text": "Cuticle"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which structure in a leaf is mainly responsible for gaseous exchange ?"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Xylem"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Stomata"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Phloem"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Cuticle"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Respiration in plants",
+        "Stomata"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Identify the type of reproduction shown in the diagram given below :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Budding"
+        },
+        {
+          "label": "B",
+          "text": "Fragmentation"
+        },
+        {
+          "label": "C",
+          "text": "Spore Formation"
+        },
+        {
+          "label": "D",
+          "text": "Binary Fission"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Identify the type of reproduction shown in the diagram given below :"
+          },
+          {
+            "type": "image_placeholder",
+            "text": "Diagram showing stages of asexual reproduction in an organism"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Budding"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Fragmentation"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Spore Formation"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Binary Fission"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Asexual Reproduction",
+        "Binary Fission in Amoeba"
+      ],
+      "primary_form": "diagram_based",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Identify the correct statement for spirogyra, leishmania and hydra :",
+      "options": [
+        {
+          "label": "A",
+          "text": "they reproduce sexually."
+        },
+        {
+          "label": "B",
+          "text": "they are unicellular."
+        },
+        {
+          "label": "C",
+          "text": "they are multicellular."
+        },
+        {
+          "label": "D",
+          "text": "they reproduce asexually."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Identify the correct statement for spirogyra, leishmania and hydra :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "they reproduce sexually."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "they are unicellular."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "they are multicellular."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "they reproduce asexually."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Asexual Reproduction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Human brain has various parts or regions that help in different actions, responses and coordination. From the following, identify the part responsible for precision of voluntary actions :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Cerebrum"
+        },
+        {
+          "label": "B",
+          "text": "Cerebellum"
+        },
+        {
+          "label": "C",
+          "text": "Medulla"
+        },
+        {
+          "label": "D",
+          "text": "Pons"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Human brain has various parts or regions that help in different actions, responses and coordination. From the following, identify the part responsible for precision of voluntary actions :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Cerebrum"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Cerebellum"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Medulla"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Pons"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Human Brain"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Pancreas secretes pancreatic juice which contain certain enzyme that helps in digestion of food. Choose the correct option from the following :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Trypsin digests emulsified fats and lipase digests proteins."
+        },
+        {
+          "label": "B",
+          "text": "Trypsin digests proteins and lipase digests emulsified fats."
+        },
+        {
+          "label": "C",
+          "text": "Trypsin and lipase both digests fats."
+        },
+        {
+          "label": "D",
+          "text": "Trypsin digests proteins and lipase digests carbohydrates."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Pancreas secretes pancreatic juice which contain certain enzyme that helps in digestion of food."
+          },
+          {
+            "type": "paragraph",
+            "text": "Choose the correct option from the following :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Trypsin digests emulsified fats and lipase digests proteins."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Trypsin digests proteins and lipase digests emulsified fats."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Trypsin and lipase both digests fats."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Trypsin digests proteins and lipase digests carbohydrates."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Nutrition in Human Beings"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Sex is determined by different factors in various species. However, in human beings, it is determined genetically. Which amongst the following option(s) is/are correct for human beings ?\n(i) Gamete carrying X chromosome from female parent.\n(ii) Gamete carrying X chromosome from male parent.\n(iii) Gamete carrying Y chromosome from male parent.",
+      "options": [
+        {
+          "label": "A",
+          "text": "(ii) and (iii)"
+        },
+        {
+          "label": "B",
+          "text": "(i) only"
+        },
+        {
+          "label": "C",
+          "text": "(i) and (iii)"
+        },
+        {
+          "label": "D",
+          "text": "(iii) only"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Sex is determined by different factors in various species. However, in human beings, it is determined genetically."
+          },
+          {
+            "type": "paragraph",
+            "text": "Which amongst the following option(s) is/are correct for human beings ?"
+          },
+          {
+            "type": "paragraph",
+            "text": "(i) Gamete carrying X chromosome from female parent."
+          },
+          {
+            "type": "paragraph",
+            "text": "(ii) Gamete carrying X chromosome from male parent."
+          },
+          {
+            "type": "paragraph",
+            "text": "(iii) Gamete carrying Y chromosome from male parent."
+          },
+          {
+            "type": "paragraph",
+            "text": "Options :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(ii) and (iii)"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) only"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) and (iii)"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(iii) only"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Sex Determination"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following group is not \u2018biodegradable\u2019 ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Vegetable peels, dead leaves, paper"
+        },
+        {
+          "label": "B",
+          "text": "Cow dung, leather bag, water"
+        },
+        {
+          "label": "C",
+          "text": "Polythene bag, rubber band, ball pen"
+        },
+        {
+          "label": "D",
+          "text": "Paper, fruits, bones"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following group is not \u2018biodegradable\u2019 ?"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Vegetable peels, dead leaves, paper"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Cow dung, leather bag, water"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Polythene bag, rubber band, ball pen"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Paper, fruits, bones"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Biodegradable and Non-biodegradable Substances"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Reflex actions do not involve thinking.\nReason (R) : Most reflex actions are controlled by the spinal cord.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Reflex actions do not involve thinking."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Most reflex actions are controlled by the spinal cord."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Reflex Action"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : In human beings, the respiratory pigment is haemoglobin present in red blood cells.\nReason (R) : Haemoglobin has a very high affinity for carbon dioxide.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "In human beings, the respiratory pigment is haemoglobin present in red blood cells."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "Haemoglobin has a very high affinity for carbon dioxide."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Respiration"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "What is the function of diaphragm in human respiratory system ? Where is it present in human body ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "What is the function of diaphragm in human respiratory system ? Where is it present in human body ?"
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Respiration"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "(a) State two differences between the act of chewing food and salivation on sight of food.\nOR\n(b) State two differences between pollination and fertilization.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "State two differences between the act of chewing food and salivation on sight of food."
+                  }
+                ],
+                "marks": 2
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "State two differences between pollination and fertilization."
+                  }
+                ],
+                "marks": 2
+              }
+            ],
+            "chooseCount": 1,
+            "displayStyle": "or"
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Reflex Action",
+        "Sexual Reproduction in Flowering Plants"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "text": "Draw a neat diagram to show germination of pollen on the female reproductive part of the flower. Name and label only the following parts :\n(a) The part that receives the pollen grain.\n(b) The structure that carries the male germ cell to reach the female germ cell.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Draw a neat diagram to show germination of pollen on the female reproductive part of the flower. Name and label only the following parts :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The part that receives the pollen grain."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The structure that carries the male germ cell to reach the female germ cell."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Sexual Reproduction in Flowering Plants"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Given below is a pyramid showing various trophic levels in an ecosystem :\n(a) From the organisms listed below, identify which one is to be placed at which trophic level ?\nDeer, Grass, Lion, Snake, Rabbit\n(b) Discuss the reason why primary consumers will have more energy as compared to secondary consumers ?\n(c) Why is the base of the pyramid broad ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Given below is a pyramid showing various trophic levels in an ecosystem :"
+          },
+          {
+            "type": "image_placeholder",
+            "text": "A pyramid showing four trophic levels: (i) Producers, (ii) Primary consumers, (iii) Secondary consumers, (iv) Tertiary consumers."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "From the organisms listed below, identify which one is to be placed at which trophic level ?"
+              },
+              {
+                "type": "paragraph",
+                "text": "Deer, Grass, Lion, Snake, Rabbit"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Discuss the reason why primary consumers will have more energy as compared to secondary consumers ?"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why is the base of the pyramid broad ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "our-environment",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Trophic levels",
+        "Ecosystem"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "Give differences between the following :\n(a) Nephron and neuron\n(b) Sensory nerve and motor nerve\n(c) Consumers and decomposers",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Give differences between the following :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Nephron and neuron"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Sensory nerve and motor nerve"
+              }
+            ]
+          },
+          {
+            "label": "c",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Consumers and decomposers"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "control-and-coordination",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Neuron",
+        "Nerves",
+        "Nephron",
+        "Decomposers"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Mendel took garden pea plants with different characteristics, such as height to study the inheritance pattern of factors (genes). He crossed tall pea plant with short pea plant and obtained all the tall plants in the F1 generation.\nAnswer the following questions :\n(a) Why only tall pea plants were observed in F1 progeny ?\n(b) By which method did Mendel obtain F2 progeny ?\n(c) (i) Write one difference between dominant and recessive trait.\nOR\n(c) (ii) Write two observations made by Mendel about F1 progeny.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Mendel took garden pea plants with different characteristics, such as height to study the inheritance pattern of factors (genes). He crossed tall pea plant with short pea plant and obtained all the tall plants in the "
+          },
+          {
+            "type": "equation",
+            "latex": "F_1"
+          },
+          {
+            "type": "paragraph",
+            "text": " generation."
+          },
+          {
+            "type": "paragraph",
+            "text": "Answer the following questions :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why only tall pea plants were observed in "
+              },
+              {
+                "type": "equation",
+                "latex": "F_1"
+              },
+              {
+                "type": "paragraph",
+                "text": " progeny ?"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "By which method did Mendel obtain "
+              },
+              {
+                "type": "equation",
+                "latex": "F_2"
+              },
+              {
+                "type": "paragraph",
+                "text": " progeny ?"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "c",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) Write one difference between dominant and recessive trait."
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) Write two observations made by Mendel about "
+              },
+              {
+                "type": "equation",
+                "latex": "F_1"
+              },
+              {
+                "type": "paragraph",
+                "text": " progeny."
+              }
+            ],
+            "marks": 2
+          }
+        ]
+      },
+      "chapter_slug": "heredity",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Mendelian Inheritance",
+        "Monohybrid Cross",
+        "Dominant and Recessive Traits"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(a) Given below are certain situations. Analyse each and describe its possible impact :\n(i) A population of bacteria living in temperate waters whose temperature increased by global warming.\n(ii) The sperm encounters the egg when it reaches the oviduct in human females.\n(iii) Self pollination does not occur in a flower that contains only pistil.\n(iv) Egg does not get fertilised in a human female.\n(v) When the seed is placed under appropriate condition of water and air in the soil ?\n\nOR\n\n(b) Given below are certain situations. Analyse and describe what would happen when :\n(i) Spores are liberated from blob-like structures of the bread mould?\n(ii) Leaves of bryophyllum fall on wet soil ?\n(iii) A pollen from different species land on the stigma of totally unrelated species ?\n(iv) Copper-T is placed in the uterus of a human female ?\n(v) Spirogyra breaks into smaller fragments upon maturation ?",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Given below are certain situations. Analyse each and describe its possible impact :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) A population of bacteria living in temperate waters whose temperature increased by global warming."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) The sperm encounters the egg when it reaches the oviduct in human females."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Self pollination does not occur in a flower that contains only pistil."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iv) Egg does not get fertilised in a human female."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(v) When the seed is placed under appropriate condition of water and air in the soil ?"
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Given below are certain situations. Analyse and describe what would happen when :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Spores are liberated from blob-like structures of the bread mould?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Leaves of bryophyllum fall on wet soil ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) A pollen from different species land on the stigma of totally unrelated species ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iv) Copper-T is placed in the uterus of a human female ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(v) Spirogyra breaks into smaller fragments upon maturation ?"
+                  }
+                ]
+              }
+            ],
+            "chooseCount": 1,
+            "displayStyle": "or"
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Sexual Reproduction in Flowering Plants",
+        "Reproduction in Human Beings",
+        "Asexual Reproduction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "(i) AgNO3 + NaCl -> NaNO3 + AgCl\n(ii) K2SO4 + BaCl2 -> BaSO4 + 2KCl\nWhich of the following options clearly describes both the reactions ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "(i) is double displacement, (ii) is displacement reaction."
+        },
+        {
+          "label": "B",
+          "text": "Both, (i) and (ii) are displacement reactions and precipitation reactions."
+        },
+        {
+          "label": "C",
+          "text": "Both, (i) and (ii) are double displacement reactions and precipitation reactions."
+        },
+        {
+          "label": "D",
+          "text": "(i) is displacement, (ii) is double displacement reaction."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "equation",
+            "latex": "\\text{AgNO}_3 + \\text{NaCl} \\longrightarrow \\text{NaNO}_3 + \\text{AgCl}"
+          },
+          {
+            "type": "equation",
+            "latex": "\\text{K}_2\\text{SO}_4 + \\text{BaCl}_2 \\longrightarrow \\text{BaSO}_4 + 2\\text{KCl}"
+          },
+          {
+            "type": "paragraph",
+            "text": "Which of the following options clearly describes both the reactions ?"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "i",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "\\text{AgNO}_3 + \\text{NaCl} \\longrightarrow \\text{NaNO}_3 + \\text{AgCl}"
+              }
+            ]
+          },
+          {
+            "label": "ii",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "\\text{K}_2\\text{SO}_4 + \\text{BaCl}_2 \\longrightarrow \\text{BaSO}_4 + 2\\text{KCl}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Double Displacement Reaction",
+        "Precipitation Reaction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which one of the following can be used as an acid-base indicator by a visually impaired (blind) student ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Turmeric"
+        },
+        {
+          "label": "B",
+          "text": "Vanilla essence"
+        },
+        {
+          "label": "C",
+          "text": "Methyl orange"
+        },
+        {
+          "label": "D",
+          "text": "Litmus"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which one of the following can be used as an acid-base indicator by a visually impaired (blind) student ?"
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Olfactory Indicators"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The gases evolved on heating lead (II) nitrate crystals are :",
+      "options": [
+        {
+          "label": "A",
+          "text": "NO and O2"
+        },
+        {
+          "label": "B",
+          "text": "N2 and NO2"
+        },
+        {
+          "label": "C",
+          "text": "NO2 and H2"
+        },
+        {
+          "label": "D",
+          "text": "NO2 and O2"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The gases evolved on heating lead (II) nitrate crystals are :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "NO and "
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{O}_2"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "\\text{N}_2"
+              },
+              {
+                "type": "paragraph",
+                "text": " and "
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{NO}_2"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "\\text{NO}_2"
+              },
+              {
+                "type": "paragraph",
+                "text": " and "
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{H}_2"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "\\text{NO}_2"
+              },
+              {
+                "type": "paragraph",
+                "text": " and "
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{O}_2"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Decomposition reaction of lead nitrate"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The formula of functional group for aldehyde is :",
+      "options": [
+        {
+          "label": "A",
+          "text": "-COOH"
+        },
+        {
+          "label": "B",
+          "text": "-CHO"
+        },
+        {
+          "label": "C",
+          "text": "-C(=O)-"
+        },
+        {
+          "label": "D",
+          "text": "-OH"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The formula of functional group for aldehyde is :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "-\\text{COOH}"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "-\\text{CHO}"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "image_placeholder",
+                "text": "Structural formula of ketone functional group"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "equation",
+                "latex": "-\\text{OH}"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Functional groups in carbon compounds"
+      ],
+      "primary_form": "diagram_based",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "Which of the following is a poor conductor of electricity ?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Pb"
+        },
+        {
+          "label": "B",
+          "text": "Cu"
+        },
+        {
+          "label": "C",
+          "text": "Ag"
+        },
+        {
+          "label": "D",
+          "text": "Al"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "Which of the following is a poor conductor of electricity ?"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Pb"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Cu"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Ag"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Al"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Physical properties of metals"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "The natural sources of oxalic acid, lactic acid and methanoic acid respectively are :",
+      "options": [
+        {
+          "label": "A",
+          "text": "tomato, curd, ant-sting"
+        },
+        {
+          "label": "B",
+          "text": "tomato, orange, nettle-sting"
+        },
+        {
+          "label": "C",
+          "text": "orange, milk, ant-sting"
+        },
+        {
+          "label": "D",
+          "text": "orange, sour milk, nettle-sting"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The natural sources of oxalic acid, lactic acid and methanoic acid respectively are :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "tomato, curd, ant-sting"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "tomato, orange, nettle-sting"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "orange, milk, ant-sting"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "orange, sour milk, nettle-sting"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Naturally occurring acids"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "When an element 'X' reacts with water, it starts floating. Identify the element 'X' :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Potassium"
+        },
+        {
+          "label": "B",
+          "text": "Calcium"
+        },
+        {
+          "label": "C",
+          "text": "Sodium"
+        },
+        {
+          "label": "D",
+          "text": "Iron"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "When an element 'X' reacts with water, it starts floating. Identify the element 'X' :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Potassium"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Calcium"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Sodium"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Iron"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Reaction of metals with water"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : Carbon shares its valence electrons with other atoms of carbon or with atoms of other elements.\nReason (R) : The shared electrons belong to the outermost shells of both the atoms and lead to both atoms attaining the noble gas configuration.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "Carbon shares its valence electrons with other atoms of carbon or with atoms of other elements."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "The shared electrons belong to the outermost shells of both the atoms and lead to both atoms attaining the noble gas configuration."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Covalent bonding in carbon compounds"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "(a) What are amphoteric oxides ?\n(b) Categorise the following based on their nature :\nZnO, Na2O, CO2",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "(a)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What are amphoteric oxides ?"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "(b)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Categorise the following based on their nature :"
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{ZnO}, \\text{Na}_2\\text{O}, \\text{CO}_2"
+              }
+            ],
+            "marks": 1
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Amphoteric oxides"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Name the substance oxidised and reduced in the following reaction :\nZnO + C ------> Zn + CO\n(b) Balance the following chemical reaction :\nPb(NO3)2 + KI ------> PbI2 + KNO3\n(c) Give one example each of electrolytic decomposition and decomposition by sunlight.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "(a)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Name the substance oxidised and reduced in the following reaction :"
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{ZnO} + \\text{C} \\longrightarrow \\text{Zn} + \\text{CO}"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "(b)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Balance the following chemical reaction :"
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{Pb}(\\text{NO}_3)_2 + \\text{KI} \\longrightarrow \\text{PbI}_2 + \\text{KNO}_3"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "(c)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Give one example each of electrolytic decomposition and decomposition by sunlight."
+              }
+            ],
+            "marks": 1
+          }
+        ]
+      },
+      "chapter_slug": "chemical-reactions-and-equations",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Redox reactions",
+        "Balancing chemical equations",
+        "Decomposition reactions"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "internal_choice",
+      "marks": 3,
+      "text": "(a) Explain chlor-alkali process with chemical equation. Name the products formed at anode and cathode.\nOR\n(b) Write the preparation of following compounds with balanced chemical equation :\n(i) Baking soda\n(ii) Bleaching powder\n(iii) Plaster of Paris",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "options": [
+              {
+                "label": "(a)",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Explain chlor-alkali process with chemical equation. Name the products formed at anode and cathode."
+                  }
+                ],
+                "marks": 3
+              },
+              {
+                "label": "(b)",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Write the preparation of following compounds with balanced chemical equation :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Baking soda"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Bleaching powder"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Plaster of Paris"
+                  }
+                ],
+                "marks": 3
+              }
+            ],
+            "chooseCount": 1,
+            "displayStyle": "or"
+          }
+        ]
+      },
+      "chapter_slug": "acids-bases-and-salts",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Chlor-alkali process",
+        "Preparation of salts"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Most of metals occur in combined state in form of ores. Carbonate ores are converted into oxides by calcination and sulphide ores by roasting. Oxides are reduced with suitable reducing agent like carbon to get free metal. Highly reactive metals like - Al, Mg are also used as reducing agents to obtain metal from their oxides. Most reactive metals are obtained by electrolytic reduction of their molten ores. Alloying is a very good method of improving the properties of a metal. We can get desired properties by this method. The electrical conductivity and melting point of an alloy is less than that of pure metals.\n(a) Why carbonate or sulphide ores are converted to oxides before extraction of metal from it ?\n(b) Write a reaction in which Aluminium is used as a reducing agent to obtain metal from its oxide.\n(c) (i) How is copper obtained from its ore (Cu2S) ? Give equations of the reactions.\nOR",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "Most of metals occur in combined state in form of ores. Carbonate ores are converted into oxides by calcination and sulphide ores by roasting. Oxides are reduced with suitable reducing agent like carbon to get free metal. Highly reactive metals like - "
+          },
+          {
+            "type": "equation",
+            "latex": "\\text{Al}, \\text{Mg}"
+          },
+          {
+            "type": "paragraph",
+            "text": " are also used as reducing agents to obtain metal from their oxides. Most reactive metals are obtained by electrolytic reduction of their molten ores. Alloying is a very good method of improving the properties of a metal. We can get desired properties by this method. The electrical conductivity and melting point of an alloy is less than that of pure metals."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "(a)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why carbonate or sulphide ores are converted to oxides before extraction of metal from it ?"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "(b)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Write a reaction in which Aluminium is used as a reducing agent to obtain metal from its oxide."
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "(c)",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) How is copper obtained from its ore ("
+              },
+              {
+                "type": "equation",
+                "latex": "\\text{Cu}_2\\text{S}"
+              },
+              {
+                "type": "paragraph",
+                "text": ") ? Give equations of the reactions."
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              }
+            ],
+            "marks": 2
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Extraction of metals",
+        "Roasting and Calcination",
+        "Reduction of metal oxides"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "(c) (ii) (I) Why highly reactive metals cannot be obtained from their oxides by using carbon as a reducing agent ?\n(II) Why solder, an alloy of lead and tin, is used for welding electrical wires together ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "(c) (ii)"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "I",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why highly reactive metals cannot be obtained from their oxides by using carbon as a reducing agent ?"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "II",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Why solder, an alloy of lead and tin, is used for welding electrical wires together ?"
+              }
+            ],
+            "marks": 1
+          }
+        ]
+      },
+      "chapter_slug": "metals-and-non-metals",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Extraction of metals",
+        "Alloys"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(a) (i) Give reasons for the following :\n(I) Covalent compounds are poor conductor of electricity.\n(II) Soap does not form lather in hard water.\n(III) Carbon shows catenation but silicon does not.\n(ii) Write chemical equations for the following :\n(I) Oxidation of ethanol by acidified K2Cr2O7.\n(II) Hydrogenation of ethene.\nOR\n(b) Mohan heated ethanol with a compound 'X' in the presence of a few drops of conc. H2SO4 and observed a sweet smelling compound 'Y' is formed. When 'Y' is treated with sodium hydroxide it gives back ethanol and a compound 'Z'.\n(i) Identify 'X', 'Y' and 'Z'.\n(ii) Write the role of conc. H2SO4 in the reaction.\n(iii) Write the chemical equations involved and name the reactions.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Give reasons for the following :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) Covalent compounds are poor conductor of electricity."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) Soap does not form lather in hard water."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(III) Carbon shows catenation but silicon does not."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Write chemical equations for the following :"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(I) Oxidation of ethanol by acidified "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "\\text{K}_2\\text{Cr}_2\\text{O}_7"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(II) Hydrogenation of ethene."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Mohan heated ethanol with a compound 'X' in the presence of a few drops of conc. "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "\\text{H}_2\\text{SO}_4"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": " and observed a sweet smelling compound 'Y' is formed. When 'Y' is treated with sodium hydroxide it gives back ethanol and a compound 'Z'."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Identify 'X', 'Y' and 'Z'."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Write the role of conc. "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "\\text{H}_2\\text{SO}_4"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": " in the reaction."
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Write the chemical equations involved and name the reactions."
+                  }
+                ]
+              }
+            ],
+            "chooseCount": 1,
+            "displayStyle": "or"
+          }
+        ]
+      },
+      "chapter_slug": "carbon-and-its-compounds",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Properties of carbon compounds",
+        "Chemical properties of carbon compounds",
+        "Soaps and detergents"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "A convex lens of focal length 15 cm, is forming a real image. If the size of image is same as the size of object, then position of object and position of image will be, respectively :",
+      "options": [
+        {
+          "label": "A",
+          "text": "- 15 cm and - 15 cm from lens"
+        },
+        {
+          "label": "B",
+          "text": "- 15 cm and + 15 cm from lens"
+        },
+        {
+          "label": "C",
+          "text": "- 30 cm and + 30 cm from lens"
+        },
+        {
+          "label": "D",
+          "text": "- 30 cm and - 30 cm from lens"
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "A convex lens of focal length 15 cm, is forming a real image. If the size of image is same as the size of object, then position of object and position of image will be, respectively :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "- 15 cm and - 15 cm from lens"
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "- 15 cm and + 15 cm from lens"
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "- 30 cm and + 30 cm from lens"
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "- 30 cm and - 30 cm from lens"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Image formation by lenses",
+        "Sign convention for spherical lenses"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "mcq",
+      "marks": 1,
+      "text": "When you look at an object very close to your eyes, the :",
+      "options": [
+        {
+          "label": "A",
+          "text": "Ciliary muscles of your eye contract and the eye lens becomes thick."
+        },
+        {
+          "label": "B",
+          "text": "Ciliary muscles of your eye get relaxed and the eye lens becomes thick."
+        },
+        {
+          "label": "C",
+          "text": "Ciliary muscles of your eye contract and the eye lens becomes thin."
+        },
+        {
+          "label": "D",
+          "text": "Ciliary muscles of your eye get relaxed and the eye lens becomes thin."
+        }
+      ],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "When you look at an object very close to your eyes, the :"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Ciliary muscles of your eye contract and the eye lens becomes thick."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Ciliary muscles of your eye get relaxed and the eye lens becomes thick."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Ciliary muscles of your eye contract and the eye lens becomes thin."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Ciliary muscles of your eye get relaxed and the eye lens becomes thin."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Power of accommodation"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "A",
+      "qtype": "assertion_reason",
+      "marks": 1,
+      "text": "Assertion (A) : When rays of white light pass through a prism, on emerging they give spectrum of seven colours.\nReason (R) : It is due to the scattering of light that red light bends minimum and violet light bends the maximum.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "B",
+          "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+        },
+        {
+          "label": "C",
+          "text": "Assertion (A) is true, but Reason (R) is false."
+        },
+        {
+          "label": "D",
+          "text": "Assertion (A) is false, but Reason (R) is true."
+        }
+      ],
+      "content": {
+        "assertion": [
+          {
+            "type": "paragraph",
+            "text": "When rays of white light pass through a prism, on emerging they give spectrum of seven colours."
+          }
+        ],
+        "reason": [
+          {
+            "type": "paragraph",
+            "text": "It is due to the scattering of light that red light bends minimum and violet light bends the maximum."
+          }
+        ],
+        "subparts": [
+          {
+            "label": "A",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "B",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Both, Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of the Assertion (A)."
+              }
+            ]
+          },
+          {
+            "label": "C",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is true, but Reason (R) is false."
+              }
+            ]
+          },
+          {
+            "label": "D",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Assertion (A) is false, but Reason (R) is true."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Dispersion of white light by a glass prism"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "short_answer",
+      "marks": 2,
+      "text": "The given figure shows image formation by a lens. Analyse the figure and answer the following questions :\n(a) What is the type of lens used for image formation in the given ray diagram ?\n(b) If the real image is formed at a distance of 30 cm from the lens and the size of image is twice the size of the object, then where was the object placed ?",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "The given figure shows image formation by a lens. Analyse the figure and answer the following questions :"
+          },
+          {
+            "type": "image_placeholder",
+            "text": "Ray diagram showing image formation by a lens with object AB and virtual/real image A'B'"
+          }
+        ],
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "What is the type of lens used for image formation in the given ray diagram ?"
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "If the real image is formed at a distance of "
+              },
+              {
+                "type": "equation",
+                "latex": "30\\text{ cm}"
+              },
+              {
+                "type": "paragraph",
+                "text": " from the lens and the size of image is twice the size of the object, then where was the object placed ?"
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": null,
+      "cognitive_level": "R",
+      "topic_names": [
+        "Refraction by lenses",
+        "Lens formula and magnification"
+      ],
+      "primary_form": "diagram_based",
+      "figures": []
+    },
+    {
+      "section": "B",
+      "qtype": "internal_choice",
+      "marks": 2,
+      "text": "(a) The resistance of a wire of 0.01 cm radius and 1.0 cm length is 7 \\Omega. Calculate its resistivity. OR (b) An electric heater is rated 220 V; 11 A. Calculate the power consumed if the heater is operated at 200 V.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "The resistance of a wire of "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "0.01 \\text{ cm}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": " radius and "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "1.0 \\text{ cm}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": " length is "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "7 \\ \\Omega"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": ". Calculate its resistivity."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "An electric heater is rated "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "220 \\text{ V}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "; "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "11 \\text{ A}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": ". Calculate the power consumed if the heater is operated at "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "200 \\text{ V}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "."
+                  }
+                ]
+              }
+            ],
+            "chooseCount": 1,
+            "displayStyle": "or"
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Resistivity",
+        "Electric Power"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "A person is unable to read a book placed closer than 1 meter from his eyes. Identify the defect of vision in his eyes. Draw the ray diagrams to show the defect of vision and its correction.",
+      "options": [],
+      "content": {
+        "stem": [
+          {
+            "type": "paragraph",
+            "text": "A person is unable to read a book placed closer than 1 meter from his eyes. Identify the defect of vision in his eyes. Draw the ray diagrams to show the defect of vision and its correction."
+          }
+        ]
+      },
+      "chapter_slug": "human-eye-and-the-colourful-world",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Defects of Vision and their Correction"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) Describe an activity to show that a current carrying conductor, placed in an external magnetic field experiences a force. (b) Imagine that you are sitting in a chamber with your back to one wall. An electron beam, moving horizontally towards the front wall from the back wall, is deflected by a strong magnetic field to your right side. Find the direction of the magnetic field.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Describe an activity to show that a current carrying conductor, placed in an external magnetic field experiences a force."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Imagine that you are sitting in a chamber with your back to one wall. An electron beam, moving horizontally towards the front wall from the back wall, is deflected by a strong magnetic field to your right side. Find the direction of the magnetic field."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Force on a Current-Carrying Conductor in a Magnetic Field"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "C",
+      "qtype": "short_answer",
+      "marks": 3,
+      "text": "(a) The pattern of magnetic field due to a current carrying wire depends upon the shape made by that wire. Justify. (b) A current carrying straight wire AB is shown in the given diagram. Out of X, Y and Z on which point will the strength of magnetic field be maximum and why ?",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "The pattern of magnetic field due to a current carrying wire depends upon the shape made by that wire. Justify."
+              }
+            ]
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "A current carrying straight wire AB is shown in the given diagram. Out of X, Y and Z on which point will the strength of magnetic field be maximum and why ?"
+              },
+              {
+                "type": "image_placeholder",
+                "text": "Diagram showing a vertical current-carrying wire AB with points X, Y, and Z located at increasing distances to the right of the wire."
+              }
+            ]
+          }
+        ]
+      },
+      "chapter_slug": "magnetic-effects-of-electric-current",
+      "cognitive_level": "An",
+      "topic_names": [
+        "Magnetic Field due to a Current-Carrying Straight Conductor"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "Lenses can form different types of images depending upon their focal length and position of object. A convex lens can create real, inverted or virtual, erect images, while a concave lens forms only virtual and diminished images. The focal length determines the power of lens. Convex lenses have positive focal length while concave lenses have negative focal length by convention. When lenses are placed together, their combined power is determined by the sum of their individual powers. Ray diagrams help to visualize how light converges or diverges through lens to form an image.",
+      "options": [],
+      "content": {
+        "passage": [
+          {
+            "type": "paragraph",
+            "text": "Lenses can form different types of images depending upon their focal length and position of object. A convex lens can create real, inverted or virtual, erect images, while a concave lens forms only virtual and diminished images. The focal length determines the power of lens. Convex lenses have positive focal length while concave lenses have negative focal length by convention. When lenses are placed together, their combined power is determined by the sum of their individual powers. Ray diagrams help to visualize how light converges or diverges through lens to form an image."
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "U",
+      "topic_names": [
+        "Refraction by Spherical Lenses",
+        "Power of a Lens"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "E",
+      "qtype": "case_based",
+      "marks": 4,
+      "text": "(a) A convex lens of focal length 20 cm is used to form an image. If an object is placed at 40 cm from the lens, what will be the position and nature of image ?\n(b) Illustrate the formation of image with the help of ray diagram, when the object is placed between the optical centre and principal focus of concave lens.\n(c) (i) A lens combination consists of a convex lens of focal length 30 cm and a concave lens of focal length 15 cm placed together. Find the equivalent focal length and power of this lens combination.\nOR\n(ii) Two lenses are placed in contact. One is a concave lens with focal length 2 m and the other is a convex lens with focal length 1.5 m. What type of lens will the combination behave as (convex or concave) ? Give reason.",
+      "options": [],
+      "content": {
+        "subparts": [
+          {
+            "label": "a",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "A convex lens of focal length 20 cm is used to form an image. If an object is placed at 40 cm from the lens, what will be the position and nature of image ?"
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "b",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "Illustrate the formation of image with the help of ray diagram, when the object is placed between the optical centre and principal focus of concave lens."
+              }
+            ],
+            "marks": 1
+          },
+          {
+            "label": "c",
+            "content": [
+              {
+                "type": "paragraph",
+                "text": "(i) A lens combination consists of a convex lens of focal length 30 cm and a concave lens of focal length 15 cm placed together. Find the equivalent focal length and power of this lens combination."
+              },
+              {
+                "type": "paragraph",
+                "text": "OR"
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) Two lenses are placed in contact. One is a concave lens with focal length 2 m and the other is a convex lens with focal length 1.5 m. What type of lens will the combination behave as (convex or concave) ? Give reason."
+              }
+            ],
+            "marks": 2
+          }
+        ]
+      },
+      "chapter_slug": "light-reflection-and-refraction",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Lens Formula",
+        "Ray Diagrams for Lenses",
+        "Power of a Lens"
+      ],
+      "primary_form": "none",
+      "figures": []
+    },
+    {
+      "section": "D",
+      "qtype": "internal_choice",
+      "marks": 5,
+      "text": "(a) (i) Due to change in length and area of cross-section of a conductor, resistance of conductor changes while resistivity does not change. Why ?\n(ii) Conductors of electric toasters and electric iron are made of an alloy rather than a pure metal. Why ?\n(iii) Define the S.I. unit of electric current.\nOR\n(b) (i) How many bulbs of resistance 8 \\Omega each should be connected in parallel combination to draw a current of 2 A from a battery of 4 V ?\n(ii) Name the device used for measuring electric current. How is it connected in a circuit ?\n(iii) State Joule's law of heating.",
+      "options": [],
+      "content": {
+        "choices": [
+          {
+            "options": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) Due to change in length and area of cross-section of a conductor, resistance of conductor changes while resistivity does not change. Why ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Conductors of electric toasters and electric iron are made of an alloy rather than a pure metal. Why ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) Define the S.I. unit of electric current."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "(i) How many bulbs of resistance "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "8 \\ \\Omega"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": " each should be connected in parallel combination to draw a current of "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "2 \\text{ A}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": " from a battery of "
+                  },
+                  {
+                    "type": "equation",
+                    "latex": "4 \\text{ V}"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": " ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(ii) Name the device used for measuring electric current. How is it connected in a circuit ?"
+                  },
+                  {
+                    "type": "paragraph",
+                    "text": "(iii) State Joule's law of heating."
+                  }
+                ]
+              }
+            ],
+            "chooseCount": 1,
+            "displayStyle": "or"
+          }
+        ]
+      },
+      "chapter_slug": "electricity",
+      "cognitive_level": "Ap",
+      "topic_names": [
+        "Factors affecting Resistance",
+        "Resistivity of Alloys",
+        "Electric Current",
+        "Resistors in Parallel",
+        "Ammeter",
+        "Joule's Law of Heating"
+      ],
+      "primary_form": "none",
+      "figures": []
+    }
+  ]
+}
