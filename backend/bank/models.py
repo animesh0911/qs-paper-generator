@@ -237,7 +237,7 @@ class IngestionJob(models.Model):
     job id immediately — no Gemini call inside the request. A scheduled
     ``drain_ingestion_jobs`` management command (platform cron, no Celery /
     Redis / worker daemon) processes pending rows via the same
-    ``GeminiExtractor`` + ``Ingestor`` the CLI path uses, scoping the created
+    ``SeamExtractor`` + ``Ingestor`` the CLI path uses, scoping the created
     ``Question`` rows to ``school``. The frontend polls ``GET
     /api/bank/ingest/{id}/`` for status and result counts.
 

@@ -28,11 +28,15 @@ from __future__ import annotations
 import copy
 import hashlib
 import re
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
-from ai_services.llm import LLMClient, make_llm_client
+from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import HumanMessage
+
+from ai_services.llm import LLMClient, ModelPurpose, make_chat_model, make_llm_client
 
 from . import content as content_mod
 from .diagram_cropper import DiagramCropper, PyMuPdfCropper
@@ -309,6 +313,98 @@ def build_question_schema(chapter_slugs) -> dict:
     return schema
 
 
+# ---------------------------------------------------------------------------
+# google-genai dict form → standard JSON Schema (for the model seam, #156)
+# ---------------------------------------------------------------------------
+
+_GENAI_TO_JSON_TYPE = {
+    "OBJECT": "object",
+    "STRING": "string",
+    "ARRAY": "array",
+    "INTEGER": "integer",
+    "NUMBER": "number",
+    "BOOLEAN": "boolean",
+}
+
+
+def genai_to_json_schema(schema: dict) -> dict:
+    """Translate a google-genai response-schema dict into standard JSON Schema.
+
+    ``SeamExtractor`` emits structured output through LangChain
+    ``with_structured_output(..., method="json_mode")``, which forwards the schema
+    to the provider's native response-schema mechanism exactly like the bespoke
+    path (``GeminiClient``) — but via ``langchain_google_genai``'s converter, which
+    speaks *standard* JSON Schema. That converter (verified against
+    langchain-google-genai 2.1.x) differs from feeding google-genai directly in
+    three ways this translator compensates for, so ``build_question_schema``'s
+    constraints survive intact:
+
+    - it expects lower-case JSON-Schema ``type`` (and upper-cases internally), so
+      genai ``OBJECT``/``STRING``/… are mapped down;
+    - it re-derives each *nested* object's ``required`` as "every property without
+      a ``default``", ignoring an explicit ``required`` list — so every property
+      absent from an object's ``required`` is marked ``default: null`` here, making
+      the derivation reproduce our ``required`` exactly;
+    - it keeps an ``enum`` only at a property's own level and reads nullability
+      from ``anyOf``/``type: null`` (not an OpenAPI ``nullable`` flag) — so a
+      ``nullable`` field becomes ``{enum?, anyOf:[{type}, {type:"null"}]}``, the
+      one form that survives with BOTH the closed ``enum`` and ``nullable`` intact.
+
+    Pure (no I/O) — the single point translation correctness is asserted.
+    """
+    return _translate_node(schema)
+
+
+def _translate_node(node: dict) -> dict:
+    jtype = _GENAI_TO_JSON_TYPE.get(node.get("type"), "string")
+    out: dict = {"type": jtype}
+
+    if "enum" in node:
+        out["enum"] = node["enum"]
+    if jtype == "array" and "items" in node:
+        out["items"] = _translate_node(node["items"])
+    if jtype == "object":
+        required = list(node.get("required", []))
+        out["properties"] = {
+            name: _translate_node(sub)
+            for name, sub in node.get("properties", {}).items()
+        }
+        if required:
+            out["required"] = required
+        # The converter re-derives a nested object's required from the absence of
+        # a default, so mark the optional properties to match our `required`.
+        for name, prop in out["properties"].items():
+            if name not in required:
+                prop["default"] = None
+
+    if node.get("nullable"):
+        out = _as_nullable(out)
+    return out
+
+
+def _as_nullable(node: dict) -> dict:
+    """Rewrite a translated node so nullability survives the converter.
+
+    A bare ``anyOf:[{…,enum},{null}]`` loses the enum and ``{…,nullable:true}``
+    loses nullability; hoisting ``enum`` beside an ``anyOf:[{type},{type:"null"}]``
+    keeps both. The parent marks the field optional with a ``default`` afterwards.
+
+    Only primitive nodes are supported: this rewrite keeps just ``type``/``enum``,
+    so applying it to an object/array would silently drop ``properties``/``items``.
+    The current schema only nullables ``chapter_slug`` (a string); rather than
+    grow speculative nested handling, fail loud (Rule 12) if that ever changes.
+    """
+    if "properties" in node or "items" in node:
+        raise ValueError(
+            "genai_to_json_schema supports `nullable` only on primitive nodes; "
+            f"got a {node.get('type')!r} node with nested structure."
+        )
+    nullable: dict = {"anyOf": [{"type": node["type"]}, {"type": "null"}]}
+    if "enum" in node:
+        nullable["enum"] = node["enum"]
+    return nullable
+
+
 def _page_prompt() -> str:
     """Build the per-page extraction prompt (one PDF page in, English-only).
 
@@ -495,15 +591,44 @@ def _split_pages(pdf_bytes: bytes) -> list[bytes]:
         src.close()
 
 
+def _coerce_and_merge(page_payloads: Iterable[dict]) -> list[dict]:
+    """Coerce, page-rewrite, and de-duplicate per-page extraction payloads.
+
+    Shared by both Extractors: ``page_payloads`` yields one ``{"questions": [...]}``
+    dict per page, in document order. Each question is coerced to the coordinator
+    shape, dropped if its stem is empty, de-duplicated across pages by text
+    fingerprint (a question spilling across a page break is seen twice), and its
+    figure page-refs rewritten from the single-page slice (page 1) to the absolute
+    1-based document page so the cropper clips the right page.
+    """
+    questions: list[dict] = []
+    seen: set[str] = set()
+    for page_index, payload in enumerate(page_payloads):
+        for obj in payload.get("questions", []):
+            if not isinstance(obj, dict):
+                continue
+            question = _coerce_question(obj)
+            if not question["text"].strip():
+                continue
+            fp = _fingerprint(question["text"])
+            if fp in seen:
+                continue
+            seen.add(fp)
+            for figure in question["figures"]:
+                figure["page"] = page_index + 1
+            questions.append(question)
+    return questions
+
+
 class GeminiExtractor:
-    """Default Extractor — one native-PDF Gemini call per PAGE, merged in order.
+    """Legacy Extractor — one bespoke native-PDF Gemini call per PAGE, merged in
+    order. Kept revertable behind ``SeamExtractor`` until the #156 benchmark
+    proves ``with_structured_output`` parity (ADR-0005).
 
     Page-at-a-time extraction forces a deep read of each page: on long scanned
     bilingual papers a single whole-document call skims and under-recalls (Hindi
-    pages duplicate question numbers, later sections get dropped). Each page's
-    questions are coerced, their figure page-refs rewritten to the absolute page
-    number, and duplicates (a question spilling across a page break) dropped by
-    text fingerprint. Provider-agnostic via `LLMClient`.
+    pages duplicate question numbers, later sections get dropped). Provider-bound
+    via the bespoke `LLMClient`/`GeminiClient`.
     """
 
     def __init__(self, client: LLMClient | None = None):
@@ -514,27 +639,70 @@ class GeminiExtractor:
         # Close chapter_slug to the live taxonomy so the model can only emit a
         # canonical slug (or null) — built once per paper, not per page.
         schema = build_question_schema(Chapter.objects.values_list("slug", flat=True))
-        questions: list[dict] = []
-        seen: set[str] = set()
-        for page_index, page_bytes in enumerate(_split_pages(pdf_bytes)):
-            payload = self.client.extract(page_bytes, prompt, schema)
-            for obj in payload.get("questions", []):
-                if not isinstance(obj, dict):
-                    continue
-                question = _coerce_question(obj)
-                if not question["text"].strip():
-                    continue
-                fp = _fingerprint(question["text"])
-                if fp in seen:
-                    continue
-                seen.add(fp)
-                # The model localises figures on the single page it was shown
-                # (page 1 of the slice); rewrite to the absolute 1-based page so
-                # the cropper clips the right page of the full document.
-                for figure in question["figures"]:
-                    figure["page"] = page_index + 1
-                questions.append(question)
-        return questions
+        return _coerce_and_merge(
+            self.client.extract(page_bytes, prompt, schema)
+            for page_bytes in _split_pages(pdf_bytes)
+        )
+
+
+# A model factory matching the seam's ``make_chat_model(purpose) -> BaseChatModel``,
+# injectable so tests pass a fake (Rules 9/11; mirrors generate_answers).
+MakeChatModel = Callable[[ModelPurpose], BaseChatModel]
+
+
+def _page_message(prompt: str, page_bytes: bytes) -> list[HumanMessage]:
+    """One multimodal turn: the extraction prompt plus the page as an inline PDF.
+
+    ``langchain_google_genai`` reads a ``media`` content block's raw bytes into a
+    Gemini ``Blob`` — the LangChain equivalent of the bespoke path's
+    ``Part.from_bytes(..., mime_type="application/pdf")``.
+    """
+    return [
+        HumanMessage(
+            content=[
+                {"type": "text", "text": prompt},
+                {
+                    "type": "media",
+                    "mime_type": "application/pdf",
+                    "data": page_bytes,
+                },
+            ]
+        )
+    ]
+
+
+class SeamExtractor:
+    """Default Extractor — native-PDF extraction on the model seam (#156).
+
+    Builds the chat model via ``make_chat_model(ModelPurpose.EXTRACTION)`` and
+    extracts one page at a time through LangChain ``with_structured_output(...,
+    method="json_mode")``, which forwards the translated schema to the provider's
+    native response-schema mechanism (Gemini today; swappable by config). The
+    schema's closed ``chapter_slug`` enum and ``nullable``/``required`` constraints
+    survive the JSON-Schema translation (``genai_to_json_schema``). Page-at-a-time
+    extraction, coercion, figure page-rewrite, and dedup are shared with
+    ``GeminiExtractor`` (``_coerce_and_merge``). ``make_model`` is injectable so
+    tests pass a fake factory — no module patching (Rules 9/11).
+    """
+
+    def __init__(self, make_model: MakeChatModel = make_chat_model):
+        self._make_model = make_model
+
+    def extract(self, pdf_bytes: bytes) -> list[dict]:
+        # Close chapter_slug to the live taxonomy, then translate to the standard
+        # JSON Schema LangChain's structured-output converter speaks — built once
+        # per paper, not per page.
+        json_schema = genai_to_json_schema(
+            build_question_schema(Chapter.objects.values_list("slug", flat=True))
+        )
+        structured = self._make_model(ModelPurpose.EXTRACTION).with_structured_output(
+            json_schema, method="json_mode"
+        )
+        prompt = _page_prompt()
+        return _coerce_and_merge(
+            structured.invoke(_page_message(prompt, page_bytes))
+            for page_bytes in _split_pages(pdf_bytes)
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -578,7 +746,7 @@ class _Provenance:
 class Ingestor:
     """Pipeline coordinator. Two adapters are injectable: Extractor and DiagramCropper.
 
-    The default constructor wires `GeminiExtractor` + `PyMuPdfCropper`; tests pass
+    The default constructor wires `SeamExtractor` + `PyMuPdfCropper`; tests pass
     stubs for either.
     """
 
@@ -587,7 +755,7 @@ class Ingestor:
         extractor: Extractor | None = None,
         cropper: DiagramCropper | None = None,
     ):
-        self.extractor = extractor or GeminiExtractor()
+        self.extractor = extractor or SeamExtractor()
         self.cropper = cropper or PyMuPdfCropper()
 
     def ingest(

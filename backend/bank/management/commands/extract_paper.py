@@ -1,7 +1,7 @@
 """extract_paper — extract one source PDF into committed JSON (+ cropped diagrams).
 
 The offline, key-requiring producer for the committed-JSON path. It sends one
-paper PDF to ``GeminiExtractor`` (needs ``GEMINI_API_KEY``), crops any localised
+paper PDF to ``SeamExtractor`` (needs ``GEMINI_API_KEY``), crops any localised
 figures into ``<out>/assets/`` (no extra LLM call — pure PyMuPDF), and dumps the
 extracted, tagged question dicts as a single ``content/parsed/*.json`` file in
 the exact shape ``load_questions`` consumes.
@@ -31,7 +31,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from bank.content import has_item
 from bank.diagram_cropper import crop_to_dir
-from bank.ingestor import GeminiExtractor, _fingerprint
+from bank.ingestor import SeamExtractor, _fingerprint
 
 
 class Command(BaseCommand):
@@ -67,7 +67,7 @@ class Command(BaseCommand):
         self.stdout.write(
             f"Extracting {source_pdf} (this calls the LLM, may take minutes)..."
         )
-        questions = GeminiExtractor().extract(pdf_bytes)
+        questions = SeamExtractor().extract(pdf_bytes)
         if not questions:
             raise CommandError(f"Extractor returned no questions for {source_pdf}.")
 

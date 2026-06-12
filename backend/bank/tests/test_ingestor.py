@@ -12,13 +12,16 @@ from pathlib import Path
 
 import pytest
 
+from ai_services.llm import ModelPurpose
 from bank.diagram_cropper import _crop_figure, crop_to_dir
 from bank.ingestor import (
     GeminiExtractor,
     Ingestor,
+    SeamExtractor,
     _coerce_figures,
     _parse_source_filename,
     build_question_schema,
+    genai_to_json_schema,
 )
 from bank.models import Chapter, Question
 from bank.question_shape import compute_parse_quality
@@ -142,6 +145,61 @@ def test_response_schema_chapter_enum_equals_seeded_taxonomy():
     chapter = schema["properties"]["questions"]["items"]["properties"]["chapter_slug"]
     assert set(chapter["enum"]) == set(slugs)
     assert chapter["nullable"] is True
+
+
+@pytest.mark.django_db
+def test_genai_to_json_schema_preserves_constraints_through_langchain_converter():
+    """The chapter_slug enum + nullable + the question's required set survive the
+    JSON-Schema translation, all the way through LangChain's converter to the
+    provider schema.
+
+    Why this matters (#156): SeamExtractor routes the schema through
+    ``with_structured_output``, whose converter speaks standard JSON Schema,
+    re-derives ``required`` from the absence of a ``default``, and reads an enum
+    only at a property's own level — so a naive translation silently drops either
+    the closed taxonomy (re-opening #108) or nullability. Asserting on the *gapic*
+    schema the converter actually produces — not just our intermediate dict —
+    proves the constraints reach the model, deterministically and with no API
+    call. ``_dict_to_gapic_schema`` is exactly what ``with_structured_output``'s
+    json_mode path calls."""
+    from langchain_google_genai._function_utils import _dict_to_gapic_schema
+
+    slugs = list(Chapter.objects.values_list("slug", flat=True))
+    gapic = _dict_to_gapic_schema(genai_to_json_schema(build_question_schema(slugs)))
+
+    question = gapic.properties["questions"].items
+    # Only the fields the bespoke schema marks required stay required — the
+    # converter must not promote optional fields just because they lack a default.
+    assert set(question.required) == {"section", "qtype", "marks", "rawText", "content"}
+
+    chapter = question.properties["chapter_slug"]
+    assert chapter.nullable is True  # the genuine "unsure" case survives
+    assert set(chapter.enum) == set(slugs)  # AND the closed taxonomy survives (#108)
+    # Other closed enums (the deterministic vocabularies) come through too.
+    assert set(question.properties["section"].enum) == {"A", "B", "C", "D", "E"}
+    assert set(question.properties["cognitive_level"].enum) == {"R", "U", "Ap", "An"}
+
+
+def test_genai_to_json_schema_rejects_nullable_non_primitive():
+    """A ``nullable`` object/array fails loud instead of silently losing structure.
+
+    Why this matters: the nullable rewrite keeps only ``type``/``enum``, so a
+    future schema marking an object or array nullable would silently drop its
+    ``properties``/``items`` and ship a structurally wrong schema to the model.
+    The current schema only nullables a string (``chapter_slug``); guarding the
+    boundary turns a silent mistranslation into an obvious error (Rule 12)."""
+    schema = {
+        "type": "OBJECT",
+        "properties": {
+            "blob": {
+                "type": "OBJECT",
+                "nullable": True,
+                "properties": {"x": {"type": "STRING"}},
+            }
+        },
+    }
+    with pytest.raises(ValueError, match="only on primitive nodes"):
+        genai_to_json_schema(schema)
 
 
 @pytest.mark.django_db
@@ -392,6 +450,139 @@ def test_gemini_extractor_rewrites_figure_page_to_absolute(monkeypatch):
 
     out = GeminiExtractor(client=FigureOnEachPage()).extract(b"%PDF")
     assert [q["figures"][0]["page"] for q in out] == [1, 2, 3]
+
+
+# ---------------------------------------------------------------------------
+# SeamExtractor — extraction on the model seam, via an injected fake factory
+# ---------------------------------------------------------------------------
+
+
+class _FakeStructured:
+    """Stands in for ``model.with_structured_output(...)``: returns one canned
+    payload per page-call, then empty, recording each invocation."""
+
+    def __init__(self, payloads: list[dict]):
+        self._payloads = list(payloads)
+        self.invocations: list = []
+
+    def invoke(self, messages):
+        self.invocations.append(messages)
+        return self._payloads.pop(0) if self._payloads else {"questions": []}
+
+
+class _FakeChatModel:
+    """A chat model whose ``with_structured_output`` captures the schema/method
+    and hands back a ``_FakeStructured`` — no provider package, no network."""
+
+    def __init__(self, payloads: list[dict]):
+        self._payloads = payloads
+        self.schema = None
+        self.method = None
+        self.structured: _FakeStructured | None = None
+
+    def with_structured_output(self, schema, method=None):
+        self.schema = schema
+        self.method = method
+        self.structured = _FakeStructured(self._payloads)
+        return self.structured
+
+
+def _fake_factory(payloads: list[dict]):
+    """A ``make_chat_model`` stand-in recording the purpose it's asked to build."""
+    model = _FakeChatModel(payloads)
+    purposes = []
+
+    def make_model(purpose):
+        purposes.append(purpose)
+        return model
+
+    return make_model, model, purposes
+
+
+@pytest.mark.django_db
+def test_seam_extractor_builds_via_seam_with_json_mode_and_closed_enum():
+    """SeamExtractor asks the seam for the EXTRACTION model and requests json_mode
+    structured output over a schema that still closes chapter_slug to the taxonomy.
+
+    Why this matters (#156): observability/provider-swap only happen if extraction
+    actually goes through ``make_chat_model``; json_mode is the path that maps to
+    the provider's native response_schema (parity with the bespoke call); and the
+    closed enum is the #108 fix that must reach the model after translation."""
+    payload = {"questions": [{"qtype": "short_answer", "marks": 3, "rawText": "Q?"}]}
+    make_model, model, purposes = _fake_factory([payload])
+
+    out = SeamExtractor(make_model=make_model).extract(b"%PDF")
+
+    assert purposes == [ModelPurpose.EXTRACTION]
+    assert model.method == "json_mode"
+    chapter = model.schema["properties"]["questions"]["items"]["properties"][
+        "chapter_slug"
+    ]
+    assert set(chapter["enum"]) == set(Chapter.objects.values_list("slug", flat=True))
+    assert out[0]["text"] == "Q?"
+    assert out[0]["section"] == "C"  # marks 3 → C, derived deterministically
+
+
+@pytest.mark.django_db
+def test_seam_extractor_sends_each_page_as_inline_pdf_and_merges(monkeypatch):
+    """One structured call per page, the page bytes ride as an inline-PDF media
+    block, and results merge in document order — the same per-page deep-read +
+    merge contract as the bespoke extractor, now on the seam.
+
+    Why this matters: extraction parity isn't just the schema — the multimodal
+    message (PDF in, not OCR text) and per-page fan-out are what give recall on
+    long scanned papers, so they must survive the move to LangChain messages."""
+    monkeypatch.setattr("bank.ingestor._split_pages", lambda b: [b"p1", b"p2"])
+    payloads = [
+        {"questions": [{"qtype": "short_answer", "marks": 2, "rawText": "Q1"}]},
+        {"questions": [{"qtype": "short_answer", "marks": 2, "rawText": "Q2"}]},
+    ]
+    make_model, model, _ = _fake_factory(payloads)
+
+    out = SeamExtractor(make_model=make_model).extract(b"%PDF")
+
+    assert [q["text"] for q in out] == ["Q1", "Q2"]
+    # Each page is one HumanMessage carrying a text part + an application/pdf media
+    # part with that page's raw bytes (the LangChain equivalent of Part.from_bytes).
+    sent = model.structured.invocations
+    assert len(sent) == 2
+    media = [
+        part
+        for msg in (call[0] for call in sent)
+        for part in msg.content
+        if part.get("type") == "media"
+    ]
+    assert [p["mime_type"] for p in media] == ["application/pdf", "application/pdf"]
+    assert [p["data"] for p in media] == [b"p1", b"p2"]
+
+
+@pytest.mark.django_db
+def test_seam_extractor_path_still_runs_guardrails():
+    """A bad chapter_slug from the seam path is still flagged, not silently kept.
+
+    Why this matters: the benchmark gate aside, ``bank.guardrails`` (Layer 2) is
+    the documented backstop for any provider whose structured-output enforcement
+    is weaker than Gemini's (ADR-0005). Routing the seam extractor through the
+    Ingestor must not bypass it."""
+    payload = {
+        "questions": [
+            {
+                "qtype": "short_answer",
+                "marks": 3,
+                "rawText": "Define refraction.",
+                "chapter_slug": "no-such-chapter",
+            }
+        ]
+    }
+    make_model, _, _ = _fake_factory([payload])
+
+    result = Ingestor(extractor=SeamExtractor(make_model=make_model)).ingest(b"%PDF")
+
+    assert result.created == 1
+    row = Question.objects.get()
+    assert row.chapter_id is None
+    assert row.review_flags == ["chapter_unresolved"]
+    assert row.verified is False
 
 
 # ---------------------------------------------------------------------------
