@@ -1,0 +1,32 @@
+[
+  {
+    "paper": "31_1_1_Science",
+    "arm": "baseline",
+    "missing": false,
+    "expected": 39,
+    "extracted": 41,
+    "matched": 39,
+    "recall": 1.0,
+    "precision": 0.9512195121951219,
+    "section_accuracy": 1.0,
+    "qtype_accuracy": 0.9743589743589743,
+    "structure_usable": 1.0,
+    "missed_nums": [],
+    "spurious": 2
+  },
+  {
+    "paper": "31_1_1_Science",
+    "arm": "seam",
+    "missing": false,
+    "expected": 39,
+    "extracted": 41,
+    "matched": 39,
+    "recall": 1.0,
+    "precision": 0.9512195121951219,
+    "section_accuracy": 1.0,
+    "qtype_accuracy": 0.9487179487179487,
+    "structure_usable": 1.0,
+    "missed_nums": [],
+    "spurious": 2
+  }
+]
