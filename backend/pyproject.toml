@@ -7,7 +7,7 @@ select = ["E", "F", "I", "N", "W", "UP"]
 ignore = ["N818"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["accounts", "ai_services", "bank", "papers", "config"]
+known-first-party = ["accounts", "ai_services", "bank", "corpus", "papers", "config"]
 
 [tool.ruff.lint.per-file-ignores]
 # Migrations are Django-generated; black formats them but long auto-emitted
