@@ -23,6 +23,18 @@ Back up important local data before infrastructure changes. RetrievalChunk uses
 an unbounded vector column until issue #174 selects the production embedding
 model; that issue must add the selected dimension-specific production index.
 
+If an existing volume reports a collation-version mismatch after the image
+change, rebuild and refresh the affected development databases once:
+
+```bash
+docker compose exec db psql -U qpg -d template1 \
+  -c "REINDEX DATABASE template1;" \
+  -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;"
+docker compose exec db psql -U qpg -d qpg \
+  -c "REINDEX DATABASE qpg;" \
+  -c "ALTER DATABASE qpg REFRESH COLLATION VERSION;"
+```
+
 ```bash
 # Optional — copy the template if you want to override any defaults.
 cp .env.example .env

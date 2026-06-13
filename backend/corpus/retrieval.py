@@ -183,6 +183,9 @@ class RetrievalChunkBuilder:
             .select_related("parent")
             .order_by("source_start")
         )
+        existing_texts = dict(
+            document.retrieval_chunks.values_list("stable_chunk_id", "text")
+        )
         keep_ids: set[str] = set()
         for section in sections:
             elements = list(
@@ -201,7 +204,14 @@ class RetrievalChunkBuilder:
                 stable_chunk_id = self._stable_id(
                     document, section, [element.stable_element_id for element in group]
                 )
-                self._upsert(document, section, stable_chunk_id, group, landmarks)
+                self._upsert(
+                    document,
+                    section,
+                    stable_chunk_id,
+                    group,
+                    landmarks,
+                    existing_texts.get(stable_chunk_id),
+                )
                 keep_ids.add(stable_chunk_id)
 
         document.retrieval_chunks.exclude(stable_chunk_id__in=keep_ids).delete()
@@ -276,6 +286,7 @@ class RetrievalChunkBuilder:
         stable_chunk_id: str,
         elements: list[TextbookElement],
         landmarks: list[ChapterMapNode],
+        previous_text: str | None,
     ) -> None:
         element_ids = [element.stable_element_id for element in elements]
         pages = sorted({element.page_number for element in elements})
@@ -297,14 +308,6 @@ class RetrievalChunkBuilder:
             if node.source_element is not None
         ]
         text = f"{heading_context}\n{body}" if body else heading_context
-        previous_text = (
-            RetrievalChunk.objects.filter(
-                document=document,
-                stable_chunk_id=stable_chunk_id,
-            )
-            .values_list("text", flat=True)
-            .first()
-        )
         defaults = {
             "chapter": document.chapter,
             "chapter_map_node": section,
