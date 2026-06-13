@@ -11,7 +11,12 @@ from pathlib import Path
 import pytest
 from django.core.management import call_command
 
-from corpus.models import TextbookDocument, TextbookElement
+from corpus.models import (
+    ChapterMapEdge,
+    ChapterMapNode,
+    TextbookDocument,
+    TextbookElement,
+)
 from corpus.textbook import DoclingNormalizer, load_docling_json
 
 FIXTURE = Path(__file__).parent / "fixtures" / "jesc104_pages_1_8_16.json"
@@ -151,6 +156,12 @@ def test_import_command_is_idempotent_and_records_provenance():
         TextbookElement.objects.values_list("stable_element_id", flat=True)
     )
     first_pks = list(TextbookElement.objects.values_list("pk", flat=True))
+    first_node_pks = list(
+        ChapterMapNode.objects.order_by("stable_node_id").values_list("pk", flat=True)
+    )
+    first_edge_pks = list(
+        ChapterMapEdge.objects.order_by("stable_edge_id").values_list("pk", flat=True)
+    )
     call_command("import_textbook_document", FIXTURE, **options)
 
     document = TextbookDocument.objects.get()
@@ -164,3 +175,21 @@ def test_import_command_is_idempotent_and_records_provenance():
         == first_ids
     )
     assert list(TextbookElement.objects.values_list("pk", flat=True)) == first_pks
+    assert first_node_pks
+    assert first_edge_pks
+    assert (
+        list(
+            ChapterMapNode.objects.order_by("stable_node_id").values_list(
+                "pk", flat=True
+            )
+        )
+        == first_node_pks
+    )
+    assert (
+        list(
+            ChapterMapEdge.objects.order_by("stable_edge_id").values_list(
+                "pk", flat=True
+            )
+        )
+        == first_edge_pks
+    )

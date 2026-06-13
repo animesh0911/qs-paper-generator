@@ -14,6 +14,7 @@ from django.db import transaction
 
 from bank.models import Chapter
 
+from .chapter_map import ChapterMapBuilder
 from .models import TextbookDocument, TextbookElement
 from .textbook import DoclingNormalizer, canonical_json_hash, load_docling_json
 
@@ -74,4 +75,5 @@ class CorpusImporter:
             unique_fields=["document", "stable_element_id"],
         )
         document.elements.exclude(stable_element_id__in=stable_ids).delete()
+        ChapterMapBuilder().rebuild(document)
         return CorpusImportResult(document=document, element_count=len(normalized))
