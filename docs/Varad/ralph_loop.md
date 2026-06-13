@@ -5,36 +5,42 @@ skill behavior lives in `.claude/skills`.
 
 ## Loop
 
-1. Pick one GitHub issue.
-2. Read the issue, `contracts/v1_contract.md`, relevant PRDs, and any prior
+1. Pick one GitHub issue and identify its committed base. Use `origin/main`
+   unless the issue explicitly depends on an unmerged committed branch.
+2. Run the `issue-workflow` start script and continue from its clean issue
+   worktree.
+3. Read the issue, `contracts/v1_contract.md`, relevant PRDs, and any prior
    scratchboard for the issue.
-3. Inspect `.claude/skills`, choose the issue-relevant skills, read each chosen
+4. Inspect `.claude/skills`, choose the issue-relevant skills, read each chosen
    `SKILL.md` before relying on it.
-4. Define the public interface and issue-level success criteria. Create a
+5. Check GitNexus freshness. Refresh a stale index, then use query, context,
+   and impact results to identify the smallest relevant code surface before
+   broad file reads.
+6. Define the public interface and issue-level success criteria. Create a
    scratchboard only when the issue needs durable decisions or multi-step notes.
-5. Download or inspect any external artifacts needed for the work.
-6. Implement with `tdd`: one RED/GREEN slice at a time.
-7. Run focused verification after each slice; run the full changed-area
-   verification gate when the issue implementation is complete.
-8. Run the `code-review` skill on the uncommitted issue diff.
-9. Fix accepted review findings and re-run the affected focused checks.
-10. Re-read the GitHub issue for obvious scope misses.
-11. Run the full changed-area verification gate.
-12. In Main Flow, explain the data/control flow created or changed by the
+7. Download or inspect any external artifacts needed for the work.
+8. Implement with `tdd`: one RED/GREEN slice at a time.
+9. Run `issue-workflow` focused verification after each slice; run its full
+   changed-area verification when the issue implementation is complete.
+10. Run the `code-review` skill on the uncommitted issue diff.
+11. Fix accepted review findings and re-run affected focused checks.
+12. Re-read the GitHub issue for obvious scope misses.
+13. Run the `issue-workflow` full changed-area verification gate.
+14. In Main Flow, explain the data/control flow created or changed by the
     issue, with code-level references to the key interfaces, API calls, schemas,
     state shapes, persistence models, and tests.
-13. Commit only that issue's files. When executing multiple issues, keep
+15. Commit only that issue's files. When executing multiple issues, keep
     issue-scoped commits even when they share a branch.
-14. Run the `agy-code-review` skill on the issue commit. Antigravity owns the
+16. Run the `agy-code-review` skill on the issue commit. Antigravity owns the
     deep second pass: full-repository tracing, issue-scope audit, cross-boundary
     contract checks, and missing intent-level test analysis.
-15. Codex validates Antigravity findings against the real worktree, fixes
+17. Codex validates Antigravity findings against the real worktree, fixes
     accepted findings in a separate commit, and runs focused checks. Repeat the
     full verification gate only when the fix has meaningful blast radius.
-16. Push the branch.
-17. Close the GitHub issue only after the pushed branch contains the completed,
+18. Push the branch.
+19. Close the GitHub issue only after the pushed branch contains the completed,
     verified work.
-18. Give the user a brief summary of what changed, including the concrete code
+20. Give the user a brief summary of what changed, including the concrete code
     behavior affected.
 
 
@@ -46,6 +52,9 @@ skill's workflow, read it thoroughly before acting.
 
 - `tdd`: default implementation skill. Use for feature work, bug fixes,
   contract changes, and any issue with acceptance criteria.
+- `issue-workflow`: mandatory at issue start and verification gates. Use it to
+  isolate work from unrelated changes and select deterministic changed-area
+  checks.
 - `code-review`: mandatory before commit. Use on the diff after implementation
   and verification; fix findings before final verification.
 - `zoom-out`: use when the code area is unfamiliar and you need a fast map of
@@ -72,26 +81,16 @@ Name the public interface under test in the scratchboard, then follow
 Use two levels:
 
 - **Focused checks:** the narrow tests/type checks covering the current
-  RED/GREEN slice or review fix.
+  RED/GREEN slice or review fix. Run `issue-workflow` focused verification;
+  backend selection uses `pytest-testmon`.
 - **Full changed-area checks:** run once after implementation and again only
-  when review fixes have meaningful blast radius.
+  when review fixes have meaningful blast radius. Run `issue-workflow` full
+  verification.
 
-Frontend:
-
-```bash
-cd frontend
-npm test
-npm run type-check
-npm run build
-npm run lint
-```
-
-Backend:
+Run from the issue worktree root:
 
 ```bash
-cd backend
-pytest
-python -m compileall .
+.claude/skills/issue-workflow/scripts/verify_issue.sh full
 ```
 
 If a command is unavailable or skipped, record that explicitly in the final
