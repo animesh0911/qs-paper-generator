@@ -14,6 +14,7 @@ from django.core.management import call_command
 from corpus.models import (
     ChapterMapEdge,
     ChapterMapNode,
+    RetrievalChunk,
     TextbookDocument,
     TextbookElement,
 )
@@ -162,6 +163,9 @@ def test_import_command_is_idempotent_and_records_provenance():
     first_edge_pks = list(
         ChapterMapEdge.objects.order_by("stable_edge_id").values_list("pk", flat=True)
     )
+    first_chunk_pks = list(
+        RetrievalChunk.objects.order_by("stable_chunk_id").values_list("pk", flat=True)
+    )
     call_command("import_textbook_document", FIXTURE, **options)
 
     document = TextbookDocument.objects.get()
@@ -177,6 +181,7 @@ def test_import_command_is_idempotent_and_records_provenance():
     assert list(TextbookElement.objects.values_list("pk", flat=True)) == first_pks
     assert first_node_pks
     assert first_edge_pks
+    assert first_chunk_pks
     assert (
         list(
             ChapterMapNode.objects.order_by("stable_node_id").values_list(
@@ -192,4 +197,12 @@ def test_import_command_is_idempotent_and_records_provenance():
             )
         )
         == first_edge_pks
+    )
+    assert (
+        list(
+            RetrievalChunk.objects.order_by("stable_chunk_id").values_list(
+                "pk", flat=True
+            )
+        )
+        == first_chunk_pks
     )

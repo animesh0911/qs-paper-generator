@@ -16,6 +16,7 @@ from bank.models import Chapter
 
 from .chapter_map import ChapterMapBuilder
 from .models import TextbookDocument, TextbookElement
+from .retrieval import RetrievalChunkBuilder
 from .textbook import DoclingNormalizer, canonical_json_hash, load_docling_json
 
 
@@ -76,4 +77,5 @@ class CorpusImporter:
         )
         document.elements.exclude(stable_element_id__in=stable_ids).delete()
         ChapterMapBuilder().rebuild(document)
+        RetrievalChunkBuilder().rebuild(document)
         return CorpusImportResult(document=document, element_count=len(normalized))

@@ -119,7 +119,7 @@ def test_landmarks_are_contained_without_splitting_section_ownership(document):
         (node.node_type, node.title, node.source_start, node.source_end)
         for node in landmarks
     ] == [
-        ("activity", "Activity 4.2", 7, 8),
+        ("activity", "Activity 4.2", 7, 14),
         ("figure", "Figure 4.1 Carbon bonds", 9, 10),
         ("table", "Table 4.1 Carbon compounds", 13, 14),
         ("questions", "Questions", 15, 16),
@@ -137,6 +137,16 @@ def test_landmarks_are_contained_without_splitting_section_ownership(document):
     )
     assert ("Activity 4.2", "Figure 4.1 Carbon bonds") in next_edges
     assert ("Figure 4.1 Carbon bonds", "Table 4.1 Carbon compounds") in next_edges
+
+
+@pytest.mark.django_db
+def test_activity_landmark_keeps_embedded_visuals_and_continuing_text(document):
+    """An activity remains identifiable after an embedded figure or table."""
+    ChapterMapBuilder().rebuild(document)
+
+    activity = ChapterMapNode.objects.get(node_type="activity")
+
+    assert (activity.source_start, activity.source_end) == (7, 14)
 
 
 @pytest.mark.django_db

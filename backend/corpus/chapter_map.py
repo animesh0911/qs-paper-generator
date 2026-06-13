@@ -160,8 +160,6 @@ class ChapterMapBuilder:
     def _before_next_landmark(self, elements: list[TextbookElement], index: int) -> int:
         for candidate_index in range(index + 1, len(elements)):
             candidate = elements[candidate_index]
-            if candidate.element_type in {"picture", "table"}:
-                return candidate_index - 1
             if candidate.element_type == "section_header":
                 return candidate_index - 1
         return len(elements) - 1
