@@ -38,7 +38,25 @@ class TextbookElementAdmin(admin.ModelAdmin):
 
 @admin.register(RetrievalChunk)
 class RetrievalChunkAdmin(admin.ModelAdmin):
-    list_display = ("chapter", "chapter_map_node", "page_start", "page_end")
-    list_filter = ("chapter", "chapter_map_node")
+    list_display = (
+        "chapter",
+        "chapter_map_node",
+        "page_start",
+        "page_end",
+        "embedding_model",
+        "embedding_version",
+    )
+    list_filter = (
+        "chapter",
+        "chapter_map_node",
+        "embedding_model",
+        "embedding_version",
+    )
     search_fields = ("text", "stable_chunk_id")
-    readonly_fields = ("stable_chunk_id", "search_vector")
+    readonly_fields = (
+        "stable_chunk_id",
+        "search_vector",
+        "embedding",
+        "embedding_model",
+        "embedding_version",
+    )

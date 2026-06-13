@@ -137,6 +137,35 @@ def test_rebuild_creates_stable_traceable_chunks_with_one_topic_owner(document):
 
 
 @pytest.mark.django_db
+def test_rebuild_preserves_current_embeddings_and_clears_stale_ones(document):
+    """A stable chunk identity must not let a vector outlive changed source text."""
+    builder = RetrievalChunkBuilder(max_chars=120)
+    builder.rebuild(document)
+    chunk = RetrievalChunk.objects.filter(content_types__contains=["text"]).first()
+    chunk.embedding = [1.0, 0.0, 0.0]
+    chunk.embedding_model = "fixed-vector-test"
+    chunk.embedding_version = "v1"
+    chunk.save(update_fields=["embedding", "embedding_model", "embedding_version"])
+
+    builder.rebuild(document)
+    chunk.refresh_from_db()
+    assert list(chunk.embedding) == [1.0, 0.0, 0.0]
+
+    element = TextbookElement.objects.get(
+        document=document,
+        stable_element_id=chunk.source_element_ids[-1],
+    )
+    element.text = f"{element.text} Updated."
+    element.save(update_fields=["text"])
+
+    builder.rebuild(document)
+    chunk.refresh_from_db()
+    assert chunk.embedding is None
+    assert chunk.embedding_model == ""
+    assert chunk.embedding_version == ""
+
+
+@pytest.mark.django_db
 def test_lexical_retriever_ranks_cited_chunks_and_applies_topic_and_type_filters(
     document,
 ):

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Issue Workflow"
+  short_description: "Start isolated issue worktrees and run scoped verification"
+  default_prompt: "Use the issue workflow to start or verify an issue in an isolated worktree."

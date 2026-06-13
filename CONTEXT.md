@@ -42,6 +42,13 @@ The ordered, citation-bearing result returned by a **TextbookRetriever**. It con
 **TextbookRetriever**
 The corpus-owned retrieval seam: `retrieve(TextbookRetrievalRequest) -> GroundingContext`. The first adapter, `PostgresTextbookRetriever`, performs deterministic lexical-only ranking with Chapter, optional ChapterMapNode, content-type, query-text, and result-limit filters. Lives in `corpus.retrieval`.
 
+**EmbeddingClient**
+The provider-neutral corpus seam for converting ordered text batches into
+fixed-length vectors under one explicit model, version, and dimension profile.
+Corpus feature code depends on this interface and never imports an embedding
+provider SDK directly. Tests use fixed vectors; production model selection and
+live population are separate measured gates. Lives in `corpus.embeddings`.
+
 **primary_form**
 Field on `Question` (`bank.models.PrimaryForm`): the dominant non-text form a question depends on — `none`, `diagram_based`, or `table_based`. Emitted by the **Extractor**, *orthogonal* to **QuestionType** (a `short_answer` can be `diagram_based`). `diagram_based` also reinforces `Question.has_diagram` at ingest. Stored for future form-aware picking/rendering; not yet a picker gate.
 

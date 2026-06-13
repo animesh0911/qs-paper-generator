@@ -7,7 +7,7 @@ The whole stack runs in Docker Compose. Three services:
 
 | service    | image / build      | port  | role                                 |
 | ---------- | ------------------ | ----- | ------------------------------------ |
-| `db`       | `postgres:16`      | —     | Postgres 16, volume `pgdata`         |
+| `db`       | `pgvector/pgvector:0.8.2-pg16-bookworm` | — | Postgres 16 + pgvector, volume `pgdata` |
 | `web`      | `./backend`        | 8000  | Django + DRF (gunicorn-less dev)     |
 | `frontend` | `./frontend`       | 5173  | Vite dev server (React + Tailwind)   |
 
@@ -17,6 +17,11 @@ The whole stack runs in Docker Compose. Three services:
 
 Nothing to install on the host beyond Docker. Compose has sane defaults baked
 in, so `.env` is optional.
+
+The pgvector image remains Postgres 16 and reuses the existing `pgdata` volume.
+Back up important local data before infrastructure changes. RetrievalChunk uses
+an unbounded vector column until issue #174 selects the production embedding
+model; that issue must add the selected dimension-specific production index.
 
 ```bash
 # Optional — copy the template if you want to override any defaults.

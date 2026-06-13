@@ -8,6 +8,7 @@ closed syllabus taxonomy but does not participate in Question ingestion.
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
+from pgvector.django import VectorField
 
 from bank.models import Chapter
 
@@ -187,6 +188,9 @@ class RetrievalChunk(models.Model):
     content_types = models.JSONField(default=list)
     citation = models.JSONField(default=dict)
     search_vector = SearchVectorField(null=True)
+    embedding = VectorField(null=True)
+    embedding_model = models.CharField(max_length=200, blank=True)
+    embedding_version = models.CharField(max_length=100, blank=True)
 
     class Meta:
         ordering = ["chapter_map_node__source_start", "stable_chunk_id"]
@@ -198,6 +202,21 @@ class RetrievalChunk(models.Model):
             models.CheckConstraint(
                 condition=models.Q(page_end__gte=models.F("page_start")),
                 name="retrieval_chunk_valid_page_range",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        embedding__isnull=True,
+                        embedding_model="",
+                        embedding_version="",
+                    )
+                    | (
+                        models.Q(embedding__isnull=False)
+                        & ~models.Q(embedding_model="")
+                        & ~models.Q(embedding_version="")
+                    )
+                ),
+                name="retrieval_chunk_embedding_profile_complete",
             ),
         ]
         indexes = [

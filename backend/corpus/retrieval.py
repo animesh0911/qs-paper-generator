@@ -15,9 +15,12 @@ from typing import Protocol
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db import transaction
+from django.db.models.functions import Cast
+from pgvector.django import CosineDistance, VectorField
 
 from bank.models import Chapter
 
+from .embeddings import EmbeddingClient, validate_embedding_vectors
 from .models import ChapterMapNode, RetrievalChunk, TextbookDocument, TextbookElement
 
 _ATOMIC_CONTENT_TYPES = {"caption", "picture", "table"}
@@ -103,6 +106,66 @@ class PostgresTextbookRetriever:
         if not terms:
             raise ValueError("query_text must contain a searchable term.")
         return SearchQuery(" | ".join(terms), config="english", search_type="raw")
+
+
+class PostgresVectorTextbookRetriever:
+    """Retrieve dense candidates for one injected embedding profile."""
+
+    def __init__(self, client: EmbeddingClient):
+        self.client = client
+
+    def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext:
+        if not request.query_text.strip():
+            raise ValueError("query_text must not be blank.")
+        if request.limit < 1:
+            raise ValueError("limit must be positive.")
+        if (
+            request.chapter_map_node is not None
+            and request.chapter_map_node.document.chapter_id != request.chapter.pk
+        ):
+            raise ValueError("chapter_map_node must belong to the requested Chapter.")
+
+        vectors = self.client.embed((request.query_text,))
+        validate_embedding_vectors(
+            vectors,
+            expected_count=1,
+            dimensions=self.client.profile.dimensions,
+        )
+        query_vector = vectors[0]
+
+        chunks = RetrievalChunk.objects.filter(
+            chapter=request.chapter,
+            embedding__isnull=False,
+            embedding_model=self.client.profile.model,
+            embedding_version=self.client.profile.version,
+        ).select_related("document", "chapter", "chapter_map_node")
+        if request.chapter_map_node is not None:
+            chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
+        if request.content_types:
+            chunks = chunks.filter(content_types__contains=list(request.content_types))
+        distance = CosineDistance(
+            Cast(
+                "embedding",
+                VectorField(dimensions=self.client.profile.dimensions),
+            ),
+            query_vector,
+        )
+        candidates = list(
+            chunks.annotate(distance=distance).order_by("distance")[: request.limit]
+        )
+        ranked = sorted(
+            candidates,
+            key=lambda chunk: (float(chunk.distance), chunk.stable_chunk_id),
+        )
+        return GroundingContext(
+            results=tuple(
+                GroundingChunk(
+                    chunk=chunk,
+                    rank=1.0 - float(chunk.distance),
+                )
+                for chunk in ranked
+            )
+        )
 
 
 class RetrievalChunkBuilder:
@@ -234,33 +297,48 @@ class RetrievalChunkBuilder:
             if node.source_element is not None
         ]
         text = f"{heading_context}\n{body}" if body else heading_context
+        previous_text = (
+            RetrievalChunk.objects.filter(
+                document=document,
+                stable_chunk_id=stable_chunk_id,
+            )
+            .values_list("text", flat=True)
+            .first()
+        )
+        defaults = {
+            "chapter": document.chapter,
+            "chapter_map_node": section,
+            "text": text,
+            "source_element_ids": element_ids,
+            "page_start": min(pages),
+            "page_end": max(pages),
+            "content_types": content_types,
+            "citation": {
+                "document_id": document.pk,
+                "source_file_name": document.source_file_name,
+                "source_hash": document.source_hash,
+                "chapter_slug": document.chapter.slug,
+                "chapter_map_node_id": section.stable_node_id,
+                "source_element_ids": element_ids,
+                "pages": pages,
+                "context_source_element_ids": [
+                    element.stable_element_id for element in context_elements
+                ],
+                "context_pages": sorted(
+                    {element.page_number for element in context_elements}
+                ),
+            },
+        }
+        if previous_text is not None and previous_text != text:
+            defaults.update(
+                embedding=None,
+                embedding_model="",
+                embedding_version="",
+            )
         RetrievalChunk.objects.update_or_create(
             document=document,
             stable_chunk_id=stable_chunk_id,
-            defaults={
-                "chapter": document.chapter,
-                "chapter_map_node": section,
-                "text": text,
-                "source_element_ids": element_ids,
-                "page_start": min(pages),
-                "page_end": max(pages),
-                "content_types": content_types,
-                "citation": {
-                    "document_id": document.pk,
-                    "source_file_name": document.source_file_name,
-                    "source_hash": document.source_hash,
-                    "chapter_slug": document.chapter.slug,
-                    "chapter_map_node_id": section.stable_node_id,
-                    "source_element_ids": element_ids,
-                    "pages": pages,
-                    "context_source_element_ids": [
-                        element.stable_element_id for element in context_elements
-                    ],
-                    "context_pages": sorted(
-                        {element.page_number for element in context_elements}
-                    ),
-                },
-            },
+            defaults=defaults,
         )
 
     @staticmethod
