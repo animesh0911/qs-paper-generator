@@ -16,8 +16,8 @@ Build the first teacher-facing chapter graph with:
 - the existing corpus API as the semantic source of truth;
 - a synchronized HTML outline and source-details panel as equal navigation
   surfaces, not as graph fallbacks;
-- existing Vitest and Testing Library coverage, plus Playwright/Chrome
-  performance traces for #171.
+- existing Vitest coverage, plus frontend interaction-test setup and
+  Playwright/Chrome performance traces for #171.
 
 Do not add a graph database, Graphology, Cytoscape.js, Sigma.js, G6, Zustand,
 or a server-side layout engine for this slice. Do not store graph coordinates
@@ -103,6 +103,8 @@ Use a three-surface workspace:
   same details.
 - Escape or canvas click clears locked selection.
 - Collapse/expand recomputes layout only when the visible node set changes.
+- Animate node-position and viewport changes after collapse/expand; respect
+  `prefers-reduced-motion`.
 - If the full chapter becomes noisy, show the selected/expanded subtree with
   breadcrumbs back to the chapter root.
 
@@ -131,6 +133,9 @@ type ChapterGraphState = {
 };
 ```
 
+Treat `expandedNodeIds` as immutable React state: every change creates a new
+`Set` reference. Do not mutate the current set in place.
+
 Derive the rest with pure functions:
 
 - `mapChapterGraph(apiResponse)` validates and indexes nodes/edges.
@@ -143,6 +148,12 @@ Use `Map` and `Set` adjacency indexes. At 40–100 nodes, a graph-analysis
 framework is unnecessary. Memoize the API mapping, visible subgraph, layout
 result, and custom node components. Hover should update only emphasis state; it
 must not call the API or layout function.
+
+The API exposes parent IDs rather than an explicit hierarchy depth. Build and
+validate depth from parent pointers while mapping the response; do not infer
+depth from title numbering. Give graph nodes a fixed width with bounded,
+wrapped/truncated titles and pass explicit width/height estimates to Dagre so
+layout remains deterministic without a render-measure-relayout cycle.
 
 Suggested module boundaries:
 
@@ -279,6 +290,9 @@ rich HTML-node and accessibility requirements.
 - **Premature analytics model:** do not equate `Question.topic_names` with
   ChapterMapNode identity.
 - **Bundle leakage:** lazy-load the route and measure the Vite chunk.
+- **Missing interaction-test runtime:** #171 must add `@testing-library/react`
+  with a jsdom Vitest environment and `@playwright/test` with a frontend
+  Playwright configuration before its required interaction/browser tests.
 
 ## Primary Sources
 
