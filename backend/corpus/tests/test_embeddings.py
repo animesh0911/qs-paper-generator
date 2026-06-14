@@ -91,18 +91,27 @@ def test_pgvector_extension_and_retrieval_chunk_vector_are_migration_owned(chunk
     chunk.embedding = [1.0, 2.0, 3.0]
     chunk.embedding_model = "fixed-vector-test"
     chunk.embedding_version = "v1"
-    chunk.save(update_fields=["embedding", "embedding_model", "embedding_version"])
+    chunk.embedding_dimensions = 3
+    chunk.save(
+        update_fields=[
+            "embedding",
+            "embedding_model",
+            "embedding_version",
+            "embedding_dimensions",
+        ]
+    )
     chunk.refresh_from_db()
 
     assert extension is not None
     assert list(chunk.embedding) == [1.0, 2.0, 3.0]
     assert chunk.embedding_model == "fixed-vector-test"
     assert chunk.embedding_version == "v1"
+    assert chunk.embedding_dimensions == 3
 
 
 @pytest.mark.django_db
 def test_retrieval_chunk_rejects_incomplete_embedding_profile(chunk):
-    """A vector without its exact model and version is unsafe to retrieve."""
+    """A vector without its complete profile is unsafe to retrieve."""
     chunk.embedding = [1.0, 2.0, 3.0]
 
     with pytest.raises(IntegrityError), transaction.atomic():
@@ -154,6 +163,31 @@ def test_embedding_population_replaces_a_different_profile_version(chunk):
     assert updated.calls == [(chunk.text,)]
     assert list(chunk.embedding) == [0.0, 1.0, 0.0]
     assert chunk.embedding_version == "v2"
+
+
+@pytest.mark.django_db
+def test_embedding_population_replaces_a_different_profile_dimension(chunk):
+    """Dimension changes must never reuse vectors from an incompatible profile."""
+    first = FixedEmbeddingClient({chunk.text: (1.0, 0.0, 0.0)})
+    resized = FixedEmbeddingClient(
+        {chunk.text: (0.0, 1.0, 0.0, 0.0)},
+        dimensions=4,
+    )
+    populator = RetrievalChunkEmbeddingPopulator()
+
+    populator.populate(
+        EmbeddingPopulationRequest(document=chunk.document, client=first)
+    )
+    result = populator.populate(
+        EmbeddingPopulationRequest(document=chunk.document, client=resized)
+    )
+    chunk.refresh_from_db()
+
+    assert result.populated_count == 1
+    assert result.skipped_count == 0
+    assert resized.calls == [(chunk.text,)]
+    assert list(chunk.embedding) == [0.0, 1.0, 0.0, 0.0]
+    assert chunk.embedding_dimensions == 4
 
 
 @pytest.mark.django_db
@@ -230,6 +264,7 @@ def test_embedding_population_rejects_invalid_client_output(chunk, vectors, mess
     assert chunk.embedding is None
     assert chunk.embedding_model == ""
     assert chunk.embedding_version == ""
+    assert chunk.embedding_dimensions is None
 
 
 @pytest.mark.django_db
@@ -261,6 +296,7 @@ def test_dense_retrieval_orders_fixed_vectors_and_applies_corpus_filters(chunk):
         embedding=[0.9, 0.1, 0.0],
         embedding_model="fixed-vector-test",
         embedding_version="v1",
+        embedding_dimensions=3,
     )
     RetrievalChunk.objects.create(
         document=chunk.document,
@@ -276,6 +312,7 @@ def test_dense_retrieval_orders_fixed_vectors_and_applies_corpus_filters(chunk):
         embedding=[1.0, 0.0, 0.0],
         embedding_model="another-model",
         embedding_version="v1",
+        embedding_dimensions=3,
     )
     other_chapter = Chapter.objects.exclude(pk=chunk.chapter_id).first()
     other_document = TextbookDocument.objects.create(
@@ -323,11 +360,20 @@ def test_dense_retrieval_orders_fixed_vectors_and_applies_corpus_filters(chunk):
         embedding=[1.0, 0.0, 0.0],
         embedding_model="fixed-vector-test",
         embedding_version="v1",
+        embedding_dimensions=3,
     )
     chunk.embedding = [1.0, 0.0, 0.0]
     chunk.embedding_model = "fixed-vector-test"
     chunk.embedding_version = "v1"
-    chunk.save(update_fields=["embedding", "embedding_model", "embedding_version"])
+    chunk.embedding_dimensions = 3
+    chunk.save(
+        update_fields=[
+            "embedding",
+            "embedding_model",
+            "embedding_version",
+            "embedding_dimensions",
+        ]
+    )
     client = FixedEmbeddingClient({"dense query": (1.0, 0.0, 0.0)})
     retriever = PostgresVectorTextbookRetriever(client)
 
@@ -358,7 +404,15 @@ def test_dense_retrieval_uses_the_fixed_profile_hnsw_index(chunk):
     chunk.embedding = [1.0, 0.0, 0.0]
     chunk.embedding_model = "fixed-vector-test"
     chunk.embedding_version = "v1"
-    chunk.save(update_fields=["embedding", "embedding_model", "embedding_version"])
+    chunk.embedding_dimensions = 3
+    chunk.save(
+        update_fields=[
+            "embedding",
+            "embedding_model",
+            "embedding_version",
+            "embedding_dimensions",
+        ]
+    )
     retriever = PostgresVectorTextbookRetriever(
         FixedEmbeddingClient({"dense query": (1.0, 0.0, 0.0)})
     )

@@ -191,6 +191,7 @@ class RetrievalChunk(models.Model):
     embedding = VectorField(null=True)
     embedding_model = models.CharField(max_length=200, blank=True)
     embedding_version = models.CharField(max_length=100, blank=True)
+    embedding_dimensions = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ["chapter_map_node__source_start", "stable_chunk_id"]
@@ -209,11 +210,13 @@ class RetrievalChunk(models.Model):
                         embedding__isnull=True,
                         embedding_model="",
                         embedding_version="",
+                        embedding_dimensions__isnull=True,
                     )
                     | (
                         models.Q(embedding__isnull=False)
                         & ~models.Q(embedding_model="")
                         & ~models.Q(embedding_version="")
+                        & models.Q(embedding_dimensions__isnull=False)
                     )
                 ),
                 name="retrieval_chunk_embedding_profile_complete",

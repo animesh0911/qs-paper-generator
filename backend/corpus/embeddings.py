@@ -77,6 +77,7 @@ class RetrievalChunkEmbeddingPopulator:
                 embedding__isnull=False,
                 embedding_model=profile.model,
                 embedding_version=profile.version,
+                embedding_dimensions=profile.dimensions,
             )
         )
         skipped_count = chunks.count() - len(pending)
@@ -90,10 +91,16 @@ class RetrievalChunkEmbeddingPopulator:
                 chunk.embedding = vector
                 chunk.embedding_model = profile.model
                 chunk.embedding_version = profile.version
+                chunk.embedding_dimensions = profile.dimensions
             with transaction.atomic():
                 RetrievalChunk.objects.bulk_update(
                     batch,
-                    ["embedding", "embedding_model", "embedding_version"],
+                    [
+                        "embedding",
+                        "embedding_model",
+                        "embedding_version",
+                        "embedding_dimensions",
+                    ],
                 )
             populated_count += len(batch)
 

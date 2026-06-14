@@ -138,6 +138,7 @@ class PostgresVectorTextbookRetriever:
             embedding__isnull=False,
             embedding_model=self.client.profile.model,
             embedding_version=self.client.profile.version,
+            embedding_dimensions=self.client.profile.dimensions,
         ).select_related("document", "chapter", "chapter_map_node")
         if request.chapter_map_node is not None:
             chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
@@ -337,6 +338,7 @@ class RetrievalChunkBuilder:
                 embedding=None,
                 embedding_model="",
                 embedding_version="",
+                embedding_dimensions=None,
             )
         RetrievalChunk.objects.update_or_create(
             document=document,

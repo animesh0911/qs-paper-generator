@@ -145,7 +145,15 @@ def test_rebuild_preserves_current_embeddings_and_clears_stale_ones(document):
     chunk.embedding = [1.0, 0.0, 0.0]
     chunk.embedding_model = "fixed-vector-test"
     chunk.embedding_version = "v1"
-    chunk.save(update_fields=["embedding", "embedding_model", "embedding_version"])
+    chunk.embedding_dimensions = 3
+    chunk.save(
+        update_fields=[
+            "embedding",
+            "embedding_model",
+            "embedding_version",
+            "embedding_dimensions",
+        ]
+    )
 
     builder.rebuild(document)
     chunk.refresh_from_db()
@@ -163,6 +171,7 @@ def test_rebuild_preserves_current_embeddings_and_clears_stale_ones(document):
     assert chunk.embedding is None
     assert chunk.embedding_model == ""
     assert chunk.embedding_version == ""
+    assert chunk.embedding_dimensions is None
 
 
 @pytest.mark.django_db

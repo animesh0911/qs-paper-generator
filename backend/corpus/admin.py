@@ -45,12 +45,14 @@ class RetrievalChunkAdmin(admin.ModelAdmin):
         "page_end",
         "embedding_model",
         "embedding_version",
+        "embedding_dimensions",
     )
     list_filter = (
         "chapter",
         "chapter_map_node",
         "embedding_model",
         "embedding_version",
+        "embedding_dimensions",
     )
     search_fields = ("text", "stable_chunk_id")
     readonly_fields = (
@@ -59,4 +61,5 @@ class RetrievalChunkAdmin(admin.ModelAdmin):
         "embedding",
         "embedding_model",
         "embedding_version",
+        "embedding_dimensions",
     )
