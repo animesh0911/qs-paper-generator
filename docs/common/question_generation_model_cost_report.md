@@ -1,7 +1,7 @@
 # CBSE Class 10 Science Q&A Generation: Model Selection & API Cost Report
 
-**Date Checked:** June 13, 2026  
-**Status:** Completed Report  
+**Date Checked:** June 13, 2026
+**Status:** Completed Report
 **Target File:** [question_generation_model_cost_report.md](file:///Users/varad/V/repo/qs-paper-generator/docs/common/question_generation_model_cost_report.md)
 
 ---
@@ -24,7 +24,7 @@ Following an audit of the repository's ADRs, scratchboards, and remote issue tra
 
 ## Model Pricing (as of June 2026)
 
-Pricing is prioritized by official/provider pricing and OpenRouter's aggregator pricing. 
+Pricing is prioritized by official/provider pricing and OpenRouter's aggregator pricing.
 
 | Model | Provider/Gateway | Input Rate (per 1M tokens) | Output Rate (per 1M tokens) | Context Caching Rates |
 | :--- | :--- | :--- | :--- | :--- |
