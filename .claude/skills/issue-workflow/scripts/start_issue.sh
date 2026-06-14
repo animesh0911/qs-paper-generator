@@ -42,6 +42,8 @@ git -C "$repo_root" worktree add -b "$branch" "$worktree_path" "$base_ref"
 
 if [[ -n "$(git -C "$worktree_path" status --porcelain)" ]]; then
   echo "New worktree is unexpectedly dirty: $worktree_path" >&2
+  git -C "$repo_root" worktree remove --force "$worktree_path"
+  git -C "$repo_root" branch -D "$branch"
   exit 1
 fi
 

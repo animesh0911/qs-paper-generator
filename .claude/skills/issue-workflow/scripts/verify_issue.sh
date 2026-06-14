@@ -11,17 +11,20 @@ mode="${1:-}"
 
 repo_root="$(git rev-parse --show-toplevel)"
 base_ref="${BASE_REF:-origin/main}"
-merge_base="$(git -C "$repo_root" merge-base HEAD "$base_ref")"
+merge_base="$(git -C "$repo_root" merge-base HEAD "$base_ref" 2>/dev/null || true)"
+if [[ -z "$merge_base" ]]; then
+  echo "Could not find a merge base between HEAD and $base_ref." >&2
+  echo "Ensure the base ref exists locally and has been fetched." >&2
+  exit 1
+fi
 export DJANGO_DEBUG="${DJANGO_DEBUG:-1}"
 
 changed_files=()
-while IFS= read -r path; do
+while IFS= read -r -d '' path; do
   changed_files+=("$path")
 done < <(
-  {
-    git -C "$repo_root" diff --name-only "$merge_base" --
-    git -C "$repo_root" ls-files --others --exclude-standard
-  } | sort -u
+  git -C "$repo_root" diff --name-only -z "$merge_base" --
+  git -C "$repo_root" ls-files --others --exclude-standard -z
 )
 
 if ((${#changed_files[@]} == 0)); then
@@ -52,10 +55,16 @@ for path in "${changed_files[@]}"; do
 done
 
 backend_python="${BACKEND_PYTHON:-}"
-if [[ -z "$backend_python" && -x "$repo_root/backend/.venv/bin/python" ]]; then
-  backend_python="$repo_root/backend/.venv/bin/python"
-elif [[ -z "$backend_python" ]]; then
-  backend_python="$(command -v python3 || true)"
+if [[ -z "$backend_python" ]]; then
+  if [[ -x "$repo_root/backend/.venv/bin/python" ]]; then
+    backend_python="$repo_root/backend/.venv/bin/python"
+  elif [[ -x "$repo_root/backend/.venv/Scripts/python.exe" ]]; then
+    backend_python="$repo_root/backend/.venv/Scripts/python.exe"
+  elif [[ -x "$repo_root/backend/.venv/Scripts/python" ]]; then
+    backend_python="$repo_root/backend/.venv/Scripts/python"
+  else
+    backend_python="$(command -v python3 || command -v python || true)"
+  fi
 fi
 
 backend_compose=()
@@ -78,7 +87,7 @@ run_backend_in_compose() {
 }
 
 require_frontend_dependencies() {
-  if [[ ! -x "$repo_root/frontend/node_modules/.bin/vitest" ]]; then
+  if [[ ! -d "$repo_root/frontend/node_modules/vitest" ]]; then
     echo "Frontend verification requires frontend dependencies (run npm install)." >&2
     exit 1
   fi
@@ -96,11 +105,11 @@ if [[ "$backend_changed" == true ]]; then
       cd "$repo_root/backend"
       "$backend_python" -m pytest
     )
-    while IFS= read -r path; do
+    while IFS= read -r -d '' path; do
       if [[ -f "$repo_root/$path" ]]; then
         "$backend_python" -m py_compile "$repo_root/$path"
       fi
-    done < <(git -C "$repo_root" ls-files "backend/*.py")
+    done < <(git -C "$repo_root" ls-files -z "backend/*.py")
     if ((${#backend_python_files[@]} > 0)); then
       "$backend_python" -m ruff check "${backend_python_files[@]}"
       "$backend_python" -m black --check "${backend_python_files[@]}"
