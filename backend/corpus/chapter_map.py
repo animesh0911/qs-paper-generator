@@ -77,13 +77,16 @@ class ChapterMapBuilder:
             section_ids.add(stable_node_id)
             sections_by_number[number] = section
 
-        landmark_ids = self._rebuild_landmarks(document, elements)
+        landmark_ids = self._rebuild_landmarks(document, root, elements)
         keep_ids = {root.stable_node_id, *section_ids, *landmark_ids}
         document.chapter_map_nodes.exclude(stable_node_id__in=keep_ids).delete()
-        self._rebuild_edges(document)
+        self._rebuild_edges(document, elements)
 
     def _rebuild_landmarks(
-        self, document: TextbookDocument, elements: list[TextbookElement]
+        self,
+        document: TextbookDocument,
+        root: ChapterMapNode,
+        elements: list[TextbookElement],
     ) -> set[str]:
         sections = list(
             document.chapter_map_nodes.filter(node_type=ChapterMapNode.NodeType.SECTION)
@@ -95,9 +98,14 @@ class ChapterMapBuilder:
                 continue
             node_type, title, start, end = landmark
             parent = next(
-                section
-                for section in sections
-                if section.source_start <= element.source_order <= section.source_end
+                (
+                    section
+                    for section in sections
+                    if section.source_start
+                    <= element.source_order
+                    <= section.source_end
+                ),
+                root,
             )
             owned = elements[start : end + 1]
             stable_node_id = self._stable_id(node_type, element.stable_element_id)
@@ -160,8 +168,6 @@ class ChapterMapBuilder:
     def _before_next_landmark(self, elements: list[TextbookElement], index: int) -> int:
         for candidate_index in range(index + 1, len(elements)):
             candidate = elements[candidate_index]
-            if candidate.element_type in {"picture", "table"}:
-                return candidate_index - 1
             if candidate.element_type == "section_header":
                 return candidate_index - 1
         return len(elements) - 1
@@ -180,7 +186,9 @@ class ChapterMapBuilder:
                     return candidate
         return None
 
-    def _rebuild_edges(self, document: TextbookDocument) -> None:
+    def _rebuild_edges(
+        self, document: TextbookDocument, elements: list[TextbookElement]
+    ) -> None:
         nodes = list(document.chapter_map_nodes.select_related("parent"))
         edge_ids: set[str] = set()
         for node in nodes:
@@ -225,9 +233,9 @@ class ChapterMapBuilder:
         sections = [
             node for node in nodes if node.node_type == ChapterMapNode.NodeType.SECTION
         ]
-        for element in document.elements.exclude(
-            element_type__in=["caption", "section_header"]
-        ):
+        for element in elements:
+            if element.element_type in {"caption", "section_header"}:
+                continue
             for match in _SOURCE_REFERENCE.finditer(element.text):
                 target = landmarks.get(self._reference_key(match))
                 if target is None or (

@@ -5,7 +5,10 @@ source-addressable elements. It references ``bank.Chapter`` as the shared
 closed syllabus taxonomy but does not participate in Question ingestion.
 """
 
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
+from pgvector.django import VectorField
 
 from bank.models import Chapter
 
@@ -162,4 +165,63 @@ class ChapterMapEdge(models.Model):
                 fields=["document", "stable_edge_id"],
                 name="unique_chapter_map_edge_id",
             )
+        ]
+
+
+class RetrievalChunk(models.Model):
+    """One stable searchable excerpt with exact corpus provenance."""
+
+    document = models.ForeignKey(
+        TextbookDocument, on_delete=models.CASCADE, related_name="retrieval_chunks"
+    )
+    chapter = models.ForeignKey(
+        Chapter, on_delete=models.PROTECT, related_name="retrieval_chunks"
+    )
+    chapter_map_node = models.ForeignKey(
+        ChapterMapNode, on_delete=models.CASCADE, related_name="retrieval_chunks"
+    )
+    stable_chunk_id = models.CharField(max_length=64)
+    text = models.TextField()
+    source_element_ids = models.JSONField(default=list)
+    page_start = models.PositiveSmallIntegerField()
+    page_end = models.PositiveSmallIntegerField()
+    content_types = models.JSONField(default=list)
+    citation = models.JSONField(default=dict)
+    search_vector = SearchVectorField(null=True)
+    embedding = VectorField(null=True)
+    embedding_model = models.CharField(max_length=200, blank=True)
+    embedding_version = models.CharField(max_length=100, blank=True)
+    embedding_dimensions = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["chapter_map_node__source_start", "stable_chunk_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "stable_chunk_id"],
+                name="unique_retrieval_chunk_id",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(page_end__gte=models.F("page_start")),
+                name="retrieval_chunk_valid_page_range",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        embedding__isnull=True,
+                        embedding_model="",
+                        embedding_version="",
+                        embedding_dimensions__isnull=True,
+                    )
+                    | (
+                        models.Q(embedding__isnull=False)
+                        & ~models.Q(embedding_model="")
+                        & ~models.Q(embedding_version="")
+                        & models.Q(embedding_dimensions__isnull=False)
+                    )
+                ),
+                name="retrieval_chunk_embedding_profile_complete",
+            ),
+        ]
+        indexes = [
+            GinIndex(fields=["search_vector"], name="retrieval_chunk_search_gin"),
         ]

@@ -33,6 +33,22 @@ A corpus-owned navigational node derived from textbook headings and selected con
 **ChapterMapEdge**
 A typed, evidence-backed relationship between **ChapterMapNodes**. The deterministic MVP relationship types are `contains`, `next`, and `references`; LLM-inferred conceptual relationships are not canonical. Lives in `corpus.models.ChapterMapEdge`.
 
+**RetrievalChunk**
+A stable searchable group of adjacent **TextbookElements** owned by exactly one section/topic **ChapterMapNode**. It preserves exact source-element IDs, pages, content types, citation metadata, and bounded parent-heading context while never merging across topic boundaries. Lives in `corpus.models.RetrievalChunk`.
+
+**GroundingContext**
+The ordered, citation-bearing result returned by a **TextbookRetriever**. It contains ranked RetrievalChunks and their exact Chapter, ChapterMapNode, TextbookElement, and page provenance; it is not persisted independently.
+
+**TextbookRetriever**
+The corpus-owned retrieval seam: `retrieve(TextbookRetrievalRequest) -> GroundingContext`. The first adapter, `PostgresTextbookRetriever`, performs deterministic lexical-only ranking with Chapter, optional ChapterMapNode, content-type, query-text, and result-limit filters. Lives in `corpus.retrieval`.
+
+**EmbeddingClient**
+The provider-neutral corpus seam for converting ordered text batches into
+fixed-length vectors under one explicit model, version, and dimension profile.
+Corpus feature code depends on this interface and never imports an embedding
+provider SDK directly. Tests use fixed vectors; production model selection and
+live population are separate measured gates. Lives in `corpus.embeddings`.
+
 **primary_form**
 Field on `Question` (`bank.models.PrimaryForm`): the dominant non-text form a question depends on — `none`, `diagram_based`, or `table_based`. Emitted by the **Extractor**, *orthogonal* to **QuestionType** (a `short_answer` can be `diagram_based`). `diagram_based` also reinforces `Question.has_diagram` at ingest. Stored for future form-aware picking/rendering; not yet a picker gate.
 

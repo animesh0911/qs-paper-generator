@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from .models import TextbookDocument, TextbookElement
+from .models import RetrievalChunk, TextbookDocument, TextbookElement
 
 
 @admin.register(TextbookDocument)
@@ -34,3 +34,32 @@ class TextbookElementAdmin(admin.ModelAdmin):
     @admin.display(description="Text")
     def short_text(self, obj):
         return obj.text[:100]
+
+
+@admin.register(RetrievalChunk)
+class RetrievalChunkAdmin(admin.ModelAdmin):
+    list_display = (
+        "chapter",
+        "chapter_map_node",
+        "page_start",
+        "page_end",
+        "embedding_model",
+        "embedding_version",
+        "embedding_dimensions",
+    )
+    list_filter = (
+        "chapter",
+        "chapter_map_node",
+        "embedding_model",
+        "embedding_version",
+        "embedding_dimensions",
+    )
+    search_fields = ("text", "stable_chunk_id")
+    readonly_fields = (
+        "stable_chunk_id",
+        "search_vector",
+        "embedding",
+        "embedding_model",
+        "embedding_version",
+        "embedding_dimensions",
+    )

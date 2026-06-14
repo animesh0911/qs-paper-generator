@@ -1,0 +1,2045 @@
+{
+  "summary": {
+    "query_count": 22,
+    "passed": 13,
+    "failed": 9,
+    "pass_rate": 0.5909,
+    "supported_passed": 13,
+    "supported_count": 18,
+    "unsupported_passed": 0,
+    "unsupported_count": 4
+  },
+  "rows": [
+    {
+      "id": "q01_def_catenation",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 1,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.5,
+          "stable_chunk_id": "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            5
+          ],
+          "source_element_ids": [
+            "56068fc3a72772fca71ec4709052e090536dadb42531ae11afae36bd9fca1777"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            1
+          ],
+          "source_element_ids": [
+            "479959a0e3ff84ee720ce8768a221fbf19d69a3987e8e40ad80070f6836e5261",
+            "7573d5a9402b6cc5f59f058ddf3770e71eb7bfe2bbccc3e1ccc3213ca718b404"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "dcabe4f8ff04ba02c9427192203f2f06a542dcc3c15d3b4368085b93804dc890",
+          "topic_title": "4.2.1 Saturated and Unsaturated Carbon Compounds",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            6
+          ],
+          "source_element_ids": [
+            "adf5dd351698982c34d8302b78b7bb0b3fdfaeb742e08f2336bb4044a60e6557",
+            "9623d512d125042d9fce356a2cac1cd9efa638ddce8731409d7da9a80397625d",
+            "53dd17dc8917d9e5c3e6d60821e92d40197eaecd85352a50203d26c0b5ea2f1a",
+            "2c3fac48571cfbab2ef434008e49731c8de5366ead917ad9672f65f8d2ffb845",
+            "45a149c87bf3b21446157a5805b4b3c1ce732c79a8456a143707f2f45b5ddc0a",
+            "38fa559d5c94afdf2f57277d58e79f15779419304ac034f7832e90d94985cdb2"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5",
+          "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            6
+          ],
+          "source_element_ids": [
+            "ddf4dcb0ce67231f034a420dec6a073791cc1f76235f32aa59e87b2fb3a410c8"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd",
+          "topic_title": "4.2.4 Homologous Series",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            10
+          ],
+          "source_element_ids": [
+            "0f1cf22df388ac805a12adf1ea39880833304670ec63b6cc8c405386d1019a28"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q02_def_homologous_series",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 2,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "topic_title": "4.2.5 Nomenclature of Carbon Compounds",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            10
+          ],
+          "source_element_ids": [
+            "7a16113725547ebdac2f5bc0a62e8560f4219af1684a9a618ea358c97a71c4e7",
+            "f0ddd9d5e7d2d0282efa8c8e157363a4b699f62e3b640ebbc456921c4d76417c"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0",
+          "topic_title": "4.2.4 Homologous Series",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            9
+          ],
+          "source_element_ids": [
+            "aa401ad346e5a7fa3308bc9bcf0d1a5715675c4168e85bb111048c716848e660",
+            "d6e28cad0535e2cb0ffdb96c093aeb9c662d7bad6358d4ee29da6b7fb7e27c3a"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7",
+          "topic_title": "4.2.4 Homologous Series",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            9,
+            10
+          ],
+          "source_element_ids": [
+            "6ee936f5a1e2e9d176b3a51fe5d310ede60d3b48e837926f02b3bb2c554ec86c",
+            "17caefd0b63dfd23faf4d66cec062b71949f086b44bcd5d6b4620ea1a2d7148f",
+            "4164eb9ef01a4f29af388e8976cf8dd209b16383bd2634ed471c7bc9585ee773",
+            "bd016e9a0a4de2fd48ec9c9a411052c2eb267f0dec301c6f61c2d85beb174386",
+            "7afe03d6864f4dd100cdea60106dae668599d904469b5f338a1b86f117605d39"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd",
+          "topic_title": "4.2.4 Homologous Series",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            10
+          ],
+          "source_element_ids": [
+            "0f1cf22df388ac805a12adf1ea39880833304670ec63b6cc8c405386d1019a28"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "topic_title": "4.3.3 Addition Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "d92d0465977441440ee28651ce9f0a43f19f42e9445f70a638526a6da343f846"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q03_def_structural_isomers",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 2,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede",
+          "topic_title": "4.2.1 Saturated and Unsaturated Carbon Compounds",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            6
+          ],
+          "source_element_ids": [
+            "78335a70f67ecf7c4b8efc6f5b3d746c64a6af77e482d6ae75ea54da22b4b372",
+            "3efd675cda4028cf50e17f480d1130164d2a9cceeebf7bf19305f055e1a43760"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7",
+          "topic_title": "4.2.2 Chains, Branches and Rings",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            8
+          ],
+          "source_element_ids": [
+            "9e1ea4b986096eee38d081ea462b7fdc12dfd400f9531a55cd140a424119b384",
+            "588afdfab2bc47d7b64d1b5fe55886aa49f6cfc311e9e4c8522f75bc9ca2935f",
+            "e5bcae22dc34db5062d331b5774b0bc94c9a521dc2cc3fe0f355689aaf42a5a8",
+            "70057d5f8b9c001f93612c9f4daa3b889d9cb0b56e86bbb965c99ba48985a318",
+            "adf17a104076cffaa0fb286193db9aa7481b7d6c18f8298de81e3cf7d989bf27",
+            "260c5fa0d7737091e0dc043a08caed3e0802f3a0945e9db6b9a5bc37437e2c4b",
+            "7216a3e729dc0f978496cc1ce96ed47cfb1d9d5676edbdf8583b039d22b098ed",
+            "1dffa4d47ee89004d9fe1497aada47a80f6b793d1ecd64b08c93e1567e7cf7b1",
+            "4838914d4767684931e6f8b78061b7f9506231ed767cb1f451089cd253cbd3e9",
+            "17e8d576cdace811b56150ffd12d369e9132f17d3465c5c5a7b11677933329b3",
+            "8e3e9302f6f72f9de39f3ff5b4b213027a790a0927b666cff29daffc434bdd99",
+            "4c7fd2dc022b6b41b4523ec4ae78ca65214480e8d5af2de03d74e12b02689f06",
+            "d678dcec35cd2b90be5433cfc7bb270349d7ee482c2b05222d15a3e771ac0b46",
+            "4e204272b1056a77e45cbe1833eb374f4cd7e5b4e5fa226fc8348b2ada4158f6",
+            "2a726198c81f79b7739d9ddcfe103a5585ea8230b5580ec71c23f47095ad9ce9"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "154809056b99fda4546ccc333878f9da7742bf3412fdc05aafb14b558a32df78",
+          "topic_title": "4.2.5 Nomenclature of Carbon Compounds",
+          "content_types": [
+            "list_item",
+            "questions",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            11,
+            12
+          ],
+          "source_element_ids": [
+            "659bbed48d742a1566988d808b5fc9126d552ef2184a3d9edee966b4fa774c6c",
+            "d36400eb5a7aab00c92dcf6c741d070c77a6377b007e1f2e4f43d5c8e742cb3f",
+            "5ab7970d136b1d9134a483ac156cd23a338df96517001d509af156d8fb1124ca",
+            "0d0e6296ad8511f5a3269dca7a07e7b1209fa2ddb10a34148dec5a3534993277",
+            "0bc81f7fbfd6e615dfc9f01f2bec38c35310e374dc84b444b5d049977eccb00e",
+            "9011fcc1abaaaa2f3978de2c278e886be657217052d43475412fa209fa4913e5",
+            "232c5399c5d8855b9b13fc5f7faa3a919378ac1353eaa0cb6a89dfc0ada9f8cf",
+            "01242781a30ab594ec951e318643c8c18249de1964cc2db90e2ecc705a4fde36",
+            "c6c6ba1a522ce6512e8f4f1669bc058c66d137c439e14b03f06e4cb102d2e3f4",
+            "ab9b3215e43d09dbeccf44e2341f41fd7256eb1124429dcc3d84ce1c0f560e17",
+            "95fe9b2049e485a704bcec6f1d426f0b35ebf9fa5408f3803408d9523fe1b6d8",
+            "c2649ec370d44cfa05be49f6b7925ccf7ef8fa5d60ee092c39beb91fc8ddb3ea",
+            "4e46d8711218154402440759d1d41ce0b95ca978bf2d9ed4c140f203ee1d1833"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "190a4a93bb84747d734aa57260363cf65913d0cd47f7fe2ffce2d79aa16c4975",
+          "topic_title": "4.2.2 Chains, Branches and Rings",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            8
+          ],
+          "source_element_ids": [
+            "226437e5f5d1539af6bfdf1f1eb1ac55251890b9c113cd898d51d79ce534b8b5",
+            "50fca788f05fc68433e4f1263c12f3e36c30e726b686ef7179725c954b07b292",
+            "87d794ba3019ce34b78af3ec225dbfd04ce377d18a63f7de58a3331402b7fe56",
+            "4f45d615e3879d28f20bead5718ad48186bc29ecbdd57da58cc7afa9d6a4b57b",
+            "ced4fef7361c79b18a089ed59b25b9aed409660a67b62fc50b8b7db5342af826",
+            "200ab40d4357b44f5d1c02d0bf172504c7bc329891eb09986b56414811d1ee58",
+            "d2154f18fc4864f88c2024d69bc0e7cd9466100d5a77f1d518cb4802f8c47a0b",
+            "61cff6f303430cfc04d309a1a985819d89bd57c9c1c40e9509d13b9b7a3d38d2",
+            "b93de57445af75552ba1a68444672342ecb2d220f06081407485dc6a98f3770f",
+            "6effbcd38081afb5dbce27783e19120d357b0aaf05900ac0a191b58c747de9cc",
+            "316cb44247b7c7184057d836e028148f25bc1a14ecbc8061d6338f6c891460b5",
+            "60197209e946677125933967200682797d5f511081b0a8bc6223deb3ed356211",
+            "92b3bbb46c6bbf1c2eba8d7e4e5dcdb8ab037c65b00783f652b4f37b5f19c3bd"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "deed9865a4b1a6e59c6d77e0146d2a534084b57cbf3d3c030e9b228e4f987935",
+          "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            5
+          ],
+          "source_element_ids": [
+            "e809c921f798ed21949550849e1fef1b168ada48efe1e4d82bddd4fc1fbe86b5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q04_def_covalent_bond",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 3,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.5,
+          "stable_chunk_id": "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            4
+          ],
+          "source_element_ids": [
+            "55f6c09a9abc29abc9ecb8ec5e96eb286c5b91feaa8f16c9067ce6cee67dbd2b"
+          ]
+        },
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            4
+          ],
+          "source_element_ids": [
+            "16f55bd8997c264707ec83058a7d92e58bc16ee9686f815589150d2917c6ca42",
+            "3a625425bc0bfb748941829fe1e9a82abc73775d8e6c3de0d6f9585f2e98712e",
+            "d00ae17907bb63cd840c01871ace18a3e579d3f9f84ec7dfdac1545d51e80b03"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "3b367edf6a3121c69f1092fd08de536f313a45169f5980f523e671f2922b8a37",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "activity",
+            "text"
+          ],
+          "pages": [
+            1
+          ],
+          "source_element_ids": [
+            "754dd8c3fdfd28e0c361b8504192122c2802ff572bb565d38b3cc47e79c8703e",
+            "2f3c970145d664df2844e41e89f99c258c6a07a8e8be7071c556fe849d77f3e1",
+            "c3b798b058225cd462da51b405f4d3008d9412297a114627579b1a10636d7b0a",
+            "a34e90454f7b8df7e6d6e2e5e7335e2c6fb30ca61b7d9dfde767d14ce07cace2"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "541df09e6ae710668dfb6a00902eb4d3dbe32051235ed80f0b437265be4fdfc5",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "activity",
+            "text"
+          ],
+          "pages": [
+            1
+          ],
+          "source_element_ids": [
+            "5a9ba24dfa4b184b0bef88dca76b0104b905222eaf7144f07a3da9ac5517d761",
+            "3cea035ae9ec42c4ae6a42d1b26be0ee48d7d5910e9d105638e6382ed45135e1"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            3
+          ],
+          "source_element_ids": [
+            "22a0461ac02b26a144be97aa6e812a2e2c206931d753d5fdf7e19c63a0668b50"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q05_exp_melting_boiling_points",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 2,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.7,
+          "stable_chunk_id": "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            3
+          ],
+          "source_element_ids": [
+            "22a0461ac02b26a144be97aa6e812a2e2c206931d753d5fdf7e19c63a0668b50"
+          ]
+        },
+        {
+          "rank": 0.6,
+          "stable_chunk_id": "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            1
+          ],
+          "source_element_ids": [
+            "479959a0e3ff84ee720ce8768a221fbf19d69a3987e8e40ad80070f6836e5261",
+            "7573d5a9402b6cc5f59f058ddf3770e71eb7bfe2bbccc3e1ccc3213ca718b404"
+          ]
+        },
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "f85acfe6a645a04a09b83777a4bf4473156bd0b92792a02171ce8b56792ffce8"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "155b20e887bcfae40ae331d561b3e15b860be866270deef15c7c5864e26c7d5c",
+            "025577aed6229f8a135a882d3c3414031c649774991d40633832b3fdabaa3bd1"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd",
+          "topic_title": "4.2.4 Homologous Series",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            10
+          ],
+          "source_element_ids": [
+            "0f1cf22df388ac805a12adf1ea39880833304670ec63b6cc8c405386d1019a28"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q06_exp_graphite_conductivity",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 1,
+      "result_count": 4,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            4
+          ],
+          "source_element_ids": [
+            "16f55bd8997c264707ec83058a7d92e58bc16ee9686f815589150d2917c6ca42",
+            "3a625425bc0bfb748941829fe1e9a82abc73775d8e6c3de0d6f9585f2e98712e",
+            "d00ae17907bb63cd840c01871ace18a3e579d3f9f84ec7dfdac1545d51e80b03"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            4
+          ],
+          "source_element_ids": [
+            "55f6c09a9abc29abc9ecb8ec5e96eb286c5b91feaa8f16c9067ce6cee67dbd2b"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            1
+          ],
+          "source_element_ids": [
+            "479959a0e3ff84ee720ce8768a221fbf19d69a3987e8e40ad80070f6836e5261",
+            "7573d5a9402b6cc5f59f058ddf3770e71eb7bfe2bbccc3e1ccc3213ca718b404"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            3
+          ],
+          "source_element_ids": [
+            "22a0461ac02b26a144be97aa6e812a2e2c206931d753d5fdf7e19c63a0668b50"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q07_exp_ethanol_oxidation",
+      "supported": true,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "formula",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "9d71c3b47f444fb04b07ddb6cec282a8967c5abb5e1b746475f2ef32cd3ec1df",
+            "bf7c00f5f304afae4763cf59fa0667eddf3671ee9cb19868b18e51f56063500f",
+            "6471359c733b85870a4b7b200203b2c93b68eae91a32bd80489ede6a4648a566"
+          ]
+        },
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "activity",
+            "formula",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "2f516fd32d802d18cb3a24f62a81bc737df44ec6b6d3f4e18a8aadb4acf63156",
+            "77d1c8b9ba2e8aef6863c88dd786381faa0f057abbf89a5bfa74cc1c74b11e4f",
+            "340c2edfc54b76fcf276f8b65dcf51e670bd41b5bbfcbcd89bd3024c614b0110",
+            "59ff092d4cef4754d8eb6f7187b00e340ecfe3c0632515a6de517a9efb2bc5c9",
+            "66f255e2f7606d5d51076eae4a13354270f7add6f6f0af6adcad93811f98f70b",
+            "271671410b5ab73aaa3dc9a894800b4b819ddb28821cb2779f99afb54009d1ec",
+            "daf74b1b0060ca426efa89219b6b71e25e731aa6f0948e44d312525fa2c29293",
+            "030a714c402c37a0ea2be4939e875395f76bc6f8d4c85f3942756e24bc81aa9a",
+            "6f2b974522e17493e12d081554f0804896964ca043614c4497710e7253f38f42",
+            "1e4b5dd09615531dde921a6ce363a1ddb6fb5c662f248494b9f07b6eb4eb85a3"
+          ]
+        },
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "2f285557404e6d063b875f974ec4855dc71e1807b4d3cda93172847c337f06d2",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "60703c71baf85d65d72a608e5684df350795a9df8a8a416ddd56342d40289adb",
+            "f8a92b5ded5576ddcfe3606cee13bb8779f72c1971fc937242b57b323d5be58b",
+            "de8fdbd048589487bd9f1845290d6c98e744bae8a89bc005bb9a4ef28b4f93c5",
+            "2af89078e15b757efdc111b1bee2fa4fd38788c0fcc505e8418ed90241c05ad1",
+            "2430d20fab8a6f0b77f76713843117584b5fb0179c85b4ca7842ba7cdafde826",
+            "48287a14558980085c3ed93fe2a4cd0276e149ebe08bb3980f636a26b1c7ee54",
+            "f01f76e0e53fbc3e1164f25bdbdc78f1e55483ae4fb8d9706dbf49ced5ea437d",
+            "31ada6c0cbeff8c5b4d376df796e5181e8ce2df5a053d1234b0611760d3f5f67",
+            "1ef92708bf3e8e880ef081f04a4ed651bea5b4f7da6dc66731f725a74bfbb911"
+          ]
+        },
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "36c824e271c4788cce797d3d648f4d7437fb2a2b7efffb2a55276a352b1134d9",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "9f90ceb1338f6ef0f48420b6551816e4f3d335f3234b1d0ba85dafd617d82866"
+          ]
+        },
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            17
+          ],
+          "source_element_ids": [
+            "d0ba2c539bdbb0e376ee9069788e92321aac6585b0e720c5d4017ff3659b957e",
+            "8dcb2a4cb3ac8a3244582cfb5f00de8572d82686f8f1bea50836c5cba47c182e",
+            "f7fe1ca08359b46cbb292047b4b2f414779a3a2ab7c123dc89da798866fb5bc9",
+            "69b40cf85322253ff7ffa1cb9c00baf677a19145ef338153e5416df6105252f9",
+            "d69d86800798dbcd093bfd1e0f5f3113b63fbb347810ee3a743b90b5876bf645",
+            "624257740704463c0c6fecdc6217aec8453b7965f550ac80f9c1608e5f2858dc",
+            "d4d458b17c3ba2edc01b43181817b4ca281dbe029df19099a020ae7c7fb6780b",
+            "50c2b817aa9f784ff588811d1848d97aed59255214b7ef4ea3f8222e667218be",
+            "f5e5af4fb96da452cc2ee4cb2418308891def830a227546aa6606695ad5894cb"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q08_rxn_esterification",
+      "supported": true,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "topic_title": "4.3.3 Addition Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "d92d0465977441440ee28651ce9f0a43f19f42e9445f70a638526a6da343f846"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "topic_title": "4.3.1 Combustion",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            12
+          ],
+          "source_element_ids": [
+            "55744ca87d1395652011dcba0ef7cfa9e0efcef4ac5f67e3af785ca74a613720"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13",
+          "topic_title": "4.3.3 Addition Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "46e5fd0d97bb179cb1b3ebedd155d36098638213fe8ce0ee93704c550913f4dd"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2",
+          "topic_title": "4.3.4 Substitution Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "1ed33cd43ec49fa0402d7a3963eef923a7480180b3b4b1ba79709e8d6219d2e0",
+            "9fb2ea563cb95ca93e7e54b22aca7a6da145eee0f6f8c36658d1d795d9155852"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "topic_title": "4.3.2 Oxidation",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            13
+          ],
+          "source_element_ids": [
+            "2153a0c0335abd6a8dcaba378f1582455a79f738f7a60bc5e7d61d92ec672ef2",
+            "4abe5b2184bd72e72455f953a191097a6a96c99dff30843a3b2ae914e2c7a9e1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q09_rxn_saponification",
+      "supported": true,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "formula",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "9d71c3b47f444fb04b07ddb6cec282a8967c5abb5e1b746475f2ef32cd3ec1df",
+            "bf7c00f5f304afae4763cf59fa0667eddf3671ee9cb19868b18e51f56063500f",
+            "6471359c733b85870a4b7b200203b2c93b68eae91a32bd80489ede6a4648a566"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "activity",
+            "text"
+          ],
+          "pages": [
+            19
+          ],
+          "source_element_ids": [
+            "898235cb37b70b363be18c5d3017d7c0919f3cce650a454bd8566b4f813b0143"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "eff01854388f0dd5bd26b49c94b9f2d35064eec219567ce7c842e74db9b86fc7"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "topic_title": "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            12
+          ],
+          "source_element_ids": [
+            "4d43e247fc45cc8f839f8b36cc90189fb0fb2b66e1b37f6dd35e7f65eb4b1912"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "topic_title": "4.3.3 Addition Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "d92d0465977441440ee28651ce9f0a43f19f42e9445f70a638526a6da343f846"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q10_rxn_hydrogenation",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 1,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "topic_title": "4.3.3 Addition Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "d92d0465977441440ee28651ce9f0a43f19f42e9445f70a638526a6da343f846"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede",
+          "topic_title": "4.2.1 Saturated and Unsaturated Carbon Compounds",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            6
+          ],
+          "source_element_ids": [
+            "78335a70f67ecf7c4b8efc6f5b3d746c64a6af77e482d6ae75ea54da22b4b372",
+            "3efd675cda4028cf50e17f480d1130164d2a9cceeebf7bf19305f055e1a43760"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            2
+          ],
+          "source_element_ids": [
+            "f186517796f230cbbb53f7271d2636aae61c6574a036a66cea6a48ee3b798cb0",
+            "4b23c5cd69bc100bd5a382a9c861b2d1b67f011f359a46d17bc111eec28274ad"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "551856d6693bf2cdc83ce8b10f1c043c69700d1b86719df1b5ba4c974f658ce6",
+            "725f7e72022537e6114a2793ad401d5d96a9fdffe761f51cd278959e48b3195d",
+            "b0cf289817b81c67f1f97e6427256d9fe9236a50349bd899e0ffa602f7aa0add"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            3
+          ],
+          "source_element_ids": [
+            "6d0cacaddde8c2d31cf2c10daea3ab8270ef44c889074a74b327aee6f4db9941",
+            "1cc013dc1c8c1208cbb58662c1f9e153f3a8473d50c5d33fba36fe85b86042b3",
+            "e77768647a5c38527602cb8e70ccdb27578b3688f3bf2e875cbe55e985eab21e"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q11_rxn_substitution",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 1,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2",
+          "topic_title": "4.3.4 Substitution Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "1ed33cd43ec49fa0402d7a3963eef923a7480180b3b4b1ba79709e8d6219d2e0",
+            "9fb2ea563cb95ca93e7e54b22aca7a6da145eee0f6f8c36658d1d795d9155852"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "topic_title": "4.3.3 Addition Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "d92d0465977441440ee28651ce9f0a43f19f42e9445f70a638526a6da343f846"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "formula",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "9d71c3b47f444fb04b07ddb6cec282a8967c5abb5e1b746475f2ef32cd3ec1df",
+            "bf7c00f5f304afae4763cf59fa0667eddf3671ee9cb19868b18e51f56063500f",
+            "6471359c733b85870a4b7b200203b2c93b68eae91a32bd80489ede6a4648a566"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "activity",
+            "formula",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "2f516fd32d802d18cb3a24f62a81bc737df44ec6b6d3f4e18a8aadb4acf63156",
+            "77d1c8b9ba2e8aef6863c88dd786381faa0f057abbf89a5bfa74cc1c74b11e4f",
+            "340c2edfc54b76fcf276f8b65dcf51e670bd41b5bbfcbcd89bd3024c614b0110",
+            "59ff092d4cef4754d8eb6f7187b00e340ecfe3c0632515a6de517a9efb2bc5c9",
+            "66f255e2f7606d5d51076eae4a13354270f7add6f6f0af6adcad93811f98f70b",
+            "271671410b5ab73aaa3dc9a894800b4b819ddb28821cb2779f99afb54009d1ec",
+            "daf74b1b0060ca426efa89219b6b71e25e731aa6f0948e44d312525fa2c29293",
+            "030a714c402c37a0ea2be4939e875395f76bc6f8d4c85f3942756e24bc81aa9a",
+            "6f2b974522e17493e12d081554f0804896964ca043614c4497710e7253f38f42",
+            "1e4b5dd09615531dde921a6ce363a1ddb6fb5c662f248494b9f07b6eb4eb85a3"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "29fc4f6587a7c85b0a84be5b9ce43d8694ef4b620a19eb721094e5269c478442",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            3
+          ],
+          "source_element_ids": [
+            "0eaa58490d19818d7f45c1fea981fc3417d900fb1cc770ecf1309af94afcc2b8",
+            "672a7d5c278d8090f3e079eb6cdf52254961828c3f721a2caed06f8318146d52",
+            "476f19c422235f5f8ee126e263453b065b001a3b8e6218268ad0c5916484c06a",
+            "c426c8c700addcfc52f2143219cfb820dad6ad5c3e9f197b7a725a1a9b849504",
+            "0459b18af759f2d912ccab6d67f82e69afd66fac6a70b259ee23167bc78e1d66",
+            "0fc29806e8a8be1f1b0798eb2a3c2b7cf350d2fb79fcd0481c85f3829ca90375",
+            "63285f03eaa910d7cc4d9e2e1544140320244681bf3ed64028af9f9056f376b5",
+            "21915bfc11aab104d39e4b8c9e51964453aa7028b2a875dc249e0928582ca8dd"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q12_act_carbonate_test",
+      "supported": true,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "formula",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "9d71c3b47f444fb04b07ddb6cec282a8967c5abb5e1b746475f2ef32cd3ec1df",
+            "bf7c00f5f304afae4763cf59fa0667eddf3671ee9cb19868b18e51f56063500f",
+            "6471359c733b85870a4b7b200203b2c93b68eae91a32bd80489ede6a4648a566"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "activity",
+            "formula",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "2f516fd32d802d18cb3a24f62a81bc737df44ec6b6d3f4e18a8aadb4acf63156",
+            "77d1c8b9ba2e8aef6863c88dd786381faa0f057abbf89a5bfa74cc1c74b11e4f",
+            "340c2edfc54b76fcf276f8b65dcf51e670bd41b5bbfcbcd89bd3024c614b0110",
+            "59ff092d4cef4754d8eb6f7187b00e340ecfe3c0632515a6de517a9efb2bc5c9",
+            "66f255e2f7606d5d51076eae4a13354270f7add6f6f0af6adcad93811f98f70b",
+            "271671410b5ab73aaa3dc9a894800b4b819ddb28821cb2779f99afb54009d1ec",
+            "daf74b1b0060ca426efa89219b6b71e25e731aa6f0948e44d312525fa2c29293",
+            "030a714c402c37a0ea2be4939e875395f76bc6f8d4c85f3942756e24bc81aa9a",
+            "6f2b974522e17493e12d081554f0804896964ca043614c4497710e7253f38f42",
+            "1e4b5dd09615531dde921a6ce363a1ddb6fb5c662f248494b9f07b6eb4eb85a3"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "topic_title": "4.3.1 Combustion",
+          "content_types": [
+            "activity",
+            "formula",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            12
+          ],
+          "source_element_ids": [
+            "da59017ea075eecc2955f24cd6612a93ca296d507feff92637a7c8fb05cf0f69",
+            "c8a89e7e709d8b5d09ab9fdfdc1dd212abfc5a80e435cc17228f551c5e4b4c51",
+            "41a0e1ad5befc3c981b400419624a674b276a793e333d982d9a85e491cd2009e",
+            "9468bb0ad89a8d89432e1dba23da7f85f2f24f1d995c2b07ff670b1cb00e550b",
+            "73e8acfc3458fc28009c6853221e4a6b41d5880496050cd6aa388a7a10a64918",
+            "6500438fb596dd6f79df8fc25067751454cde3781af982db6eba6f05b3cd5eed",
+            "cc6d1af07e0654d8ce57ebf33389043c725ee5356ae7efa86545dd6fe036ef01",
+            "4d4aab4e979ca2b0861c510f94251bdfb06600f47d4d429e5af002fcb8de5c38",
+            "2729e647974700221fdd18516d8f5ccdeb6bfa83b34a38723dd94c2260acacf7",
+            "9449e08bf661aa4e0c7a4ba42bd56d4e78694a689d7d7a52e1ae9580ed2534a1",
+            "76365e22ba7a6109e71ee8b76e74ae710b8ac4e0f66a19ce0f7e5dc2db205fdc",
+            "35e4ee4423279c5471df1fbfbb9bd6269c22d93103a942fcd30f1dea712ae2ff"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "98cab1c761c45b4e427c838859d026fe8ed0f3f457547c490a4f2ec08915ea64",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "list_item",
+            "section_header"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "f7bb282174be883cde6fa12310bc2038e3029bf310e58abb9ed044c20bf9cae6",
+            "bcd7350d94474f242c96da1cc884ea8e428853f80ca9c9044fb7aff2c4326c6c",
+            "b4e78e2966f73b362003b3a89ebab4a8ba589a7c31feb6d138ef57aae9393fcb",
+            "6871e04cc9af38291f28d73cb639d7d61098a0b0e9b365224fd432e3920b81a5"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "2f285557404e6d063b875f974ec4855dc71e1807b4d3cda93172847c337f06d2",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "60703c71baf85d65d72a608e5684df350795a9df8a8a416ddd56342d40289adb",
+            "f8a92b5ded5576ddcfe3606cee13bb8779f72c1971fc937242b57b323d5be58b",
+            "de8fdbd048589487bd9f1845290d6c98e744bae8a89bc005bb9a4ef28b4f93c5",
+            "2af89078e15b757efdc111b1bee2fa4fd38788c0fcc505e8418ed90241c05ad1",
+            "2430d20fab8a6f0b77f76713843117584b5fb0179c85b4ca7842ba7cdafde826",
+            "48287a14558980085c3ed93fe2a4cd0276e149ebe08bb3980f636a26b1c7ee54",
+            "f01f76e0e53fbc3e1164f25bdbdc78f1e55483ae4fb8d9706dbf49ced5ea437d",
+            "31ada6c0cbeff8c5b4d376df796e5181e8ce2df5a053d1234b0611760d3f5f67",
+            "1ef92708bf3e8e880ef081f04a4ed651bea5b4f7da6dc66731f725a74bfbb911"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q13_act_ethanol_sodium",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 3,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.4,
+          "stable_chunk_id": "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            17
+          ],
+          "source_element_ids": [
+            "d0ba2c539bdbb0e376ee9069788e92321aac6585b0e720c5d4017ff3659b957e",
+            "8dcb2a4cb3ac8a3244582cfb5f00de8572d82686f8f1bea50836c5cba47c182e",
+            "f7fe1ca08359b46cbb292047b4b2f414779a3a2ab7c123dc89da798866fb5bc9",
+            "69b40cf85322253ff7ffa1cb9c00baf677a19145ef338153e5416df6105252f9",
+            "d69d86800798dbcd093bfd1e0f5f3113b63fbb347810ee3a743b90b5876bf645",
+            "624257740704463c0c6fecdc6217aec8453b7965f550ac80f9c1608e5f2858dc",
+            "d4d458b17c3ba2edc01b43181817b4ca281dbe029df19099a020ae7c7fb6780b",
+            "50c2b817aa9f784ff588811d1848d97aed59255214b7ef4ea3f8222e667218be",
+            "f5e5af4fb96da452cc2ee4cb2418308891def830a227546aa6606695ad5894cb"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "formula",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "9d71c3b47f444fb04b07ddb6cec282a8967c5abb5e1b746475f2ef32cd3ec1df",
+            "bf7c00f5f304afae4763cf59fa0667eddf3671ee9cb19868b18e51f56063500f",
+            "6471359c733b85870a4b7b200203b2c93b68eae91a32bd80489ede6a4648a566"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "activity",
+            "formula",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "2f516fd32d802d18cb3a24f62a81bc737df44ec6b6d3f4e18a8aadb4acf63156",
+            "77d1c8b9ba2e8aef6863c88dd786381faa0f057abbf89a5bfa74cc1c74b11e4f",
+            "340c2edfc54b76fcf276f8b65dcf51e670bd41b5bbfcbcd89bd3024c614b0110",
+            "59ff092d4cef4754d8eb6f7187b00e340ecfe3c0632515a6de517a9efb2bc5c9",
+            "66f255e2f7606d5d51076eae4a13354270f7add6f6f0af6adcad93811f98f70b",
+            "271671410b5ab73aaa3dc9a894800b4b819ddb28821cb2779f99afb54009d1ec",
+            "daf74b1b0060ca426efa89219b6b71e25e731aa6f0948e44d312525fa2c29293",
+            "030a714c402c37a0ea2be4939e875395f76bc6f8d4c85f3942756e24bc81aa9a",
+            "6f2b974522e17493e12d081554f0804896964ca043614c4497710e7253f38f42",
+            "1e4b5dd09615531dde921a6ce363a1ddb6fb5c662f248494b9f07b6eb4eb85a3"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "topic_title": "4.3.1 Combustion",
+          "content_types": [
+            "activity",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            12,
+            13
+          ],
+          "source_element_ids": [
+            "fd62435b85bf10539ba2689e96c590745a2395ec07160469dc538967158cfc89",
+            "c062d49cb1f563cd505143147d86d261d78c2276ab7c6b647b849abc13fdebde",
+            "32460662533f21ac65768127350091c0df9f55ed8178f04086451e0f3f942551",
+            "41c1473a127cf263338435c08714d128b278ec7a3b9377ee0fd50e9a447b35a3",
+            "300e59ae2664dbd29784e0d26ab005a19bd5b3c75ee67fae0ac86c309c0ff03a",
+            "7afad2d1e2785519bc59f83bcb1c0edd18ef09f23ee904027eae776d6aee165e",
+            "b5c1884d6a2df4af6862d52ca81cce61d855656454ee16af630eaf8e6b581bee"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "98cab1c761c45b4e427c838859d026fe8ed0f3f457547c490a4f2ec08915ea64",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "list_item",
+            "section_header"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "f7bb282174be883cde6fa12310bc2038e3029bf310e58abb9ed044c20bf9cae6",
+            "bcd7350d94474f242c96da1cc884ea8e428853f80ca9c9044fb7aff2c4326c6c",
+            "b4e78e2966f73b362003b3a89ebab4a8ba589a7c31feb6d138ef57aae9393fcb",
+            "6871e04cc9af38291f28d73cb639d7d61098a0b0e9b365224fd432e3920b81a5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q14_act_soap_micelles",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 5,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.5,
+          "stable_chunk_id": "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "activity",
+            "text"
+          ],
+          "pages": [
+            19
+          ],
+          "source_element_ids": [
+            "898235cb37b70b363be18c5d3017d7c0919f3cce650a454bd8566b4f813b0143"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "formula",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "9d71c3b47f444fb04b07ddb6cec282a8967c5abb5e1b746475f2ef32cd3ec1df",
+            "bf7c00f5f304afae4763cf59fa0667eddf3671ee9cb19868b18e51f56063500f",
+            "6471359c733b85870a4b7b200203b2c93b68eae91a32bd80489ede6a4648a566"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "topic_title": "4.3.1 Combustion",
+          "content_types": [
+            "activity",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            12,
+            13
+          ],
+          "source_element_ids": [
+            "fd62435b85bf10539ba2689e96c590745a2395ec07160469dc538967158cfc89",
+            "c062d49cb1f563cd505143147d86d261d78c2276ab7c6b647b849abc13fdebde",
+            "32460662533f21ac65768127350091c0df9f55ed8178f04086451e0f3f942551",
+            "41c1473a127cf263338435c08714d128b278ec7a3b9377ee0fd50e9a447b35a3",
+            "300e59ae2664dbd29784e0d26ab005a19bd5b3c75ee67fae0ac86c309c0ff03a",
+            "7afad2d1e2785519bc59f83bcb1c0edd18ef09f23ee904027eae776d6aee165e",
+            "b5c1884d6a2df4af6862d52ca81cce61d855656454ee16af630eaf8e6b581bee"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "topic_title": "4.3.1 Combustion",
+          "content_types": [
+            "activity",
+            "formula",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            12
+          ],
+          "source_element_ids": [
+            "da59017ea075eecc2955f24cd6612a93ca296d507feff92637a7c8fb05cf0f69",
+            "c8a89e7e709d8b5d09ab9fdfdc1dd212abfc5a80e435cc17228f551c5e4b4c51",
+            "41a0e1ad5befc3c981b400419624a674b276a793e333d982d9a85e491cd2009e",
+            "9468bb0ad89a8d89432e1dba23da7f85f2f24f1d995c2b07ff670b1cb00e550b",
+            "73e8acfc3458fc28009c6853221e4a6b41d5880496050cd6aa388a7a10a64918",
+            "6500438fb596dd6f79df8fc25067751454cde3781af982db6eba6f05b3cd5eed",
+            "cc6d1af07e0654d8ce57ebf33389043c725ee5356ae7efa86545dd6fe036ef01",
+            "4d4aab4e979ca2b0861c510f94251bdfb06600f47d4d429e5af002fcb8de5c38",
+            "2729e647974700221fdd18516d8f5ccdeb6bfa83b34a38723dd94c2260acacf7",
+            "9449e08bf661aa4e0c7a4ba42bd56d4e78694a689d7d7a52e1ae9580ed2534a1",
+            "76365e22ba7a6109e71ee8b76e74ae710b8ac4e0f66a19ce0f7e5dc2db205fdc",
+            "35e4ee4423279c5471df1fbfbb9bd6269c22d93103a942fcd30f1dea712ae2ff"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "9332934e7be92ac4726a7e7b9d12b91ffa5f2ac2280436c301c0338695f889b1",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "activity",
+            "caption",
+            "picture"
+          ],
+          "pages": [
+            17
+          ],
+          "source_element_ids": [
+            "ced4ff90528bcb7b45af43d6485a1d557430dec44f49ad15908d500792126d34",
+            "ae09f7aef04049eba07d5d9778df114390e4dc5afe6010a43c6c07057099132c"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q15_tbl_melting_boiling",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 1,
+      "result_count": 3,
+      "results": [
+        {
+          "rank": 0.6,
+          "stable_chunk_id": "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "caption",
+            "table"
+          ],
+          "pages": [
+            2
+          ],
+          "source_element_ids": [
+            "3439a0e96d603b970bd342b2646e389b9a45fceb41e17e5e54a5bd64655a0ca2",
+            "0b3e0d0d65ceeb0797e0d54998287a2287c6934fdb9ab039c3279034cf868df5"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908",
+          "topic_title": "4.2.3 Will you be my Friend?",
+          "content_types": [
+            "caption",
+            "table"
+          ],
+          "pages": [
+            9
+          ],
+          "source_element_ids": [
+            "ed797eb31f45f7527291f34aa80e1e353fa0e049eeab766cdf517ce2fba1684e",
+            "8b3817e6d4030ce5f7a6ed806257d5099448b8eb4dfd3071dab9df98dd1b9689"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15",
+          "topic_title": "4.2.5 Nomenclature of Carbon Compounds",
+          "content_types": [
+            "caption",
+            "table"
+          ],
+          "pages": [
+            11
+          ],
+          "source_element_ids": [
+            "d3d361609ec40242ca5f3260300b0dc055065b3fdbf10de1173a569d4062cd8d",
+            "fcc2a7e90199acdaaa20da16ac3fc54d3d0e81712a8eb06bbe950e25a2df97af"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q16_tbl_functional_groups",
+      "supported": true,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.6,
+          "stable_chunk_id": "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908",
+          "topic_title": "4.2.3 Will you be my Friend?",
+          "content_types": [
+            "caption",
+            "table"
+          ],
+          "pages": [
+            9
+          ],
+          "source_element_ids": [
+            "ed797eb31f45f7527291f34aa80e1e353fa0e049eeab766cdf517ce2fba1684e",
+            "8b3817e6d4030ce5f7a6ed806257d5099448b8eb4dfd3071dab9df98dd1b9689"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "caption",
+            "table"
+          ],
+          "pages": [
+            2
+          ],
+          "source_element_ids": [
+            "3439a0e96d603b970bd342b2646e389b9a45fceb41e17e5e54a5bd64655a0ca2",
+            "0b3e0d0d65ceeb0797e0d54998287a2287c6934fdb9ab039c3279034cf868df5"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "da4665d36a969f249ff4f9f87eaa7d7097f29594e2f7997d6e6d4e7162bb89c0",
+          "topic_title": "4.2.2 Chains, Branches and Rings",
+          "content_types": [
+            "caption",
+            "table"
+          ],
+          "pages": [
+            7
+          ],
+          "source_element_ids": [
+            "9fb5d70d285beac042f7ecd70d79815e47e429679d79baaa9f5fe75974870375",
+            "7a624481ec4534f799a04ca92428ecf22492ccde816b24909af5dd220c4b8f40"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15",
+          "topic_title": "4.2.5 Nomenclature of Carbon Compounds",
+          "content_types": [
+            "caption",
+            "table"
+          ],
+          "pages": [
+            11
+          ],
+          "source_element_ids": [
+            "d3d361609ec40242ca5f3260300b0dc055065b3fdbf10de1173a569d4062cd8d",
+            "fcc2a7e90199acdaaa20da16ac3fc54d3d0e81712a8eb06bbe950e25a2df97af"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "e2f0b684c005b70c2a4614fb37f28055e47d0e5de1aea838aded38ad8ed8f142",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "activity",
+            "table"
+          ],
+          "pages": [
+            1
+          ],
+          "source_element_ids": [
+            "a163e9f098d8eb4c6e0048410e21c6ef623f7d94181f2f879555033c5a025fb6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q17_exe_ethane_bonds",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 1,
+      "result_count": 1,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "213dd53cc9b8e03f9a9376e2ddd5212b630c20efeaa2eaa93a782d811b922bde",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "exercises",
+            "list_item",
+            "section_header"
+          ],
+          "pages": [
+            20,
+            21
+          ],
+          "source_element_ids": [
+            "a79cbfbcf27ed34baf714d86bfeee0b6aa940b5d20d9f410e7867e5e20009679",
+            "c627edf6c12b47296d5ecc15f0cdbb702f9ff0363c94dbeb95b4021f7ec1effa",
+            "25c7aafe83f16c09705fcbbe99df0244fb4c30ecf8bac3eb0440c3130455954d",
+            "4a1dd1d24cbf8de997a528e18546c49158aff5e5a7575a5af129dfa14c8ef91a",
+            "b51624f8fee26a39bde9b8accb3960542659af581ed332b32e83ab7cb2cc472b",
+            "e06d4634ee67913da453615a9d43ceedc5a36455c50fa84aa464647ca9f1c906",
+            "dbd23a09a96799c4fa2784c3ae933916d87472a7df601a85672373a0f51fa5d2",
+            "674474af16411f9c76ebd7d10ad5004b4aa4327561fa33d21e189bb862d94902",
+            "410325bf5e19ae337b8a34534962a317586f75c81656a010255b167af184c85a",
+            "4209f28a1f2365e704f26fb7f9c86f4873701f934738c4ced98a4042650ec781",
+            "fb195cc8ea11823ede08db9579af0db13c44f7f83fb55162ca35c568686b14e9",
+            "c0e01798ab498e7d9a63e7ec90f67abbbcc983b4b374769698f408a01f688572",
+            "bf5b7837897c1a06dce8ece81e5364942d88dc0106cf0f78288c7777cfe3df39",
+            "39f8adb5ed2a664632f0dd36e4a4522c620a473b0623e9a85bf2605730b08b65",
+            "1c8c6a538109332d04adcf15a0c1ff45e348cfdfa08cd93efde0f1310800c95c",
+            "259b6ed1a9e7da4f400323d2d6b0cbf630e993f4d2e37deb22ff9aa1855772d3",
+            "b8ebc6696b61d5e235a3f54eb0e29ffa02a1a03614ae396825e1c9274fe83158",
+            "75f7bfa0865cbdbfeb10c675462fe4946665012e36e51feff4680c46ad4991ab",
+            "aebd961e0da62471f5bdcd47114841fee1decb17a1756a5f0464623ebbe52923",
+            "0604dfd7ab295fae76597bde41a4dd10947524540edba668e2d9192c0db8841f",
+            "66f812aad76c8305c452030363357ddc6469946ef8f1814988d2b5f59b61e3d5",
+            "76c41e51c0ccca1549b928b762d487d98bed1dd5adfcc5ec197ea37586e72e09",
+            "eb58bf8b662f6493a5aed90d87f5cf9f3664d600999b2d497dbf17a8529a02f1",
+            "6672837ebd93a256d0be9224b8c26e5824de586b757e612e4be0be8cf13ffb30",
+            "5229a10b8404b72d0bdd708049cb4bb77e874709d6627b9dea73f90e36960ddf",
+            "48e1a6448f78109d8a281737f221091dab6bd41f81c77ef0fed5321486808c3e",
+            "ab0bbc084872d9e2704d364dc5ff6eab8b01e912c8c1e33161624673b4c12c4b",
+            "07ad87c6ae1351b4fde62dd6c399e22d2a79f89776d5467dd762d7b6d51414aa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q18_exe_carbon_fuels",
+      "supported": true,
+      "passed": true,
+      "first_relevant_rank": 1,
+      "result_count": 2,
+      "results": [
+        {
+          "rank": 0.6,
+          "stable_chunk_id": "213dd53cc9b8e03f9a9376e2ddd5212b630c20efeaa2eaa93a782d811b922bde",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "exercises",
+            "list_item",
+            "section_header"
+          ],
+          "pages": [
+            20,
+            21
+          ],
+          "source_element_ids": [
+            "a79cbfbcf27ed34baf714d86bfeee0b6aa940b5d20d9f410e7867e5e20009679",
+            "c627edf6c12b47296d5ecc15f0cdbb702f9ff0363c94dbeb95b4021f7ec1effa",
+            "25c7aafe83f16c09705fcbbe99df0244fb4c30ecf8bac3eb0440c3130455954d",
+            "4a1dd1d24cbf8de997a528e18546c49158aff5e5a7575a5af129dfa14c8ef91a",
+            "b51624f8fee26a39bde9b8accb3960542659af581ed332b32e83ab7cb2cc472b",
+            "e06d4634ee67913da453615a9d43ceedc5a36455c50fa84aa464647ca9f1c906",
+            "dbd23a09a96799c4fa2784c3ae933916d87472a7df601a85672373a0f51fa5d2",
+            "674474af16411f9c76ebd7d10ad5004b4aa4327561fa33d21e189bb862d94902",
+            "410325bf5e19ae337b8a34534962a317586f75c81656a010255b167af184c85a",
+            "4209f28a1f2365e704f26fb7f9c86f4873701f934738c4ced98a4042650ec781",
+            "fb195cc8ea11823ede08db9579af0db13c44f7f83fb55162ca35c568686b14e9",
+            "c0e01798ab498e7d9a63e7ec90f67abbbcc983b4b374769698f408a01f688572",
+            "bf5b7837897c1a06dce8ece81e5364942d88dc0106cf0f78288c7777cfe3df39",
+            "39f8adb5ed2a664632f0dd36e4a4522c620a473b0623e9a85bf2605730b08b65",
+            "1c8c6a538109332d04adcf15a0c1ff45e348cfdfa08cd93efde0f1310800c95c",
+            "259b6ed1a9e7da4f400323d2d6b0cbf630e993f4d2e37deb22ff9aa1855772d3",
+            "b8ebc6696b61d5e235a3f54eb0e29ffa02a1a03614ae396825e1c9274fe83158",
+            "75f7bfa0865cbdbfeb10c675462fe4946665012e36e51feff4680c46ad4991ab",
+            "aebd961e0da62471f5bdcd47114841fee1decb17a1756a5f0464623ebbe52923",
+            "0604dfd7ab295fae76597bde41a4dd10947524540edba668e2d9192c0db8841f",
+            "66f812aad76c8305c452030363357ddc6469946ef8f1814988d2b5f59b61e3d5",
+            "76c41e51c0ccca1549b928b762d487d98bed1dd5adfcc5ec197ea37586e72e09",
+            "eb58bf8b662f6493a5aed90d87f5cf9f3664d600999b2d497dbf17a8529a02f1",
+            "6672837ebd93a256d0be9224b8c26e5824de586b757e612e4be0be8cf13ffb30",
+            "5229a10b8404b72d0bdd708049cb4bb77e874709d6627b9dea73f90e36960ddf",
+            "48e1a6448f78109d8a281737f221091dab6bd41f81c77ef0fed5321486808c3e",
+            "ab0bbc084872d9e2704d364dc5ff6eab8b01e912c8c1e33161624673b4c12c4b",
+            "07ad87c6ae1351b4fde62dd6c399e22d2a79f89776d5467dd762d7b6d51414aa"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "6b4cd3c4098c303b78ea8c09a9156d1eae8eeb07247ca2f3983aa2ef8f7cd54b",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "exercises",
+            "list_item"
+          ],
+          "pages": [
+            21
+          ],
+          "source_element_ids": [
+            "f03fcb7932182a543679907fc021bfcf8424747a83006851fa429285ad6f1606",
+            "9576491048696f76e7f297959705612952befdc50f70282a43e7cff1436d41b3",
+            "33634a5a9d9e9d0577d98822356ef64b891dd19575cbfdb36610d38de6bdd87a",
+            "a329f70b8108104c370075d5d9d82996abf93b298415f2be2bb04c9352d31cb0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q19_uns_nylon_66",
+      "supported": false,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "213dd53cc9b8e03f9a9376e2ddd5212b630c20efeaa2eaa93a782d811b922bde",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "exercises",
+            "list_item",
+            "section_header"
+          ],
+          "pages": [
+            20,
+            21
+          ],
+          "source_element_ids": [
+            "a79cbfbcf27ed34baf714d86bfeee0b6aa940b5d20d9f410e7867e5e20009679",
+            "c627edf6c12b47296d5ecc15f0cdbb702f9ff0363c94dbeb95b4021f7ec1effa",
+            "25c7aafe83f16c09705fcbbe99df0244fb4c30ecf8bac3eb0440c3130455954d",
+            "4a1dd1d24cbf8de997a528e18546c49158aff5e5a7575a5af129dfa14c8ef91a",
+            "b51624f8fee26a39bde9b8accb3960542659af581ed332b32e83ab7cb2cc472b",
+            "e06d4634ee67913da453615a9d43ceedc5a36455c50fa84aa464647ca9f1c906",
+            "dbd23a09a96799c4fa2784c3ae933916d87472a7df601a85672373a0f51fa5d2",
+            "674474af16411f9c76ebd7d10ad5004b4aa4327561fa33d21e189bb862d94902",
+            "410325bf5e19ae337b8a34534962a317586f75c81656a010255b167af184c85a",
+            "4209f28a1f2365e704f26fb7f9c86f4873701f934738c4ced98a4042650ec781",
+            "fb195cc8ea11823ede08db9579af0db13c44f7f83fb55162ca35c568686b14e9",
+            "c0e01798ab498e7d9a63e7ec90f67abbbcc983b4b374769698f408a01f688572",
+            "bf5b7837897c1a06dce8ece81e5364942d88dc0106cf0f78288c7777cfe3df39",
+            "39f8adb5ed2a664632f0dd36e4a4522c620a473b0623e9a85bf2605730b08b65",
+            "1c8c6a538109332d04adcf15a0c1ff45e348cfdfa08cd93efde0f1310800c95c",
+            "259b6ed1a9e7da4f400323d2d6b0cbf630e993f4d2e37deb22ff9aa1855772d3",
+            "b8ebc6696b61d5e235a3f54eb0e29ffa02a1a03614ae396825e1c9274fe83158",
+            "75f7bfa0865cbdbfeb10c675462fe4946665012e36e51feff4680c46ad4991ab",
+            "aebd961e0da62471f5bdcd47114841fee1decb17a1756a5f0464623ebbe52923",
+            "0604dfd7ab295fae76597bde41a4dd10947524540edba668e2d9192c0db8841f",
+            "66f812aad76c8305c452030363357ddc6469946ef8f1814988d2b5f59b61e3d5",
+            "76c41e51c0ccca1549b928b762d487d98bed1dd5adfcc5ec197ea37586e72e09",
+            "eb58bf8b662f6493a5aed90d87f5cf9f3664d600999b2d497dbf17a8529a02f1",
+            "6672837ebd93a256d0be9224b8c26e5824de586b757e612e4be0be8cf13ffb30",
+            "5229a10b8404b72d0bdd708049cb4bb77e874709d6627b9dea73f90e36960ddf",
+            "48e1a6448f78109d8a281737f221091dab6bd41f81c77ef0fed5321486808c3e",
+            "ab0bbc084872d9e2704d364dc5ff6eab8b01e912c8c1e33161624673b4c12c4b",
+            "07ad87c6ae1351b4fde62dd6c399e22d2a79f89776d5467dd762d7b6d51414aa"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "formula",
+            "text"
+          ],
+          "pages": [
+            16
+          ],
+          "source_element_ids": [
+            "9d71c3b47f444fb04b07ddb6cec282a8967c5abb5e1b746475f2ef32cd3ec1df",
+            "bf7c00f5f304afae4763cf59fa0667eddf3671ee9cb19868b18e51f56063500f",
+            "6471359c733b85870a4b7b200203b2c93b68eae91a32bd80489ede6a4648a566"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "6b4cd3c4098c303b78ea8c09a9156d1eae8eeb07247ca2f3983aa2ef8f7cd54b",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "exercises",
+            "list_item"
+          ],
+          "pages": [
+            21
+          ],
+          "source_element_ids": [
+            "f03fcb7932182a543679907fc021bfcf8424747a83006851fa429285ad6f1606",
+            "9576491048696f76e7f297959705612952befdc50f70282a43e7cff1436d41b3",
+            "33634a5a9d9e9d0577d98822356ef64b891dd19575cbfdb36610d38de6bdd87a",
+            "a329f70b8108104c370075d5d9d82996abf93b298415f2be2bb04c9352d31cb0"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "551856d6693bf2cdc83ce8b10f1c043c69700d1b86719df1b5ba4c974f658ce6",
+            "725f7e72022537e6114a2793ad401d5d96a9fdffe761f51cd278959e48b3195d",
+            "b0cf289817b81c67f1f97e6427256d9fe9236a50349bd899e0ffa602f7aa0add"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26",
+          "topic_title": "4.4.2 Properties of Ethanoic Acid",
+          "content_types": [
+            "activity",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            17
+          ],
+          "source_element_ids": [
+            "d0ba2c539bdbb0e376ee9069788e92321aac6585b0e720c5d4017ff3659b957e",
+            "8dcb2a4cb3ac8a3244582cfb5f00de8572d82686f8f1bea50836c5cba47c182e",
+            "f7fe1ca08359b46cbb292047b4b2f414779a3a2ab7c123dc89da798866fb5bc9",
+            "69b40cf85322253ff7ffa1cb9c00baf677a19145ef338153e5416df6105252f9",
+            "d69d86800798dbcd093bfd1e0f5f3113b63fbb347810ee3a743b90b5876bf645",
+            "624257740704463c0c6fecdc6217aec8453b7965f550ac80f9c1608e5f2858dc",
+            "d4d458b17c3ba2edc01b43181817b4ca281dbe029df19099a020ae7c7fb6780b",
+            "50c2b817aa9f784ff588811d1848d97aed59255214b7ef4ea3f8222e667218be",
+            "f5e5af4fb96da452cc2ee4cb2418308891def830a227546aa6606695ad5894cb"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q20_uns_ethene_hydration",
+      "supported": false,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "activity",
+            "formula",
+            "list_item",
+            "section_header",
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "2f516fd32d802d18cb3a24f62a81bc737df44ec6b6d3f4e18a8aadb4acf63156",
+            "77d1c8b9ba2e8aef6863c88dd786381faa0f057abbf89a5bfa74cc1c74b11e4f",
+            "340c2edfc54b76fcf276f8b65dcf51e670bd41b5bbfcbcd89bd3024c614b0110",
+            "59ff092d4cef4754d8eb6f7187b00e340ecfe3c0632515a6de517a9efb2bc5c9",
+            "66f255e2f7606d5d51076eae4a13354270f7add6f6f0af6adcad93811f98f70b",
+            "271671410b5ab73aaa3dc9a894800b4b819ddb28821cb2779f99afb54009d1ec",
+            "daf74b1b0060ca426efa89219b6b71e25e731aa6f0948e44d312525fa2c29293",
+            "030a714c402c37a0ea2be4939e875395f76bc6f8d4c85f3942756e24bc81aa9a",
+            "6f2b974522e17493e12d081554f0804896964ca043614c4497710e7253f38f42",
+            "1e4b5dd09615531dde921a6ce363a1ddb6fb5c662f248494b9f07b6eb4eb85a3"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2",
+          "topic_title": "4.4.1 Properties of Ethanol",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            15
+          ],
+          "source_element_ids": [
+            "551856d6693bf2cdc83ce8b10f1c043c69700d1b86719df1b5ba4c974f658ce6",
+            "725f7e72022537e6114a2793ad401d5d96a9fdffe761f51cd278959e48b3195d",
+            "b0cf289817b81c67f1f97e6427256d9fe9236a50349bd899e0ffa602f7aa0add"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "topic_title": "4.2.5 Nomenclature of Carbon Compounds",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            10
+          ],
+          "source_element_ids": [
+            "7a16113725547ebdac2f5bc0a62e8560f4219af1684a9a618ea358c97a71c4e7",
+            "f0ddd9d5e7d2d0282efa8c8e157363a4b699f62e3b640ebbc456921c4d76417c"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "13b299df8e972eff3fdcd34cb29667c4d6436355b8a55a91bb17967cf26b1394",
+          "topic_title": "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "b6f0884322b22584270a4cd1f87a0da03f4ea4975e052826688da55cc3d824fc",
+            "f86cfa7489e3a8969666278e4ef30314c8933614b3c2d29b3417b14a83118763"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "1807d7d6a39af135801ec11996644229616565070477fbe48f358d3c7a4fb33e",
+          "topic_title": "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID",
+          "content_types": [
+            "picture"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "e8fe1c30ab7108718bba36b6a5288d5d9d5000f18a62edfd93eba7b46c0029cb"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q21_uns_sn1_sn2_mechanism",
+      "supported": false,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "6b4cd3c4098c303b78ea8c09a9156d1eae8eeb07247ca2f3983aa2ef8f7cd54b",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "exercises",
+            "list_item"
+          ],
+          "pages": [
+            21
+          ],
+          "source_element_ids": [
+            "f03fcb7932182a543679907fc021bfcf8424747a83006851fa429285ad6f1606",
+            "9576491048696f76e7f297959705612952befdc50f70282a43e7cff1436d41b3",
+            "33634a5a9d9e9d0577d98822356ef64b891dd19575cbfdb36610d38de6bdd87a",
+            "a329f70b8108104c370075d5d9d82996abf93b298415f2be2bb04c9352d31cb0"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "264040228bc4eb1bb0f784f88110b3a38dbe2ceed6200df62c405d71b4245fd9",
+          "topic_title": "4.3.4 Substitution Reaction",
+          "content_types": [
+            "list_item",
+            "questions",
+            "section_header"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "b113fea1e9b03328a6061e73c71975148b11eda817d7ae5a2b374a9e57687453",
+            "a0de21c866bc97b0b1d678441c9cae341b2507ad02f8efcb44aff15dac7b6e48",
+            "86e4bd5741a42158f84e41aa385f42af8cb4ed989ff2fef945ccf921762c0e1a"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2",
+          "topic_title": "4.3.4 Substitution Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "1ed33cd43ec49fa0402d7a3963eef923a7480180b3b4b1ba79709e8d6219d2e0",
+            "9fb2ea563cb95ca93e7e54b22aca7a6da145eee0f6f8c36658d1d795d9155852"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "topic_title": "4.3.3 Addition Reaction",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            14
+          ],
+          "source_element_ids": [
+            "d92d0465977441440ee28651ce9f0a43f19f42e9445f70a638526a6da343f846"
+          ]
+        },
+        {
+          "rank": 0.1,
+          "stable_chunk_id": "0e79606a440f00bb6c07a25e9bed2e155f951c2e13661de0f9610b6058ce4aec",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "list_item"
+          ],
+          "pages": [
+            17
+          ],
+          "source_element_ids": [
+            "28e39b65617e6d93b98bbb2378656ec77ee79242858827be95a626d57b113371"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q22_uns_group_14_properties",
+      "supported": false,
+      "passed": false,
+      "first_relevant_rank": null,
+      "result_count": 5,
+      "results": [
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+          "topic_title": "4.2.3 Will you be my Friend?",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            8
+          ],
+          "source_element_ids": [
+            "4dbd08ff07454ad8751c4761c6129a86cbba80a9a887fda29c3b74b1bbe6d18f",
+            "52b46efede0ed5208c83dd7f85ceb5debe5e3bda94acce8d896025ffb2dfc028"
+          ]
+        },
+        {
+          "rank": 0.3,
+          "stable_chunk_id": "d3946c7d7e60b1870dc5929ee379a4f8d40074f28b522ee45a0a1ef46af8cd0a",
+          "topic_title": "4.5 SOAPS AND DETERGENTS",
+          "content_types": [
+            "list_item"
+          ],
+          "pages": [
+            20
+          ],
+          "source_element_ids": [
+            "7ddd9d267b31fa68428970ffa011a49fd0177eb313aa388fb742b3d438d6db0b",
+            "981c7e2ff1f93ccbdcfd94815617ed30123f89aa50100e86d48ad42faf690e92",
+            "ebc6b9718a217429c4832568b1784f704c56e8cb33d1bda84e08d09bd1cf7bfa",
+            "6336b15642f3206f545b0e7f75f257c7d7242678aa6fb49cb38e562035aea86c",
+            "c1bfa530115be1372b78f1e79a3d13d778e69d65931527b8881bd3de26db1d08",
+            "3af4a342aaac17e986aac6054b40f1e4c06c82f101b29820b9b235196a627705",
+            "83010725424dcd1cb222b06738d616ed5c0354748d3b8176fb3bb36b7fb4a863",
+            "d191b9ea80aac2088376b6815acd5d47c17592a3eb13ec89bf65ebd2a6b27eab"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            5
+          ],
+          "source_element_ids": [
+            "56068fc3a72772fca71ec4709052e090536dadb42531ae11afae36bd9fca1777"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "541df09e6ae710668dfb6a00902eb4d3dbe32051235ed80f0b437265be4fdfc5",
+          "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+          "content_types": [
+            "activity",
+            "text"
+          ],
+          "pages": [
+            1
+          ],
+          "source_element_ids": [
+            "5a9ba24dfa4b184b0bef88dca76b0104b905222eaf7144f07a3da9ac5517d761",
+            "3cea035ae9ec42c4ae6a42d1b26be0ee48d7d5910e9d105638e6382ed45135e1"
+          ]
+        },
+        {
+          "rank": 0.2,
+          "stable_chunk_id": "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0",
+          "topic_title": "4.2.4 Homologous Series",
+          "content_types": [
+            "text"
+          ],
+          "pages": [
+            9
+          ],
+          "source_element_ids": [
+            "aa401ad346e5a7fa3308bc9bcf0d1a5715675c4168e85bb111048c716848e660",
+            "d6e28cad0535e2cb0ffdb96c093aeb9c662d7bad6358d4ee29da6b7fb7e27c3a"
+          ]
+        }
+      ]
+    }
+  ]
+}
