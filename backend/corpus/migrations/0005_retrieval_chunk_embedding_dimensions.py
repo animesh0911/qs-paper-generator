@@ -27,6 +27,14 @@ class Migration(migrations.Migration):
             name="embedding_dimensions",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
+        migrations.RunSQL(
+            sql="""
+                UPDATE corpus_retrievalchunk
+                SET embedding_dimensions = vector_dims(embedding)
+                WHERE embedding IS NOT NULL;
+            """,
+            reverse_sql=migrations.RunSQL.noop,
+        ),
         migrations.AddConstraint(
             model_name="retrievalchunk",
             constraint=models.CheckConstraint(
