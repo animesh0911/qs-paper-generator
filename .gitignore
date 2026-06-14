@@ -6,6 +6,7 @@
 science_2024/
 science_2025/
 science_2026/
+content/ncert/*/
 
 # Python
 __pycache__/

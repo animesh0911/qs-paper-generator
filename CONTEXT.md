@@ -21,6 +21,34 @@ A canonical CBSE Class 10 Science chapter, seeded from the NCERT taxonomy. Ident
 **Topic**
 A subdivision *within* a chapter (e.g. "Monohybrid Cross" inside `heredity`). V1 stores topics as **freeform LLM-emitted strings** on `Question.topic_names = list[str]`. No `Topic` model. Canonicalisation deferred until V2 (cluster strings or seed from textbook TOC then). Emitted by the **Tagger**, persisted by the Ingestor, surfaced in `PaperDocumentV1` `metadata.topicNames`.
 
+**TextbookDocument**
+A canonical extracted NCERT chapter and its immutable extraction provenance. A TextbookDocument belongs to an existing **Chapter** and records the source hash, extractor identity/version, canonical JSON path, and page count. Lives in `corpus.models.TextbookDocument`.
+
+**TextbookElement**
+One source-addressable element from a **TextbookDocument**, such as a heading, paragraph, table, picture, or equation image. It preserves source order, page number, bounding box, heading path, text, structured payload, and asset reference without inventing uncertain source content. Lives in `corpus.models.TextbookElement`.
+
+**ChapterMapNode**
+A corpus-owned navigational node derived from textbook headings and selected content landmarks. Section/topic nodes partition a **TextbookDocument** into deterministic source-order ranges so later RetrievalChunks can be separated by **Chapter** and ChapterMapNode. It is distinct from the deferred bank-question **Topic**. Lives in `corpus.models.ChapterMapNode`.
+
+**ChapterMapEdge**
+A typed, evidence-backed relationship between **ChapterMapNodes**. The deterministic MVP relationship types are `contains`, `next`, and `references`; LLM-inferred conceptual relationships are not canonical. Lives in `corpus.models.ChapterMapEdge`.
+
+**RetrievalChunk**
+A stable searchable group of adjacent **TextbookElements** owned by exactly one section/topic **ChapterMapNode**. It preserves exact source-element IDs, pages, content types, citation metadata, and bounded parent-heading context while never merging across topic boundaries. Lives in `corpus.models.RetrievalChunk`.
+
+**GroundingContext**
+The ordered, citation-bearing result returned by a **TextbookRetriever**. It contains ranked RetrievalChunks and their exact Chapter, ChapterMapNode, TextbookElement, and page provenance; it is not persisted independently.
+
+**TextbookRetriever**
+The corpus-owned retrieval seam: `retrieve(TextbookRetrievalRequest) -> GroundingContext`. The first adapter, `PostgresTextbookRetriever`, performs deterministic lexical-only ranking with Chapter, optional ChapterMapNode, content-type, query-text, and result-limit filters. Lives in `corpus.retrieval`.
+
+**EmbeddingClient**
+The provider-neutral corpus seam for converting ordered text batches into
+fixed-length vectors under one explicit model, version, and dimension profile.
+Corpus feature code depends on this interface and never imports an embedding
+provider SDK directly. Tests use fixed vectors; production model selection and
+live population are separate measured gates. Lives in `corpus.embeddings`.
+
 **primary_form**
 Field on `Question` (`bank.models.PrimaryForm`): the dominant non-text form a question depends on — `none`, `diagram_based`, or `table_based`. Emitted by the **Extractor**, *orthogonal* to **QuestionType** (a `short_answer` can be `diagram_based`). `diagram_based` also reinforces `Question.has_diagram` at ingest. Stored for future form-aware picking/rendering; not yet a picker gate.
 

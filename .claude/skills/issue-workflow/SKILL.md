@@ -25,14 +25,6 @@ The script fetches `origin` and creates a new branch in a separate clean
 worktree. Never implement an issue in a checkout that already has unrelated
 changes.
 
-Override the defaults only when necessary:
-
-```bash
-ISSUE_BRANCH=codex/issue-123-slug \
-ISSUE_WORKTREE_PATH=/tmp/qpg-123 \
-.claude/skills/issue-workflow/scripts/start_issue.sh 123 origin/main
-```
-
 ## Verify An Issue
 
 During each RED/GREEN slice, run affected checks:

@@ -7,7 +7,7 @@ The whole stack runs in Docker Compose. Three services:
 
 | service    | image / build      | port  | role                                 |
 | ---------- | ------------------ | ----- | ------------------------------------ |
-| `db`       | `postgres:16`      | —     | Postgres 16, volume `pgdata`         |
+| `db`       | `pgvector/pgvector:0.8.2-pg16-bookworm` | — | Postgres 16 + pgvector, volume `pgdata` |
 | `web`      | `./backend`        | 8000  | Django + DRF (gunicorn-less dev)     |
 | `frontend` | `./frontend`       | 5173  | Vite dev server (React + Tailwind)   |
 
@@ -17,6 +17,23 @@ The whole stack runs in Docker Compose. Three services:
 
 Nothing to install on the host beyond Docker. Compose has sane defaults baked
 in, so `.env` is optional.
+
+The pgvector image remains Postgres 16 and reuses the existing `pgdata` volume.
+Back up important local data before infrastructure changes. RetrievalChunk uses
+an unbounded vector column until issue #174 selects the production embedding
+model; that issue must add the selected dimension-specific production index.
+
+If an existing volume reports a collation-version mismatch after the image
+change, rebuild and refresh the affected development databases once:
+
+```bash
+docker compose exec db psql -U qpg -d template1 \
+  -c "REINDEX DATABASE template1;" \
+  -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;"
+docker compose exec db psql -U qpg -d qpg \
+  -c "REINDEX DATABASE qpg;" \
+  -c "ALTER DATABASE qpg REFRESH COLLATION VERSION;"
+```
 
 ```bash
 # Optional — copy the template if you want to override any defaults.

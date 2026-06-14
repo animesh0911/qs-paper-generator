@@ -1,0 +1,359 @@
+[
+  {
+    "id": "q01_def_catenation",
+    "query": "Define catenation and explain why carbon shows this property.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.2 VERSATILE NATURE OF CARBON"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      5
+    ],
+    "reviewer_rationale": "Catenation is explicitly defined on page 5 under section 4.2 as the unique ability of carbon to form bonds with other carbon atoms to give rise to large molecules. The stability of C-C bonds and carbon's small size are also explained there.",
+    "query_category": "definition",
+    "result_limit": 5
+  },
+  {
+    "id": "q02_def_homologous_series",
+    "query": "What is a homologous series? Give an example.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.2.4 Homologous Series"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      9
+    ],
+    "reviewer_rationale": "Homologous series is defined on page 9 under section 4.2.4 as a family of organic compounds with the same functional group substituting for hydrogen in a carbon chain, sharing similar chemical properties (e.g., alcohols like methanol, ethanol, propanol).",
+    "query_category": "definition",
+    "result_limit": 5
+  },
+  {
+    "id": "q03_def_structural_isomers",
+    "query": "What are structural isomers? Explain using butane as an example.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.2.2 Chains, Branches and Rings"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      7,
+      8
+    ],
+    "reviewer_rationale": "Structural isomers are defined on page 8 under section 4.2.2. The section introduces the straight and branched skeletons of butane (C4H10) on page 7 and shows the complete structures on page 8.",
+    "query_category": "definition",
+    "result_limit": 5
+  },
+  {
+    "id": "q04_def_covalent_bond",
+    "query": "Define covalent bonds and describe their general physical properties.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.1 BONDING IN CARBON - THE COVALENT BOND"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      1,
+      2
+    ],
+    "reviewer_rationale": "Covalent bonds are defined on page 2 (section 4.1) as bonds formed by sharing of an electron pair between two atoms. Their general physical properties, such as low melting/boiling points and lack of electrical conductivity, are introduced on pages 1 and 2.",
+    "query_category": "definition",
+    "result_limit": 5
+  },
+  {
+    "id": "q05_exp_melting_boiling_points",
+    "query": "Why do covalent compounds generally have low melting and boiling points?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.1 BONDING IN CARBON - THE COVALENT BOND"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      1,
+      2
+    ],
+    "reviewer_rationale": "Section 4.1 on page 1 and page 2 explains that intermolecular forces of attraction in covalent compounds are weak. Hence, minimal energy is required to break these forces, leading to low melting and boiling points.",
+    "query_category": "explanation",
+    "result_limit": 5
+  },
+  {
+    "id": "q06_exp_graphite_conductivity",
+    "query": "Why does graphite conduct electricity while diamond does not?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.1 BONDING IN CARBON - THE COVALENT BOND"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      4
+    ],
+    "reviewer_rationale": "The allotropes of carbon sidebar on page 4 explains that in graphite, each carbon atom is bonded to three other carbon atoms in the same plane, leaving one electron free to conduct electricity. In diamond, each carbon is bonded to four others in a rigid 3D structure with no free electrons.",
+    "query_category": "explanation",
+    "result_limit": 5
+  },
+  {
+    "id": "q07_exp_ethanol_oxidation",
+    "query": "Why is the conversion of ethanol to ethanoic acid considered an oxidation reaction?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.3.2 Oxidation"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      13
+    ],
+    "reviewer_rationale": "Section 4.3.2 on page 13 explains that this conversion adds oxygen to the starting material (ethanol) using oxidising agents like alkaline KMnO4 or acidified K2Cr2O7.",
+    "query_category": "explanation",
+    "result_limit": 5
+  },
+  {
+    "id": "q08_rxn_esterification",
+    "query": "Explain the esterification reaction with a chemical equation.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.4.2 Properties of Ethanoic Acid"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      16,
+      17
+    ],
+    "reviewer_rationale": "Esterification is detailed on pages 16 and 17. The reaction between ethanoic acid and absolute ethanol in the presence of an acid catalyst to produce an ester and water is described on page 17, and Activity 4.8 is set up on page 16.",
+    "query_category": "reaction",
+    "result_limit": 5
+  },
+  {
+    "id": "q09_rxn_saponification",
+    "query": "What is saponification and how is it used to prepare soap?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.4.2 Properties of Ethanoic Acid"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      17
+    ],
+    "reviewer_rationale": "Saponification is described on page 17 under the reactions of ethanoic acid. It involves treating an ester with sodium hydroxide (an alkali) to convert it back to alcohol and the sodium salt of the carboxylic acid (soap).",
+    "query_category": "reaction",
+    "result_limit": 5
+  },
+  {
+    "id": "q10_rxn_hydrogenation",
+    "query": "What is hydrogenation? Explain its industrial application and the catalyst used.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.3.3 Addition Reaction"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      14
+    ],
+    "reviewer_rationale": "Hydrogenation is detailed on page 14 (section 4.3.3) as the addition of hydrogen to unsaturated hydrocarbons in the presence of catalysts like palladium or nickel to yield saturated hydrocarbons. Its industrial application is the hydrogenation of vegetable oils.",
+    "query_category": "reaction",
+    "result_limit": 5
+  },
+  {
+    "id": "q11_rxn_substitution",
+    "query": "Describe the substitution reaction of methane with chlorine.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.3.4 Substitution Reaction"
+    ],
+    "expected_content_types": [
+      "text"
+    ],
+    "expected_source_pages": [
+      14
+    ],
+    "reviewer_rationale": "Section 4.3.4 on page 14 explains the substitution reaction of saturated hydrocarbons where chlorine replaces hydrogen atoms one by one in the presence of sunlight (CH4 + Cl2 -> CH3Cl + HCl).",
+    "query_category": "reaction",
+    "result_limit": 5
+  },
+  {
+    "id": "q12_act_carbonate_test",
+    "query": "How can you distinguish between alcohol and carboxylic acid experimentally based on Activity 4.9?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.4.2 Properties of Ethanoic Acid"
+    ],
+    "expected_content_types": [
+      "activity"
+    ],
+    "expected_source_pages": [
+      17
+    ],
+    "reviewer_rationale": "Activity 4.9 on page 17 demonstrates the reaction of ethanoic acid with carbonates and hydrogencarbonates to release CO2 gas, which turns lime water milky. Alcohols do not react with carbonates/hydrogencarbonates to produce CO2.",
+    "query_category": "activity",
+    "result_limit": 5
+  },
+  {
+    "id": "q13_act_ethanol_sodium",
+    "query": "What happens when sodium is added to ethanol as shown in Activity 4.6?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.4.1 Properties of Ethanol"
+    ],
+    "expected_content_types": [
+      "activity"
+    ],
+    "expected_source_pages": [
+      15
+    ],
+    "reviewer_rationale": "Activity 4.6 on page 15 demonstrates the reaction of sodium metal with absolute alcohol to evolve hydrogen gas (tested by pop sound) and form sodium ethoxide.",
+    "query_category": "activity",
+    "result_limit": 5
+  },
+  {
+    "id": "q14_act_soap_micelles",
+    "query": "Describe the cleaning action of soap using the concept of micelle formation from Activity 4.10.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.5 SOAPS AND DETERGENTS"
+    ],
+    "expected_content_types": [
+      "activity"
+    ],
+    "expected_source_pages": [
+      17,
+      18
+    ],
+    "reviewer_rationale": "Activity 4.10 on page 17 and the accompanying text on pages 17-18 describe how soap molecules form micelles (clusters with hydrophobic tails facing inward to interact with oil and hydrophilic ionic ends facing outward in water) to emulsify and pull out dirt.",
+    "query_category": "activity",
+    "result_limit": 5
+  },
+  {
+    "id": "q15_tbl_melting_boiling",
+    "query": "Compare the melting and boiling points of acetic acid and chloroform using the textbook data.",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.1 BONDING IN CARBON - THE COVALENT BOND"
+    ],
+    "expected_content_types": [
+      "table"
+    ],
+    "expected_source_pages": [
+      2
+    ],
+    "reviewer_rationale": "Table 4.1 on page 2 lists the melting and boiling points of acetic acid (290 K, 391 K) and chloroform (209 K, 334 K) to compare carbon compounds.",
+    "query_category": "table",
+    "result_limit": 5
+  },
+  {
+    "id": "q16_tbl_functional_groups",
+    "query": "What is the formula and class of compounds for the functional group containing oxygen with a single bonded -OH?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.2.5 Nomenclature of Carbon Compounds"
+    ],
+    "expected_content_types": [
+      "table"
+    ],
+    "expected_source_pages": [
+      9
+    ],
+    "reviewer_rationale": "Table 4.3 on page 9 lists the functional groups. Under the oxygen heteroatom, the class is 'Alcohol' and the formula of the functional group is '-OH'.",
+    "query_category": "table",
+    "result_limit": 5
+  },
+  {
+    "id": "q17_exe_ethane_bonds",
+    "query": "How many covalent bonds are present in a molecule of ethane (C2H6)?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.5 SOAPS AND DETERGENTS"
+    ],
+    "expected_content_types": [
+      "exercises"
+    ],
+    "expected_source_pages": [
+      6,
+      20
+    ],
+    "reviewer_rationale": "This is Exercise Question 1 on page 20. The structural and dot representations of ethane are detailed on page 6 (section 4.2.1), showing 7 covalent bonds.",
+    "query_category": "exercise",
+    "result_limit": 5
+  },
+  {
+    "id": "q18_exe_carbon_fuels",
+    "query": "Why are carbon and its compounds used as fuels for most applications?",
+    "supported": true,
+    "expected_topic_titles": [
+      "4.5 SOAPS AND DETERGENTS"
+    ],
+    "expected_content_types": [
+      "exercises"
+    ],
+    "expected_source_pages": [
+      12,
+      20
+    ],
+    "reviewer_rationale": "This is Exercise Question 9 on page 20. The combustion properties explaining why they are used as fuels (release of heat and light) are detailed in section 4.3.1 on page 12.",
+    "query_category": "exercise",
+    "result_limit": 5
+  },
+  {
+    "id": "q19_uns_nylon_66",
+    "query": "Explain the industrial preparation of nylon-6,6 from adipic acid and hexamethylenediamine.",
+    "supported": false,
+    "expected_topic_titles": [],
+    "expected_content_types": [],
+    "expected_source_pages": [],
+    "reviewer_rationale": "Nylon-6,6 is a synthetic polymer that is completely outside the scope of NCERT Class 10 Science Chapter 4 (Carbon and its Compounds).",
+    "query_category": null,
+    "result_limit": 5
+  },
+  {
+    "id": "q20_uns_ethene_hydration",
+    "query": "How is ethanol manufactured industrially by the hydration of ethene?",
+    "supported": false,
+    "expected_topic_titles": [],
+    "expected_content_types": [],
+    "expected_source_pages": [],
+    "reviewer_rationale": "The hydration of ethene is an industrial preparation method of alcohols covered in higher classes. The textbook only mentions ethanol preparation via fermentation of sugarcane molasses (page 16).",
+    "query_category": null,
+    "result_limit": 5
+  },
+  {
+    "id": "q21_uns_sn1_sn2_mechanism",
+    "query": "Explain the mechanism of nucleophilic substitution reactions (SN1 and SN2) in haloalkanes.",
+    "supported": false,
+    "expected_topic_titles": [],
+    "expected_content_types": [],
+    "expected_source_pages": [],
+    "reviewer_rationale": "SN1 and SN2 reaction mechanisms are advanced concepts from Class 12 organic chemistry, not covered in this basic Class 10 chapter on carbon.",
+    "query_category": null,
+    "result_limit": 5
+  },
+  {
+    "id": "q22_uns_group_14_properties",
+    "query": "Detail the periodic table group characteristics of Group 14 elements including Silicon and Germanium.",
+    "supported": false,
+    "expected_topic_titles": [],
+    "expected_content_types": [],
+    "expected_source_pages": [],
+    "reviewer_rationale": "The chapter focuses on carbon chemistry. While silicon is briefly mentioned for catenation on page 5, general periodic trends of Group 14 elements are not covered.",
+    "query_category": null,
+    "result_limit": 5
+  }
+]

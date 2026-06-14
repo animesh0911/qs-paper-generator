@@ -26,7 +26,7 @@ flowchart LR
       HZ["/healthz"]
     end
 
-    subgraph DB["db — postgres:16"]
+    subgraph DB["db — pgvector/pgvector:0.8.2-pg16-bookworm"]
       PG[("Postgres<br/>qpg + qpg_cache (DatabaseCache)")]
     end
 

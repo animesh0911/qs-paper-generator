@@ -12,5 +12,6 @@ urlpatterns = [
     path("healthz", healthz),
     path("api/auth/", include("accounts.urls")),
     path("api/bank/", include("bank.urls")),
+    path("api/corpus/", include("corpus.urls")),
     path("api/papers/", include("papers.urls")),
 ]
