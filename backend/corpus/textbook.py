@@ -135,7 +135,11 @@ class DoclingNormalizer:
     def _clean_text(value: str) -> str:
         text = " ".join(value.split())
         words = text.split()
-        if len(words) % 2 == 0 and words[: len(words) // 2] == words[len(words) // 2 :]:
+        if (
+            len(words) >= 4
+            and len(words) % 2 == 0
+            and words[: len(words) // 2] == words[len(words) // 2 :]
+        ):
             text = " ".join(words[: len(words) // 2])
         return text
 

@@ -150,6 +150,36 @@ def test_activity_landmark_keeps_embedded_visuals_and_continuing_text(document):
 
 
 @pytest.mark.django_db
+def test_sectionless_landmarks_belong_to_the_document_root(document):
+    """Landmarks still need a retrieval owner when extraction finds no topics."""
+    document.elements.all().delete()
+    activity = TextbookElement.objects.create(
+        document=document,
+        stable_element_id="sectionless-activity",
+        element_type="section_header",
+        source_order=0,
+        page_number=1,
+        bbox={"l": 1, "t": 2, "r": 3, "b": 0},
+        text="Activity 4.1",
+    )
+    TextbookElement.objects.create(
+        document=document,
+        stable_element_id="sectionless-content",
+        element_type="text",
+        source_order=1,
+        page_number=1,
+        bbox={"l": 1, "t": 2, "r": 3, "b": 0},
+        text="Observe the sample.",
+    )
+
+    ChapterMapBuilder().rebuild(document)
+
+    root = ChapterMapNode.objects.get(document=document, node_type="document")
+    landmark = ChapterMapNode.objects.get(source_element=activity)
+    assert landmark.parent == root
+
+
+@pytest.mark.django_db
 def test_references_edges_require_an_exact_local_landmark_and_keep_evidence(document):
     """The map must not invent semantic links from unresolved source mentions."""
     ChapterMapBuilder().rebuild(document)
