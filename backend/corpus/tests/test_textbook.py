@@ -57,6 +57,12 @@ def test_normalizer_cleans_only_demonstrated_noise_and_builds_heading_paths():
     assert heading.heading_path[-1] == "4.2.3 Will you be my Friend?"
 
 
+def test_clean_text_preserves_legitimate_two_word_repetition():
+    """Source fidelity matters more than guessing that short repetition is noise."""
+    assert DoclingNormalizer._clean_text("iron iron") == "iron iron"
+    assert DoclingNormalizer._clean_text("Activity 4.1 Activity 4.1") == "Activity 4.1"
+
+
 def test_stable_ids_depend_on_source_and_docling_reference():
     """The same extraction is reproducible while a different PDF cannot collide."""
     payload = load_docling_json(FIXTURE)
