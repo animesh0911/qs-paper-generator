@@ -10,7 +10,13 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             sql="DROP INDEX IF EXISTS retrieval_chunk_fixed_test_v1_hnsw;",
-            reverse_sql=migrations.RunSQL.noop,
+            reverse_sql="""
+                CREATE INDEX retrieval_chunk_fixed_test_v1_hnsw
+                ON corpus_retrievalchunk
+                USING hnsw ((embedding::vector(3)) vector_cosine_ops)
+                WHERE embedding_model = 'fixed-vector-test'
+                  AND embedding_version = 'v1';
+            """,
         ),
         migrations.RemoveConstraint(
             model_name="retrievalchunk",

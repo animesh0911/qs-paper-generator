@@ -17,6 +17,7 @@ from django.test.utils import CaptureQueriesContext
 from bank.models import Chapter
 from corpus.embeddings import (
     EmbeddingPopulationRequest,
+    EmbeddingProfile,
     RetrievalChunkEmbeddingPopulator,
 )
 from corpus.models import (
@@ -107,6 +108,21 @@ def test_pgvector_extension_and_retrieval_chunk_vector_are_migration_owned(chunk
     assert chunk.embedding_model == "fixed-vector-test"
     assert chunk.embedding_version == "v1"
     assert chunk.embedding_dimensions == 3
+
+
+@pytest.mark.parametrize(
+    ("profile_kwargs", "message"),
+    [
+        ({"model": "x" * 201, "version": "v1", "dimensions": 3}, "model"),
+        ({"model": "model", "version": "x" * 101, "dimensions": 3}, "version"),
+    ],
+)
+def test_embedding_profile_rejects_values_that_persistence_cannot_store(
+    profile_kwargs, message
+):
+    """The EmbeddingClient interface must fail before persistence limits do."""
+    with pytest.raises(ValueError, match=message):
+        EmbeddingProfile(**profile_kwargs)
 
 
 @pytest.mark.django_db
@@ -241,6 +257,7 @@ def test_embedding_population_resumes_after_a_failed_batch(chunk):
         ((), "wrong vector count"),
         (((1.0, 2.0),), "wrong dimensions"),
         (((1.0, math.inf, 3.0),), "non-finite"),
+        (((0.0, 0.0, 0.0),), "zero-norm"),
     ],
 )
 def test_embedding_population_rejects_invalid_client_output(chunk, vectors, message):

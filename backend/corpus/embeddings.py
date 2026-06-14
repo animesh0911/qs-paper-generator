@@ -37,6 +37,10 @@ class EmbeddingProfile:
             raise ValueError("model must not be blank.")
         if not self.version.strip():
             raise ValueError("version must not be blank.")
+        if len(self.model) > 200:
+            raise ValueError("model must not exceed 200 characters.")
+        if len(self.version) > 100:
+            raise ValueError("version must not exceed 100 characters.")
         if self.dimensions < 1:
             raise ValueError("dimensions must be positive.")
 
@@ -123,3 +127,5 @@ def validate_embedding_vectors(
             raise ValueError("EmbeddingClient returned the wrong dimensions.")
         if not all(math.isfinite(value) for value in vector):
             raise ValueError("EmbeddingClient returned a non-finite value.")
+        if not any(value != 0.0 for value in vector):
+            raise ValueError("EmbeddingClient returned a zero-norm vector.")

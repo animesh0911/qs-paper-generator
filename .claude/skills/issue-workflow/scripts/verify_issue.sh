@@ -35,6 +35,7 @@ printf '  %s\n' "${changed_files[@]}"
 backend_changed=false
 frontend_changed=false
 backend_python_files=()
+backend_python_relative_files=()
 for path in "${changed_files[@]}"; do
   case "$path" in
     backend/* | contracts/* | docker-compose.yml)
@@ -46,6 +47,7 @@ for path in "${changed_files[@]}"; do
   esac
   if [[ "$path" == backend/*.py && -f "$repo_root/$path" ]]; then
     backend_python_files+=("$repo_root/$path")
+    backend_python_relative_files+=("${path#backend/}")
   fi
 done
 
@@ -56,11 +58,23 @@ elif [[ -z "$backend_python" ]]; then
   backend_python="$(command -v python3 || true)"
 fi
 
-require_backend_python() {
-  if [[ -z "$backend_python" ]] || ! "$backend_python" -m pytest --version >/dev/null 2>&1; then
-    echo "Backend verification requires Python with pytest installed." >&2
+backend_compose=()
+if command -v docker-compose >/dev/null 2>&1; then
+  backend_compose=(docker-compose)
+elif docker compose version >/dev/null 2>&1; then
+  backend_compose=(docker compose)
+fi
+
+backend_python_available() {
+  [[ -n "$backend_python" ]] && "$backend_python" -m pytest --version >/dev/null 2>&1
+}
+
+run_backend_in_compose() {
+  if ((${#backend_compose[@]} == 0)); then
+    echo "Backend verification requires local Python with pytest or Docker Compose." >&2
     exit 1
   fi
+  "${backend_compose[@]}" run --rm -e RUN_MIGRATIONS=0 web "$@"
 }
 
 require_frontend_dependencies() {
@@ -71,14 +85,13 @@ require_frontend_dependencies() {
 }
 
 if [[ "$backend_changed" == true ]]; then
-  require_backend_python
-  if [[ "$mode" == "focused" ]]; then
+  if backend_python_available && [[ "$mode" == "focused" ]]; then
     if ! "$backend_python" -c "import testmon" >/dev/null 2>&1; then
       echo "Focused backend verification requires pytest-testmon." >&2
       exit 1
     fi
     (cd "$repo_root/backend" && "$backend_python" -m pytest --testmon)
-  else
+  elif backend_python_available; then
     (
       cd "$repo_root/backend"
       "$backend_python" -m pytest
@@ -91,6 +104,16 @@ if [[ "$backend_changed" == true ]]; then
     if ((${#backend_python_files[@]} > 0)); then
       "$backend_python" -m ruff check "${backend_python_files[@]}"
       "$backend_python" -m black --check "${backend_python_files[@]}"
+    fi
+  elif [[ "$mode" == "focused" ]]; then
+    echo "Local pytest unavailable; running the full backend suite in Docker Compose."
+    run_backend_in_compose pytest
+  else
+    run_backend_in_compose pytest
+    run_backend_in_compose python -m compileall .
+    if ((${#backend_python_relative_files[@]} > 0)); then
+      run_backend_in_compose ruff check "${backend_python_relative_files[@]}"
+      run_backend_in_compose black --check "${backend_python_relative_files[@]}"
     fi
   fi
 fi
