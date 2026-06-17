@@ -744,6 +744,27 @@ export function contentItemsToText(items: ContentItem[]): string {
   return items.map(contentItemToText).filter(Boolean).join('\n');
 }
 
+/**
+ * Full printable question text for a Slot, for the per-question copy control.
+ *
+ * Joins the question's source regions (display prefix + region text) and
+ * deliberately omits editor-only chrome — marks labels (`displaySuffix`) and
+ * the question-type badge — so teachers copy the question as printed, not the
+ * editor's metadata.
+ */
+export function editorSlotClipboardText(slot: EditorPaperSlotView): string {
+  return slot.questionBlockTree.children
+    .map((region) =>
+      [region.displayPrefix, region.text]
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .join(' '),
+    )
+    .filter(Boolean)
+    .join('\n')
+    .trim();
+}
+
 export function contentItemToText(item: ContentItem): string {
   if (item.text) return item.text;
   if (item.latex) return item.latex;
