@@ -86,6 +86,28 @@ def test_one_failing_job_does_not_abort_the_drain(paper, user):
     assert good.status == AIJobStatus.DONE
 
 
+def test_reclaimed_running_job_is_failed_not_re_run(paper):
+    # A row left RUNNING by a crashed drain must not stay stuck (that would lock
+    # the paper at 409 forever). A later pass reclaims it and fails it WITHOUT
+    # calling the handler — editor jobs have no checkpoint, so re-running would
+    # re-bill (Rule 13).
+    job = AIJob.objects.create(
+        paper=paper,
+        kind=AIJobKind.REVIEW,
+        base_revision=paper.revision,
+        status=AIJobStatus.RUNNING,
+    )
+
+    def handler(_j):
+        raise AssertionError("handler must not run for a reclaimed running job")
+
+    _drain(handlers={kind.value: handler for kind in AIJobKind})
+
+    job.refresh_from_db()
+    assert job.status == AIJobStatus.FAILED
+    assert "reclaimed" in job.error.lower()
+
+
 def test_default_handlers_are_stubbed_until_later_issues(paper):
     # No handler injected: the real registry is stubbed, so the job fails with a
     # clear message rather than silently doing nothing or calling a model.

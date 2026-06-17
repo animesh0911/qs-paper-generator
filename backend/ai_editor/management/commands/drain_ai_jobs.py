@@ -11,7 +11,10 @@ short (few-second) interval because a teacher is waiting; V1 surfaces the
 Per job the drain:
 1. **Claims** it atomically — ``select_for_update(skip_locked=True)`` flips
    ``pending``→``running`` so two overlapping drains can never both work (and
-   double-bill, Rule 13) the same row.
+   double-bill, Rule 13) the same row. A row already ``running`` is one a prior
+   drain died on; since editor jobs have no per-page checkpoint (unlike
+   ``IngestionJob``), it is **failed** rather than re-run — re-running would
+   re-bill (Rule 13), and failing frees the paper from the one-active-job lock.
 2. **Cost-guards on revision** — if the job's ``base_revision`` no longer matches
    the paper's current ``revision``, the paper was edited while the job sat
    queued, so any proposal would be rejected on apply; the job is ``cancelled``
@@ -34,6 +37,11 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from ai_editor.models import AIJob, AIJobKind, AIJobStatus
+
+# Rows a drain pass acts on. ``running`` is included so a job left running by a
+# crashed/restarted drain is not stuck forever (which would lock its paper at
+# 409 via the one-active-job guard) — see ``_process``.
+_DRAINABLE = (AIJobStatus.PENDING, AIJobStatus.RUNNING)
 
 
 def _not_implemented(kind: str) -> Callable[[AIJob], dict]:
@@ -75,20 +83,18 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        pending = AIJob.objects.filter(status=AIJobStatus.PENDING).order_by(
-            "created_at"
-        )
+        drainable = AIJob.objects.filter(status__in=_DRAINABLE).order_by("created_at")
         if options["limit"]:
-            pending = pending[: options["limit"]]
-        job_ids = list(pending.values_list("pk", flat=True))
+            drainable = drainable[: options["limit"]]
+        job_ids = list(drainable.values_list("pk", flat=True))
 
         if not job_ids:
-            self.stdout.write("No pending AI jobs.")
+            self.stdout.write("No drainable AI jobs.")
             return
 
         if options["dry_run"]:
             self.stdout.write(
-                f"[dry-run] {len(job_ids)} pending job(s) — each implemented "
+                f"[dry-run] {len(job_ids)} drainable job(s) — each implemented "
                 f"handler is a PAID model call. Not processing:"
             )
             for job in AIJob.objects.filter(pk__in=job_ids):
@@ -99,30 +105,48 @@ class Command(BaseCommand):
             return
 
         for job_id in job_ids:
-            job = self._claim(job_id)
+            job, reclaimed = self._claim(job_id)
             if job is not None:
-                self._process(job)
+                self._process(job, reclaimed=reclaimed)
 
     @staticmethod
-    def _claim(job_id: int) -> AIJob | None:
-        """Atomically flip one still-pending row to running; skip if locked/gone."""
+    def _claim(job_id: int) -> tuple[AIJob | None, bool]:
+        """Atomically claim one drainable row as running; skip if locked/gone.
+
+        Returns ``(job, reclaimed)`` where ``reclaimed`` is True when the row was
+        already ``running`` — i.e. a previous drain died mid-flight and this pass
+        is picking it back up.
+        """
         with transaction.atomic():
             job = (
                 AIJob.objects.select_for_update(skip_locked=True)
-                .filter(pk=job_id, status=AIJobStatus.PENDING)
+                .filter(pk=job_id, status__in=_DRAINABLE)
                 .first()
             )
             if job is None:
-                return None
+                return None, False
+            reclaimed = job.status == AIJobStatus.RUNNING
             job.status = AIJobStatus.RUNNING
             job.save(update_fields=["status", "updated_at"])
-            return job
+            return job, reclaimed
 
-    def _process(self, job: AIJob) -> None:
+    def _process(self, job: AIJob, *, reclaimed: bool) -> None:
         """Cancel a stale job, else run its handler and record done/failed.
 
         Any handler error is caught and recorded as ``failed`` — one bad job
         must not abort the rest of the drain."""
+        if reclaimed:
+            # A prior drain died after claiming this job. Editor jobs have no
+            # per-page checkpoint (unlike IngestionJob), so re-running the
+            # handler would re-bill a paid call (Rule 13). Fail it terminally
+            # instead, which also frees the paper from the one-active-job lock;
+            # the teacher can re-request. (#34 may add resumable handlers.)
+            job.status = AIJobStatus.FAILED
+            job.error = "Reclaimed after an interrupted drain run; not retried."
+            job.save(update_fields=["status", "error", "updated_at"])
+            self.stderr.write(f"Job #{job.pk} failed (reclaimed, interrupted run).")
+            return
+
         if job.base_revision != job.paper.revision:
             job.status = AIJobStatus.CANCELLED
             job.error = (

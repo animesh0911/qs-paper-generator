@@ -32,6 +32,16 @@ from ai_services.llm import ModelPurpose, make_chat_model
 # requests that are not about the paper or the editor.
 INTENT_ROUTES = ("chat", "summary", "review", "editor_edit", "off_topic")
 
+# Few-shot anchors for the classifier — one per route — so routing is grounded
+# in concrete teacher phrasing rather than zero-shot guesswork.
+_INTENT_EXAMPLES = (
+    '- "how many marks is section C" -> chat',
+    '- "give me a quick overview of this paper" -> summary',
+    '- "check the paper for coverage gaps and duplicates" -> review',
+    "- \"change the section B heading to 'Short Answers'\" -> editor_edit",
+    '- "what is the capital of France" -> off_topic',
+)
+
 # Injectable for tests (GenericFakeChatModel); production builds the real model.
 make_model: Callable[[ModelPurpose], BaseChatModel] = make_chat_model
 
@@ -56,10 +66,12 @@ def classify_intent(text: str, *, paper_title: str) -> dict:
     ``off_topic`` so a misbehaving model can never widen the routing surface.
     """
     parser = PydanticOutputParser(pydantic_object=IntentResult)
+    examples = "\n".join(_INTENT_EXAMPLES)
     prompt = (
         f"{_GUARDRAIL}\n\n"
         f"Paper: {paper_title!r}.\n"
         f"Classify the teacher's request into exactly one route.\n"
+        f"Examples:\n{examples}\n\n"
         f"{parser.get_format_instructions()}\n\n"
         f"Request: {text}"
     )
