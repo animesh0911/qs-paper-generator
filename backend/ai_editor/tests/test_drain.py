@@ -6,10 +6,13 @@ cancelled *before* the handler is invoked (the cost guard), a handler error
 fails only its own job, and ``--dry-run`` touches nothing.
 """
 
+from datetime import timedelta
+
 import pytest
 from django.core.management import call_command
+from django.utils import timezone
 
-from ai_editor.management.commands.drain_ai_jobs import Command
+from ai_editor.management.commands.drain_ai_jobs import RECLAIM_RUNNING_AFTER, Command
 from ai_editor.models import AIJob, AIJobKind, AIJobStatus
 from papers.models import Paper
 
@@ -86,17 +89,40 @@ def test_one_failing_job_does_not_abort_the_drain(paper, user):
     assert good.status == AIJobStatus.DONE
 
 
-def test_reclaimed_running_job_is_failed_not_re_run(paper):
-    # A row left RUNNING by a crashed drain must not stay stuck (that would lock
-    # the paper at 409 forever). A later pass reclaims it and fails it WITHOUT
-    # calling the handler — editor jobs have no checkpoint, so re-running would
-    # re-bill (Rule 13).
+def _running(paper, *, idle):
+    """A RUNNING job whose updated_at is set ``idle`` in the past."""
     job = AIJob.objects.create(
         paper=paper,
         kind=AIJobKind.REVIEW,
         base_revision=paper.revision,
         status=AIJobStatus.RUNNING,
     )
+    # .update() bypasses auto_now so we can age the row deterministically.
+    AIJob.objects.filter(pk=job.pk).update(updated_at=timezone.now() - idle)
+    return job
+
+
+def test_running_job_within_grace_is_not_hijacked(paper):
+    # A job a sibling drain just claimed (recent updated_at) must be invisible to
+    # an overlapping pass — otherwise the short cron interval would fail a live
+    # job and invite a retry that double-bills (Rule 13).
+    job = _running(paper, idle=RECLAIM_RUNNING_AFTER - timedelta(minutes=1))
+
+    def handler(_j):
+        raise AssertionError("a within-grace running job must be left alone")
+
+    _drain(handlers={kind.value: handler for kind in AIJobKind})
+
+    job.refresh_from_db()
+    assert job.status == AIJobStatus.RUNNING
+
+
+def test_stale_running_job_is_reclaimed_and_failed_not_re_run(paper):
+    # A row left RUNNING by a crashed drain must not stay stuck forever (that
+    # would lock the paper at 409). Once idle past the grace window it is failed
+    # WITHOUT calling the handler — editor jobs have no checkpoint, so re-running
+    # would re-bill (Rule 13).
+    job = _running(paper, idle=RECLAIM_RUNNING_AFTER + timedelta(minutes=1))
 
     def handler(_j):
         raise AssertionError("handler must not run for a reclaimed running job")

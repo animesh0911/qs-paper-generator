@@ -11,10 +11,13 @@ short (few-second) interval because a teacher is waiting; V1 surfaces the
 Per job the drain:
 1. **Claims** it atomically — ``select_for_update(skip_locked=True)`` flips
    ``pending``→``running`` so two overlapping drains can never both work (and
-   double-bill, Rule 13) the same row. A row already ``running`` is one a prior
-   drain died on; since editor jobs have no per-page checkpoint (unlike
-   ``IngestionJob``), it is **failed** rather than re-run — re-running would
-   re-bill (Rule 13), and failing frees the paper from the one-active-job lock.
+   double-bill, Rule 13) the same row. A ``running`` row is only claimable once
+   it has been idle past ``RECLAIM_RUNNING_AFTER`` — long enough that a sibling
+   drain still working it is never hijacked; a row that idle is one a prior
+   drain died on. Since editor jobs have no per-page checkpoint (unlike
+   ``IngestionJob``), a reclaimed row is **failed** rather than re-run —
+   re-running would re-bill (Rule 13), and failing frees the paper from the
+   one-active-job lock.
 2. **Cost-guards on revision** — if the job's ``base_revision`` no longer matches
    the paper's current ``revision``, the paper was edited while the job sat
    queued, so any proposal would be rejected on apply; the job is ``cancelled``
@@ -32,16 +35,29 @@ would run and exits without claiming or calling anything.
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import timedelta
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import Q
+from django.utils import timezone
 
 from ai_editor.models import AIJob, AIJobKind, AIJobStatus
 
-# Rows a drain pass acts on. ``running`` is included so a job left running by a
-# crashed/restarted drain is not stuck forever (which would lock its paper at
-# 409 via the one-active-job guard) — see ``_process``.
-_DRAINABLE = (AIJobStatus.PENDING, AIJobStatus.RUNNING)
+# A ``running`` row is only reclaimed once it has been idle (``updated_at``)
+# longer than this. The window must comfortably exceed the slowest handler so an
+# overlapping drain on the short cron interval never reclaims a job a sibling
+# pass is still actively working — that would fail a live job and invite a retry
+# that double-bills (Rule 13). A genuinely abandoned (crashed-drain) row crosses
+# the window and is then freed.
+RECLAIM_RUNNING_AFTER = timedelta(minutes=10)
+
+
+def _drainable_filter(now) -> Q:
+    """Pending rows, plus running rows idle past :data:`RECLAIM_RUNNING_AFTER`."""
+    return Q(status=AIJobStatus.PENDING) | Q(
+        status=AIJobStatus.RUNNING, updated_at__lt=now - RECLAIM_RUNNING_AFTER
+    )
 
 
 def _not_implemented(kind: str) -> Callable[[AIJob], dict]:
@@ -83,7 +99,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        drainable = AIJob.objects.filter(status__in=_DRAINABLE).order_by("created_at")
+        now = timezone.now()
+        drainable = AIJob.objects.filter(_drainable_filter(now)).order_by("created_at")
         if options["limit"]:
             drainable = drainable[: options["limit"]]
         job_ids = list(drainable.values_list("pk", flat=True))
@@ -113,6 +130,11 @@ class Command(BaseCommand):
     def _claim(job_id: int) -> tuple[AIJob | None, bool]:
         """Atomically claim one drainable row as running; skip if locked/gone.
 
+        The drainable predicate is re-evaluated under the row lock with a fresh
+        ``now``, so a running row a sibling drain claimed (and thus refreshed
+        ``updated_at`` on) between listing and locking is no longer reclaimable
+        and is skipped — closing the claim→process race window (Rule 13).
+
         Returns ``(job, reclaimed)`` where ``reclaimed`` is True when the row was
         already ``running`` — i.e. a previous drain died mid-flight and this pass
         is picking it back up.
@@ -120,7 +142,7 @@ class Command(BaseCommand):
         with transaction.atomic():
             job = (
                 AIJob.objects.select_for_update(skip_locked=True)
-                .filter(pk=job_id, status__in=_DRAINABLE)
+                .filter(_drainable_filter(timezone.now()), pk=job_id)
                 .first()
             )
             if job is None:
