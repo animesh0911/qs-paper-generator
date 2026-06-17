@@ -158,6 +158,10 @@ class ModelPurpose(StrEnum):
     # ``with_structured_output``; gated behind a benchmark-proven parity run
     # (ADR-0005). Resolves to the Gemini extraction model by default.
     EXTRACTION = "extraction"
+    # Paper-editor AI assistant (#31): typed-intent classification, chat, and
+    # (later) summary/review/edit proposals. Resolves to the global default
+    # model until an editor-specific provider/model is configured via env.
+    EDITOR_ASSISTANT = "editor_assistant"
 
 
 @dataclass(frozen=True)
