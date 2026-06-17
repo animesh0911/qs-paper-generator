@@ -25,6 +25,7 @@ import {
   type StructuredPaperUndoEntry,
 } from '@/lib/paper-document';
 import type { PaperFormatRenderer } from '@/lib/paper-format-renderers';
+import { useAssistantChat } from './useAssistantChat.hook';
 import { useEditorAlternatives } from './useEditorAlternatives.hook';
 import { useEditorDragOrdering } from './useEditorDragOrdering.hook';
 import { useEditorSelection } from './useEditorSelection.hook';
@@ -87,6 +88,8 @@ export function useEditorWorkspace({
       }),
     [alternativesIntent, paperState, renderer, selectedSlotId],
   );
+  const { assistantStatus, assistantResult, runReview, dismissResult } =
+    useAssistantChat({ view });
   const selectedSlot = view.sections
     .flatMap((section) => section.slots)
     .find((slot) => slot.slotId === selectedSlotId);
@@ -211,8 +214,12 @@ export function useEditorWorkspace({
     activeRailSlotId,
     alternativesIntent,
     alternativesOverlayOpen,
+    assistantResult,
+    assistantStatus,
     chatInputRef,
     chatValue,
+    dismissResult,
+    runReview,
     dragNotice,
     dragSensors,
     handleAskQuestion,

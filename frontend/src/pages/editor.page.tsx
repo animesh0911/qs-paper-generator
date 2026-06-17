@@ -28,7 +28,6 @@ import {
   Download,
   FileCheck2,
   Lock,
-  MessageSquareText,
   RotateCcw,
   Save,
 } from 'lucide-react';
@@ -46,13 +45,16 @@ import {
   type PaperFormatRenderer,
 } from '@/lib/paper-format-renderers';
 import { assertPaperDocument } from '@/lib/paper-document';
+import { editorSlotClipboardText } from '@/lib/editor-paper';
 import { useEditorWorkspace } from '@/hooks/useEditorWorkspace.hook';
 import {
+  AssistantChat,
   EditorAlternativesOverlay,
   EditorInspector,
   EditorOutlineRail,
   PaperChromeEditor,
   QuestionActionRail,
+  QuestionCopyButton,
   QuestionRegionEditor,
   SortableQuestionSlot,
 } from '@/components/editor';
@@ -215,9 +217,13 @@ function EditorPageWorkspace({
     activeRailSlotId,
     alternativesIntent,
     alternativesOverlayOpen,
+    assistantResult,
+    assistantStatus,
     chatInputRef,
     chatValue,
     closeAlternativesOverlay,
+    dismissResult,
+    runReview,
     dragNotice,
     dragSensors,
     handleAskQuestion,
@@ -330,6 +336,7 @@ function EditorPageWorkspace({
           warnings={warnings}
           canUndo={Boolean(undoEntry)}
           onUndo={handleUndo}
+          onReview={runReview}
           onSave={() => void runAction('save')}
           onDownload={() => void runAction('download')}
           onApprove={() => void runAction('approve')}
@@ -827,8 +834,12 @@ function EditorPageWorkspace({
                                 </div>
                                 <div
                                   data-editor-chrome
-                                  className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground"
+                                  className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground"
                                 >
+                                  <QuestionCopyButton
+                                    displayNumber={slot.displayNumber}
+                                    text={editorSlotClipboardText(slot)}
+                                  />
                                   <span>
                                     {slot.questionType.replace(/_/g, ' ')}
                                   </span>
@@ -923,33 +934,16 @@ function EditorPageWorkspace({
         </div>
       )}
 
-      <div
-        data-editor-chrome
-        className="editor-chat-footer fixed bottom-3 left-1/2 z-30 w-[min(calc(100vw-2rem),48rem)] -translate-x-1/2"
-      >
-        <div className="flex items-center gap-3 rounded-lg border bg-background/95 p-2 shadow-[0_8px_24px_rgba(15,23,42,0.12)] backdrop-blur">
-          <MessageSquareText
-            className="h-5 w-5 flex-none text-muted-foreground"
-            aria-hidden="true"
-          />
-          <input
-            ref={chatInputRef}
-            aria-label="Ask about this paper"
-            className={cn(
-              'min-w-0 flex-1 bg-transparent px-1 text-sm outline-none',
-              'placeholder:text-muted-foreground',
-            )}
-            value={chatValue}
-            placeholder={
-              selectedSlot
-                ? `Ask about question ${selectedSlot.displayNumber}`
-                : 'Ask about this paper'
-            }
-            onChange={(event) => setChatValue(event.target.value)}
-          />
-          <Button size="sm">Ask</Button>
-        </div>
-      </div>
+      <AssistantChat
+        status={assistantStatus}
+        result={assistantResult}
+        chatValue={chatValue}
+        selectedSlotLabel={selectedSlot?.displayNumber}
+        inputRef={chatInputRef}
+        onChatChange={setChatValue}
+        onApply={() => undefined}
+        onDismiss={dismissResult}
+      />
     </div>
   );
 }
@@ -962,6 +956,7 @@ export function EditorActionBar({
   warnings,
   canUndo,
   onUndo,
+  onReview,
   onSave,
   onDownload,
   onApprove,
@@ -973,6 +968,7 @@ export function EditorActionBar({
   warnings: string[];
   canUndo: boolean;
   onUndo: () => void;
+  onReview: () => void;
   onSave: () => void;
   onDownload: () => void;
   onApprove: () => void;
@@ -1021,8 +1017,8 @@ export function EditorActionBar({
       <Button
         variant="outline"
         size="sm"
-        disabled
-        title="Review is unavailable"
+        onClick={onReview}
+        title="Run a sample paper review"
       >
         <FileCheck2 className="mr-2 h-4 w-4" aria-hidden="true" />
         Review paper
