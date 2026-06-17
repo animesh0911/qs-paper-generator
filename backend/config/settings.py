@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "corsheaders",
     # local
     "accounts",
+    "ai_editor",
     "bank",
     "corpus",
     "papers",

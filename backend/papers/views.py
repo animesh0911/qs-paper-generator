@@ -12,6 +12,7 @@ Domain rules live in ``papers.builder`` and ``papers.picker``.
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -83,7 +84,12 @@ class PaperDetailView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         paper.document = document
-        paper.save(update_fields=["document"])
+        # Bump the revision so a queued AI job (#31) whose base_revision was
+        # taken before this edit is cancelled by the drain instead of spending
+        # paid tokens on a now-stale proposal (Rule 13).
+        paper.revision = F("revision") + 1
+        paper.save(update_fields=["document", "revision"])
+        paper.refresh_from_db(fields=["revision"])
         return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
 
 
