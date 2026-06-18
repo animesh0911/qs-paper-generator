@@ -19,6 +19,7 @@ Where it fits:
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
@@ -190,10 +191,20 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
 
 
 def validate_generated_questions(
-    payload: dict[str, Any],
+    payload: Any,
     request: QuestionGenerationRequest,
 ) -> CandidateValidationResult:
     """Accept only canonical-compatible generated Question payloads."""
+    if not isinstance(payload, dict):
+        return CandidateValidationResult(
+            valid_questions=(),
+            errors=(
+                CandidateValidationError(
+                    0, "malformed_payload", "payload must be an object"
+                ),
+            ),
+        )
+
     questions = payload.get("questions")
     if not isinstance(questions, list):
         return CandidateValidationResult(
@@ -351,17 +362,26 @@ def _string_sequence(value: Any) -> bool:
 def _answer_matches_option(answer: Any, options: Sequence[Any]) -> bool:
     if not isinstance(answer, str):
         return False
-    normalized_answer = answer.strip().lower()
+    normalized_answer = answer.strip()
     for option in options:
         if not isinstance(option, dict):
             continue
         label = option.get("label")
-        if isinstance(label, str) and normalized_answer.startswith(label.lower()):
+        if isinstance(label, str) and _answer_names_label(normalized_answer, label):
             return True
         text = _flatten_option_text(option.get("content"))
-        if text and text.lower() in normalized_answer:
+        if text and text.lower() in normalized_answer.lower():
             return True
     return False
+
+
+def _answer_names_label(answer: str, label: str) -> bool:
+    escaped = re.escape(label.strip())
+    if not escaped:
+        return False
+    return bool(
+        re.match(rf"(?i)^(?:option\s+)?{escaped}(?:\s*[.)\]:-]|\s+-|\s*$)", answer)
+    )
 
 
 def _flatten_option_text(content: Any) -> str:

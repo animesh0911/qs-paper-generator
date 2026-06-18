@@ -71,6 +71,14 @@ def test_validator_rejects_malformed_model_output():
     assert [error.code for error in result.errors] == ["missing_questions"]
 
 
+def test_validator_rejects_missing_model_output():
+    """A missing structured-output envelope is a rejection, not a crash."""
+    result = validate_generated_questions(None, _request())
+
+    assert result.valid_questions == ()
+    assert [error.code for error in result.errors] == ["malformed_payload"]
+
+
 def test_validator_reports_rejection_reasons():
     """Rejection reasons name the contract violation instead of hiding bad output."""
     payload = {
@@ -111,6 +119,16 @@ def test_validator_rejects_bad_mcq_options():
 def test_validator_rejects_mcq_answer_that_matches_no_option():
     """An MCQ answer must point back to one of the generated options."""
     payload = {"questions": [_question(answer="None of these generated options.")]}
+
+    result = validate_generated_questions(payload, _request())
+
+    assert result.valid_questions == ()
+    assert "mcq_answer_mismatch" in {error.code for error in result.errors}
+
+
+def test_validator_does_not_match_mcq_label_by_first_letter_only():
+    """A prose answer starting with 'a' is not automatically option A."""
+    payload = {"questions": [_question(answer="An unrelated answer starts with a.")]}
 
     result = validate_generated_questions(payload, _request())
 
