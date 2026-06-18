@@ -89,6 +89,7 @@ class SourceType(models.TextChoices):
     PREVIOUS_YEAR_PAPER = "previous_year_paper", "Previous-year paper"
     SAMPLE_PAPER = "sample_paper", "Sample paper"
     QUESTION_BANK = "question_bank", "Question bank"
+    AI_GENERATED = "ai_generated", "AI-generated"
 
 
 class AnswerSource(models.TextChoices):

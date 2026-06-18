@@ -189,6 +189,15 @@ chat model and owns provider/model/key/tracing/retry. Successor to the `LLMClien
 adapter (ADR-0004). Tests inject a fake factory, not a patched module. See ADR-0005.
 _Avoid_: LLM gateway, model wrapper.
 
+**QuestionGenerator**
+Provider-neutral seam for bulk generated Question-and-answer candidates. It
+returns canonical-compatible Question payloads, not trusted `Question` rows and
+not candidate workflow state. The LangChain adapter resolves the logical
+`question_generation` model route through `ai_services.llm`, while
+`bank.generation` owns the provider-enforced response schema, production prompt,
+and deterministic validator. Future `GenerationBatch` lifecycle code persists
+valid payloads as `GeneratedQuestionCandidate` rows.
+
 **job ledger**
 The queryable Postgres lifecycle record of an async workflow (`IngestionJob`;
 planned `GenerationBatch`): `status`, `school`, owner, result counts, the poll
