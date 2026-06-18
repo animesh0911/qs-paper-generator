@@ -44,6 +44,7 @@ export const GUARD_MESSAGES = {
     "I can't change which questions belong to a section.",
   forbidden_raw_content:
     'I can only set plain text or a number here, not raw editor content.',
+  forbidden_value_type: "That value isn't the right type for this field.",
   forbidden_path: "I can't change that part of the paper.",
 } as const;
 

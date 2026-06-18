@@ -39,47 +39,68 @@ const ALLOWED_OP = 'replace';
 const FORMAT_LAYOUT_ROLES =
   'marks|questionNumbers|mcqOptions|instructions|masthead|footer';
 
-type IdKind = 'blockId' | 'sectionId' | 'slotId';
+type IdKind = 'chromeBlockId' | 'instructionBlockId' | 'sectionId' | 'slotId';
+type ValueKind = 'text' | 'number';
 
 interface AllowedPathPattern {
   pattern: RegExp;
   idKinds: IdKind[];
+  valueKind: ValueKind;
 }
 
+// Block kinds are collection-specific so a chrome path can't resolve an
+// instruction block (or vice versa); `valueKind` keeps a string off a numeric
+// field (slot marks) even though both are scalars.
 const ALLOWED_PATH_PATTERNS: AllowedPathPattern[] = [
-  { pattern: /^\/paper\/title$/, idKinds: [] },
-  { pattern: /^\/paper\/subtitle$/, idKinds: [] },
+  { pattern: /^\/paper\/title$/, idKinds: [], valueKind: 'text' },
+  { pattern: /^\/paper\/subtitle$/, idKinds: [], valueKind: 'text' },
   {
     pattern: /^\/paper\/chromeBlocks\/(?<blockId>[^/]+)\/text$/,
-    idKinds: ['blockId'],
+    idKinds: ['chromeBlockId'],
+    valueKind: 'text',
   },
   {
     pattern: /^\/paper\/instructionBlocks\/(?<blockId>[^/]+)\/text$/,
-    idKinds: ['blockId'],
+    idKinds: ['instructionBlockId'],
+    valueKind: 'text',
   },
   {
     pattern: /^\/paper\/sections\/(?<sectionId>[^/]+)\/title$/,
     idKinds: ['sectionId'],
+    valueKind: 'text',
   },
   {
     pattern: /^\/paper\/sections\/(?<sectionId>[^/]+)\/subtitle$/,
     idKinds: ['sectionId'],
+    valueKind: 'text',
   },
   {
     pattern: /^\/paper\/sections\/(?<sectionId>[^/]+)\/instructions$/,
     idKinds: ['sectionId'],
+    valueKind: 'text',
   },
   {
     pattern:
       /^\/paper\/sections\/(?<sectionId>[^/]+)\/slots\/(?<slotId>[^/]+)\/marks$/,
     idKinds: ['sectionId', 'slotId'],
+    valueKind: 'number',
   },
-  { pattern: /^\/format\/page\/(?:size|orientation)$/, idKinds: [] },
+  {
+    pattern: /^\/format\/page\/(?:size|orientation)$/,
+    idKinds: [],
+    valueKind: 'text',
+  },
   {
     pattern: new RegExp(`^/format/layout/(?:${FORMAT_LAYOUT_ROLES})$`),
     idKinds: [],
+    valueKind: 'text',
   },
 ];
+
+const BLOCK_COLLECTION: Record<string, string> = {
+  chromeBlockId: 'chromeBlocks',
+  instructionBlockId: 'instructionBlocks',
+};
 
 const MARKS_PATH =
   /^\/paper\/sections\/(?<sectionId>[^/]+)\/slots\/(?<slotId>[^/]+)\/marks$/;
@@ -98,6 +119,13 @@ function isScalar(value: unknown): boolean {
     typeof value === 'number' ||
     typeof value === 'boolean'
   );
+}
+
+// `number` rejects boolean (a `true` marks value is a type confusion, not a
+// quantity); `text` requires a string so a bare number can't land on a label.
+function valueMatchesKind(value: unknown, valueKind: ValueKind): boolean {
+  if (valueKind === 'number') return typeof value === 'number';
+  return typeof value === 'string';
 }
 
 function findById(
@@ -119,9 +147,9 @@ function targetExists(
   captured: Record<string, string>,
 ): boolean {
   const paper = document.paper as unknown as Record<string, unknown>;
-  if (kind === 'blockId') {
-    return ['chromeBlocks', 'instructionBlocks'].some(
-      (field) => findById(paper[field], captured.blockId) !== undefined,
+  if (kind in BLOCK_COLLECTION) {
+    return (
+      findById(paper[BLOCK_COLLECTION[kind]], captured.blockId) !== undefined
     );
   }
   const section = findById(paper.sections, captured.sectionId);
@@ -165,7 +193,7 @@ function classifyPatch(
 ): GuardId | null {
   if (patch.op !== ALLOWED_OP) return 'unsupported_operation';
 
-  for (const { pattern, idKinds } of ALLOWED_PATH_PATTERNS) {
+  for (const { pattern, idKinds, valueKind } of ALLOWED_PATH_PATTERNS) {
     const match = pattern.exec(patch.path);
     if (match === null) continue;
     const captured = (match.groups ?? {}) as Record<string, string>;
@@ -173,6 +201,9 @@ function classifyPatch(
       if (!targetExists(document, kind, captured)) return 'unknown_target';
     }
     if (!isScalar(patch.value)) return 'forbidden_raw_content';
+    if (!valueMatchesKind(patch.value, valueKind)) {
+      return 'forbidden_value_type';
+    }
     return null;
   }
   return forbiddenGuard(patch.path);

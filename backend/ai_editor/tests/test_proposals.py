@@ -218,6 +218,49 @@ def test_slot_under_wrong_section_is_an_unknown_target():
     assert "unknown_target" in _guard_ids(result)
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/paper/chromeBlocks/instr-1/text",  # instr-1 is an instruction block
+        "/paper/instructionBlocks/chrome-1/text",  # chrome-1 is a chrome block
+    ],
+)
+def test_block_id_must_live_in_the_collection_its_path_names(path):
+    # Deny-by-default: a chrome path must not resolve an instruction block (or
+    # vice versa), or the AI could target the wrong block and the apply would
+    # land on the wrong element or silently no-op.
+    result = _validate([{"op": "replace", "path": path, "value": "x"}])
+    assert "unknown_target" in _guard_ids(result)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("hello", "forbidden_value_type"),
+        (True, "forbidden_value_type"),
+        ([], "forbidden_raw_content"),  # non-scalar caught first
+    ],
+)
+def test_non_numeric_marks_value_is_rejected(value, expected):
+    # marks is numeric in the contract; a string/bool would corrupt canonical
+    # state on apply even though it is a scalar.
+    result = _validate(
+        [
+            {
+                "op": "replace",
+                "path": "/paper/sections/section-a/slots/slot-a1/marks",
+                "value": value,
+            }
+        ]
+    )
+    assert expected in _guard_ids(result)
+
+
+def test_numeric_value_on_a_text_field_is_rejected():
+    result = _validate([{"op": "replace", "path": "/paper/title", "value": 5}])
+    assert "forbidden_value_type" in _guard_ids(result)
+
+
 def test_oversized_proposal_is_rejected():
     patches = [
         {"op": "replace", "path": "/paper/title", "value": "x"}
@@ -287,6 +330,7 @@ def test_guard_id_registry_is_the_pinned_contract():
         "forbidden_question_count",
         "forbidden_section_membership",
         "forbidden_raw_content",
+        "forbidden_value_type",
         "forbidden_path",
     }
 

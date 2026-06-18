@@ -161,6 +161,36 @@ describe('validateProposal forbidden categories', () => {
     expect(guardIds(result)).toContain('unknown_target');
   });
 
+  it.each([
+    '/paper/chromeBlocks/instr-1/text', // instr-1 is an instruction block
+    '/paper/instructionBlocks/chrome-1/text', // chrome-1 is a chrome block
+  ])('rejects a block id addressed under the wrong collection: %s', (path) => {
+    const result = validate([{ op: 'replace', path, value: 'x' }]);
+    expect(guardIds(result)).toContain('unknown_target');
+  });
+
+  it.each([
+    ['hello', 'forbidden_value_type'],
+    [true, 'forbidden_value_type'],
+    [[], 'forbidden_raw_content'], // non-scalar caught first
+  ])('rejects a non-numeric marks value %s', (value, expected) => {
+    const result = validate([
+      {
+        op: 'replace',
+        path: '/paper/sections/section-a/slots/slot-a1/marks',
+        value,
+      },
+    ]);
+    expect(guardIds(result)).toContain(expected);
+  });
+
+  it('rejects a numeric value on a text field', () => {
+    const result = validate([
+      { op: 'replace', path: '/paper/title', value: 5 },
+    ]);
+    expect(guardIds(result)).toContain('forbidden_value_type');
+  });
+
   it('rejects an oversized proposal', () => {
     const patches = Array.from({ length: MAX_PATCHES + 1 }, () => ({
       op: 'replace',
@@ -213,6 +243,7 @@ describe('validateProposal contract', () => {
         'forbidden_question_count',
         'forbidden_section_membership',
         'forbidden_raw_content',
+        'forbidden_value_type',
         'forbidden_path',
       ]),
     );

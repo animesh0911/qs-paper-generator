@@ -26,6 +26,10 @@ The guard-id set below is pinned by a parity test on each side.
 ## 2. Response shapes
 
 Endpoint-specific, discriminated on `status` (PRD #30: no generic UI guessing).
+These shapes are the validated **`job.result`** payload — the async job poll
+envelope (`GET /api/ai/jobs/{jobId}/`, #31) carries the job lifecycle `status`
+(`pending`/`running`/`done`/…) at its top level and nests this proposal/refusal
+under `result`. Parse `result` with these schemas only once the job is `done`.
 
 ### Proposal
 
@@ -73,7 +77,7 @@ so a wrong `oldValue` cannot widen what Apply touches.
 | ---------- | --------------------------- | ------------------------------------------------ |
 | `op`       | string                      | Only `replace` is allowed. Others → unsupported. |
 | `path`     | JSON Pointer                | **ID-addressed**, not array index (see §4).      |
-| `value`    | string \| number \| boolean | Scalar only. Structured value → raw content.     |
+| `value`    | string \| number            | Scalar, typed per field: text fields require a string, slot marks require a number. Structured value → raw content. |
 | `oldValue` | any (optional)              | Advisory; not trusted by guards.                 |
 
 Patches address by **stable id** (`/paper/sections/<sectionId>/...`), never array
@@ -81,8 +85,10 @@ index, so a reorder can never silently retarget a patch (#32 decision).
 
 ## 4. Allowed paths (deny-by-default)
 
-A patch is allowed **only** when it is a scalar `replace` whose `path` matches one
-of these AND the ids resolve in the live document. Everything else is blocked.
+A patch is allowed **only** when it is a `replace` whose `path` matches one of
+these, the ids resolve in the live document, and the value is the field's
+expected type. A block id resolves **only** within the collection its path names
+(`chromeBlocks` vs `instructionBlocks`). Everything else is blocked.
 
 | Path                                                                             | Edits                      |
 | -------------------------------------------------------------------------------- | -------------------------- |
@@ -117,6 +123,7 @@ parity tests enforce the set.
 | `forbidden_question_count`     | A whole-slot or slots-collection target                     |
 | `forbidden_section_membership` | A whole-section or sections-collection target               |
 | `forbidden_raw_content`        | A non-scalar (object/array) value — raw BlockNote JSON       |
+| `forbidden_value_type`         | A scalar of the wrong type for the field (e.g. text on marks) |
 | `forbidden_path`               | Any other path outside the allowlist                        |
 
 The PRD's forbidden categories (sourced question text, question-bank source data,

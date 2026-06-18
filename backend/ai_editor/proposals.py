@@ -109,37 +109,62 @@ GUARD_MESSAGES: dict[str, str] = {
     "forbidden_raw_content": (
         "I can only set plain text or a number here, not raw editor content."
     ),
+    "forbidden_value_type": "That value isn't the right type for this field.",
     "forbidden_path": "I can't change that part of the paper.",
 }
 
 # Deny-by-default allowlist. A patch is allowed only if its path fully matches one
-# of these AND the captured ids resolve in the live document AND it is a scalar
-# ``replace``. Each pattern carries the kind of id it expects so the resolver can
-# confirm the target exists (the "missing ids" guard).
+# of these AND the captured ids resolve in the live document AND its value is the
+# expected scalar type. Each entry is ``(pattern, id_kinds, value_kind)``:
+# ``id_kinds`` names the ids the resolver must confirm exist (the "missing ids"
+# guard) — block kinds are collection-specific so a chrome path can't resolve an
+# instruction block (or vice versa); ``value_kind`` is ``"text"`` or ``"number"``
+# so a string can't land on a numeric field (e.g. slot marks).
 _FORMAT_LAYOUT_ROLES = "marks|questionNumbers|mcqOptions|instructions|masthead|footer"
-ALLOWED_PATH_PATTERNS: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
-    (re.compile(r"^/paper/title$"), ()),
-    (re.compile(r"^/paper/subtitle$"), ()),
-    (re.compile(r"^/paper/chromeBlocks/(?P<blockId>[^/]+)/text$"), ("blockId",)),
+ALLOWED_PATH_PATTERNS: tuple[tuple[re.Pattern[str], tuple[str, ...], str], ...] = (
+    (re.compile(r"^/paper/title$"), (), "text"),
+    (re.compile(r"^/paper/subtitle$"), (), "text"),
+    (
+        re.compile(r"^/paper/chromeBlocks/(?P<blockId>[^/]+)/text$"),
+        ("chromeBlockId",),
+        "text",
+    ),
     (
         re.compile(r"^/paper/instructionBlocks/(?P<blockId>[^/]+)/text$"),
-        ("blockId",),
+        ("instructionBlockId",),
+        "text",
     ),
-    (re.compile(r"^/paper/sections/(?P<sectionId>[^/]+)/title$"), ("sectionId",)),
-    (re.compile(r"^/paper/sections/(?P<sectionId>[^/]+)/subtitle$"), ("sectionId",)),
+    (
+        re.compile(r"^/paper/sections/(?P<sectionId>[^/]+)/title$"),
+        ("sectionId",),
+        "text",
+    ),
+    (
+        re.compile(r"^/paper/sections/(?P<sectionId>[^/]+)/subtitle$"),
+        ("sectionId",),
+        "text",
+    ),
     (
         re.compile(r"^/paper/sections/(?P<sectionId>[^/]+)/instructions$"),
         ("sectionId",),
+        "text",
     ),
     (
         re.compile(
             r"^/paper/sections/(?P<sectionId>[^/]+)/slots/(?P<slotId>[^/]+)/marks$"
         ),
         ("sectionId", "slotId"),
+        "number",
     ),
-    (re.compile(r"^/format/page/(size|orientation)$"), ()),
-    (re.compile(rf"^/format/layout/(?:{_FORMAT_LAYOUT_ROLES})$"), ()),
+    (re.compile(r"^/format/page/(size|orientation)$"), (), "text"),
+    (re.compile(rf"^/format/layout/(?:{_FORMAT_LAYOUT_ROLES})$"), (), "text"),
 )
+
+# Resolves a block id against the one collection its path names, keyed by id kind.
+_BLOCK_COLLECTION = {
+    "chromeBlockId": "chromeBlocks",
+    "instructionBlockId": "instructionBlocks",
+}
 
 # A marks edit is allowed; this matches it so the warning pass can recompute
 # totals without re-running the full classifier.
@@ -162,6 +187,17 @@ def _is_scalar(value: Any) -> bool:
     return isinstance(value, (str, int, float, bool))
 
 
+def _value_matches_kind(value: Any, value_kind: str) -> bool:
+    """Confirm a scalar value is the type the field expects.
+
+    ``number`` rejects ``bool`` (a ``True`` marks value is a type confusion, not a
+    quantity); ``text`` requires a string so a bare number can't land on a label.
+    """
+    if value_kind == "number":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return isinstance(value, str)
+
+
 def _find_by_id(items: Any, target_id: str) -> dict | None:
     if not isinstance(items, list):
         return None
@@ -178,12 +214,9 @@ def _find_by_id(items: Any, target_id: str) -> dict | None:
 def _target_exists(document: dict, kind: str, captured: dict[str, str]) -> bool:
     """Confirm a captured id resolves to a node in the live document."""
     paper = document.get("paper", {}) if isinstance(document, dict) else {}
-    if kind == "blockId":
-        block_id = captured["blockId"]
-        return any(
-            _find_by_id(paper.get(field), block_id) is not None
-            for field in ("chromeBlocks", "instructionBlocks")
-        )
+    if kind in _BLOCK_COLLECTION:
+        collection = paper.get(_BLOCK_COLLECTION[kind])
+        return _find_by_id(collection, captured["blockId"]) is not None
     section = _find_by_id(paper.get("sections"), captured["sectionId"])
     if section is None:
         return False
@@ -203,7 +236,7 @@ def _classify_patch(document: dict, patch: EditPatch) -> str | None:
     if patch.op != ALLOWED_OP:
         return "unsupported_operation"
 
-    for pattern, id_kinds in ALLOWED_PATH_PATTERNS:
+    for pattern, id_kinds, value_kind in ALLOWED_PATH_PATTERNS:
         match = pattern.match(patch.path)
         if match is None:
             continue
@@ -213,6 +246,8 @@ def _classify_patch(document: dict, patch: EditPatch) -> str | None:
                 return "unknown_target"
         if not _is_scalar(patch.value):
             return "forbidden_raw_content"
+        if not _value_matches_kind(patch.value, value_kind):
+            return "forbidden_value_type"
         return None
 
     return _forbidden_guard(patch.path)
