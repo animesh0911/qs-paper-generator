@@ -194,9 +194,16 @@ Provider-neutral seam for bulk generated Question-and-answer candidates. It
 returns canonical-compatible Question payloads, not trusted `Question` rows and
 not candidate workflow state. The LangChain adapter resolves the logical
 `question_generation` model route through `ai_services.llm`, while
-`bank.generation` owns the provider-enforced response schema, production prompt,
-and deterministic validator. Future `GenerationBatch` lifecycle code persists
-valid payloads as `GeneratedQuestionCandidate` rows.
+`bank.generation` owns the provider-enforced response schema and production
+prompt. Future `GenerationBatch` lifecycle code persists valid payloads as
+`GeneratedQuestionCandidate` rows.
+
+**GeneratedQuestionGate**
+Deterministic validation module for untrusted QuestionGenerator output. It
+accepts only candidate-shaped Question payloads with canonical Chapter,
+QuestionType, marks, cognitive level, content, answer, Topic names, and
+AI-generated source provenance; it rejects workflow fields such as candidate or
+batch state. Lives in `bank.generated_question_gate`.
 
 **job ledger**
 The queryable Postgres lifecycle record of an async workflow (`IngestionJob`;

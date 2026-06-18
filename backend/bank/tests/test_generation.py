@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from ai_services.llm import ModelPurpose, resolve_chat_model_config
+from bank.generated_question_gate import (
+    validate_generated_questions as validate_with_gate,
+)
 from bank.generation import (
     LangChainQuestionGenerator,
     QuestionGenerationRequest,
@@ -60,6 +63,14 @@ def test_validator_accepts_supported_question_types():
     result = validate_generated_questions(payload, _request())
 
     assert len(result.valid_questions) == 4
+    assert result.errors == ()
+
+
+def test_generated_question_gate_is_direct_test_surface():
+    """GeneratedQuestionGate is the deterministic seam future batches call."""
+    result = validate_with_gate({"questions": [_question()]}, _request())
+
+    assert len(result.valid_questions) == 1
     assert result.errors == ()
 
 
