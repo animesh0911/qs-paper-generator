@@ -52,6 +52,7 @@ class TextbookRetrievalRequest:
     chapter_map_node_ids: tuple[str, ...] = ()
     content_types: tuple[str, ...] = ()
     limit: int = 5
+    context_chunk_limit: int | None = None
 
 
 @dataclass(frozen=True)
@@ -79,8 +80,8 @@ class ChapterMapContextAssembler:
         self.context_char_limit = context_char_limit
 
     def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext:
-        if request.limit < 1:
-            raise ValueError("limit must be positive.")
+        if request.context_chunk_limit is not None and request.context_chunk_limit < 1:
+            raise ValueError("context_chunk_limit must be positive.")
         selected_ids = self._selected_ids(request)
         selected_nodes = list(
             ChapterMapNode.objects.filter(
@@ -109,11 +110,12 @@ class ChapterMapContextAssembler:
                 if self._matches_content_types(chunk, request.content_types)
             ]
 
+        source_order_by_chunk_id = self._source_order_by_chunk_id(chunks)
         ordered_chunks = sorted(
             chunks,
             key=lambda chunk: (
                 chunk.chapter_map_node.source_start,
-                chunk.page_start,
+                source_order_by_chunk_id.get(chunk.pk, chunk.page_start),
                 chunk.stable_chunk_id,
             ),
         )
@@ -130,8 +132,10 @@ class ChapterMapContextAssembler:
                 break
             included.append(GroundingChunk(chunk=chunk, rank=float(len(included) + 1)))
             char_count = next_count
-            if len(included) >= request.limit:
-                cap_reached = len(filtered_chunks) > len(included)
+            if (
+                request.context_chunk_limit is not None
+                and len(included) >= request.context_chunk_limit
+            ):
                 break
 
         included_node_ids = list(
@@ -151,6 +155,11 @@ class ChapterMapContextAssembler:
                 "context_char_count": char_count,
                 "context_char_limit": self.context_char_limit,
                 "cap_reached": cap_reached,
+                "chunk_limit_reached": (
+                    request.context_chunk_limit is not None
+                    and len(filtered_chunks) > len(included)
+                    and len(included) >= request.context_chunk_limit
+                ),
             },
         )
 
@@ -204,6 +213,36 @@ class ChapterMapContextAssembler:
     ) -> bool:
         chunk_types = set(chunk.content_types)
         return any(content_type in chunk_types for content_type in content_types)
+
+    @staticmethod
+    def _source_order_by_chunk_id(chunks: list[RetrievalChunk]) -> dict[int, int]:
+        element_ids_by_document: dict[int, set[str]] = {}
+        for chunk in chunks:
+            element_ids_by_document.setdefault(chunk.document_id, set()).update(
+                chunk.source_element_ids
+            )
+        rows = TextbookElement.objects.filter(
+            document_id__in=element_ids_by_document.keys(),
+            stable_element_id__in={
+                element_id
+                for element_ids in element_ids_by_document.values()
+                for element_id in element_ids
+            },
+        ).values_list("document_id", "stable_element_id", "source_order")
+        source_order_by_element = {
+            (document_id, stable_element_id): source_order
+            for document_id, stable_element_id, source_order in rows
+        }
+        source_order_by_chunk_id = {}
+        for chunk in chunks:
+            source_orders = [
+                source_order_by_element[(chunk.document_id, element_id)]
+                for element_id in chunk.source_element_ids
+                if (chunk.document_id, element_id) in source_order_by_element
+            ]
+            if source_orders:
+                source_order_by_chunk_id[chunk.pk] = min(source_orders)
+        return source_order_by_chunk_id
 
     @staticmethod
     def _included_by_default(chunk: RetrievalChunk) -> bool:
