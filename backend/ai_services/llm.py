@@ -154,6 +154,9 @@ class ModelPurpose(StrEnum):
     """
 
     ANSWER_GENERATION = "answer_generation"
+    # Bulk Question-and-answer candidate generation (#142). This is a logical
+    # route only: provider/model/retry/cost policy resolve from env at the seam.
+    QUESTION_GENERATION = "question_generation"
     # Bank ingestion. Moved onto the seam (#156) via LangChain
     # ``with_structured_output``; gated behind a benchmark-proven parity run
     # (ADR-0005). Resolves to the Gemini extraction model by default.
