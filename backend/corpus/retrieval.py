@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Protocol
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
@@ -30,6 +30,11 @@ _LANDMARK_CONTENT_TYPES = {
     ChapterMapNode.NodeType.EXERCISES,
     ChapterMapNode.NodeType.QUESTIONS,
 }
+_DEFAULT_EXCLUDED_CONTEXT_TYPES = {
+    ChapterMapNode.NodeType.EXERCISES,
+    ChapterMapNode.NodeType.QUESTIONS,
+}
+_FORMULA_ONLY_CONTENT_TYPES = {"formula", "equation"}
 _CHEMICAL_TERM = re.compile(r"^(?:pH|(?:[A-Z][a-z]?\d*)+)$")
 
 
@@ -42,8 +47,9 @@ class ChunkBuildResult:
 @dataclass(frozen=True)
 class TextbookRetrievalRequest:
     chapter: Chapter
-    query_text: str
+    query_text: str = ""
     chapter_map_node: ChapterMapNode | None = None
+    chapter_map_node_ids: tuple[str, ...] = ()
     content_types: tuple[str, ...] = ()
     limit: int = 5
 
@@ -57,10 +63,158 @@ class GroundingChunk:
 @dataclass(frozen=True)
 class GroundingContext:
     results: tuple[GroundingChunk, ...]
+    diagnostics: dict[str, object] = field(default_factory=dict)
 
 
 class TextbookRetriever(Protocol):
     def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext: ...
+
+
+class ChapterMapContextAssembler:
+    """Assemble selected ChapterMapNode subtree context without search."""
+
+    def __init__(self, context_char_limit: int = 25000):
+        if context_char_limit < 1:
+            raise ValueError("context_char_limit must be positive.")
+        self.context_char_limit = context_char_limit
+
+    def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext:
+        if request.limit < 1:
+            raise ValueError("limit must be positive.")
+        selected_ids = self._selected_ids(request)
+        selected_nodes = list(
+            ChapterMapNode.objects.filter(
+                document__chapter=request.chapter,
+                stable_node_id__in=selected_ids,
+            )
+            .select_related("document", "parent")
+            .order_by("source_start", "stable_node_id")
+        )
+        if len(selected_nodes) != len(set(selected_ids)):
+            raise ValueError(
+                "chapter_map_node_ids must belong to the requested Chapter."
+            )
+
+        context_nodes = self._context_nodes(selected_nodes)
+        chunks = list(
+            RetrievalChunk.objects.filter(
+                chapter=request.chapter,
+                chapter_map_node_id__in=[node.pk for node in context_nodes],
+            ).select_related("document", "chapter", "chapter_map_node")
+        )
+        if request.content_types:
+            chunks = [
+                chunk
+                for chunk in chunks
+                if self._matches_content_types(chunk, request.content_types)
+            ]
+
+        ordered_chunks = sorted(
+            chunks,
+            key=lambda chunk: (
+                chunk.chapter_map_node.source_start,
+                chunk.page_start,
+                chunk.stable_chunk_id,
+            ),
+        )
+        filtered_chunks = [
+            chunk for chunk in ordered_chunks if self._included_by_default(chunk)
+        ]
+        included: list[GroundingChunk] = []
+        char_count = 0
+        cap_reached = False
+        for chunk in filtered_chunks:
+            next_count = char_count + len(chunk.text)
+            if next_count > self.context_char_limit:
+                cap_reached = True
+                break
+            included.append(GroundingChunk(chunk=chunk, rank=float(len(included) + 1)))
+            char_count = next_count
+            if len(included) >= request.limit:
+                cap_reached = len(filtered_chunks) > len(included)
+                break
+
+        included_node_ids = list(
+            dict.fromkeys(
+                result.chunk.chapter_map_node.stable_node_id for result in included
+            )
+        )
+        return GroundingContext(
+            results=tuple(included),
+            diagnostics={
+                "mode": "chapter_map_subtree",
+                "chapter_slug": request.chapter.slug,
+                "requested_chapter_map_node_ids": list(selected_ids),
+                "included_chapter_map_node_ids": included_node_ids,
+                "included_chunk_count": len(included),
+                "skipped_chunk_count": len(ordered_chunks) - len(included),
+                "context_char_count": char_count,
+                "context_char_limit": self.context_char_limit,
+                "cap_reached": cap_reached,
+            },
+        )
+
+    @staticmethod
+    def _selected_ids(request: TextbookRetrievalRequest) -> tuple[str, ...]:
+        ids = request.chapter_map_node_ids
+        if request.chapter_map_node is not None:
+            if request.chapter_map_node.document.chapter_id != request.chapter.pk:
+                raise ValueError(
+                    "chapter_map_node_ids must belong to the requested Chapter."
+                )
+            ids = (*ids, request.chapter_map_node.stable_node_id)
+        ids = tuple(dict.fromkeys(ids))
+        if not ids:
+            raise ValueError("chapter_map_node_ids must not be empty.")
+        return ids
+
+    @staticmethod
+    def _context_nodes(selected_nodes: list[ChapterMapNode]) -> list[ChapterMapNode]:
+        documents = {node.document_id for node in selected_nodes}
+        nodes = list(
+            ChapterMapNode.objects.filter(document_id__in=documents)
+            .select_related("parent")
+            .order_by("source_start", "stable_node_id")
+        )
+        selected_pks = {node.pk for node in selected_nodes}
+        nodes_by_pk = {node.pk: node for node in nodes}
+
+        def in_selected_subtree(node: ChapterMapNode) -> bool:
+            current: ChapterMapNode | None = node
+            while current is not None:
+                if current.pk in selected_pks:
+                    return True
+                current = nodes_by_pk.get(current.parent_id)
+            return False
+
+        return [
+            node
+            for node in nodes
+            if in_selected_subtree(node)
+            and node.node_type
+            in {
+                ChapterMapNode.NodeType.SECTION,
+                ChapterMapNode.NodeType.DOCUMENT,
+            }
+        ]
+
+    @staticmethod
+    def _matches_content_types(
+        chunk: RetrievalChunk, content_types: tuple[str, ...]
+    ) -> bool:
+        chunk_types = set(chunk.content_types)
+        return any(content_type in chunk_types for content_type in content_types)
+
+    @staticmethod
+    def _included_by_default(chunk: RetrievalChunk) -> bool:
+        content_types = set(chunk.content_types)
+        if content_types & _DEFAULT_EXCLUDED_CONTEXT_TYPES:
+            return False
+        if content_types <= _FORMULA_ONLY_CONTENT_TYPES:
+            return False
+        if "picture" in content_types and "caption" not in content_types:
+            return False
+        return True
 
 
 class PostgresTextbookRetriever:
