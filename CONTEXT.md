@@ -203,3 +203,36 @@ resumable after a crash and lets it pause for human review and resume from a
 separate process (the cron-drain). The complement to the **job ledger**: ledger =
 "what/who/status", checkpointer = "where in the graph". See ADR-0006.
 _Avoid_: cache, session store.
+
+## AI editor terms
+
+Vocabulary for the editor AI integration (PRD #30). The full proposal contract is
+`contracts/ai_proposal.v1.md`.
+
+**edit proposal**
+What the editor AI returns instead of a re-written paper: a scoped set of
+`replace`-only **patches** against the canonical `PaperDocumentV1`, plus a
+`summary`, `affected[]` areas, and a `validation` verdict — or a **refusal**. The
+model is never the source of truth for safety; a proposal is only previewable once
+the **AI editor guardrails** pass. Lives in `ai_editor.proposals.EditProposal`,
+mirrored on the frontend in `ai-proposal.schema.ts`.
+_Avoid_: diff, edit, suggestion (for the wire shape).
+
+**patch (editor edit)**
+One `{op, path, value, oldValue?}` change inside an **edit proposal**. `op` is
+always `replace`; `path` is an **id-addressed** JSON Pointer
+(`/paper/sections/<sectionId>/instructions`), never an array index, so a reorder
+cannot silently retarget it; `value` is a scalar; `oldValue` is advisory (inspector
+diff only — guards read the live document, never `oldValue`).
+_Avoid_: JSON Patch (RFC 6902 ops are not all supported), mutation.
+
+**AI editor guardrails**
+The deterministic, deny-by-default validators (`ai_editor.proposals.validate_proposal`
+and the frontend `validateProposal` mirror) that decide whether an **edit proposal**
+may preview/apply — independently of the model. A **patch** passes only if it is a
+scalar `replace` at an allowlisted path whose ids resolve; everything else is
+blocked and mapped to a named guard with a user-safe message (`forbidden_question_text`,
+`unknown_target`, …). Distinct from the **ingest guardrails** (`bank.guardrails`),
+which protect *parsed questions*, not *editor edits*. Guard ids are pinned by a
+parity test on each side.
+_Avoid_: validation, filter, sanitizer.

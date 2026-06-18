@@ -30,6 +30,16 @@ export type {
   SubQuestion,
 } from './paper-document.schema';
 
+export type {
+  EditPatch,
+  EditProposal,
+  GuardId,
+  GuardViolation,
+  ProposalResponse,
+  ProposalValidation,
+  Refusal,
+} from './ai-proposal.schema';
+
 export interface Chapter {
   id: number;
   slug: string;
