@@ -9,6 +9,12 @@ This file is read by `/improve-codebase-architecture` and other architecture-awa
 **Question**
 A single bank item. Has section (A–E), **QuestionType** (contract-string enum), marks, chapter, cognitive level, **rawText**, structured **content** (contract-shape JSON), **topic_names** (freeform LLM-emitted strings), **source provenance** (`source_type`, `source_name`, `source_file_name`, `source_page_number`, `source_original_qnum`), **parse_quality**, **review_flags**, **verified**, optional answer, optional diagram. Lives in `bank.models.Question`.
 
+**GenerationBatch**
+A durable, teacher-owned bulk AI Question-generation job. It records the creating teacher and school, selected **Chapters**, optional topic hints, requested count, difficulty preset, lifecycle status (`queued`, `generating_questions`, `validating`, `ready_for_review`, `accepted`, `failed`, `expired`), timestamps, and failure text. The HTTP API creates and polls this row; `drain_generation_batches` drives it out-of-request using the **QuestionGenerator** seam. At most one active GenerationBatch may exist per teacher. Ready, unaccepted batches expire after 30 days. Lives in `bank.models.GenerationBatch`.
+
+**GeneratedQuestionCandidate**
+One valid, canonical-compatible generated Question payload linked to a **GenerationBatch**. Candidate rows are created only after deterministic validation succeeds; invalid model outputs are discarded and never exposed through the API. A candidate remains review-only until teacher acceptance creates the corresponding **Question** row, then the candidate stores the accepted Question link and accepted timestamp. Lives in `bank.models.GeneratedQuestionCandidate`.
+
 **QuestionType**
 Enum on `Question.qtype`. Values are **identical to PaperDocumentV1 `questionType` strings** — no mapping layer. Members: `mcq`, `assertion_reason`, `very_short_answer`, `short_answer`, `long_answer`, `case_based`, `internal_choice`, `diagram_based`, `table_based`, `custom`. Classified at ingest from the question's structure (e.g. `assertion`+`reason` keys → `assertion_reason`), with section default as fallback. See ADR-0001.
 
