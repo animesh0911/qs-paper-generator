@@ -9,6 +9,12 @@ This file is read by `/improve-codebase-architecture` and other architecture-awa
 **Question**
 A single bank item. Has section (A–E), **QuestionType** (contract-string enum), marks, chapter, cognitive level, **rawText**, structured **content** (contract-shape JSON), **topic_names** (freeform LLM-emitted strings), **source provenance** (`source_type`, `source_name`, `source_file_name`, `source_page_number`, `source_original_qnum`), **parse_quality**, **review_flags**, **verified**, optional answer, optional diagram. Lives in `bank.models.Question`.
 
+**GenerationBatch**
+A durable, teacher-owned bulk AI Question-generation job. It records the creating teacher and school, selected **Chapters**, optional topic hints, requested count, difficulty preset, lifecycle status (`queued`, `generating_questions`, `validating`, `ready_for_review`, `accepted`, `failed`, `expired`), timestamps, and failure text. The HTTP API creates and polls this row; `drain_generation_batches` drives it out-of-request using the **QuestionGenerator** seam. At most one active GenerationBatch may exist per teacher. Ready, unaccepted batches expire after 30 days. Lives in `bank.models.GenerationBatch`.
+
+**GeneratedQuestionCandidate**
+One valid, canonical-compatible generated Question payload linked to a **GenerationBatch**. Candidate rows are created only after deterministic validation succeeds; invalid model outputs are discarded and never exposed through the API. A candidate remains review-only until teacher acceptance creates the corresponding **Question** row, then the candidate stores the accepted Question link and accepted timestamp. Lives in `bank.models.GeneratedQuestionCandidate`.
+
 **QuestionType**
 Enum on `Question.qtype`. Values are **identical to PaperDocumentV1 `questionType` strings** — no mapping layer. Members: `mcq`, `assertion_reason`, `very_short_answer`, `short_answer`, `long_answer`, `case_based`, `internal_choice`, `diagram_based`, `table_based`, `custom`. Classified at ingest from the question's structure (e.g. `assertion`+`reason` keys → `assertion_reason`), with section default as fallback. See ADR-0001.
 
@@ -189,6 +195,22 @@ chat model and owns provider/model/key/tracing/retry. Successor to the `LLMClien
 adapter (ADR-0004). Tests inject a fake factory, not a patched module. See ADR-0005.
 _Avoid_: LLM gateway, model wrapper.
 
+**QuestionGenerator**
+Provider-neutral seam for bulk generated Question-and-answer candidates. It
+returns canonical-compatible Question payloads, not trusted `Question` rows and
+not candidate workflow state. The LangChain adapter resolves the logical
+`question_generation` model route through `ai_services.llm`, while
+`bank.generation` owns the provider-enforced response schema and production
+prompt. Future `GenerationBatch` lifecycle code persists valid payloads as
+`GeneratedQuestionCandidate` rows.
+
+**GeneratedQuestionGate**
+Deterministic validation module for untrusted QuestionGenerator output. It
+accepts only candidate-shaped Question payloads with canonical Chapter,
+QuestionType, marks, cognitive level, content, answer, Topic names, and
+AI-generated source provenance; it rejects workflow fields such as candidate or
+batch state. Lives in `bank.generated_question_gate`.
+
 **job ledger**
 The queryable Postgres lifecycle record of an async workflow (`IngestionJob`;
 planned `GenerationBatch`): `status`, `school`, owner, result counts, the poll
@@ -203,3 +225,36 @@ resumable after a crash and lets it pause for human review and resume from a
 separate process (the cron-drain). The complement to the **job ledger**: ledger =
 "what/who/status", checkpointer = "where in the graph". See ADR-0006.
 _Avoid_: cache, session store.
+
+## AI editor terms
+
+Vocabulary for the editor AI integration (PRD #30). The full proposal contract is
+`contracts/ai_proposal.v1.md`.
+
+**edit proposal**
+What the editor AI returns instead of a re-written paper: a scoped set of
+`replace`-only **patches** against the canonical `PaperDocumentV1`, plus a
+`summary`, `affected[]` areas, and a `validation` verdict — or a **refusal**. The
+model is never the source of truth for safety; a proposal is only previewable once
+the **AI editor guardrails** pass. Lives in `ai_editor.proposals.EditProposal`,
+mirrored on the frontend in `ai-proposal.schema.ts`.
+_Avoid_: diff, edit, suggestion (for the wire shape).
+
+**patch (editor edit)**
+One `{op, path, value, oldValue?}` change inside an **edit proposal**. `op` is
+always `replace`; `path` is an **id-addressed** JSON Pointer
+(`/paper/sections/<sectionId>/instructions`), never an array index, so a reorder
+cannot silently retarget it; `value` is a scalar; `oldValue` is advisory (inspector
+diff only — guards read the live document, never `oldValue`).
+_Avoid_: JSON Patch (RFC 6902 ops are not all supported), mutation.
+
+**AI editor guardrails**
+The deterministic, deny-by-default validators (`ai_editor.proposals.validate_proposal`
+and the frontend `validateProposal` mirror) that decide whether an **edit proposal**
+may preview/apply — independently of the model. A **patch** passes only if it is a
+scalar `replace` at an allowlisted path whose ids resolve; everything else is
+blocked and mapped to a named guard with a user-safe message (`forbidden_question_text`,
+`unknown_target`, …). Distinct from the **ingest guardrails** (`bank.guardrails`),
+which protect *parsed questions*, not *editor edits*. Guard ids are pinned by a
+parity test on each side.
+_Avoid_: validation, filter, sanitizer.

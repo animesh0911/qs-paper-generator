@@ -20,8 +20,10 @@ teacher-confirmed apply flow.
 
 Build AI editor integration as a controlled proposal system. Typed chat goes to
 a backend intent classifier. Button actions skip classification and call the
-specific backend endpoint. Long-running AI requests run as async jobs with
-Redis-backed V1 job state. The backend sends the full canonical paper document
+specific backend endpoint. Long-running AI requests run as out-of-request async
+jobs: the endpoint persists a Postgres `AIJob` row and a cron-run management
+command drains it (no Redis, no Celery), the same pattern ingestion uses (#104).
+The backend sends the full canonical paper document
 plus product guardrails to the model, then returns scoped proposals or read-only
 results.
 
@@ -63,8 +65,12 @@ borrow the UX pattern of scoped preview, accept, reject, and refine.
 - Typed chat goes through a backend intent classifier with product context and examples.
 - Do not define a narrow list of user-visible allowed intents. The classifier should identify whether the request is paper/editor-related and route to chat, summary, review, editor edit, or off-topic refusal.
 - Use separate endpoints for typed intent, chat, summary, review, editor edit, refine, and job polling.
-- V1 async job state lives in Redis/Celery memory state only. No persisted `AIJob` model in V1.
-- Only one active AI job/proposal is allowed per editor session.
+- V1 async job state lives in a persisted Postgres `AIJob` model, not Redis/Celery memory. This **reverses** the original "no persisted `AIJob` model in V1" decision: that constraint assumed a Redis/Celery runtime, which #105/#106 removed from the stack (the Django cache moved to Postgres `DatabaseCache`; the Celery broker was dropped). See #107.
+- Async endpoints create a `pending` `AIJob` row and return its job id immediately. A cron-run `drain_ai_jobs` management command picks up `pending`/`running` rows out-of-request, calls `ai_services.llm`, and writes the result/status back — the same Redis/Celery-free drain pattern as `IngestionJob` + `drain_ingestion_jobs` (#104). `AIJob` carries the session/paper scope, `baseRevision`, status (`pending`/`running`/`done`/`failed`), the request payload, and the validated result.
+- Job pickup latency is bounded by the drain cron interval. Standard platform schedulers (Render/Railway/crontab) floor at ~1 minute, and the MVP infra constraint forbids an always-on worker daemon (CONTEXT.md), so V1 **accepts up-to-~1-minute latency** and surfaces the `pending` state in the chat UI rather than promising sub-minute response. Lower latency would require a worker daemon and is out of scope for V1.
+- The drain claims each job atomically before working it (flip `pending`→`running` under `select_for_update`), so overlapping or accidentally-concurrent drain runs cannot double-process a row and double-bill the paid LLM call (Rule 13). Like `drain_ingestion_jobs`, the cron is still expected to schedule non-overlapping runs.
+- Before calling `ai_services.llm`, the drain re-checks the job's `baseRevision` against the paper's current revision and cancels the job with no model call if it is already stale — a queued job whose paper changed while `pending` must not spend paid tokens on a proposal that would only be rejected on apply (Rule 13).
+- Only one active AI job/proposal is allowed at a time, scoped to the **paper** (not just the client session): a new job request is rejected while that paper still has a non-terminal (`pending`/`running`) `AIJob` row. Paper-scoping closes the two-tabs / two-teachers gap a session-only guard would leave open.
 - While an AI edit/review job that can propose changes is pending, block structured editor mutations and allow reading/navigation.
 - Frontend tracks an in-memory monotonic `documentRevision`. AI requests include `baseRevision`; responses are accepted only when the base revision still matches.
 - The model returns scoped proposals, not a full modified paper.
@@ -92,6 +98,12 @@ borrow the UX pattern of scoped preview, accept, reject, and refine.
 - `POST /api/ai/editor-edit/`: create an editor edit proposal job.
 - `POST /api/ai/editor-edit/refine/`: refine the active editor edit proposal.
 - `GET /api/ai/jobs/{jobId}/`: poll async job state and result.
+
+The job-creating POST endpoints above (`summarize-paper`, `review-paper`,
+`editor-edit`, `editor-edit/refine`) return **202** with
+`{ "jobId", "status": "pending", "baseRevision" }`. The detailed result shapes
+shown below are what `GET /api/ai/jobs/{jobId}/` returns once the `drain_ai_jobs`
+cron completes the job.
 
 Editor edit responses should be endpoint-specific:
 
