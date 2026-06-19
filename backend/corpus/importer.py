@@ -44,18 +44,29 @@ class CorpusImporter:
         payload = load_docling_json(request.canonical_json_path)
         normalized = DoclingNormalizer(request.source_hash).normalize(payload)
         artifact_hash = canonical_json_hash(request.canonical_json_path)
-        document, _ = TextbookDocument.objects.get_or_create(
+        document_defaults = {
+            "source_file_name": request.source_file_name,
+            "canonical_json_path": str(request.canonical_json_path),
+            "page_count": len(payload.get("pages", {})),
+        }
+        document, created = TextbookDocument.objects.get_or_create(
             chapter=request.chapter,
             source_hash=request.source_hash,
             extractor_name=request.extractor_name,
             extractor_version=request.extractor_version,
             canonical_json_hash=artifact_hash,
-            defaults={
-                "source_file_name": request.source_file_name,
-                "canonical_json_path": str(request.canonical_json_path),
-                "page_count": len(payload.get("pages", {})),
-            },
+            defaults=document_defaults,
         )
+        if not created:
+            changed_fields = [
+                field
+                for field, value in document_defaults.items()
+                if getattr(document, field) != value
+            ]
+            for field in changed_fields:
+                setattr(document, field, document_defaults[field])
+            if changed_fields:
+                document.save(update_fields=changed_fields)
         stable_ids = [element.stable_element_id for element in normalized]
         TextbookElement.objects.bulk_create(
             [

@@ -24,6 +24,7 @@ import {
 } from '@dnd-kit/sortable';
 import {
   AlertTriangle,
+  ArrowLeftRight,
   CheckCircle2,
   Download,
   FileCheck2,
@@ -32,7 +33,7 @@ import {
   RotateCcw,
   Save,
 } from 'lucide-react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
 import { resolveEditorFixture } from '@/mocks';
 import {
@@ -56,7 +57,7 @@ import {
   QuestionRegionEditor,
   SortableQuestionSlot,
 } from '@/components/editor';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { PaperDocument } from '@/types';
 
@@ -322,18 +323,27 @@ function EditorPageWorkspace({
             {view.paperMeta.join(' · ')}
           </p>
         </div>
-        <EditorActionBar
-          persisted={persisted}
-          dirty={dirty}
-          actionState={actionState}
-          actionError={actionError}
-          warnings={warnings}
-          canUndo={Boolean(undoEntry)}
-          onUndo={handleUndo}
-          onSave={() => void runAction('save')}
-          onDownload={() => void runAction('download')}
-          onApprove={() => void runAction('approve')}
-        />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Link
+            to={persisted ? '/editor' : '/'}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            <ArrowLeftRight className="mr-2 size-4" />
+            {persisted ? 'Current demo' : 'Generate live paper'}
+          </Link>
+          <EditorActionBar
+            persisted={persisted}
+            dirty={dirty}
+            actionState={actionState}
+            actionError={actionError}
+            warnings={warnings}
+            canUndo={Boolean(undoEntry)}
+            onUndo={handleUndo}
+            onSave={() => void runAction('save')}
+            onDownload={() => void runAction('download')}
+            onApprove={() => void runAction('approve')}
+          />
+        </div>
       </header>
 
       <div className="grid min-h-[calc(100vh-3.5rem)] grid-cols-[minmax(12rem,14vw)_minmax(0,1fr)_minmax(14rem,16vw)] gap-4 px-4 pb-36 pt-4 max-lg:grid-cols-1 max-lg:[&_.editor-inspector]:order-2 max-lg:[&_.editor-left-rail]:static max-sm:px-3">

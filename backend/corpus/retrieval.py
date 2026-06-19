@@ -15,6 +15,7 @@ from typing import Protocol
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db import transaction
+from django.db.models import Q
 from django.db.models.functions import Cast
 from pgvector.django import CosineDistance, VectorField
 
@@ -29,7 +30,7 @@ _LANDMARK_CONTENT_TYPES = {
     ChapterMapNode.NodeType.EXERCISES,
     ChapterMapNode.NodeType.QUESTIONS,
 }
-_CHEMICAL_TERM = re.compile(r"^(?:pH|[A-Z][a-z]?\d*)$")
+_CHEMICAL_TERM = re.compile(r"^(?:pH|(?:[A-Z][a-z]?\d*)+)$")
 
 
 @dataclass(frozen=True)
@@ -84,7 +85,7 @@ class PostgresTextbookRetriever:
         if request.chapter_map_node is not None:
             chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
         if request.content_types:
-            chunks = chunks.filter(content_types__contains=list(request.content_types))
+            chunks = chunks.filter(self._content_type_filter(request.content_types))
         ranked = chunks.annotate(
             rank=SearchRank("search_vector", query, cover_density=True)
         ).order_by("-rank", "stable_chunk_id")[: request.limit]
@@ -106,6 +107,13 @@ class PostgresTextbookRetriever:
         if not terms:
             raise ValueError("query_text must contain a searchable term.")
         return SearchQuery(" | ".join(terms), config="english", search_type="raw")
+
+    @staticmethod
+    def _content_type_filter(content_types: tuple[str, ...]) -> Q:
+        query = Q()
+        for content_type in content_types:
+            query |= Q(content_types__contains=[content_type])
+        return query
 
 
 class PostgresVectorTextbookRetriever:
@@ -143,7 +151,9 @@ class PostgresVectorTextbookRetriever:
         if request.chapter_map_node is not None:
             chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
         if request.content_types:
-            chunks = chunks.filter(content_types__contains=list(request.content_types))
+            chunks = chunks.filter(
+                PostgresTextbookRetriever._content_type_filter(request.content_types)
+            )
         distance = CosineDistance(
             Cast(
                 "embedding",

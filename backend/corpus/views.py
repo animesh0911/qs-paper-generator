@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import ChapterMapNode, TextbookDocument
+from .models import ChapterMapNode, TextbookDocument, TextbookElement
 from .serializers import (
     ChapterMapEdgeSerializer,
     ChapterMapNodeSerializer,
@@ -43,7 +43,8 @@ def chapter_map_node_details(request, document_id, stable_node_id):
         stable_node_id=stable_node_id,
     )
     elements = list(
-        node.document.elements.filter(
+        TextbookElement.objects.filter(
+            document_id=node.document_id,
             source_order__gte=node.source_start,
             source_order__lte=node.source_end,
         ).order_by("source_order")

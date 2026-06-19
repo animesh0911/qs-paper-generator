@@ -16,6 +16,27 @@ repo_name="$(basename "$repo_root")"
 worktree_root="${ISSUE_WORKTREE_ROOT:-$(dirname "$repo_root")}"
 worktree_path="${ISSUE_WORKTREE_PATH:-$worktree_root/$repo_name-issue-$issue_number}"
 branch="${ISSUE_BRANCH:-codex/issue-$issue_number}"
+creating_worktree=false
+
+cleanup_partial_worktree() {
+  local exit_code=$?
+
+  if [[ "$creating_worktree" == true ]]; then
+    if git -C "$repo_root" worktree list --porcelain | grep -Fxq "worktree $worktree_path"; then
+      git -C "$repo_root" worktree remove --force "$worktree_path" || true
+    elif [[ -e "$worktree_path" ]]; then
+      echo "Partial worktree path remains and needs inspection: $worktree_path" >&2
+    fi
+
+    if git -C "$repo_root" show-ref --verify --quiet "refs/heads/$branch"; then
+      git -C "$repo_root" branch -D "$branch" || true
+    fi
+  fi
+
+  exit "$exit_code"
+}
+
+trap cleanup_partial_worktree ERR
 
 git -C "$repo_root" fetch origin
 git -C "$repo_root" rev-parse --verify --quiet "$base_ref^{commit}" >/dev/null || {
@@ -38,7 +59,9 @@ if [[ -e "$worktree_path" ]]; then
   exit 1
 fi
 
+creating_worktree=true
 git -C "$repo_root" worktree add -b "$branch" "$worktree_path" "$base_ref"
+creating_worktree=false
 
 if [[ -n "$(git -C "$worktree_path" status --porcelain)" ]]; then
   echo "New worktree is unexpectedly dirty: $worktree_path" >&2

@@ -10,6 +10,7 @@ fi
 commit=$1
 issue=$2
 shift 2
+review_model="Gemini 3.5 Flash (High)"
 
 command -v git >/dev/null 2>&1 || {
   echo "git is not installed or not on PATH" >&2
@@ -21,6 +22,10 @@ command -v agy >/dev/null 2>&1 || {
 }
 # `gh` is required only to fetch issue metadata; checked lazily below so an
 # issue-less review (issue arg '-'/'none') runs without it.
+agy models | grep -Fqx "$review_model" || {
+  echo "required Antigravity review model is unavailable: $review_model" >&2
+  exit 1
+}
 
 repo_root=$(git rev-parse --show-toplevel)
 commit_sha=$(git rev-parse --verify "${commit}^{commit}")
@@ -115,11 +120,21 @@ git -C "$repo_root" worktree add --detach --quiet "$repo_context_dir" "$commit_s
 
 (
   cd "$repo_context_dir"
-  agy --dangerously-skip-permissions --print-timeout 10m --print \
+  agy --dangerously-skip-permissions \
+    --log-file "$packet_dir/agy.cli.log" \
+    --model "$review_model" \
+    --print-timeout 10m \
+    --print \
     "Act as a senior code reviewer. The clean repository at the current working directory is the reviewed commit. Review $packet_dir/changes.patch against $packet_dir/issue.md; $packet_dir/changed-files.txt defines the changed-file scope and $packet_dir/review-context/ contains optional highlighted evidence. Own the deep review pass: inspect any repository file needed to trace callers, adapters, schemas, backend/frontend contracts, and acceptance-criteria coverage. You may run non-destructive commands or focused tests when useful. Do not edit files or create commits. Be baseline-aware: a repository gap is actionable only when this commit introduced or worsened it, or when it proves an explicit acceptance criterion in issue.md remains unmet. Do not turn pre-existing adjacent backlog work into blocking findings. Write the review to $review_file. Start with a concise acceptance-criteria coverage audit, then rank actionable findings by severity. For each finding include: confidence (verified, inferred, or needs-context), changed file path, relevant line or hunk, concrete failure mode, cited repository evidence, whether the commit caused/worsened it or which explicit acceptance criterion it misses, and why it conflicts with issue intent or engineering correctness. Any cross-boundary or integration claim must cite the repository file that proves the external interface; if evidence is unavailable, mark it needs-context and do not rank it high severity. Include missing tests only when they protect issue intent. Omit pre-existing adjacent gaps or list them separately as non-blocking context. Do not request speculative features, out-of-scope refactors, or style-only changes. If all acceptance criteria are covered and there are no actionable findings, write exactly: No actionable findings. Verify that $review_file exists and is non-empty, then reply with exactly DONE." \
     > "$packet_dir/agy.stdout.log" 2> "$packet_dir/agy.stderr.log"
 ) || {
   echo "Antigravity review failed; logs: $packet_dir/agy.stdout.log $packet_dir/agy.stderr.log" >&2
+  exit 1
+}
+
+grep -Fq "Propagating selected model override to backend: label=\"$review_model\"" \
+  "$packet_dir/agy.cli.log" || {
+  echo "Antigravity did not confirm the required review model: $review_model" >&2
   exit 1
 }
 

@@ -172,10 +172,12 @@ def test_import_command_is_idempotent_and_records_provenance():
     first_chunk_pks = list(
         RetrievalChunk.objects.order_by("stable_chunk_id").values_list("pk", flat=True)
     )
-    call_command("import_textbook_document", FIXTURE, **options)
+    updated_options = {**options, "source_file_name": "renamed-jesc104.pdf"}
+    call_command("import_textbook_document", FIXTURE, **updated_options)
 
     document = TextbookDocument.objects.get()
     assert document.source_hash == SOURCE_HASH
+    assert document.source_file_name == "renamed-jesc104.pdf"
     assert document.extractor_name == "Docling"
     assert document.extractor_version == "2.102.1"
     assert document.page_count == 3

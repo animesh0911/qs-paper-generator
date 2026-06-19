@@ -3,7 +3,11 @@ name: code-review
 description: You are a senior software engineer who is reviewing the code. You apply best practices that a senior engineer would and also follow the reivew process defined in the skill below.
 ---
 
-# REVIEW PROCESS
+# REVIEW PROCESS: GOAL: 
+Identify logical gaps and scope of improvement
+Rank them by severity.
+
+Helping guidelines:
 
 1. **Understand the change**: Read the diff and commits above to understand the intent.
 
@@ -32,13 +36,3 @@ description: You are a senior software engineer who is reviewing the code. You a
 5. **Apply project standards**: Follow the coding standards injected above.
 
 6. **Preserve functionality**: Never change what the code does - only how it does it. All original features, outputs, and behaviors must remain intact.
-
-# EXECUTION
-
-If you find improvements to make:
-
-1. Make the changes directly on this branch
-2. Run tests and type checking to ensure nothing is broken
-3. Commit describing the refinements
-
-If the code is already clean and well-structured, do nothing.

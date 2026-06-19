@@ -34,7 +34,7 @@ A corpus-owned navigational node derived from textbook headings and selected con
 A typed, evidence-backed relationship between **ChapterMapNodes**. The deterministic MVP relationship types are `contains`, `next`, and `references`; LLM-inferred conceptual relationships are not canonical. Lives in `corpus.models.ChapterMapEdge`.
 
 **RetrievalChunk**
-A stable searchable group of adjacent **TextbookElements** owned by exactly one section/topic **ChapterMapNode**. It preserves exact source-element IDs, pages, content types, citation metadata, and bounded parent-heading context while never merging across topic boundaries. Lives in `corpus.models.RetrievalChunk`.
+A stable searchable group of adjacent **TextbookElements** owned by exactly one section/topic **ChapterMapNode**. It preserves exact source-element IDs, pages, content types, citation metadata, and bounded parent-heading context while never merging across topic boundaries. For generation, RetrievalChunks are the runtime textbook context; the canonical JSON remains the reproducible import artifact. Lives in `corpus.models.RetrievalChunk`.
 
 **GroundingContext**
 The ordered, citation-bearing result returned by a **TextbookRetriever**. It contains ranked RetrievalChunks and their exact Chapter, ChapterMapNode, TextbookElement, and page provenance; it is not persisted independently.

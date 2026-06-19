@@ -27,6 +27,7 @@ class TextbookElementAdmin(admin.ModelAdmin):
         "short_text",
     )
     list_filter = ("document", "element_type", "page_number")
+    list_select_related = ("document",)
     search_fields = ("text", "stable_element_id")
     readonly_fields = ("stable_element_id",)
     ordering = ("document", "source_order")
@@ -54,6 +55,7 @@ class RetrievalChunkAdmin(admin.ModelAdmin):
         "embedding_version",
         "embedding_dimensions",
     )
+    list_select_related = ("chapter", "chapter_map_node")
     search_fields = ("text", "stable_chunk_id")
     readonly_fields = (
         "stable_chunk_id",
