@@ -45,3 +45,6 @@ frontend/tsconfig.tsbuildinfo
 # Codex / design-tool local state
 .codex/
 .impeccable/
+
+AGENTS.md*
+CLAUDE.md*
