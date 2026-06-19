@@ -36,6 +36,7 @@ from .models import CognitiveLevel, QuestionType, SourceType
 __all__ = [
     "CandidateValidationError",
     "CandidateValidationResult",
+    "DIFFICULTY_TARGETS_BY_PRESET",
     "LangChainQuestionGenerator",
     "QUESTION_GENERATION_RESPONSE_SCHEMA",
     "QuestionGenerationRequest",
@@ -43,6 +44,12 @@ __all__ = [
     "build_question_generation_prompt",
     "validate_generated_questions",
 ]
+
+DIFFICULTY_TARGETS_BY_PRESET = {
+    "balanced": {"easy": 30, "medium": 50, "hard": 20},
+    "easy": {"easy": 60, "medium": 30, "hard": 10},
+    "hard": {"easy": 10, "medium": 40, "hard": 50},
+}
 
 QUESTION_GENERATION_RESPONSE_SCHEMA: dict[str, Any] = {
     "type": "object",
