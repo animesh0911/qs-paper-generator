@@ -184,7 +184,7 @@ def test_lexical_retriever_ranks_cited_chunks_and_applies_topic_and_type_filters
     request = TextbookRetrievalRequest(
         chapter=document.chapter,
         chapter_map_node=topic,
-        content_types=("table",),
+        content_types=("table", "activity"),
         query_text="compound formula",
         limit=3,
     )
@@ -218,11 +218,11 @@ def test_lexical_retriever_returns_no_context_for_unsupported_query(document):
 def test_lexical_retriever_preserves_short_science_terms(document):
     """Science retrieval must not discard meaningful symbols such as pH or O2."""
     element = TextbookElement.objects.get(stable_element_id="element-2")
-    element.text = "The pH changes when O2 reacts with Fe."
+    element.text = "The pH changes when O2, Fe, and CO react."
     element.save(update_fields=["text"])
     RetrievalChunkBuilder().rebuild(document)
 
-    for query in ("pH", "O2", "Fe"):
+    for query in ("pH", "O2", "Fe", "CO"):
         context = PostgresTextbookRetriever().retrieve(
             TextbookRetrievalRequest(chapter=document.chapter, query_text=query)
         )

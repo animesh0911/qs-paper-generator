@@ -63,6 +63,7 @@ The script creates a temporary review packet containing only:
 - `repository/` — a clean detached worktree at the reviewed commit, available
   for full caller/interface/contract tracing and non-destructive test commands
 - `agy.stdout.log` / `agy.stderr.log` — captured CLI narration and diagnostics
+- `agy.cli.log` — CLI diagnostics proving the selected review model
 - `review.md` — Antigravity's output
 
 On success, stdout contains only the absolute path to `review.md`. Read that
@@ -118,6 +119,10 @@ If no findings are accepted, leave the committed change untouched and say so.
 ## Important CLI Behavior
 
 - Invoke the installed binary as `agy`.
+- Reviews must use exactly `Gemini 3.5 Flash (High)`. The wrapper verifies that
+  `agy models` lists it, passes it through `--model`, and fails unless
+  `agy.cli.log` confirms the exact selected model. This validation is required
+  because the CLI may silently fall back when given an invalid model label.
 - Put every CLI flag before `--print`; later flags can become prompt text.
 - Run Antigravity inside the clean detached repository snapshot. The issue and
   patch packet remain the review handoff and scope anchor.

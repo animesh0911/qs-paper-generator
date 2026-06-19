@@ -2,45 +2,36 @@
  * Dashboard — the only authenticated page.
  *
  * Pure orchestration: wires the `useCoverageForm` hook to the
- * `CoverageFormView`, posts to `assemblePaper`, and renders the result via
- * `PaperPreview`. All form state lives in the hook; all render logic lives
- * in the components. The page itself only owns the assemble call, the
- * scroll-into-view nudge, and the error string.
+ * `CoverageFormView`, posts to `assemblePaper`, and opens the persisted result
+ * in the editor. All form state lives in the hook; all render logic lives in
+ * the components.
  *
  * @module DashboardPage
  */
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { assemblePaper, downloadPaperPdf } from '@/lib/api';
-import type { PaperDocument } from '@/types';
+import { assemblePaper } from '@/lib/api';
+import { generatedPaperEditorPath } from '@/lib/editor-routes';
 import { useAuth } from '@/hooks/useAuth.hook';
 import { useCoverageForm } from '@/hooks/useCoverageForm.hook';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CoverageFormView, PaperPreview } from '@/components/coverage';
+import { CoverageFormView } from '@/components/coverage';
 
 export default function Dashboard() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const form = useCoverageForm();
 
-  const [paper, setPaper] = useState<PaperDocument | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const paperRef = useRef<HTMLDivElement>(null);
 
   async function generate() {
     setBusy(true);
     setError('');
     try {
       const next = await assemblePaper(form.toAssemblePayload());
-      setPaper(next);
-      requestAnimationFrame(() => {
-        paperRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      });
+      navigate(generatedPaperEditorPath(next.paper.id));
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -67,34 +58,10 @@ export default function Dashboard() {
             </p>
           </CardHeader>
           <CardContent>
-            <CoverageFormView
-              form={form}
-              busy={busy}
-              onGenerate={generate}
-              trailing={
-                paper && (
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate(`/editor/${paper.paper.id}`)}
-                    >
-                      Open editor
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => downloadPaperPdf(paper)}
-                    >
-                      Download PDF
-                    </Button>
-                  </>
-                )
-              }
-            />
+            <CoverageFormView form={form} busy={busy} onGenerate={generate} />
             {error && <p className="text-sm text-destructive mt-2">{error}</p>}
           </CardContent>
         </Card>
-
-        {paper && <PaperPreview ref={paperRef} paper={paper} />}
       </main>
     </div>
   );

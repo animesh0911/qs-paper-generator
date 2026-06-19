@@ -37,8 +37,11 @@ printf '  %s\n' "${changed_files[@]}"
 
 backend_changed=false
 frontend_changed=false
+docs_changed=false
+shell_changed=false
 backend_python_files=()
 backend_python_relative_files=()
+shell_files=()
 for path in "${changed_files[@]}"; do
   case "$path" in
     backend/* | contracts/* | docker-compose.yml)
@@ -47,7 +50,14 @@ for path in "${changed_files[@]}"; do
     frontend/* | package.json | package-lock.json)
       frontend_changed=true
       ;;
+    docs/* | *.md)
+      docs_changed=true
+      ;;
   esac
+  if [[ "$path" == *.sh && -f "$repo_root/$path" ]]; then
+    shell_changed=true
+    shell_files+=("$repo_root/$path")
+  fi
   if [[ "$path" == backend/*.py && -f "$repo_root/$path" ]]; then
     backend_python_files+=("$repo_root/$path")
     backend_python_relative_files+=("${path#backend/}")
@@ -91,6 +101,17 @@ require_frontend_dependencies() {
     echo "Frontend verification requires frontend dependencies (run npm install)." >&2
     exit 1
   fi
+}
+
+run_shell_checks() {
+  if ((${#shell_files[@]} == 0)); then
+    return
+  fi
+  if ! command -v shellcheck >/dev/null 2>&1; then
+    echo "Shell verification requires shellcheck." >&2
+    exit 1
+  fi
+  shellcheck "${shell_files[@]}"
 }
 
 if [[ "$backend_changed" == true ]]; then
@@ -142,6 +163,14 @@ if [[ "$frontend_changed" == true ]]; then
   fi
 fi
 
-if [[ "$backend_changed" == false && "$frontend_changed" == false ]]; then
-  echo "No backend or frontend checks selected for these changes."
+if [[ "$shell_changed" == true ]]; then
+  run_shell_checks
+fi
+
+if [[ "$backend_changed" == false && "$frontend_changed" == false && "$shell_changed" == false ]]; then
+  if [[ "$docs_changed" == true ]]; then
+    echo "Docs-only changes detected; no executable checks selected."
+  else
+    echo "No backend, frontend, or shell checks selected for these changes."
+  fi
 fi
