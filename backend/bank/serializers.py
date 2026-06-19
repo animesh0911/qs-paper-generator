@@ -15,7 +15,15 @@ owner-scoped answer-key endpoint (``papers.views.PaperAnswerKeyPdfView``).
 
 from rest_framework import serializers
 
-from .models import Chapter, IngestionJob, Question, SourceType
+from .generation import DIFFICULTY_TARGETS_BY_PRESET
+from .models import (
+    Chapter,
+    GeneratedQuestionCandidate,
+    GenerationBatch,
+    IngestionJob,
+    Question,
+    SourceType,
+)
 
 
 class ChapterSerializer(serializers.ModelSerializer):
@@ -85,6 +93,91 @@ class IngestionJobSerializer(serializers.ModelSerializer):
             "created_count",
             "skipped_count",
             "error",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class GenerationBatchCreateSerializer(serializers.Serializer):
+    """Validates one bulk Question-generation request."""
+
+    chapter_slugs = serializers.ListField(
+        child=serializers.SlugField(),
+        min_length=1,
+        allow_empty=False,
+    )
+    topic_names = serializers.ListField(
+        child=serializers.CharField(allow_blank=False),
+        required=False,
+        default=list,
+    )
+    difficulty_preset = serializers.CharField(
+        required=False,
+        default="balanced",
+        max_length=40,
+    )
+    count = serializers.IntegerField(
+        required=False, default=10, min_value=1, max_value=50
+    )
+
+    def validate_chapter_slugs(self, value):
+        chapters = list(Chapter.objects.filter(slug__in=value).order_by("order"))
+        found = {chapter.slug for chapter in chapters}
+        missing = [slug for slug in value if slug not in found]
+        if missing:
+            raise serializers.ValidationError(
+                f"Unknown chapter slug(s): {', '.join(missing)}"
+            )
+        return value
+
+    def validate_difficulty_preset(self, value):
+        if value not in DIFFICULTY_TARGETS_BY_PRESET:
+            raise serializers.ValidationError(f"Unknown difficulty preset: {value}")
+        return value
+
+
+class GenerationBatchSerializer(serializers.ModelSerializer):
+    """Poll shape for a bulk generation batch."""
+
+    chapter_slugs = serializers.SerializerMethodField()
+    candidate_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GenerationBatch
+        fields = [
+            "id",
+            "status",
+            "chapter_slugs",
+            "topic_names",
+            "difficulty_preset",
+            "requested_count",
+            "candidate_count",
+            "error",
+            "ready_at",
+            "accepted_at",
+            "expired_at",
+            "created_at",
+            "updated_at",
+        ]
+
+    def get_chapter_slugs(self, obj):
+        return list(obj.chapters.order_by("order").values_list("slug", flat=True))
+
+    def get_candidate_count(self, obj):
+        return obj.candidates.count()
+
+
+class GeneratedQuestionCandidateSerializer(serializers.ModelSerializer):
+    """Review-list shape for valid generated Question candidates."""
+
+    class Meta:
+        model = GeneratedQuestionCandidate
+        fields = [
+            "id",
+            "status",
+            "payload",
+            "question_id",
+            "accepted_at",
             "created_at",
             "updated_at",
         ]

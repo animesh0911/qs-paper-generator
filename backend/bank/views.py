@@ -8,6 +8,10 @@
   Gemini extraction runs out-of-request via the ``drain_ingestion_jobs`` cron
   command — no LLM call inside the request.
 * ``GET  /api/bank/ingest/{job_id}/`` — poll a job's status / result counts.
+* ``POST /api/bank/generation-batches/`` — queue bulk AI Question generation.
+* ``GET  /api/bank/generation-batches/{batch_id}/`` — poll generation status.
+* ``GET  /api/bank/generation-batches/{batch_id}/candidates/`` — list valid
+  generated candidates for teacher review.
 
 The HTTP path is the *live* ingestion front door (teachers uploading their own
 PDFs at runtime); the committed-JSON CLI path (``extract_paper`` →
@@ -15,14 +19,33 @@ PDFs at runtime); the committed-JSON CLI path (``extract_paper`` →
 two-front-door note in CONTEXT.md ``Ingestor``.
 """
 
+from django.db import transaction
+from django.utils import timezone
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
-from .models import Chapter, CognitiveLevel, IngestionJob, QuestionType, Section
+from .models import (
+    ACTIVE_GENERATION_BATCH_STATUSES,
+    AnswerSource,
+    Chapter,
+    CognitiveLevel,
+    GeneratedQuestionCandidateStatus,
+    GenerationBatch,
+    GenerationBatchStatus,
+    IngestionJob,
+    ParseQuality,
+    Question,
+    QuestionType,
+    Section,
+    SourceType,
+)
 from .permissions import IsTeacher
 from .serializers import (
     ChapterSerializer,
+    GeneratedQuestionCandidateSerializer,
+    GenerationBatchCreateSerializer,
+    GenerationBatchSerializer,
     IngestionJobSerializer,
     IngestionUploadSerializer,
 )
@@ -89,3 +112,169 @@ def ingest_status(request, job_id):
     except IngestionJob.DoesNotExist:
         return Response({"detail": "Not found."}, status=404)
     return Response(IngestionJobSerializer(job).data)
+
+
+@api_view(["POST"])
+@permission_classes([IsTeacher])
+def generation_batch_create(request):
+    """Queue a teacher's bulk AI Question-generation request."""
+    serializer = GenerationBatchCreateSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    GenerationBatch.expire_ready_batches()
+
+    with transaction.atomic():
+        user = type(request.user).objects.select_for_update().get(pk=request.user.pk)
+        active = GenerationBatch.objects.filter(
+            created_by=user,
+            status__in=ACTIVE_GENERATION_BATCH_STATUSES,
+        ).first()
+        if active:
+            return Response(
+                {
+                    "detail": (
+                        f"Teacher already has active generation batch #{active.pk}."
+                    )
+                },
+                status=409,
+            )
+
+        data = serializer.validated_data
+        chapters_for_request = list(
+            Chapter.objects.filter(slug__in=data["chapter_slugs"]).order_by("order")
+        )
+        batch = GenerationBatch.objects.create(
+            school=user.school,
+            created_by=user,
+            topic_names=list(data["topic_names"]),
+            difficulty_preset=data["difficulty_preset"],
+            requested_count=data["count"],
+        )
+        batch.chapters.set(chapters_for_request)
+
+    return Response(GenerationBatchSerializer(batch).data, status=202)
+
+
+@api_view(["GET"])
+@permission_classes([IsTeacher])
+def generation_batch_detail(request, batch_id):
+    """Return one generation batch status, scoped to the creating teacher."""
+    batch = _get_owned_generation_batch(request, batch_id)
+    if batch is None:
+        return Response({"detail": "Not found."}, status=404)
+    batch.expire_if_stale()
+    return Response(GenerationBatchSerializer(batch).data)
+
+
+@api_view(["GET"])
+@permission_classes([IsTeacher])
+def generation_batch_candidates(request, batch_id):
+    """Return valid candidates for one owned generation batch."""
+    batch = _get_owned_generation_batch(request, batch_id)
+    if batch is None:
+        return Response({"detail": "Not found."}, status=404)
+    batch.expire_if_stale()
+    candidates = batch.candidates.all()
+    return Response(GeneratedQuestionCandidateSerializer(candidates, many=True).data)
+
+
+@api_view(["POST"])
+@permission_classes([IsTeacher])
+def generation_batch_accept(request, batch_id):
+    """Accept all ready candidates in a batch and insert them into the bank."""
+    with transaction.atomic():
+        batch = _get_owned_generation_batch(request, batch_id, lock=True)
+        if batch is None:
+            return Response({"detail": "Not found."}, status=404)
+        if batch.expire_if_stale():
+            return Response({"detail": "Generation batch has expired."}, status=409)
+        if batch.status != GenerationBatchStatus.READY_FOR_REVIEW:
+            return Response(
+                {"detail": "Generation batch is not ready for review."}, status=409
+            )
+
+        candidates = list(
+            batch.candidates.select_for_update().filter(
+                status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW
+            )
+        )
+        if not candidates:
+            return Response(
+                {"detail": "Generation batch has no candidates to accept."}, status=409
+            )
+
+        now = timezone.now()
+        for candidate in candidates:
+            candidate.question = _question_from_candidate(candidate, batch)
+            candidate.status = GeneratedQuestionCandidateStatus.ACCEPTED
+            candidate.accepted_at = now
+            candidate.save(
+                update_fields=["question", "status", "accepted_at", "updated_at"]
+            )
+
+        batch.status = GenerationBatchStatus.ACCEPTED
+        batch.accepted_at = now
+        batch.error = ""
+        batch.save(update_fields=["status", "accepted_at", "error", "updated_at"])
+
+    return Response(GenerationBatchSerializer(batch).data)
+
+
+def _get_owned_generation_batch(request, batch_id, *, lock=False):
+    queryset = GenerationBatch.objects.filter(
+        pk=batch_id,
+        created_by=request.user,
+        school=request.user.school,
+    ).prefetch_related("chapters")
+    if lock:
+        queryset = queryset.select_for_update()
+    return queryset.first()
+
+
+def _question_from_candidate(candidate, batch):
+    payload = candidate.payload
+    chapter = Chapter.objects.get(slug=payload["chapter_slug"])
+    return Question.objects.create(
+        school=batch.school,
+        chapter=chapter,
+        section=_section_for_generated_qtype(payload["qtype"]),
+        qtype=payload["qtype"],
+        marks=payload["marks"],
+        cognitive_level=payload["cognitive_level"],
+        text=payload["raw_text"],
+        options=_options_from_generated_content(payload),
+        content=payload["content"],
+        topic_names=list(payload["topic_names"]),
+        answer=payload["answer"],
+        answer_source=AnswerSource.GENERATED_UNVERIFIED,
+        verified=False,
+        parse_quality=ParseQuality.CLEAN,
+        source_type=SourceType.AI_GENERATED,
+        source_name=payload.get("source", {}).get("name", ""),
+    )
+
+
+def _section_for_generated_qtype(qtype):
+    return {
+        QuestionType.MCQ: Section.A,
+        QuestionType.VSA: Section.B,
+        QuestionType.SA: Section.C,
+        QuestionType.LA: Section.D,
+    }[qtype]
+
+
+def _options_from_generated_content(payload):
+    if payload["qtype"] != QuestionType.MCQ:
+        return []
+    options = payload.get("content", {}).get("options", [])
+    flattened = []
+    for option in options:
+        if not isinstance(option, dict):
+            continue
+        content = option.get("content", [])
+        text = " ".join(
+            item.get("text", "")
+            for item in content
+            if isinstance(item, dict) and isinstance(item.get("text"), str)
+        ).strip()
+        flattened.append({"label": option.get("label", ""), "text": text})
+    return flattened

@@ -38,6 +38,11 @@ class Paper(models.Model):
     # Snapshot of PaperDocumentV1 at assemble time. Overwritten on PATCH,
     # frozen on approve. Null for papers assembled before this field existed.
     document = models.JSONField(null=True, blank=True)
+    # Monotonic counter bumped each time ``document`` is overwritten. The AI
+    # editor (#31) snapshots this as a job's ``base_revision`` so the drain can
+    # cancel a job whose paper changed while it was queued, before spending any
+    # paid tokens (Rule 13).
+    revision = models.PositiveIntegerField(default=0)
     # Selection report. Shape owned by papers.picker.CoverageReport:
     # {coverage: {chapter_slug: int}, cog_coverage: {level: int},
     #  unfilled: [{slot_index, section, qtype, marks, reason}]}

@@ -106,6 +106,27 @@ def test_patch_saves_edited_document(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
+def test_patch_bumps_paper_revision(api_client, seeded_bank):
+    # Each document overwrite bumps revision so a queued AI job (#31) whose
+    # base_revision predates the edit is cancelled by the drain (Rule 13).
+    from papers.models import Paper
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+    assert Paper.objects.get(pk=paper_pk).revision == 0
+
+    api_client.patch(
+        f"/api/papers/{paper_pk}/", {"document": dict(create.data)}, format="json"
+    )
+    assert Paper.objects.get(pk=paper_pk).revision == 1
+
+    api_client.patch(
+        f"/api/papers/{paper_pk}/", {"document": dict(create.data)}, format="json"
+    )
+    assert Paper.objects.get(pk=paper_pk).revision == 2
+
+
+@pytest.mark.django_db
 def test_patch_rejected_wrong_schema(api_client, seeded_bank):
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["id"].removeprefix("paper_")

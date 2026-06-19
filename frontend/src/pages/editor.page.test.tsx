@@ -27,6 +27,7 @@ describe('persisted editor document status', () => {
 describe('editor action bar', () => {
   const callbacks = {
     onUndo: () => undefined,
+    onReview: () => undefined,
     onSave: () => undefined,
     onDownload: () => undefined,
     onApprove: () => undefined,
@@ -85,7 +86,7 @@ describe('editor action bar', () => {
     expect(html).not.toContain('Unsaved changes');
   });
 
-  it('clearly disables production actions for demo papers', () => {
+  it('disables production actions for demo papers but keeps the review scaffold available', () => {
     const html = renderToStaticMarkup(
       <EditorActionBar
         persisted={false}
@@ -99,6 +100,14 @@ describe('editor action bar', () => {
     );
 
     expect(html).toContain('Demo paper · actions unavailable');
-    expect(html).toContain('Review is unavailable');
+    // Approve is a production action and stays disabled without a saved paper.
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*Approve/);
+    // Review paper is a UI scaffold action (mocked, no backend) and stays
+    // usable: its button tag carries the review title and no `disabled=""`
+    // attribute (Tailwind's `disabled:` utility classes don't count).
+    expect(html).not.toContain('Review is unavailable');
+    expect(html).toMatch(
+      /<button(?![^>]*disabled="")[^>]*title="Run a sample paper review"/,
+    );
   });
 });

@@ -16,7 +16,10 @@ Where it fits:
 - Exposed to the API via ``bank.serializers`` and ``bank.views``.
 """
 
+from datetime import timedelta
+
 from django.db import models
+from django.utils import timezone
 
 from accounts.models import School
 
@@ -89,6 +92,7 @@ class SourceType(models.TextChoices):
     PREVIOUS_YEAR_PAPER = "previous_year_paper", "Previous-year paper"
     SAMPLE_PAPER = "sample_paper", "Sample paper"
     QUESTION_BANK = "question_bank", "Question bank"
+    AI_GENERATED = "ai_generated", "AI-generated"
 
 
 class AnswerSource(models.TextChoices):
@@ -296,3 +300,161 @@ class IngestionJob(models.Model):
 
     def __str__(self):
         return f"IngestionJob #{self.pk} [{self.status}] {self.source_file_name}"
+
+
+class GenerationBatchStatus(models.TextChoices):
+    """Lifecycle stages exposed to teachers while generated candidates mature."""
+
+    QUEUED = "queued", "Queued"
+    GENERATING_QUESTIONS = "generating_questions", "Generating Questions"
+    VALIDATING = "validating", "Validating"
+    READY_FOR_REVIEW = "ready_for_review", "Ready for review"
+    ACCEPTED = "accepted", "Accepted"
+    FAILED = "failed", "Failed"
+    EXPIRED = "expired", "Expired"
+
+
+ACTIVE_GENERATION_BATCH_STATUSES = (
+    GenerationBatchStatus.QUEUED,
+    GenerationBatchStatus.GENERATING_QUESTIONS,
+    GenerationBatchStatus.VALIDATING,
+    GenerationBatchStatus.READY_FOR_REVIEW,
+)
+
+GENERATION_BATCH_REVIEW_TTL = timedelta(days=30)
+
+
+class GenerationBatch(models.Model):
+    """A queued bulk AI Question-generation request.
+
+    The HTTP endpoint persists this row and returns immediately. A cron-run
+    ``drain_generation_batches`` command later asks ``QuestionGenerator`` for
+    generated payloads, validates them, and stores valid ones as
+    ``GeneratedQuestionCandidate`` rows. No generated row enters ``Question``
+    until the teacher accepts the batch.
+    """
+
+    school = models.ForeignKey(
+        School,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="generation_batches",
+    )
+    created_by = models.ForeignKey(
+        "accounts.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="generation_batches",
+    )
+    chapters = models.ManyToManyField(Chapter, related_name="generation_batches")
+    topic_names = models.JSONField(default=list, blank=True)
+    difficulty_preset = models.CharField(max_length=40, default="balanced")
+    requested_count = models.PositiveSmallIntegerField(default=10)
+    status = models.CharField(
+        max_length=24,
+        choices=GenerationBatchStatus.choices,
+        default=GenerationBatchStatus.QUEUED,
+        db_index=True,
+    )
+    error = models.TextField(blank=True)
+    ready_at = models.DateTimeField(null=True, blank=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    expired_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @classmethod
+    def expire_ready_batches(cls, *, now=None) -> int:
+        """Expire review-ready batches older than the 30-day review window."""
+        now = now or timezone.now()
+        cutoff = now - GENERATION_BATCH_REVIEW_TTL
+        batches = cls.objects.filter(
+            status=GenerationBatchStatus.READY_FOR_REVIEW,
+            ready_at__lt=cutoff,
+        )
+        batch_ids = list(batches.values_list("pk", flat=True))
+        if not batch_ids:
+            return 0
+
+        cls.objects.filter(pk__in=batch_ids).update(
+            status=GenerationBatchStatus.EXPIRED,
+            expired_at=now,
+            updated_at=now,
+        )
+        GeneratedQuestionCandidate.objects.filter(
+            batch_id__in=batch_ids,
+            status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW,
+        ).update(status=GeneratedQuestionCandidateStatus.EXPIRED, updated_at=now)
+        return len(batch_ids)
+
+    def expire_if_stale(self, *, now=None) -> bool:
+        """Expire this batch if its unaccepted review window elapsed."""
+        now = now or timezone.now()
+        if (
+            self.status != GenerationBatchStatus.READY_FOR_REVIEW
+            or self.ready_at is None
+            or self.ready_at >= now - GENERATION_BATCH_REVIEW_TTL
+        ):
+            return False
+        GenerationBatch.objects.filter(pk=self.pk).update(
+            status=GenerationBatchStatus.EXPIRED,
+            expired_at=now,
+            updated_at=now,
+        )
+        GeneratedQuestionCandidate.objects.filter(
+            batch=self,
+            status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW,
+        ).update(status=GeneratedQuestionCandidateStatus.EXPIRED, updated_at=now)
+        self.status = GenerationBatchStatus.EXPIRED
+        self.expired_at = now
+        self.updated_at = now
+        return True
+
+    def __str__(self):
+        return f"GenerationBatch #{self.pk} [{self.status}]"
+
+
+class GeneratedQuestionCandidateStatus(models.TextChoices):
+    """Review state for one valid generated Question payload."""
+
+    READY_FOR_REVIEW = "ready_for_review", "Ready for review"
+    ACCEPTED = "accepted", "Accepted"
+    EXPIRED = "expired", "Expired"
+
+
+class GeneratedQuestionCandidate(models.Model):
+    """One valid generated Question payload awaiting teacher acceptance."""
+
+    batch = models.ForeignKey(
+        GenerationBatch,
+        on_delete=models.CASCADE,
+        related_name="candidates",
+    )
+    status = models.CharField(
+        max_length=24,
+        choices=GeneratedQuestionCandidateStatus.choices,
+        default=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW,
+        db_index=True,
+    )
+    payload = models.JSONField(default=dict)
+    question = models.ForeignKey(
+        Question,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="generated_candidates",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return f"GeneratedQuestionCandidate #{self.pk} [{self.status}]"

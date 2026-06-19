@@ -23,6 +23,7 @@ import {
 import {
   blockNoteBlocksToContentItems,
   buildEditorPaperView,
+  editorSlotClipboardText,
 } from './editor-paper';
 
 function question(state: NormalizedPaperDocument, questionId: string) {
@@ -700,6 +701,26 @@ describe('editor paper view model', () => {
     expect(
       metalsSlot.alternateQuestions.map((question) => question.questionId),
     ).toEqual(['q_table_metals_002']);
+  });
+
+  it('copies the full question text without editor marks or type chrome', () => {
+    // The per-question copy control must hand teachers the question as printed
+    // (stem + every option), never the editor's marks label or type badge —
+    // otherwise pasted text would carry our UI metadata instead of the question.
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const view = buildEditorPaperView(document);
+    const firstSlot = findSlot(view, 'slot_A_01');
+
+    const clipboardText = editorSlotClipboardText(firstSlot);
+
+    expect(clipboardText.split('\n')).toHaveLength(
+      firstSlot.questionBlockTree.children.length,
+    );
+    expect(clipboardText).toContain(
+      'What is the phenotypic ratio in the F2 generation of a monohybrid cross?',
+    );
+    expect(clipboardText).not.toContain(firstSlot.marksLabel);
+    expect(clipboardText).not.toContain(firstSlot.questionType);
   });
 });
 
