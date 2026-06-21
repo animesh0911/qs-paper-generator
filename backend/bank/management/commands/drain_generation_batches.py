@@ -30,6 +30,7 @@ from bank.models import (
     GenerationBatch,
     GenerationBatchStatus,
 )
+from corpus.retrieval import ChapterMapContextAssembler, TextbookRetrievalRequest
 
 RECLAIM_RUNNING_AFTER = timedelta(minutes=10)
 
@@ -37,6 +38,11 @@ RECLAIM_RUNNING_AFTER = timedelta(minutes=10)
 def build_generator():
     """Return the production generator; tests monkeypatch this seam."""
     return LangChainQuestionGenerator()
+
+
+def build_context_assembler():
+    """Return corpus-owned selected-topic context assembler."""
+    return ChapterMapContextAssembler()
 
 
 def _drainable_filter(now) -> Q:
@@ -126,6 +132,9 @@ class Command(BaseCommand):
 
         try:
             request = _request_from_batch(batch)
+            grounding_manifest = _grounding_manifest_from_batch(batch)
+            if grounding_manifest:
+                request = _request_from_batch(batch, grounding_manifest)
             generated = build_generator().generate(request)
             batch.status = GenerationBatchStatus.VALIDATING
             batch.save(update_fields=["status", "updated_at"])
@@ -136,7 +145,11 @@ class Command(BaseCommand):
 
             GeneratedQuestionCandidate.objects.bulk_create(
                 [
-                    GeneratedQuestionCandidate(batch=batch, payload=payload)
+                    GeneratedQuestionCandidate(
+                        batch=batch,
+                        payload=payload,
+                        grounding_manifest=grounding_manifest or {},
+                    )
                     for payload in result.valid_questions
                 ]
             )
@@ -157,7 +170,10 @@ class Command(BaseCommand):
         )
 
 
-def _request_from_batch(batch: GenerationBatch) -> QuestionGenerationRequest:
+def _request_from_batch(
+    batch: GenerationBatch,
+    grounding_manifest: dict[str, object] | None = None,
+) -> QuestionGenerationRequest:
     chapter_slugs = tuple(
         batch.chapters.order_by("order").values_list("slug", flat=True)
     )
@@ -165,5 +181,56 @@ def _request_from_batch(batch: GenerationBatch) -> QuestionGenerationRequest:
         chapter_slugs=chapter_slugs,
         topic_names=tuple(batch.topic_names),
         difficulty_targets=DIFFICULTY_TARGETS_BY_PRESET.get(batch.difficulty_preset),
+        grounding_manifest=grounding_manifest,
         count=batch.requested_count,
     )
+
+
+def _grounding_manifest_from_batch(batch: GenerationBatch) -> dict[str, object] | None:
+    node_ids = tuple(batch.chapter_map_node_ids or [])
+    if not node_ids:
+        return None
+    chapters = list(batch.chapters.order_by("order"))
+    if len(chapters) != 1:
+        raise ValueError("Grounded generation requires exactly one Chapter.")
+    context = build_context_assembler().retrieve(
+        TextbookRetrievalRequest(
+            chapter=chapters[0],
+            chapter_map_node_ids=node_ids,
+        )
+    )
+    if not context.results:
+        raise ValueError("No grounded NCERT context exists for selected topic.")
+    excerpts = []
+    for result in context.results:
+        chunk = result.chunk
+        excerpts.append(
+            {
+                "citation_id": chunk.stable_chunk_id,
+                "chapter_map_node_id": chunk.chapter_map_node.stable_node_id,
+                "pages": list(
+                    chunk.citation.get(
+                        "pages", range(chunk.page_start, chunk.page_end + 1)
+                    )
+                ),
+                "source_element_ids": list(
+                    chunk.citation.get("source_element_ids", chunk.source_element_ids)
+                ),
+                "content_types": list(chunk.content_types),
+                "text": chunk.text,
+            }
+        )
+    return {
+        "chapter_slug": chapters[0].slug,
+        "requested_chapter_map_node_ids": list(node_ids),
+        "included_chapter_map_node_ids": context.diagnostics.get(
+            "included_chapter_map_node_ids", []
+        ),
+        "excerpts": excerpts,
+        "unsupported_content_policy": (
+            "Excluded by default: existing NCERT question/exercise chunks, "
+            "picture-only chunks without captions, formula-only chunks, "
+            "numerical/formula-only generation, and diagram-image generation."
+        ),
+        "diagnostics": dict(context.diagnostics),
+    }
