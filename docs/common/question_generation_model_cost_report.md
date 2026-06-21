@@ -18,7 +18,7 @@ Following an audit of the repository's ADRs, scratchboards, and remote issue tra
 
 ### **Provider and Gateway Architecture**
 * **Local / Native API:** Access to Gemini is natively handled via `google-genai` and LangChain (`langchain-google-genai`). Access to DeepSeek is officially supported via the DeepSeek API.
-* **Intended Production Gateway:** The repository's architectural decisions (specifically [ADR-0005](file:///Users/varad/V/repo/qs-paper-generator/docs/adr/0005-langgraph-llm-orchestration.md) and [issue-142-generation-foundation.md](file:///Users/varad/V/repo/qs-paper-generator/docs/Varad/scratchboards/issue-142-generation-foundation.md)) intend to route multi-provider model calls (such as DeepSeek or Anthropic) through **OpenRouter** or a shared **LiteLLM gateway** (`LLM_PROVIDER` in `docker-compose.yml`), keeping secrets and provider-specific SDK logic server-side.
+* **Intended Production Gateway:** The repository's architectural decisions (specifically [ADR-0005](../adr/0005-langgraph-llm-orchestration.md) and [GitHub issue #142](https://github.com/animesh0911/qs-paper-generator/issues/142)) intend to route multi-provider model calls (such as DeepSeek or Anthropic) through **OpenRouter** or a shared **LiteLLM gateway** (`LLM_PROVIDER` in `docker-compose.yml`), keeping secrets and provider-specific SDK logic server-side.
 
 ---
 
@@ -120,5 +120,5 @@ Cost estimations are calculated for cache misses and cache hits across different
 1. **Token Density:** Standard ratio of 4 characters per token is assumed for NCERT text and JSON schemas.
 2. **Schema Overhead:** The structured output schema and system prompts are assumed to consume approximately 2,400 tokens per call.
 3. **Cache Invalidation:** OpenRouter does not guarantee cache hits for all routed providers. Actual cache-hit ratios might be lower depending on traffic and OpenRouter-specific configurations.
-4. **Validation Drops:** As specified in [issue-142-generation-foundation.md](file:///Users/varad/V/repo/qs-paper-generator/docs/Varad/scratchboards/issue-142-generation-foundation.md), invalid Q&A outputs are discarded before candidate persistence. If a model generates invalid payloads, additional calls may be required to fulfill quotas, raising actual API call counts and final costs.
+4. **Validation Drops:** As specified in [GitHub issue #142](https://github.com/animesh0911/qs-paper-generator/issues/142), invalid Q&A outputs are discarded before candidate persistence. If a model generates invalid payloads, additional calls may be required to fulfill quotas, raising actual API call counts and final costs.
 5. **Gateway Provider:** OpenRouter routing pricing may vary slightly from official platform pricing based on routing markups or selected backend providers.

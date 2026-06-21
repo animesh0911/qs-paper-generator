@@ -42,7 +42,7 @@ Changed: issue #20 now has Vitest-backed frontend contract tests,
 
 Files: `frontend/src/mocks/*`, `frontend/src/types/*`,
 `frontend/package.json`, `docs/Varad/ralph_loop.md`,
-`docs/Varad/scratchboards/issue-20-implementation.md`
+`docs/archive/Varad/scratchboards/issue-20-implementation.md`
 
 Boundary: no normalization, BlockNote rendering, editor UI, or backend
 generation changes are included.
@@ -59,7 +59,7 @@ Changed: finalized Varad `PaperDocumentV1` backbone for backend/frontend work
 and refreshed `.claude/skills` to prioritize upstream engineering skills.
 
 Files: `docs/Varad/v1_contract.md`,
-`docs/Varad/scratchboards/issue-20-mocked-paperdocument-v1.md`,
+`docs/archive/Varad/scratchboards/issue-20-mocked-paperdocument-v1.md`,
 `.claude/skills/*`, `docs/agents/*`, `AGENTS.md`, `CLAUDE.md`
 
 Boundary: this handoff commit intentionally excludes frontend Vitest/mock

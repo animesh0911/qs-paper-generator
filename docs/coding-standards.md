@@ -1,104 +1,36 @@
 # Coding Standards
 
-Conventions enforced across this codebase. Lint+format tools catch the mechanical pieces; the docstring conventions below are reviewed in PRs.
+Keep this stable and short. Put issue workflow, review gates, and one-off
+commands in task docs, not here.
 
-## Tools
+## Source Of Truth
 
-| Tool | Purpose | Applies to |
-|---|---|---|
-| Black | Code formatting | Python |
-| Ruff | Linting + import order | Python |
-| Prettier | Code formatting | TypeScript, JSX, JSON, CSS |
-| ESLint | Linting + React rules | TypeScript, JSX |
-| Husky + lint-staged | Pre-commit gate | Staged files |
+- Use domain terms from `CONTEXT.md` exactly.
+- Python formatting/linting lives in `backend/pyproject.toml` (`black`, `ruff`, 88 columns, py312).
+- Frontend formatting/linting lives in `frontend/package.json`, `frontend/eslint.config.js`, and `frontend/.prettierrc`.
 
-Configuration lives in `backend/pyproject.toml` (Black, Ruff) and `frontend/package.json` + `eslint.config.js`.
+## Shape
 
-## Running locally
+- Backend follows Django app boundaries: `models.py`, `serializers.py`, `views.py`, `urls.py`, `admin.py`, plus focused modules for deep responsibilities.
+- Keep ownership boundaries explicit: `bank` owns Questions and generation candidates; `corpus` owns textbook import, chapter maps, retrieval chunks, embeddings, and grounding seams; `ai_services` owns provider seams.
+- Frontend filenames use the existing suffixes: `*.page.tsx`, `*.component.tsx`, `*.hook.ts`, `*.test.ts(x)`, and focused `src/lib/*.ts` helpers.
 
-```bash
-# Backend (inside the web container)
-docker exec qs_paper_generator-web-1 ruff check .
-docker exec qs_paper_generator-web-1 black --check .
+## Code Style
 
-# Frontend
-docker exec qs_paper_generator-frontend-1 npx tsc --noEmit
-docker exec qs_paper_generator-frontend-1 npx eslint src
-```
-
-Pre-commit runs Prettier + ESLint over staged `src/**/*.{ts,tsx}` automatically.
-
-## File naming
-
-Frontend follows saas-labs conventions ported in commit `64551f5`:
-
-- Pages: `<name>.page.tsx` under `src/pages/`
-- Components: `<name>.component.tsx` under `src/components/<name>/`, with `index.ts` barrel
-- Hooks: `use<Name>.hook.ts` under `src/hooks/`
-- Libraries: `api.ts`, `utils.ts` under `src/lib/`
-
-Backend follows standard Django layout: `models.py`, `serializers.py`, `views.py`, `urls.py`, `admin.py` per app.
-
-## Docstring convention
-
-Every source file gets a **module-level docstring** explaining:
-
-1. **What the module is** — one sentence.
-2. **Where it sits** — which seam, what it depends on, who calls it.
-3. **Notable patterns** — invariants, ordering constraints, error policy.
-
-Methods get docstrings only when behaviour is **not** obvious from the signature + name. A `def total_marks(self) -> int` needs none. A `def _allocate(n, ratios) -> dict[str, int]` does, because the largest-remainder math is the whole point.
-
-This matches `CLAUDE.md` Rule "default to no comments unless WHY is non-obvious."
-
-### Python module docstring shape
-
-```python
-"""One-sentence module purpose.
-
-Longer prose: what problem this module solves, what seam it occupies,
-where the implementation contract lives.
-
-Patterns / invariants:
-- Bullet of any non-obvious rule a caller must respect.
-- Another bullet.
-
-Where it fits:
-- Called by: <module>
-- Calls into: <module>
-- Persisted via: <model>
-"""
-```
-
-### TS/TSX module header shape
-
-```ts
-/**
- * One-sentence module purpose.
- *
- * Longer prose: what this module renders / owns / coordinates.
- *
- * Patterns:
- * - Bullet of any non-obvious rule.
- *
- * Where it fits:
- * - Used by: <module>
- * - Uses: <module>
- *
- * @module <ModuleName>
- */
-```
-
-## Vocabulary
-
-Use the terms from [`CONTEXT.md`](../CONTEXT.md) exactly — `Question`, `Chapter`, `Preset`, `PaperTemplate`, `Slot`, `OR-group`, `QuestionPicker`, `CoverageReport`, `PaperDocumentV1`, `Ingestor`, `Parser`, `Tagger`, `LLMClient`, etc. Don't drift into `service`, `handler`, `component` when a domain term fits.
-
-For architecture talk, use the vocabulary in `.claude/skills/improve-codebase-architecture/LANGUAGE.md`: **module**, **interface**, **seam**, **adapter**, **depth**, **locality**.
-
-## Comments inside functions
-
-Default to none. Write one only when the **why** is non-obvious — a hidden constraint, a workaround for a specific bug, behaviour that would surprise a reader. Never narrate the **what**; identifiers do that.
+- Match nearby code before adding patterns.
+- Prefer small, typed functions over broad utility bags.
+- Do not add abstraction for one use.
+- Comments and docstrings explain non-obvious why, invariants, or boundaries; do not narrate obvious code.
+- Module docstrings are useful for deep modules and seams. Keep them concise: purpose, boundary, key invariants.
 
 ## Tests
 
-Tests must encode **why** the behaviour matters, not just **what** it does. A test that can't fail when business logic changes is wrong. See `papers/tests/test_selection.py` for examples.
+- Tests should protect intent and invariants, not only line coverage.
+- Use fakes for model, embedding, retrieval, and storage seams; never call live providers in tests.
+- Put regression tests next to the module whose behavior they protect.
+
+## Local Checks
+
+- Backend: run the relevant `pytest`, `ruff check .`, `black --check .`, and migration check when models change.
+- Frontend: run the relevant `npm run type-check`, `npm run lint`, `npm run test`, or `npm run build`.
+- Report any skipped check explicitly.

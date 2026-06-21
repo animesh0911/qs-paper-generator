@@ -1,74 +1,78 @@
 # Ubiquitous Language
 
-Authoritative glossary of every domain term used in code, docs, and conversation. If you find yourself reaching for a synonym, stop and use the term here.
-
-The machine-readable copy lives in [`CONTEXT.md`](../CONTEXT.md) at the repo root and is preferred by architecture-aware agents.
+This is the human-readable glossary. `CONTEXT.md` is the lean machine-facing
+copy agents should load first.
 
 ## Bank
 
-**Question** — single bank item. Section, qtype, marks, chapter, cognitive level, text, options, answer, `verified` flag.
+| Term | Definition | Aliases to avoid |
+| --- | --- | --- |
+| **Question** | One canonical bank item that can be picked into papers. | Item, row, generated output |
+| **QuestionType** | Contract-string type of a Question, shared with `PaperDocumentV1`. | Q type, section type |
+| **Chapter** | Closed CBSE Class 10 Science chapter taxonomy entry. | Unit, lesson |
+| **Topic** | Freeform question topic string emitted during bank ingestion or generation. | ChapterMapNode, canonical topic |
+| **Content** | Structured region-based body of a Question. | Text blob, markdown |
+| **parse_quality** | Structural eligibility signal: clean, partial, or broken. | Validity, verification |
+| **review_flags** | Reason codes explaining why a Question needs human review. | Errors, warnings |
+| **verified** | Signal that a human approved a paper containing the Question. | Picker-ready, reviewed |
 
-**Chapter** — NCERT Cl.10 Science chapter. Identified by slug (e.g. `electricity`, `life-processes`). Order matches the textbook.
+## Paper Assembly
 
-**Section** — one of A (MCQ), B (VSA), C (SA), D (LA), E (Case-based). Fixed by CBSE board layout.
+| Term | Definition | Aliases to avoid |
+| --- | --- | --- |
+| **Preset** | Named recipe for a paper shape. | Template |
+| **PaperTemplate** | Expanded Slots for one Preset. | Blueprint |
+| **Slot** | One required position in a paper. | Question placeholder |
+| **OR-group** | Pair of alternative Slots where only one contributes marks. | Choice group |
+| **QuestionPicker** | Domain component that fills Slots with eligible Questions. | Selector service |
+| **CoverageReport** | Diagnostics for chapter/cognitive coverage and unfilled Slots. | Stats, result |
+| **PaperDocumentV1** | Render-time paper contract consumed by editor and PDF. | Paper JSON |
 
-**QuestionType** — MCQ / VSA / SA / LA / CASE. Tied to section by board convention but stored separately so future presets can mix.
+## Generation
 
-**CognitiveLevel** — R (Remember), U (Understand), Ap (Apply), An (Analyse). Bloom-style classification.
+| Term | Definition | Aliases to avoid |
+| --- | --- | --- |
+| **QuestionGenerator** | Seam that asks a model for generated Question payloads. | Generator service |
+| **GenerationBatch** | Durable teacher-owned bulk generation job. | Job, batch job |
+| **GeneratedQuestionCandidate** | Valid generated payload awaiting teacher review. | Question, draft question |
+| **Generated Question Gate** | Deterministic validator for generated payloads. | Model validation |
+| **AI-generated provenance** | Source and answer provenance stamped onto accepted generated Questions. | AI flag |
 
-**Ingestor** — coordinator for the ingestion pipeline. Parses a PDF, segments into raw questions, tags them, persists `Question` rows as `verified=False`.
+## Corpus And Grounding
 
-**Parser / Tagger** — the two adapter seams of the Ingestor. Default `PdfplumberParser` and `LLMTagger`. Tests inject stubs.
+| Term | Definition | Aliases to avoid |
+| --- | --- | --- |
+| **TextbookDocument** | One canonical extracted NCERT chapter artifact. | Corpus file |
+| **TextbookElement** | One source-addressable extracted textbook element. | Chunk, paragraph |
+| **ChapterMapNode** | Corpus-owned section/topic/landmark node with source ownership. | Topic |
+| **ChapterMapEdge** | Evidence-backed relationship between ChapterMapNodes. | Graph link |
+| **RetrievalChunk** | Citation-bearing group of TextbookElements used as runtime context. | Passage, topic chunk |
+| **GroundingContext** | Ordered retrieved chunks and citations supplied to generation. | RAG result |
+| **TextbookRetriever** | Seam that returns GroundingContext. | Search service |
+| **EmbeddingClient** | Provider-neutral seam for vectorizing text batches. | Embedding provider |
+| **Selected Topic Grounding Context** | Query-free context assembled from one selected ChapterMapNode subtree. | Semantic search result |
 
-**LLMClient** — provider-agnostic LLM seam in `ai_services.llm`. `complete(prompt, max_tokens) → str`. One adapter: `LiteLLMClient` over `litellm.completion`, spanning OpenAI / Anthropic / Gemini. Model chosen via `LLM_MODEL` (provider-prefixed), falling back to `LLM_PROVIDER`.
+## Relationships
 
-## Paper template
+- A **Question** belongs to one **Chapter** and may carry many freeform **Topics**.
+- A **PaperTemplate** contains many **Slots**; a **QuestionPicker** fills them with **Questions**.
+- A **GenerationBatch** produces many **GeneratedQuestionCandidates**.
+- A **GeneratedQuestionCandidate** becomes a **Question** only after teacher acceptance.
+- A **TextbookDocument** contains many **TextbookElements** and **ChapterMapNodes**.
+- A **RetrievalChunk** belongs to exactly one **ChapterMapNode**.
+- A **GroundingContext** contains **RetrievalChunks**, not **Questions**.
 
-**Slot** — one question position in a paper template. (section, qtype, marks, or_group?).
+## Example Dialogue
 
-**OR-group** — pair of Slots representing "Answer A OR B". Both filled with distinct Questions; only one contributes to total marks.
+> **Dev:** "Can I use **Topic** to fetch NCERT context?"
+> **Domain expert:** "No. **Topic** is a freeform bank string. Use a **ChapterMapNode** when selecting textbook context."
+> **Dev:** "So generated output from a **GenerationBatch** is a **Question**?"
+> **Domain expert:** "Not yet. It is a **GeneratedQuestionCandidate** until the teacher accepts it into the bank."
+> **Dev:** "And the model receives **RetrievalChunks** through a **GroundingContext**?"
+> **Domain expert:** "Exactly. The chunks cite the textbook; the candidate still has to pass the **Generated Question Gate**."
 
-**PaperTemplate** — a `Preset` plus its expanded list of Slots. Output of TemplateBuilder, input to QuestionPicker.
+## Flagged Ambiguities
 
-**Preset** — bundled recipe for a kind of paper: name, template_name, exam_type, duration_minutes, build_slots. Currently `board`, `half_yearly`, `unit_test`. Single source of truth — used by both TemplateBuilder and PaperDocumentBuilder.
-
-**TemplateBuilder** — turns a preset name into a validated PaperTemplate.
-
-## Question picking
-
-**DifficultyLevel** — named cognitive-level distribution. `easy` / `standard` / `hard`.
-
-**PaperOptions** — teacher's inputs to QuestionPicker: the PaperTemplate, chapter slugs, per-chapter weights, difficulty.
-
-**QuestionPool** — in-memory `{bucket → [(qid, chapter_slug, level)]}`. Internal seam in QuestionPicker that lets the allocator be tested without the ORM.
-
-**FilledTemplate** — QuestionPicker output: parallel `question_ids` (None where unfilled) + a CoverageReport.
-
-**CoverageReport** — `{coverage, cog_coverage, unfilled}`. Persisted on `Paper.report` and returned in API.
-
-**QuestionPicker** — fills a PaperTemplate's Slots best-effort, honouring chapter weights and the DifficultyLevel.
-
-## Paper
-
-**Paper** — persisted paper. Title, total marks, CoverageReport, ordered PaperQuestions, `document` (PaperDocumentV1), `status` (draft/approved).
-
-**PaperQuestion** — placement of a Question in a Paper at assembly time. Order, section, or_group. **Not** read at render time — the document is the render-time source of truth. Kept for cross-paper analytics (UsageTracker, Slice 10).
-
-**PaperBuilder** — single `assemble(...)` coordinator. Builds template → picks questions → persists Paper + PaperQuestions → maps to PaperDocumentV1 → returns `AssemblyResult{paper, document}`.
-
-**PaperDocumentBuilder** — mapping layer that converts a `Paper` + `FilledTemplate` + `PaperOptions` into a `PaperDocumentV1` dict. No DB writes.
-
-**PaperDocumentV1** — single render-time contract returned by `POST /papers/assemble`. Consumed by both the frontend BlockNote editor and the PDF renderer.
-
-## Identity
-
-**School** — tenant. Optional FK on Question and Paper.
-
-**User** — Django user with a school FK; staff users see answer keys.
-
-## What we avoid
-
-- "service" — say the specific module (`QuestionPicker`, `TemplateBuilder`).
-- "component" inside backend prose — Django doesn't use that term. Say "module" or "view" or "model".
-- "boundary" — say **seam** (overloaded with DDD's "bounded context").
-- "handler" — say "view" (Django) or the module name.
+- **Topic** must not mean **ChapterMapNode**. Bank Topics are freeform strings; corpus nodes are canonical source ranges.
+- **Question** must not mean generated payload. Use **GeneratedQuestionCandidate** before acceptance.
+- **verified** must not mean picker eligibility. Use **parse_quality** for structural eligibility.
