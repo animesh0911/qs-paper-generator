@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildGenerationBatchPayload,
+  generationStageDescription,
   generationStageLabel,
   shouldShowNoValidQuestionsMessage,
 } from './question-generation';
@@ -40,6 +41,9 @@ describe('generation progress labels', () => {
     );
     expect(generationStageLabel('validating')).toBe('Validating');
     expect(generationStageLabel('ready_for_review')).toBe('Ready for review');
+    expect(generationStageDescription('ready_for_review')).toContain(
+      'not in the Question bank',
+    );
   });
 
   it('uses the no-valid-Questions failure state only for failed or empty-ready batches', () => {

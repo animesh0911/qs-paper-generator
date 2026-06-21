@@ -12,6 +12,8 @@ describe('CoverageFormView', () => {
   it('offers one Format selector populated from backend-owned formats', () => {
     const form: CoverageForm = {
       chapters: [],
+      chaptersLoading: false,
+      chaptersError: '',
       formats: [
         {
           format_id: 'cbse_science_class_10_board_compact_2026_v1',

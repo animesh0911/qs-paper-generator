@@ -66,6 +66,25 @@ export function generationStageLabel(status: GenerationBatchStatus): string {
   }
 }
 
+export function generationStageDescription(status: GenerationBatchStatus): string {
+  switch (status) {
+    case 'queued':
+      return 'The request is waiting for the generation worker.';
+    case 'generating_questions':
+      return 'The worker is drafting candidates from the selected Chapter scope and Topic hints.';
+    case 'validating':
+      return 'Candidates are being checked before they can be reviewed.';
+    case 'ready_for_review':
+      return 'Candidates are ready, but they are not in the Question bank until review is complete.';
+    case 'accepted':
+      return 'Reviewed candidates have been accepted into the Question bank.';
+    case 'expired':
+      return 'This generation job expired before review was completed.';
+    case 'failed':
+      return 'The job finished without usable candidates.';
+  }
+}
+
 export function shouldShowNoValidQuestionsMessage(
   batch: Pick<GenerationBatch, 'status' | 'candidate_count'>,
 ): boolean {
