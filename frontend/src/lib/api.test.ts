@@ -13,6 +13,8 @@ import {
   approvePaper,
   assemblePaper,
   clearToken,
+  createGenerationBatch,
+  fetchGenerationBatch,
   fetchPaperFormats,
   fetchPaperDocument,
   getToken,
@@ -70,6 +72,53 @@ describe('paper formats', () => {
           difficulty: 'standard',
         }),
       }),
+    );
+  });
+});
+
+describe('generation batches', () => {
+  it('creates and polls bulk Question generation batches through the backend API', async () => {
+    const batch = {
+      id: 144,
+      status: 'queued',
+      chapter_slugs: ['life-processes'],
+      topic_names: ['Nutrition'],
+      difficulty_preset: 'balanced',
+      requested_count: 10,
+      candidate_count: 0,
+      error: '',
+      ready_at: null,
+      accepted_at: null,
+      expired_at: null,
+      created_at: '2026-06-21T00:00:00Z',
+      updated_at: '2026-06-21T00:00:00Z',
+    };
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(batch)));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await createGenerationBatch({
+      chapter_slugs: ['life-processes'],
+      topic_names: ['Nutrition'],
+      difficulty_preset: 'balanced',
+    });
+    await fetchGenerationBatch(144);
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      '/api/bank/generation-batches/',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          chapter_slugs: ['life-processes'],
+          topic_names: ['Nutrition'],
+          difficulty_preset: 'balanced',
+        }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/bank/generation-batches/144/',
+      expect.objectContaining({ method: 'GET' }),
     );
   });
 });

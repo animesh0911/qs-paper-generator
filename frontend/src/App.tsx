@@ -13,6 +13,9 @@ import { useAuth } from '@/hooks/useAuth.hook';
 import { DashboardPage, LoginPage, PrintPaperPage } from '@/pages';
 
 const EditorPage = lazy(() => import('@/pages/editor.page'));
+const GenerationProgressPage = lazy(
+  () => import('@/pages/generation-progress.page'),
+);
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -54,6 +57,22 @@ export default function App() {
         }
       />
       <Route path="/editor/:paperId/print" element={<PrintPaperPage />} />
+      <Route
+        path="/generation-batches/:batchId"
+        element={
+          <RequireAuth>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-secondary p-6 text-sm">
+                  Loading generation workspace...
+                </div>
+              }
+            >
+              <GenerationProgressPage />
+            </Suspense>
+          </RequireAuth>
+        }
+      />
       <Route
         path="/"
         element={

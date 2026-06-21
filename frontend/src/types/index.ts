@@ -59,3 +59,36 @@ export interface PaperFormatSummary {
   format_id: string;
   name: string;
 }
+
+export type GenerationBatchStatus =
+  | 'queued'
+  | 'generating_questions'
+  | 'validating'
+  | 'ready_for_review'
+  | 'accepted'
+  | 'failed'
+  | 'expired';
+
+export type GenerationDifficultyLabel = 'Easy' | 'Standard' | 'Challenging';
+
+export interface GenerationBatchCreateRequest {
+  chapter_slugs: string[];
+  topic_names?: string[];
+  difficulty_preset: string;
+}
+
+export interface GenerationBatch {
+  id: number;
+  status: GenerationBatchStatus;
+  chapter_slugs: string[];
+  topic_names: string[];
+  difficulty_preset: string;
+  requested_count: number;
+  candidate_count: number;
+  error: string;
+  ready_at: string | null;
+  accepted_at: string | null;
+  expired_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
