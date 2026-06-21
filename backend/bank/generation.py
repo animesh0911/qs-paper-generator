@@ -73,6 +73,14 @@ QUESTION_GENERATION_RESPONSE_SCHEMA: dict[str, Any] = {
                     "content": {"type": "object"},
                     "topic_names": {"type": "array", "items": {"type": "string"}},
                     "answer": {"type": "string"},
+                    "question_citation_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
+                    "answer_citation_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
                     "source": {
                         "type": "object",
                         "properties": {
@@ -113,6 +121,7 @@ class QuestionGenerationRequest:
     topic_names: tuple[str, ...] = ()
     difficulty_targets: dict[str, int] | None = None
     question_type_distribution: dict[str, int] | None = None
+    grounding_manifest: dict[str, Any] | None = None
     count: int = 10
     language: str = "en"
 
@@ -138,6 +147,7 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
         QuestionType.SA: 2,
         QuestionType.LA: 2,
     }
+    grounding_lines = _grounding_prompt_lines(request.grounding_manifest)
     return "\n".join(
         [
             "Generate CBSE Class 10 Science Question-and-answer candidates.",
@@ -165,8 +175,38 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
             "uses a structured paragraph with all key steps.",
             "Keep source.type as ai_generated and source.name as "
             "question-generation.",
+            *grounding_lines,
         ]
     )
+
+
+def _grounding_prompt_lines(grounding_manifest: dict[str, Any] | None) -> list[str]:
+    if not grounding_manifest:
+        return []
+    lines = [
+        "Grounding requirements:",
+        "Use only the NCERT excerpts supplied below for factual claims.",
+        "Use NCERT-faithful terminology and refuse unsupported requests by "
+        "returning no candidate for that unsupported idea.",
+        "For every candidate, include non-empty question_citation_ids and "
+        "answer_citation_ids chosen from the supplied citation_id values.",
+        "Do not generate numerical, formula-only, or diagram-image questions. "
+        "Caption-aware text questions are allowed only when supported by "
+        "caption/prose context below.",
+        "Unsupported content policy: "
+        f"{grounding_manifest.get('unsupported_content_policy', '')}",
+    ]
+    for excerpt in grounding_manifest.get("excerpts", []):
+        lines.extend(
+            [
+                f"[citation_id: {excerpt.get('citation_id')}]",
+                f"ChapterMapNode: {excerpt.get('chapter_map_node_id')}",
+                f"Pages: {excerpt.get('pages')}",
+                f"Content types: {excerpt.get('content_types')}",
+                str(excerpt.get("text", "")),
+            ]
+        )
+    return lines
 
 
 class LangChainQuestionGenerator:

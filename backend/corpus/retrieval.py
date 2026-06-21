@@ -303,9 +303,9 @@ class PostgresTextbookRetriever:
 
     @staticmethod
     def _content_type_filter(content_types: tuple[str, ...]) -> Q:
-        query = Q()
-        for content_type in content_types:
-            query |= Q(content_types__contains=[content_type])
+        query = Q(content_types__contains=[content_types[0]])
+        for content_type in content_types[1:]:
+            query &= Q(content_types__contains=[content_type])
         return query
 
 

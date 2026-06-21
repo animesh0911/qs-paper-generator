@@ -43,6 +43,8 @@ def _question(**overrides):
         },
         "topic_names": ["Nutrition"],
         "answer": "Respiration releases energy from glucose.",
+        "question_citation_ids": ["chunk-respiration"],
+        "answer_citation_ids": ["chunk-respiration"],
         "source": {"type": "ai_generated", "name": "question-generation"},
     }
     question.update(overrides)
@@ -157,6 +159,49 @@ def test_prompt_keeps_workflow_fields_out_of_model_payload():
     assert "approximately equally across selected Chapters" in prompt
     assert "mcq/1" in prompt
     assert "long_answer/5" in prompt
+
+
+def test_grounded_prompt_supplies_excerpts_and_requires_citations():
+    """Grounded generation gets bounded NCERT context and citation rules."""
+    request = QuestionGenerationRequest(
+        chapter_slugs=("life-processes",),
+        grounding_manifest={
+            "unsupported_content_policy": "No formula-only chunks.",
+            "excerpts": [
+                {
+                    "citation_id": "chunk-respiration",
+                    "chapter_map_node_id": "node-nutrition",
+                    "pages": [2],
+                    "content_types": ["paragraph"],
+                    "text": "Respiration releases energy from glucose.",
+                }
+            ],
+        },
+        count=1,
+    )
+
+    prompt = build_question_generation_prompt(request)
+
+    assert "Use only the NCERT excerpts supplied below" in prompt
+    assert "question_citation_ids" in prompt
+    assert "answer_citation_ids" in prompt
+    assert "[citation_id: chunk-respiration]" in prompt
+    assert "Respiration releases energy from glucose." in prompt
+
+
+def test_grounded_validator_rejects_unknown_citations():
+    """Grounded candidates must cite supplied excerpt ids deterministically."""
+    request = QuestionGenerationRequest(
+        chapter_slugs=("life-processes",),
+        grounding_manifest={"excerpts": [{"citation_id": "chunk-respiration"}]},
+    )
+
+    result = validate_generated_questions(
+        {"questions": [_question(question_citation_ids=["invented"])]}, request
+    )
+
+    assert result.valid_questions == ()
+    assert "unknown_citation" in {error.code for error in result.errors}
 
 
 def test_question_generation_route_resolves_from_env(monkeypatch):

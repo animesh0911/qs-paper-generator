@@ -15,6 +15,8 @@ owner-scoped answer-key endpoint (``papers.views.PaperAnswerKeyPdfView``).
 
 from rest_framework import serializers
 
+from corpus.models import ChapterMapNode
+
 from .generation import DIFFICULTY_TARGETS_BY_PRESET
 from .models import (
     Chapter,
@@ -106,6 +108,11 @@ class GenerationBatchCreateSerializer(serializers.Serializer):
         min_length=1,
         allow_empty=False,
     )
+    chapter_map_node_ids = serializers.ListField(
+        child=serializers.CharField(allow_blank=False),
+        required=False,
+        default=list,
+    )
     topic_names = serializers.ListField(
         child=serializers.CharField(allow_blank=False),
         required=False,
@@ -135,6 +142,27 @@ class GenerationBatchCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Unknown difficulty preset: {value}")
         return value
 
+    def validate(self, attrs):
+        node_ids = attrs.get("chapter_map_node_ids") or []
+        if not node_ids:
+            return attrs
+        chapter_slugs = attrs.get("chapter_slugs") or []
+        if len(chapter_slugs) != 1:
+            raise serializers.ValidationError(
+                "chapter_map_node_ids require exactly one chapter_slug in the MVP."
+            )
+        nodes = ChapterMapNode.objects.filter(
+            stable_node_id__in=node_ids,
+            document__chapter__slug=chapter_slugs[0],
+        )
+        found = set(nodes.values_list("stable_node_id", flat=True))
+        missing = [node_id for node_id in node_ids if node_id not in found]
+        if missing:
+            raise serializers.ValidationError(
+                {"chapter_map_node_ids": f"Unknown node id(s): {', '.join(missing)}"}
+            )
+        return attrs
+
 
 class GenerationBatchSerializer(serializers.ModelSerializer):
     """Poll shape for a bulk generation batch."""
@@ -148,6 +176,7 @@ class GenerationBatchSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "chapter_slugs",
+            "chapter_map_node_ids",
             "topic_names",
             "difficulty_preset",
             "requested_count",
@@ -176,6 +205,7 @@ class GeneratedQuestionCandidateSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "payload",
+            "grounding_manifest",
             "question_id",
             "accepted_at",
             "created_at",
