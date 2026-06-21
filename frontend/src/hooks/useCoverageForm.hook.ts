@@ -9,6 +9,8 @@ const COVERAGE_FORM_STORAGE_KEY = 'qpg_paper_setup_state';
 
 export interface CoverageForm {
   chapters: Chapter[];
+  chaptersLoading: boolean;
+  chaptersError: string;
   formats: PaperFormatSummary[];
   selectedFormatId: string;
   chapterNameBySlug: Record<string, string>;
@@ -55,6 +57,8 @@ export function buildCoverageAssemblePayload({
 export function useCoverageForm(): CoverageForm {
   const saved = readSavedCoverageForm();
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [chaptersLoading, setChaptersLoading] = useState(true);
+  const [chaptersError, setChaptersError] = useState('');
   const [formats, setFormats] = useState<PaperFormatSummary[]>([]);
   const [selectedFormatId, setSelectedFormatId] = useState(saved.selectedFormatId);
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(
@@ -65,8 +69,15 @@ export function useCoverageForm(): CoverageForm {
 
   useEffect(() => {
     fetchChapters()
-      .then(setChapters)
-      .catch(() => setChapters([]));
+      .then((nextChapters) => {
+        setChapters(nextChapters);
+        setChaptersError('');
+      })
+      .catch((err) => {
+        setChapters([]);
+        setChaptersError((err as Error).message);
+      })
+      .finally(() => setChaptersLoading(false));
     fetchPaperFormats()
       .then((nextFormats) => {
         setFormats(nextFormats);
@@ -116,6 +127,8 @@ export function useCoverageForm(): CoverageForm {
 
   return {
     chapters,
+    chaptersLoading,
+    chaptersError,
     formats,
     selectedFormatId,
     chapterNameBySlug,

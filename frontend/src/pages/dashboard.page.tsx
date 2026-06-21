@@ -65,6 +65,10 @@ export default function Dashboard() {
     setGenerationSelectedSlugs(new Set(form.chapters.map((chapter) => chapter.slug)));
   }
 
+  function clearGenerationChapters() {
+    setGenerationSelectedSlugs(new Set());
+  }
+
   async function startQuestionBankGeneration() {
     setGenerationBusy(true);
     setGenerationError('');
@@ -118,6 +122,8 @@ export default function Dashboard() {
           <CardContent>
             <BulkQuestionGenerationSetup
               chapters={form.chapters}
+              chaptersLoading={form.chaptersLoading}
+              chaptersError={form.chaptersError}
               selectedSlugs={generationSelectedSlugs}
               topicNamesByChapter={topicNamesByChapter}
               difficulty={generationDifficulty}
@@ -125,6 +131,7 @@ export default function Dashboard() {
               error={generationError}
               onToggleChapter={toggleGenerationChapter}
               onSelectAllChapters={selectAllGenerationChapters}
+              onClearChapters={clearGenerationChapters}
               onTopicNamesChange={(slug, value) =>
                 setTopicNamesByChapter((prev) => ({ ...prev, [slug]: value }))
               }

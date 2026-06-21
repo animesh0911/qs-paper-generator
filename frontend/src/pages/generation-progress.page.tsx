@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { GenerationBatch } from '@/types';
 import { fetchGenerationBatch } from '@/lib/api';
@@ -13,6 +13,9 @@ export default function GenerationProgressPage() {
   const [batch, setBatch] = useState<GenerationBatch | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [lastCheckedAt, setLastCheckedAt] = useState('');
+  const [retryTick, setRetryTick] = useState(0);
+  const hasLoadedBatch = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -24,7 +27,9 @@ export default function GenerationProgressPage() {
         const next = await fetchGenerationBatch(batchId);
         if (cancelled) return;
         setBatch(next);
+        hasLoadedBatch.current = true;
         setError('');
+        setLastCheckedAt(new Date().toISOString());
         setLoading(false);
         if (!TERMINAL_STATUSES.has(next.status)) {
           timer = setTimeout(poll, POLL_MS);
@@ -32,17 +37,26 @@ export default function GenerationProgressPage() {
       } catch (err) {
         if (cancelled) return;
         setError((err as Error).message);
+        setLastCheckedAt(new Date().toISOString());
         setLoading(false);
-        timer = setTimeout(poll, POLL_MS);
+        if (hasLoadedBatch.current) {
+          timer = setTimeout(poll, POLL_MS);
+        }
       }
     }
 
+    setLoading(true);
     poll();
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [batchId]);
+  }, [batchId, retryTick]);
+
+  function tryAgain() {
+    setError('');
+    setRetryTick((current) => current + 1);
+  }
 
   function backToPaperSetup() {
     navigate('/');
@@ -53,8 +67,10 @@ export default function GenerationProgressPage() {
       batch={batch}
       loading={loading}
       error={error}
+      lastCheckedAt={lastCheckedAt}
+      pollIntervalMs={POLL_MS}
       onRunInBackground={backToPaperSetup}
-      onTryAgain={backToPaperSetup}
+      onTryAgain={tryAgain}
       onBackToPaperSetup={backToPaperSetup}
     />
   );
