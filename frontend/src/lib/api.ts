@@ -16,6 +16,8 @@
 import type {
   AssembleRequest,
   Chapter,
+  GenerationBatch,
+  GenerationBatchCreateRequest,
   PaperDocument,
   PaperFormatSummary,
 } from '@/types';
@@ -155,4 +157,23 @@ export async function downloadPaperPdf(paper: PaperDocument) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+export async function createGenerationBatch(
+  body: GenerationBatchCreateRequest,
+): Promise<GenerationBatch> {
+  const res = await request('/bank/generation-batches/', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+export async function fetchGenerationBatch(
+  batchId: number | string,
+): Promise<GenerationBatch> {
+  const res = await request(`/bank/generation-batches/${batchId}/`, {
+    method: 'GET',
+  });
+  return res.json();
 }
