@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Protocol
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
@@ -42,7 +42,7 @@ class ChunkBuildResult:
 @dataclass(frozen=True)
 class TextbookRetrievalRequest:
     chapter: Chapter
-    query_text: str
+    query_text: str = ""
     chapter_map_node: ChapterMapNode | None = None
     content_types: tuple[str, ...] = ()
     limit: int = 5
@@ -57,35 +57,56 @@ class GroundingChunk:
 @dataclass(frozen=True)
 class GroundingContext:
     results: tuple[GroundingChunk, ...]
+    diagnostics: dict[str, object] = field(default_factory=dict)
 
 
 class TextbookRetriever(Protocol):
     def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext: ...
 
 
+def _validate_search_request(request: TextbookRetrievalRequest) -> None:
+    if not request.query_text.strip():
+        raise ValueError("query_text must not be blank.")
+    if request.limit < 1:
+        raise ValueError("limit must be positive.")
+    _validate_chapter_map_node(request)
+
+
+def _validate_chapter_map_node(request: TextbookRetrievalRequest) -> None:
+    if (
+        request.chapter_map_node is not None
+        and request.chapter_map_node.document.chapter_id != request.chapter.pk
+    ):
+        raise ValueError("chapter_map_node must belong to the requested Chapter.")
+
+
+def _content_type_filter(content_types: tuple[str, ...]) -> Q:
+    query = Q(content_types__contains=[content_types[0]])
+    for content_type in content_types[1:]:
+        query &= Q(content_types__contains=[content_type])
+    return query
+
+
+def _apply_retrieval_scope(chunks, request: TextbookRetrievalRequest):
+    if request.chapter_map_node is not None:
+        chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
+    if request.content_types:
+        chunks = chunks.filter(_content_type_filter(request.content_types))
+    return chunks
+
+
 class PostgresTextbookRetriever:
     """Retrieve ranked chunks using only persisted Postgres lexical data."""
 
     def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext:
-        if not request.query_text.strip():
-            raise ValueError("query_text must not be blank.")
-        if request.limit < 1:
-            raise ValueError("limit must be positive.")
-        if (
-            request.chapter_map_node is not None
-            and request.chapter_map_node.document.chapter_id != request.chapter.pk
-        ):
-            raise ValueError("chapter_map_node must belong to the requested Chapter.")
+        _validate_search_request(request)
 
         query = self._query(request.query_text)
         chunks = RetrievalChunk.objects.filter(
             chapter=request.chapter,
             search_vector=query,
         ).select_related("document", "chapter", "chapter_map_node")
-        if request.chapter_map_node is not None:
-            chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
-        if request.content_types:
-            chunks = chunks.filter(self._content_type_filter(request.content_types))
+        chunks = _apply_retrieval_scope(chunks, request)
         ranked = chunks.annotate(
             rank=SearchRank("search_vector", query, cover_density=True)
         ).order_by("-rank", "stable_chunk_id")[: request.limit]
@@ -108,13 +129,6 @@ class PostgresTextbookRetriever:
             raise ValueError("query_text must contain a searchable term.")
         return SearchQuery(" | ".join(terms), config="english", search_type="raw")
 
-    @staticmethod
-    def _content_type_filter(content_types: tuple[str, ...]) -> Q:
-        query = Q()
-        for content_type in content_types:
-            query |= Q(content_types__contains=[content_type])
-        return query
-
 
 class PostgresVectorTextbookRetriever:
     """Retrieve dense candidates for one injected embedding profile."""
@@ -123,15 +137,7 @@ class PostgresVectorTextbookRetriever:
         self.client = client
 
     def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext:
-        if not request.query_text.strip():
-            raise ValueError("query_text must not be blank.")
-        if request.limit < 1:
-            raise ValueError("limit must be positive.")
-        if (
-            request.chapter_map_node is not None
-            and request.chapter_map_node.document.chapter_id != request.chapter.pk
-        ):
-            raise ValueError("chapter_map_node must belong to the requested Chapter.")
+        _validate_search_request(request)
 
         vectors = self.client.embed((request.query_text,))
         validate_embedding_vectors(
@@ -148,12 +154,7 @@ class PostgresVectorTextbookRetriever:
             embedding_version=self.client.profile.version,
             embedding_dimensions=self.client.profile.dimensions,
         ).select_related("document", "chapter", "chapter_map_node")
-        if request.chapter_map_node is not None:
-            chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
-        if request.content_types:
-            chunks = chunks.filter(
-                PostgresTextbookRetriever._content_type_filter(request.content_types)
-            )
+        chunks = _apply_retrieval_scope(chunks, request)
         distance = CosineDistance(
             Cast(
                 "embedding",
