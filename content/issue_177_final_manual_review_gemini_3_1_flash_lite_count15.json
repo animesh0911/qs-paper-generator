@@ -1,0 +1,1525 @@
+{
+  "model": "google/gemini-3.1-flash-lite",
+  "count": 15,
+  "batches": [
+    47,
+    48,
+    49,
+    50,
+    51
+  ],
+  "summary": {
+    "supported": 74,
+    "deterministic_supported": 60,
+    "deterministic_flagged": 15,
+    "needs_teacher_edit": 1
+  },
+  "candidates": [
+    {
+      "candidate_id": 398,
+      "batch_id": 47,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Which of the following properties is characteristic of covalent compounds?",
+      "answer": "C, Low melting and boiling points",
+      "question_citation_ids": [
+        "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+      ],
+      "answer_citation_ids": [
+        "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 399,
+      "batch_id": 47,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Why do covalent compounds generally have low melting and boiling points?",
+      "answer": "B, Weak intermolecular forces",
+      "question_citation_ids": [
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "answer_citation_ids": [
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 400,
+      "batch_id": 47,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Diamond and graphite are both allotropes of carbon. What is the fundamental reason for their different physical properties?",
+      "answer": "C, Difference in how carbon atoms are bonded",
+      "question_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "answer_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 401,
+      "batch_id": 47,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "In the structure of graphite, each carbon atom is bonded to how many other carbon atoms in the same plane?",
+      "answer": "B, Three",
+      "question_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "answer_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "structure"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 402,
+      "batch_id": 47,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Why does carbon refrain from forming C4+ cations?",
+      "answer": "It would require a large amount of energy to remove four electrons leaving behind a carbon cation with six protons holding onto only two electrons.",
+      "question_citation_ids": [
+        "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+      ],
+      "answer_citation_ids": [
+        "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 403,
+      "batch_id": 47,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Define a covalent bond.",
+      "answer": "A covalent bond is a bond formed by the sharing of an electron pair between two atoms.",
+      "question_citation_ids": [
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "answer_citation_ids": [
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 404,
+      "batch_id": 47,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Why are carbon compounds poor conductors of electricity?",
+      "answer": "Since the electrons are shared between atoms in covalent compounds, no charged particles are formed, making them poor conductors of electricity.",
+      "question_citation_ids": [
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "answer_citation_ids": [
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 405,
+      "batch_id": 47,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Name the two allotropes of carbon mentioned in the text that have different physical properties and how they differ in bonding.",
+      "answer": "The two allotropes are diamond and graphite. In diamond, each carbon is bonded to four others, while in graphite, each is bonded to three others in planar layers.",
+      "question_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "answer_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "name"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 406,
+      "batch_id": 47,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Explain why carbon cannot form C4- anions easily.",
+      "answer": "Carbon has four electrons in its outermost shell. Gaining four electrons to form a C4- anion would be difficult because the nucleus with six protons would struggle to hold on to ten total electrons (four extra electrons).",
+      "question_citation_ids": [
+        "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+      ],
+      "answer_citation_ids": [
+        "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.17 overlap; missing: anions, c4-, cannot, easily, form"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 407,
+      "batch_id": 47,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Describe the formation of a double bond in a molecule of oxygen.",
+      "answer": "An oxygen atom has six electrons in its L shell and requires two more to complete its octet. Each oxygen atom shares two electrons with another oxygen atom. These two shared pairs of electrons constitute a double bond.",
+      "question_citation_ids": [
+        "2a0d297249cf18e955f25c0257eb282352f619d77510863f27aa520b15088268"
+      ],
+      "answer_citation_ids": [
+        "2a0d297249cf18e955f25c0257eb282352f619d77510863f27aa520b15088268"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 408,
+      "batch_id": 47,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Explain why graphite is a good conductor of electricity unlike most non-metals.",
+      "answer": "In graphite, each carbon atom is bonded to three other carbon atoms in the same plane, and one of these bonds is a double bond. This structure allows graphite to conduct electricity despite being a non-metal.",
+      "question_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+        "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+      ],
+      "answer_citation_ids": [
+        "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 409,
+      "batch_id": 47,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Compare the bonding in diamond and graphite based on the structure.",
+      "answer": "In diamond, each carbon atom is covalently bonded to four other carbon atoms to form a rigid 3D structure. In graphite, each carbon atom is bonded to three other carbon atoms in a hexagonal planar array.",
+      "question_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "answer_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "structure"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 410,
+      "batch_id": 47,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Describe the nature of covalent bonding in carbon, explaining why carbon forms this type of bond instead of ionic bonds, using methane as an example.",
+      "answer": "Carbon has four electrons in its outermost shell and needs to reach a noble gas configuration. It cannot form C4+ as it requires too much energy, nor C4- as the nucleus cannot hold 10 electrons. Thus, carbon shares its valence electrons. In methane (CH4), carbon shares its four valence electrons with four hydrogen atoms, each hydrogen contributing one electron to form four covalent bonds.",
+      "question_citation_ids": [
+        "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+        "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd",
+        "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+      ],
+      "answer_citation_ids": [
+        "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+        "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 411,
+      "batch_id": 47,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Discuss the physical properties of carbon compounds and explain how they relate to the nature of covalent bonding.",
+      "answer": "Most carbon compounds have low melting and boiling points because the intermolecular forces between their molecules are weak. These compounds are generally poor conductors of electricity because no charged ions are formed, as electrons are shared rather than transferred. The strong bonds exist within the molecule, but the weak forces between the molecules are why they have these properties.",
+      "question_citation_ids": [
+        "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "answer_citation_ids": [
+        "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+        "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 412,
+      "batch_id": 47,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Compare the structures of diamond and graphite, and explain how their different molecular arrangements result in different physical properties.",
+      "answer": "In diamond, each carbon atom is bonded to four others to form a rigid 3D structure, making it the hardest substance. In graphite, each carbon atom is bonded to three others in a plane with a double bond, forming layers that can slide over one another, making it smooth and slippery. While their chemical properties are the same, their different structural arrangements lead to diamond's hardness and graphite's electrical conductivity and slipperiness.",
+      "question_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+        "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+      ],
+      "answer_citation_ids": [
+        "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+        "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "structures"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 413,
+      "batch_id": 48,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Which property allows carbon to form long chains of carbon atoms?",
+      "answer": "B, Catenation",
+      "question_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+      ],
+      "answer_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 414,
+      "batch_id": 48,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "What are compounds having identical molecular formula but different structures called?",
+      "answer": "C, Structural isomers",
+      "question_citation_ids": [
+        "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+      ],
+      "answer_citation_ids": [
+        "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "formula, structures"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 415,
+      "batch_id": 48,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Which functional group is indicated by the suffix '-ol'?",
+      "answer": "C, Alcohol",
+      "question_citation_ids": [
+        "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+      ],
+      "answer_citation_ids": [
+        "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.25 overlap; missing: functional, group, indicated"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 416,
+      "batch_id": 48,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "What is the general formula for alkenes?",
+      "answer": "B, CnH2n",
+      "question_citation_ids": [
+        "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+      ],
+      "answer_citation_ids": [
+        "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "answer",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.00 overlap; missing: cnh2n"
+        },
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "formula"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 417,
+      "batch_id": 48,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Define catenation.",
+      "answer": "Catenation is the unique ability of carbon to form bonds with other atoms of carbon, giving rise to large molecules.",
+      "question_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+      ],
+      "answer_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 418,
+      "batch_id": 48,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "What are defined as saturated carbon compounds?",
+      "answer": "Compounds of carbon which are linked by only single bonds between the carbon atoms are called saturated compounds.",
+      "question_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+      ],
+      "answer_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 419,
+      "batch_id": 48,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "What are hydrocarbons?",
+      "answer": "All carbon compounds which contain only carbon and hydrogen are called hydrocarbons.",
+      "question_citation_ids": [
+        "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc"
+      ],
+      "answer_citation_ids": [
+        "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 420,
+      "batch_id": 48,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Why are carbon compounds exceptionally stable?",
+      "answer": "The bonds that carbon forms with most other elements are very strong, largely due to its small size, which enables the nucleus to hold the shared pairs of electrons strongly.",
+      "question_citation_ids": [
+        "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+      ],
+      "answer_citation_ids": [
+        "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 421,
+      "batch_id": 48,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "What is a homologous series? State two characteristics of such a series.",
+      "answer": "A homologous series is a series of compounds in which the same functional group substitutes for hydrogen in a carbon chain. Two characteristics are: (1) successive members differ by a -CH2- unit, and (2) as molecular mass increases, physical properties like melting/boiling points show a gradation.",
+      "question_citation_ids": [
+        "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0",
+        "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd",
+        "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+      ],
+      "answer_citation_ids": [
+        "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0",
+        "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd",
+        "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 422,
+      "batch_id": 48,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Distinguish between saturated and unsaturated carbon compounds.",
+      "answer": "Saturated compounds are linked by only single bonds between carbon atoms and are typically not very reactive. Unsaturated carbon compounds contain one or more double or triple bonds between carbon atoms and are more reactive than saturated compounds.",
+      "question_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+        "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+      ],
+      "answer_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+        "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 423,
+      "batch_id": 48,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "What are heteroatoms and functional groups in carbon chemistry?",
+      "answer": "In a hydrocarbon chain, hydrogen can be replaced by elements like halogens, oxygen, nitrogen, or sulphur; the replacing element is called a heteroatom. These heteroatoms or groups containing them, when attached to a carbon chain, confer specific chemical properties regardless of chain length; these are called functional groups.",
+      "question_citation_ids": [
+        "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+        "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+      ],
+      "answer_citation_ids": [
+        "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+        "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 424,
+      "batch_id": 48,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Explain why silicon does not show catenation to the same extent as carbon.",
+      "answer": "While silicon can form chain-like compounds with hydrogen, they are limited to seven or eight atoms and are very reactive. In contrast, the carbon-carbon bond is very strong and stable, allowing for a large number of compounds with many carbon atoms linked together.",
+      "question_citation_ids": [
+        "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+      ],
+      "answer_citation_ids": [
+        "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 425,
+      "batch_id": 48,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Explain the two characteristics of carbon that lead to the formation of a large number of carbon compounds.",
+      "answer": "The two main characteristics are (i) Catenation: Carbon has the unique ability to form bonds with other carbon atoms, creating long chains, branches, or rings. These bonds are strong and stable. (ii) Tetravalency: Carbon has a valency of four, allowing it to bond with four other carbon atoms or atoms of mono-valent elements like hydrogen, oxygen, nitrogen, sulphur, or halogens. Together, these properties, along with the formation of strong covalent bonds due to carbon's small size, enable the existence of millions of diverse carbon compounds.",
+      "question_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+        "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+        "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+        "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+      ],
+      "answer_citation_ids": [
+        "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+        "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+        "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+        "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 426,
+      "batch_id": 48,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Describe the nomenclature process for naming carbon compounds and provide examples.",
+      "answer": "Naming carbon compounds follows these steps: (i) Identify the number of carbon atoms. (ii) If a functional group is present, add the appropriate prefix or suffix. (iii) If a suffix starts with a vowel, drop the 'e' from the alkane name (e.g., Propane becomes propanone for a ketone). (iv) For unsaturated compounds, replace 'ane' with 'ene' or 'yne'. Examples: A three-carbon chain is propane. Adding a hydroxyl group creates propanol. A double-bonded three-carbon chain is propene, while a triple-bonded one is propyne.",
+      "question_citation_ids": [
+        "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+        "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+        "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+      ],
+      "answer_citation_ids": [
+        "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+        "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+        "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "naming, nomenclature"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 427,
+      "batch_id": 48,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "How is a structural isomer defined? Use butane (C4H10) to explain how structural isomers arise.",
+      "answer": "Structural isomers are compounds that possess the identical molecular formula but different structural arrangements of their atoms. For butane, C4H10, atoms can be connected in two distinct ways to form the 'carbon skeleton'. One structure consists of a single straight chain of four carbon atoms (n-butane). A second structure is formed by branching, where a central carbon atom is bonded to three other carbon atoms (isobutane). Filling the remaining valencies with hydrogen confirms that both configurations represent two unique structures for the same formula, C4H10.",
+      "question_citation_ids": [
+        "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+        "efb71c4cfda607c15989df213488757526f80fe34aed883b4ed50c758db467a9",
+        "ad4eaf8c062035859b4432c25b0d6b74f3dfba81428679b0e0a660ec2c16f869",
+        "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+      ],
+      "answer_citation_ids": [
+        "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+        "efb71c4cfda607c15989df213488757526f80fe34aed883b4ed50c758db467a9",
+        "ad4eaf8c062035859b4432c25b0d6b74f3dfba81428679b0e0a660ec2c16f869",
+        "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "structural"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 428,
+      "batch_id": 49,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Which type of flame is observed when unsaturated carbon compounds are burnt?",
+      "answer": "B, Yellow flame with black smoke",
+      "question_citation_ids": [
+        "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+      ],
+      "answer_citation_ids": [
+        "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 429,
+      "batch_id": 49,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "What is the function of catalysts like palladium or nickel in addition reactions?",
+      "answer": "B, They cause reactions to occur or proceed at a different rate without being affected",
+      "question_citation_ids": [
+        "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+      ],
+      "answer_citation_ids": [
+        "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 430,
+      "batch_id": 49,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Why do cooking vessels sometimes get their bottoms blackened?",
+      "answer": "B, The air holes are blocked leading to incomplete combustion",
+      "question_citation_ids": [
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "answer_citation_ids": [
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 431,
+      "batch_id": 49,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Which of the following acts as an oxidising agent for converting alcohols to acids?",
+      "answer": "A, Alkaline potassium permanganate",
+      "question_citation_ids": [
+        "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+      ],
+      "answer_citation_ids": [
+        "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 432,
+      "batch_id": 49,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Define a substitution reaction.",
+      "answer": "A substitution reaction occurs when one type of atom or a group of atoms takes the place of another in a molecule. Saturated hydrocarbons undergo this in the presence of sunlight with halogens like chlorine.",
+      "question_citation_ids": [
+        "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+      ],
+      "answer_citation_ids": [
+        "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 433,
+      "batch_id": 49,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Why do coal and charcoal sometimes glow red without a flame?",
+      "answer": "This is because a flame is only produced when gaseous substances burn. Coal and charcoal glow without a flame when they are ignited without the presence of sufficient volatile substances to produce a flame.",
+      "question_citation_ids": [
+        "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+      ],
+      "answer_citation_ids": [
+        "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 434,
+      "batch_id": 49,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Give the chemical equation for the combustion of methane.",
+      "answer": "The balanced chemical equation for the combustion of methane is CH4 + 2O2 -> CO2 + 2H2O + heat and light.",
+      "question_citation_ids": [
+        "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2",
+        "f1c4b32b073ab437ecf1937d19a14b7e262cc2a6f393bf7128595055cf5b0983"
+      ],
+      "answer_citation_ids": [
+        "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2",
+        "f1c4b32b073ab437ecf1937d19a14b7e262cc2a6f393bf7128595055cf5b0983"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 435,
+      "batch_id": 49,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Why are coal and petroleum called fossil fuels?",
+      "answer": "Coal and petroleum are called fossil fuels because they have been formed from the remains of ancient biomass (trees, plants, and microorganisms) that were buried and subjected to geological processes over millions of years.",
+      "question_citation_ids": [
+        "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+      ],
+      "answer_citation_ids": [
+        "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 436,
+      "batch_id": 49,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Explain why saturated hydrocarbons generally give a clean flame while unsaturated carbon compounds give a sooty flame.",
+      "answer": "Saturated hydrocarbons contain a higher percentage of hydrogen which promotes complete combustion, resulting in a clean flame. In contrast, unsaturated carbon compounds have a higher carbon content relative to hydrogen, leading to incomplete combustion and the formation of soot (carbon particles) which makes the flame yellow and smoky.",
+      "question_citation_ids": [
+        "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+      ],
+      "answer_citation_ids": [
+        "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 437,
+      "batch_id": 49,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "What is meant by the hydrogenation of vegetable oils? Why is it considered an addition reaction?",
+      "answer": "Hydrogenation is the process of adding hydrogen to unsaturated vegetable oils in the presence of a catalyst like nickel to convert them into saturated fats. It is called an addition reaction because the hydrogen atoms are added across the double bonds of the unsaturated hydrocarbon chains without any other product being eliminated.",
+      "question_citation_ids": [
+        "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+      ],
+      "answer_citation_ids": [
+        "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 438,
+      "batch_id": 49,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Discuss the environmental impact of combustion of coal and petroleum.",
+      "answer": "Coal and petroleum contain impurities like nitrogen and sulphur. When they are burnt, these elements form oxides of sulphur and nitrogen. These gaseous oxides are released into the atmosphere and are significant environmental pollutants, contributing to issues like acid rain.",
+      "question_citation_ids": [
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "answer_citation_ids": [
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "answer",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.30 overlap; missing: acid, atmosphere, contain, contributing, elements, environmental, form, gaseous"
+        }
+      ],
+      "manual_status": "needs_teacher_edit",
+      "manual_note": "Answer adds acid-rain example; cited NCERT chunk supports oxides of sulphur/nitrogen as major environmental pollutants but does not explicitly support acid rain."
+    },
+    {
+      "candidate_id": 439,
+      "batch_id": 49,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Why is it important to ensure air holes of a gas stove are not blocked?",
+      "answer": "The air holes are designed to allow an oxygen-rich mixture to burn, ensuring complete combustion which gives a clean blue flame. If these holes are blocked, the air supply is limited, resulting in incomplete combustion that produces black soot, wastes fuel, and blackens the cooking vessels.",
+      "question_citation_ids": [
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "answer_citation_ids": [
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 440,
+      "batch_id": 49,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Describe the chemical properties of carbon compounds regarding their combustion and oxidation, citing examples.",
+      "answer": "Carbon compounds undergo combustion, which is the burning of carbon or its compounds in oxygen to release heat and light, such as carbon or methane burning to produce carbon dioxide and water. The type of flame depends on the nature of the hydrocarbon; saturated ones burn with a clean flame, while unsaturated ones produce a smoky flame. Oxidation is another key property. Carbon compounds like alcohols can be further oxidised into carboxylic acids using oxidising agents like alkaline potassium permanganate or acidified potassium dichromate, which supply oxygen to the reaction.",
+      "question_citation_ids": [
+        "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+        "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+        "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+      ],
+      "answer_citation_ids": [
+        "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+        "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+        "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 441,
+      "batch_id": 49,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Explain the process of formation of fossil fuels and why their usage is a concern.",
+      "answer": "Fossil fuels are formed from ancient biomass. Coal originated from trees and plants buried by geological shifts like earthquakes, which were then decayed under pressure over millions of years. Petroleum (oil and gas) formed from marine plants and animals that sank to the sea floor, were covered by silt, and under high pressure and bacterial action, turned into fuel trapped in rock layers. Their usage is a concern because burning them releases oxides of sulphur and nitrogen due to impurities, which are significant environmental pollutants, and they are non-renewable resources formed over millions of years.",
+      "question_citation_ids": [
+        "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1",
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "answer_citation_ids": [
+        "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1",
+        "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 442,
+      "batch_id": 49,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "What is an addition reaction? Describe its use in the context of vegetable oils and fats.",
+      "answer": "An addition reaction is a reaction where catalyst-aided hydrogen atoms are added to unsaturated hydrocarbons, turning them into saturated ones without affecting the catalyst. In the food industry, this is applied to vegetable oils, which contain long unsaturated carbon chains, to produce fats by hydrogenation using a nickel catalyst. Vegetable oils are often marketed as 'healthy' because they contain unsaturated fatty acids, whereas animal fats contain saturated fatty acids, which are generally considered less beneficial for health. Therefore, the hydrogenation process allows the conversion of unsaturated oils into saturated products.",
+      "question_citation_ids": [
+        "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+        "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+      ],
+      "answer_citation_ids": [
+        "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+        "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 443,
+      "batch_id": 50,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Which of the following compounds is commonly known as alcohol and is used as an active ingredient in many medicines like tincture iodine?",
+      "answer": "B, Ethanol",
+      "question_citation_ids": [
+        "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1"
+      ],
+      "answer_citation_ids": [
+        "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 444,
+      "batch_id": 50,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Why is pure ethanoic acid commonly referred to as glacial acetic acid?",
+      "answer": "B, Because it freezes during winter in cold climates due to its melting point of 290 K.",
+      "question_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+      ],
+      "answer_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 445,
+      "batch_id": 50,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "What is the purpose of adding methanol to industrial ethanol?",
+      "answer": "C, To make it unfit for drinking, preventing misuse.",
+      "question_citation_ids": [
+        "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+      ],
+      "answer_citation_ids": [
+        "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 446,
+      "batch_id": 50,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Saponification is the chemical process used in the preparation of soap. Which substances are produced when an ester is treated with sodium hydroxide?",
+      "answer": "B, Alcohol and sodium salt of carboxylic acid",
+      "question_citation_ids": [
+        "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+      ],
+      "answer_citation_ids": [
+        "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 447,
+      "batch_id": 50,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "What is the result of heating ethanol with excess concentrated sulphuric acid at 443 K?",
+      "answer": "Heating ethanol with excess concentrated sulphuric acid at 443 K causes the dehydration of ethanol to produce ethene and water.",
+      "question_citation_ids": [
+        "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+      ],
+      "answer_citation_ids": [
+        "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 448,
+      "batch_id": 50,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Why are carboxylic acids considered weaker than mineral acids like HCl?",
+      "answer": "Mineral acids like HCl completely ionise in water, whereas carboxylic acids are only weakly ionised, making them weaker acids.",
+      "question_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+      ],
+      "answer_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 449,
+      "batch_id": 50,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "What products are formed when ethanol reacts with sodium?",
+      "answer": "When ethanol reacts with sodium, the products formed are sodium ethoxide and hydrogen gas.",
+      "question_citation_ids": [
+        "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+      ],
+      "answer_citation_ids": [
+        "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 450,
+      "batch_id": 50,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "What is vinegar and what is its common use?",
+      "answer": "Vinegar is a 5-8% solution of acetic acid in water, which is widely used as a preservative in pickles.",
+      "question_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+      ],
+      "answer_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.33 overlap; missing: common, use"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 451,
+      "batch_id": 50,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Explain why the intake of small quantities of pure ethanol (absolute alcohol) can be lethal.",
+      "answer": "Consuming large quantities of ethanol slows down metabolic processes and suppresses the central nervous system, leading to lack of coordination, mental confusion, and drowsiness. While dilute ethanol causes drunkenness, absolute alcohol, if consumed, can be lethal due to its concentrated effect on the body's systems.",
+      "question_citation_ids": [
+        "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1",
+        "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+      ],
+      "answer_citation_ids": [
+        "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1",
+        "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 452,
+      "batch_id": 50,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Describe the reaction of ethanoic acid with carbonates and hydrogen carbonates.",
+      "answer": "Ethanoic acid reacts with both carbonates and hydrogen carbonates to produce a salt (often called sodium acetate), carbon dioxide, and water. For example, it produces CO2 gas which can be identified by passing it through lime water.",
+      "question_citation_ids": [
+        "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+      ],
+      "answer_citation_ids": [
+        "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 453,
+      "batch_id": 50,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "What is an esterification reaction and what are esters used for?",
+      "answer": "Esterification is the reaction between an acid (like ethanoic acid) and an alcohol (like ethanol) to form an ester. Esters are generally sweet-smelling substances primarily used as flavouring agents and in the making of perfumes.",
+      "question_citation_ids": [
+        "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3",
+        "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+      ],
+      "answer_citation_ids": [
+        "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3",
+        "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 454,
+      "batch_id": 50,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Why is alcohol being used as an additive in petrol in some countries?",
+      "answer": "Alcohol is used as an additive in petrol because it serves as a cleaner fuel. Burning it in sufficient air results only in the production of carbon dioxide and water, causing less pollution compared to traditional fuel consumption.",
+      "question_citation_ids": [
+        "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+      ],
+      "answer_citation_ids": [
+        "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 455,
+      "batch_id": 50,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Compare the toxic effects of methanol and ethanol on the human body.",
+      "answer": "Ethanol, when consumed in large quantities, slows metabolic processes, suppresses the central nervous system, and impairs judgment and coordination. In contrast, methanol is significantly more dangerous even in small amounts. Once ingested, methanol is oxidized to methanal in the liver. Methanal reacts rapidly with cell components, coagulating protoplasm similarly to how heat affects an egg. Furthermore, methanol specifically targets the optic nerve, which can result in permanent blindness, and its ingestion can quickly lead to death.",
+      "question_citation_ids": [
+        "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+      ],
+      "answer_citation_ids": [
+        "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.29 overlap; missing: body, compare, effects, human, toxic"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 456,
+      "batch_id": 50,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Describe the chemical properties of ethanol, including its reaction with sodium and its dehydration reaction.",
+      "answer": "Ethanol exhibits specific chemical properties through its functional group. First, it reacts with sodium metal to evolve hydrogen gas, forming sodium ethoxide; this reaction is characteristic of the hydroxyl group. Second, it undergoes a dehydration reaction when heated with excess concentrated sulphuric acid at 443 K. In this process, the sulphuric acid acts as a dehydrating agent by removing water molecules from the ethanol, resulting in the formation of the unsaturated hydrocarbon, ethene. These reactions demonstrate the utility of ethanol in various organic chemical transformations.",
+      "question_citation_ids": [
+        "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+      ],
+      "answer_citation_ids": [
+        "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 457,
+      "batch_id": 50,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Discuss the properties of ethanoic acid, including its physical nature, chemical reactions with basics, and the process of saponification.",
+      "answer": "Ethanoic acid, or acetic acid, is a weak carboxylic acid commonly used as a 5-8% solution in water called vinegar. Physically, its melting point is 290 K, causing it to freeze in cold winters, thus earning it the name 'glacial acetic acid'. Chemically, it reacts with carbonates and hydrogen carbonates to produce sodium acetate, carbon dioxide, and water. Moreover, when it reacts with an alcohol, it undergoes esterification to produce sweet-smelling esters. These esters can then undergo a process called saponification, where they are treated with sodium hydroxide to revert into alcohol and a sodium salt of the carboxylic acid, which is the foundational reaction in soap making.",
+      "question_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c",
+        "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26",
+        "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+      ],
+      "answer_citation_ids": [
+        "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c",
+        "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26",
+        "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 458,
+      "batch_id": 51,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "What is the primary reason that soap solutions appear cloudy?",
+      "answer": "B",
+      "question_citation_ids": [
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "answer_citation_ids": [
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.33 overlap; missing: appear, primary, reason, solutions"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 459,
+      "batch_id": 51,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Which part of a soap molecule interacts with oily dirt?",
+      "answer": "C",
+      "question_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "answer_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 460,
+      "batch_id": 51,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "Why are detergents preferred over soaps for cleaning in hard water?",
+      "answer": "B",
+      "question_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "answer_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 461,
+      "batch_id": 51,
+      "qtype": "mcq",
+      "marks": 1,
+      "raw_text": "What are soap molecules chemically?",
+      "answer": "A",
+      "question_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "answer_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 462,
+      "batch_id": 51,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Define a micelle.",
+      "answer": "A micelle is a cluster of soap molecules formed in water where the hydrophobic tails are in the interior of the cluster and the ionic ends are on the surface.",
+      "question_citation_ids": [
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "answer_citation_ids": [
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 463,
+      "batch_id": 51,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Why is it difficult to get foam in hard water using soap?",
+      "answer": "It is difficult because soap reacts with calcium and magnesium salts present in hard water, forming an insoluble substance called scum.",
+      "question_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "answer_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 464,
+      "batch_id": 51,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "What is the physical difference between hydrophilic and hydrophobic ends of a soap molecule?",
+      "answer": "The hydrophilic end interacts with water, while the hydrophobic end (hydrocarbon tail) interacts with hydrocarbons (oils/dirt).",
+      "question_citation_ids": [
+        "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82"
+      ],
+      "answer_citation_ids": [
+        "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 465,
+      "batch_id": 51,
+      "qtype": "very_short_answer",
+      "marks": 2,
+      "raw_text": "Define detergents.",
+      "answer": "Detergents are generally sodium salts of sulphonic acids or ammonium salts with chloride or bromide ions, used as cleansing agents.",
+      "question_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "answer_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 466,
+      "batch_id": 51,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Explain how soap molecules help in the removal of oily dirt.",
+      "answer": "Soap molecules have two ends with different properties. The hydrophobic tail attaches to oil particles, while the hydrophilic end interacts with water. This forms structures called micelles that emulsify the oil and suspend the dirt, allowing it to be rinsed away.",
+      "question_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "answer_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 467,
+      "batch_id": 51,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Why do soaps not form precipitates with the ions in hard water, but detergents do not have this problem?",
+      "answer": "Hard water contains calcium and magnesium salts which react with soaps to form insoluble curdy precipitates (scum). In contrast, the charged ends of detergents do not form such insoluble precipitates with these ions, allowing them to remain effective in hard water.",
+      "question_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "answer_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 468,
+      "batch_id": 51,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Explain why soap solutions appear cloudy.",
+      "answer": "Soap aggregates into clusters called micelles. These micelles remain in the solution as a colloid and do not precipitate due to ion-ion repulsion. These soap micelles are large enough to scatter light, which causes the soap solution to appear cloudy.",
+      "question_citation_ids": [
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "answer_citation_ids": [
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 469,
+      "batch_id": 51,
+      "qtype": "short_answer",
+      "marks": 3,
+      "raw_text": "Contrast the behavior of soap in water and how it interacts with oil.",
+      "answer": "When soap is in water, the ionic hydrophilic end interacts with water molecules. When oil is present, the hydrophobic hydrocarbon tail is not soluble in water but interacts with the non-polar oil droplet, surrounding it to form a micelle for cleaning.",
+      "question_citation_ids": [
+        "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "answer_citation_ids": [
+        "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 470,
+      "batch_id": 51,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Describe the cleaning action of soaps and what happens during the formation of micelles.",
+      "answer": "Soap molecules have two distinct ends: a hydrophilic ionic end that interacts with water and a hydrophobic hydrocarbon tail that interacts with oil. Most dirt is oily and does not dissolve in water. When soap is added, the hydrocarbon tails attach to the oil droplets, while the ionic ends face the surrounding water. This orientation pulls the dirt away from the surface and forms a structure called a micelle. These micelles stay in the water as a colloid due to ion-ion repulsion, forming an emulsion that can be easily rinsed away, leaving clothes clean.",
+      "question_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "answer_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 471,
+      "batch_id": 51,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Compare the effectiveness of soap and detergent in hard water, explaining why they differ in performance.",
+      "answer": "Soap is ineffective in hard water because it contains calcium and magnesium ions that react with soap molecules to form an insoluble substance known as scum. This results in the formation of foam with difficulty and requires using more soap. Conversely, detergents are typically sodium salts of sulphonic acids or ammonium salts with chlorides/bromides. These compounds do not form insoluble precipitates with the calcium or magnesium ions present in hard water. Therefore, detergents remain effective cleansing agents in hard water and are widely used in shampoos and clothes-cleaning products.",
+      "question_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "answer_citation_ids": [
+        "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+      ],
+      "deterministic_supported": true,
+      "deterministic_issues": [],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    },
+    {
+      "candidate_id": 472,
+      "batch_id": 51,
+      "qtype": "long_answer",
+      "marks": 5,
+      "raw_text": "Explain the role of functional groups and structural properties of soaps in their cleansing action.",
+      "answer": "Soaps are sodium or potassium salts of long-chain carboxylic acids. Their cleansing action is entirely dependent on the structural properties of these molecules: having two ends with differing properties. The hydrophilic ionic end facilitates interaction with water, providing solubility. The hydrophobic hydrocarbon tail interacts specifically with non-polar oily substances. In water, these long-chain molecules orient themselves into clusters called micelles, where tails are protected in the interior and ionic ends are in the water. This structure emulsifies oily dirt, keeps the dirt suspended in the solution, and prevents re-deposition, enabling efficient cleaning.",
+      "question_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "answer_citation_ids": [
+        "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+        "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+      ],
+      "deterministic_supported": false,
+      "deterministic_issues": [
+        {
+          "field": "question",
+          "code": "low_lexical_citation_overlap",
+          "detail": "0.12 overlap; missing: action, cleansing, functional, groups, properties, role, structural"
+        },
+        {
+          "field": "question",
+          "code": "formula_or_diagram_review_required",
+          "detail": "structural"
+        }
+      ],
+      "manual_status": "supported",
+      "manual_note": "Cited excerpt(s) support the generated question and answer at manual spot-check level."
+    }
+  ]
+}

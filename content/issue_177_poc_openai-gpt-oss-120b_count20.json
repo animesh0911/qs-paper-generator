@@ -1,0 +1,838 @@
+{
+  "provider": "openrouter",
+  "model": "openai/gpt-oss-120b",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 12,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25494,
+  "approx_input_tokens_4c": 6374,
+  "elapsed_ms": 150113,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is the term used for the ability of carbon atoms to bond with each other forming long chains, branched chains or rings?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the term used for the ability of carbon atoms to bond with each other forming long chains, branched chains or rings?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Isomerism"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Catenation"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Polymerisation"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hydrogen bonding"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Compounds of carbon that contain only single C\u2013C bonds are called:",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Compounds of carbon that contain only single C\u2013C bonds are called:"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Unsaturated compounds"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Saturated compounds"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Catenated compounds"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Polymeric compounds"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "answer_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Why does carbon form many more stable compounds than silicon?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why does carbon form many more stable compounds than silicon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon atoms are larger, allowing more bonds"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Silicon forms only double bonds"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon\u2013carbon bonds are very strong and stable"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Silicon does not exhibit catenation"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "answer_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "The strength of the C\u2013C bond compared to bonds of larger atoms is mainly because carbon:",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "The strength of the C\u2013C bond compared to bonds of larger atoms is mainly because carbon:"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Has a larger atomic radius"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Has a smaller size, allowing stronger attraction"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Has a lower electronegativity"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Forms ionic bonds easily"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "c0282130e08398cce56f608405112ec10683c1c5e259266cda8fe430e526b48b"
+        ],
+        "answer_citation_ids": [
+          "c0282130e08398cce56f608405112ec10683c1c5e259266cda8fe430e526b48b"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which functional group is represented by \u2013OH in Table\u202f4.3?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which functional group is represented by \u2013OH in Table\u202f4.3?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alcohol"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Aldehyde"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ketone"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carboxylic acid"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "A",
+        "question_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "answer_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Define catenation in carbon compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define catenation in carbon compounds."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Catenation is the ability of carbon atoms to bond with each other, forming long chains, branched chains or rings.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why are carbon\u2011carbon bonds stronger than silicon\u2011silicon bonds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why are carbon\u2011carbon bonds stronger than silicon\u2011silicon bonds?"
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Carbon atoms are smaller, so the nucleus attracts the shared electron pair more strongly, resulting in a very strong C\u2013C bond; silicon atoms are larger, giving weaker Si\u2013Si bonds.",
+        "question_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "answer_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "State the valency of carbon.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "State the valency of carbon."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Carbon has a valency of four; it can form four covalent bonds with other atoms.",
+        "question_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "answer_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Write the general formula for alkanes.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Write the general formula for alkanes."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "The general formula for alkanes is C\u2099H\u2082\u2099\u208a\u2082, where n is the number of carbon atoms.",
+        "question_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "answer_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is a homologous series?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is a homologous series?"
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "A homologous series is a group of compounds that differ by a constant unit (\u2011CH\u2082\u2011) and possess the same functional group, leading to similar chemical properties.",
+        "question_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+        ],
+        "answer_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain why carbon can form long chains, branched chains and rings.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why carbon can form long chains, branched chains and rings."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "1. Carbon exhibits catenation \u2013 it can bond to other carbon atoms, giving rise to long and branched chains. 2. Each carbon atom has a valency of four, allowing multiple bonding possibilities. 3. The C\u2013C single, double and triple bonds are strong and stable. 4. These features together enable the formation of linear, branched and cyclic structures.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Distinguish saturated and unsaturated hydrocarbons with examples.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Distinguish saturated and unsaturated hydrocarbons with examples."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Saturated hydrocarbons (alkanes) contain only single C\u2013C bonds; e.g., methane (CH\u2084) and ethane (C\u2082H\u2086). Unsaturated hydrocarbons contain double or triple C\u2013C bonds; alkenes (e.g., ethene, C\u2082H\u2084) have at least one double bond, while alkynes (e.g., ethyne, C\u2082H\u2082) have a triple bond.",
+        "question_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "answer_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Describe structural isomerism in butane using Figure\u00a04.8.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe structural isomerism in butane using Figure\u00a04.8."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Butane (C\u2084H\u2081\u2080) has two structural isomers: n\u2011butane with a straight chain (CH\u2083\u2011CH\u2082\u2011CH\u2082\u2011CH\u2083) and isobutane with a branched chain where three carbons form a chain and the fourth carbon is attached as a side group (CH\u2083\u2011CH(CH\u2083)\u2011CH\u2083). Both have the same molecular formula but different connectivity.",
+        "question_citation_ids": [
+          "efb71c4cfda607c15989df213488757526f80fe34aed883b4ed50c758db467a9"
+        ],
+        "answer_citation_ids": [
+          "efb71c4cfda607c15989df213488757526f80fe34aed883b4ed50c758db467a9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain step\u2011wise how the electron\u2011dot structure of ethene is obtained.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain step\u2011wise how the electron\u2011dot structure of ethene is obtained."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Step\u202f1: Link the two carbon atoms with a single bond. Step\u202f2: Each carbon still has one valency unsatisfied, so a double bond is introduced between them. Step\u202f3: Attach three hydrogen atoms to each carbon to satisfy the remaining three valencies, giving the structure C\u2082H\u2084 with a C=C double bond.",
+        "question_citation_ids": [
+          "197c767fb3535febe7e4a583db8e28c55f204da95042810650601750bd197e2b",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "answer_citation_ids": [
+          "197c767fb3535febe7e4a583db8e28c55f204da95042810650601750bd197e2b",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "List the steps for naming propanol according to the IUPAC rules given.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "List the steps for naming propanol according to the IUPAC rules given."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "1. Identify the longest carbon chain \u2013 three carbons \u2192 \u201cprop\u201d. 2. Determine the principal functional group \u2013 \u2013OH, which is given the suffix \u201c\u2011ol\u201d. 3. Since the suffix begins with a vowel, drop the final \u201ce\u201d from \u201cpropane\u201d and add \u201c\u2011ol\u201d \u2192 \u201cpropan\u2011ol\u201d. 4. Number the chain so that the \u2013OH gets the lowest possible number (position\u202f1). Hence the name is \u201cpropan\u20111\u2011ol\u201d.",
+        "question_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "answer_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Discuss how catenation and tetravalency contribute to the versatile nature of carbon.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Discuss how catenation and tetravalency contribute to the versatile nature of carbon."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Catenation is the unique ability of carbon atoms to bond with each other, forming long, branched and cyclic structures. This is possible because each carbon atom can form four covalent bonds (tetravalency). The four valencies allow carbon to link to other carbon atoms as well as to various heteroatoms (H, O, N, S, halogens). The C\u2013C bonds are strong, ensuring stability of large molecules. Together, catenation and tetravalency give rise to millions of organic compounds with diverse structures and properties, far exceeding those of other elements.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Explain the trend in boiling points within a homologous series of alkanes and the reason for this trend.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the trend in boiling points within a homologous series of alkanes and the reason for this trend."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "In a homologous series of alkanes, the boiling point increases as the number of carbon atoms (and thus molecular mass) increases. Larger molecules have greater surface area, leading to stronger London dispersion forces between molecules. Consequently, more energy (higher temperature) is required to overcome these intermolecular forces, causing a rise in boiling point.",
+        "question_citation_ids": [
+          "92f1f70e881ed5898c58a5093c823492fd34e2521fac0ad8d2bdd4e08464cf12"
+        ],
+        "answer_citation_ids": [
+          "92f1f70e881ed5898c58a5093c823492fd34e2521fac0ad8d2bdd4e08464cf12"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Describe how to construct the electron\u2011dot structure of ethyne and state the number of bonds required between the two carbon atoms.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe how to construct the electron\u2011dot structure of ethyne and state the number of bonds required between the two carbon atoms."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "Step\u202f1: Place the two carbon atoms side by side. Step\u202f2: Since each carbon requires four bonds and each already has one valency left after the single bond, a triple bond (three shared pairs) is introduced between them to satisfy all four valencies. Step\u202f3: Attach one hydrogen atom to each carbon to complete their valencies, giving the structure C\u2082H\u2082. Thus, a triple bond (three covalent bonds) is necessary between the carbon atoms in ethyne.",
+        "question_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "answer_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Illustrate structural isomerism in C\u2084H\u2081\u2080, naming the isomers and describing their structural differences.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Illustrate structural isomerism in C\u2084H\u2081\u2080, naming the isomers and describing their structural differences."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "C\u2084H\u2081\u2080 has two structural isomers. 1) n\u2011Butane: a straight\u2011chain arrangement of four carbon atoms (CH\u2083\u2011CH\u2082\u2011CH\u2082\u2011CH\u2083). 2) Isobutane (or methylpropane): a branched arrangement where three carbons form a chain and the fourth carbon is attached as a side\u2011group (CH\u2083\u2011CH(CH\u2083)\u2011CH\u2083). Both have the same molecular formula but differ in the connectivity of the carbon atoms, leading to different physical properties such as boiling point.",
+        "question_citation_ids": [
+          "efb71c4cfda607c15989df213488757526f80fe34aed883b4ed50c758db467a9",
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "answer_citation_ids": [
+          "efb71c4cfda607c15989df213488757526f80fe34aed883b4ed50c758db467a9",
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Outline the steps to name a compound having a carbonyl group on a four\u2011carbon chain with a double bond, indicating the appropriate suffixes.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Outline the steps to name a compound having a carbonyl group on a four\u2011carbon chain with a double bond, indicating the appropriate suffixes."
+            }
+          ]
+        },
+        "topic_names": [
+          "versatile nature of carbon"
+        ],
+        "answer": "1. Identify the longest chain containing the highest order functional group \u2013 a carbonyl (C=O) takes priority, so the chain must include it. 2. The chain has four carbons \u2192 \u201cbut\u201d. 3. Because a double bond is present, the suffix \u201c\u2011ene\u201d replaces \u201c\u2011ane\u201d. 4. The carbonyl group is indicated by the suffix \u201c\u2011one\u201d. 5. Combine the suffixes, giving \u201cbut\u20112\u2011en\u20111\u2011one\u201d (if the carbonyl is on C\u20111 and the double bond starts at C\u20112). The final name reflects both the double bond (\u2011ene) and the carbonyl (\u2011one) with appropriate numbering.",
+        "question_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15",
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "answer_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 20,
+  "valid_count": 19,
+  "validation_errors": [
+    {
+      "index": 9,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    },
+    {
+      "index": 9,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    }
+  ],
+  "persisted_candidate_count": 19
+}

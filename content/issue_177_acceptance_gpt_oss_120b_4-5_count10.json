@@ -1,0 +1,91 @@
+{
+  "provider": "openrouter",
+  "model": "openai/gpt-oss-120b",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 19,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.5",
+  "topic_title": "4.5 SOAPS AND DETERGENTS",
+  "chapter_map_node_id": "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 7,
+    "context_char_count": 7210,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 13551,
+  "approx_input_tokens_4c": 3387,
+  "elapsed_ms": 192706,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "answer": "B",
+        "answer_citation_ids": [
+          "4a23e091078b226dc0bff..."
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "...… ...",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": -3,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "The"
+        ],
+        "raw_text": "raw_text",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "",
+          ""
+        ]
+      }
+    ]
+  },
+  "raw_question_count": 1,
+  "valid_count": 0,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "marks_qtype_mismatch",
+      "detail": "mcq/-3"
+    },
+    {
+      "index": 0,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    },
+    {
+      "index": 0,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: The"
+    },
+    {
+      "index": 0,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 4a23e091078b226dc0bff..."
+    }
+  ],
+  "persisted_candidate_count": 0
+}

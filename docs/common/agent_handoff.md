@@ -14,6 +14,19 @@ next steps only.
 
 ## Log
 
+### 2026-06-21 — Issue 177 GPT-OSS Grounded Generation POC
+
+Commit: `f7f3ab2` (+ artifacts `fdc0430`, Antigravity follow-up fix in latest commit)
+Owner: Varad / Codex
+
+Changed: issue #177 final model/count recommendation is `google/gemini-3.1-flash-lite` via OpenRouter at count=15; semantic review of batches 47–51 found 74/75 supported candidates and one candidate (`438`) needing teacher edit/discard.
+
+Files: `docs/common/issue_177_grounded_generation_acceptance_report.md`, `backend/ai_services/llm.py`, `backend/bank/generation.py`, `backend/bank/citation_support.py`, `backend/bank/tests/test_generation.py`, `content/issue_177_poc_*_count*.json`, `content/issue_177_acceptance_*_4-*_count10*.json`, `content/issue_177_gemini_compare_*_count20.json`, `content/issue_177_flash_lite_compare_*_count*.json`, `content/issue_177_final_manual_review_gemini_3_1_flash_lite_count15.json`
+
+Boundary: do not run more live model calls without fresh Rule 13 consent; generated candidates remain teacher-review gated and candidate `438` should not be accepted without edit/discard.
+
+Next: run Antigravity review, final deterministic verification, push branch, and close #177 only after verified.
+
 ### 2026-05-30 — Backend PaperDocumentV1 Assemble Gap
 
 Commit: PENDING
