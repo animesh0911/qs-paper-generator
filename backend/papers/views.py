@@ -27,7 +27,7 @@ from .answer_document import (
     printable_answers_by_slot,
     validate_answer_document,
 )
-from .assets import with_resolved_asset_urls
+from .assets import strip_resolved_asset_urls, with_resolved_asset_urls
 from .builder import PaperBuilder
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
@@ -181,8 +181,11 @@ class PaperEditorDraftView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        paper.document = document
-        paper.answer_document = answer_document
+        # Strip the non-canonical asset ``url`` the GET added before persisting,
+        # so the editor round-trip never leaks a host-absolute/expiring URL into
+        # the stored documents (kept assetId-only, contract §13).
+        paper.document = strip_resolved_asset_urls(document)
+        paper.answer_document = strip_resolved_asset_urls(answer_document)
         # Bump the revision so a queued AI job (#31) whose base_revision predates
         # this edit is cancelled by the drain instead of spending paid tokens on
         # a now-stale proposal (Rule 13).

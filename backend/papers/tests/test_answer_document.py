@@ -486,6 +486,51 @@ def test_editor_draft_patch_saves_both_and_bumps_revision(api_client, user):
 
 
 @pytest.mark.django_db
+def test_editor_draft_patch_strips_resolved_asset_urls(api_client, user):
+    """The editor round-trips the url the GET added; PATCH must strip it before
+    persisting, or the raw assetId-only paper endpoints would leak host-absolute
+    (or expiring) URLs from the stored document."""
+    document = {
+        "schemaVersion": PAPER_SCHEMA,
+        "paper": {"sections": []},
+        "questions": [
+            {
+                "id": "q_1",
+                "content": {
+                    "stem": [
+                        {
+                            "type": "image",
+                            "assetId": "diagrams/x.png",
+                            "url": "http://testserver/media/diagrams/x.png",
+                        }
+                    ]
+                },
+            }
+        ],
+    }
+    paper = Paper.objects.create(
+        created_by=user, document={"schemaVersion": PAPER_SCHEMA, "paper": {}}
+    )
+    answer_document = {
+        "schemaVersion": ANSWER_SCHEMA_VERSION,
+        "paperId": f"paper_{paper.pk}",
+        "answersBySlotId": {},
+    }
+
+    resp = api_client.patch(
+        f"/api/papers/{paper.pk}/editor-draft/",
+        {"document": document, "answer_document": answer_document},
+        format="json",
+    )
+
+    assert resp.status_code == 200
+    paper.refresh_from_db()
+    stem_item = paper.document["questions"][0]["content"]["stem"][0]
+    assert stem_item["assetId"] == "diagrams/x.png"
+    assert "url" not in stem_item
+
+
+@pytest.mark.django_db
 def test_editor_draft_patch_does_not_mutate_bank_answer(api_client, user):
     """Editor answer edits are paper-local — the shared bank answer is untouched
     (issue #122): another paper using the same question keeps the bank answer."""

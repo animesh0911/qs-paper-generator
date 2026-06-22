@@ -43,3 +43,25 @@ def with_resolved_asset_urls(node, url_for: Callable[[str], str]):
     if isinstance(node, list):
         return [with_resolved_asset_urls(item, url_for) for item in node]
     return node
+
+
+def strip_resolved_asset_urls(node):
+    """Inverse of ``with_resolved_asset_urls``: drop the ``url`` we add beside an
+    ``assetId``.
+
+    The editor round-trips an enriched document back on save, so PATCH must strip
+    the non-canonical ``url`` before persisting — otherwise a host-absolute (or
+    expiring signed) URL would be stored and leak through the raw, assetId-only
+    paper endpoints. Only a ``url`` that sits beside an ``assetId`` is removed, so
+    any unrelated ``url`` field is left alone. Returns a deep copy.
+    """
+    if isinstance(node, dict):
+        has_asset = "assetId" in node
+        return {
+            key: strip_resolved_asset_urls(value)
+            for key, value in node.items()
+            if not (has_asset and key == "url")
+        }
+    if isinstance(node, list):
+        return [strip_resolved_asset_urls(item) for item in node]
+    return node
