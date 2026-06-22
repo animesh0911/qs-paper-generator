@@ -383,8 +383,53 @@ def test_grounded_batch_rejects_unknown_citations(db, user, monkeypatch):
     assert GeneratedQuestionCandidate.objects.count() == 0
 
 
-def test_accept_ready_batch_inserts_questions_and_marks_candidates(api_client, user):
-    """Teacher acceptance is the only path from generated candidate to bank row."""
+def test_accept_ready_batch_inserts_selected_questions_and_rejects_rest(
+    api_client, user
+):
+    """Teacher acceptance imports selected candidates and audits rejected ones."""
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.READY_FOR_REVIEW,
+        ready_at=timezone.now(),
+    )
+    accepted_candidate = GeneratedQuestionCandidate.objects.create(
+        batch=batch, payload=_payload(raw_text="Accepted generated Question?")
+    )
+    rejected_candidate = GeneratedQuestionCandidate.objects.create(
+        batch=batch, payload=_payload(raw_text="Rejected generated Question?")
+    )
+
+    resp = api_client.post(
+        f"/api/bank/generation-batches/{batch.pk}/accept/",
+        {"accepted_candidate_ids": [accepted_candidate.pk]},
+        format="json",
+    )
+
+    assert resp.status_code == 200
+    batch.refresh_from_db()
+    accepted_candidate.refresh_from_db()
+    rejected_candidate.refresh_from_db()
+    question = Question.objects.get()
+    assert batch.status == GenerationBatchStatus.ACCEPTED
+    assert accepted_candidate.status == GeneratedQuestionCandidateStatus.ACCEPTED
+    assert accepted_candidate.question == question
+    assert accepted_candidate.accepted_at is not None
+    assert rejected_candidate.status == GeneratedQuestionCandidateStatus.REJECTED
+    assert rejected_candidate.question is None
+    assert rejected_candidate.rejected_at is not None
+    assert question.text == "Accepted generated Question?"
+    assert question.school == user.school
+    assert question.source_type == SourceType.AI_GENERATED
+    assert question.answer_source == AnswerSource.GENERATED_UNVERIFIED
+    assert question.verified is False
+    assert question.chapter.slug == "life-processes"
+
+
+def test_accept_ready_batch_rejects_empty_selection_without_side_effects(
+    api_client, user
+):
+    """A teacher cannot complete review when no candidates remain accepted."""
     batch = GenerationBatch.objects.create(
         school=user.school,
         created_by=user,
@@ -395,20 +440,97 @@ def test_accept_ready_batch_inserts_questions_and_marks_candidates(api_client, u
         batch=batch, payload=_payload()
     )
 
-    resp = api_client.post(f"/api/bank/generation-batches/{batch.pk}/accept/")
+    resp = api_client.post(
+        f"/api/bank/generation-batches/{batch.pk}/accept/",
+        {"accepted_candidate_ids": []},
+        format="json",
+    )
 
-    assert resp.status_code == 200
+    assert resp.status_code == 400
     batch.refresh_from_db()
     candidate.refresh_from_db()
-    question = Question.objects.get()
-    assert batch.status == GenerationBatchStatus.ACCEPTED
-    assert candidate.status == GeneratedQuestionCandidateStatus.ACCEPTED
-    assert candidate.question == question
-    assert question.school == user.school
-    assert question.source_type == SourceType.AI_GENERATED
-    assert question.answer_source == AnswerSource.GENERATED_UNVERIFIED
-    assert question.verified is False
-    assert question.chapter.slug == "life-processes"
+    assert batch.status == GenerationBatchStatus.READY_FOR_REVIEW
+    assert candidate.status == GeneratedQuestionCandidateStatus.READY_FOR_REVIEW
+    assert Question.objects.count() == 0
+
+
+def test_accept_ready_batch_rejects_unknown_or_foreign_candidate_ids(api_client, user):
+    """The selected ids must be ready candidates from this owned batch."""
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.READY_FOR_REVIEW,
+        ready_at=timezone.now(),
+    )
+    candidate = GeneratedQuestionCandidate.objects.create(
+        batch=batch, payload=_payload()
+    )
+
+    resp = api_client.post(
+        f"/api/bank/generation-batches/{batch.pk}/accept/",
+        {"accepted_candidate_ids": [candidate.pk + 1000]},
+        format="json",
+    )
+
+    assert resp.status_code == 400
+    candidate.refresh_from_db()
+    assert candidate.status == GeneratedQuestionCandidateStatus.READY_FOR_REVIEW
+    assert Question.objects.count() == 0
+
+
+def test_accept_batch_is_owner_scoped_and_must_still_be_ready(api_client, user):
+    """Foreign, failed, and expired batches cannot be partially accepted."""
+    expired = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.READY_FOR_REVIEW,
+        ready_at=timezone.now() - timedelta(days=31),
+    )
+    expired_candidate = GeneratedQuestionCandidate.objects.create(
+        batch=expired, payload=_payload()
+    )
+    failed = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.FAILED,
+    )
+    failed_candidate = GeneratedQuestionCandidate.objects.create(
+        batch=failed, payload=_payload()
+    )
+    other_school = School.objects.create(name="Other School for accept")
+    other_user = type(user).objects.create_user(
+        email="accept-other@example.com", password="pass", school=other_school
+    )
+    foreign = GenerationBatch.objects.create(
+        school=other_school,
+        created_by=other_user,
+        status=GenerationBatchStatus.READY_FOR_REVIEW,
+        ready_at=timezone.now(),
+    )
+    foreign_candidate = GeneratedQuestionCandidate.objects.create(
+        batch=foreign, payload=_payload()
+    )
+
+    expired_resp = api_client.post(
+        f"/api/bank/generation-batches/{expired.pk}/accept/",
+        {"accepted_candidate_ids": [expired_candidate.pk]},
+        format="json",
+    )
+    failed_resp = api_client.post(
+        f"/api/bank/generation-batches/{failed.pk}/accept/",
+        {"accepted_candidate_ids": [failed_candidate.pk]},
+        format="json",
+    )
+    foreign_resp = api_client.post(
+        f"/api/bank/generation-batches/{foreign.pk}/accept/",
+        {"accepted_candidate_ids": [foreign_candidate.pk]},
+        format="json",
+    )
+
+    assert expired_resp.status_code == 409
+    assert failed_resp.status_code == 409
+    assert foreign_resp.status_code == 404
+    assert Question.objects.count() == 0
 
 
 def test_expiry_marks_unaccepted_candidates_but_preserves_accepted_questions(db, user):

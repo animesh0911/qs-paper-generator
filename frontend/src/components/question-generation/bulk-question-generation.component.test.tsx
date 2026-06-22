@@ -124,8 +124,11 @@ describe('GenerationProgressWorkspace', () => {
       candidates: [],
       candidatesLoading: false,
       candidatesError: '',
+      accepting: false,
+      acceptError: '',
       onRunInBackground: vi.fn(),
       onTryAgain: vi.fn(),
+      onAcceptCandidates: vi.fn(),
       onRetryCandidates: vi.fn(),
       onBackToPaperSetup: vi.fn(),
       ...overrides,
@@ -162,7 +165,54 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).not.toContain('Grounding / citation context');
     expect(html).not.toContain('NCERT p. 84');
     expect(html).toContain('Reject');
+    expect(html).toContain('Import accepted Q&amp;A');
+    expect(html).toMatch(/<button(?![^>]*disabled="")[^>]*>Import accepted Q&amp;A<\/button>/);
     expect(html).not.toContain('Run in background');
+  });
+
+  it('disables final import when every candidate is rejected', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'ready_for_review', candidate_count: 1 },
+          candidates,
+          initialRejectedCandidateIds: [1],
+        })}
+      />,
+    );
+
+    expect(html).toContain('0</span> accepted');
+    expect(html).toContain('1</span> rejected');
+    expect(html).toContain('Restore at least one candidate');
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Import accepted Q&amp;A<\/button>/);
+  });
+
+  it('shows a recoverable final import API error', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'ready_for_review', candidate_count: 1 },
+          candidates,
+          acceptError: 'Request failed (409)',
+        })}
+      />,
+    );
+
+    expect(html).toContain('Import failed.');
+    expect(html).toContain('Request failed (409)');
+    expect(html).toContain('Import accepted Q&amp;A');
+  });
+
+  it('shows completed state after the batch is accepted', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({ batch: { ...baseBatch, status: 'accepted' } })}
+      />,
+    );
+
+    expect(html).toContain('Generation batch accepted');
+    expect(html).toContain('imported into the Question bank');
+    expect(html).toContain('Back to paper setup');
   });
 
   it('shows candidate loading, empty, and error states', () => {

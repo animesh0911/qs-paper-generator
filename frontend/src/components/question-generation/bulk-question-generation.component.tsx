@@ -211,6 +211,10 @@ export interface GenerationProgressWorkspaceProps {
   candidatesError: string;
   onRunInBackground: () => void;
   onTryAgain: () => void;
+  accepting: boolean;
+  acceptError: string;
+  initialRejectedCandidateIds?: number[];
+  onAcceptCandidates: (acceptedCandidateIds: number[]) => void;
   onRetryCandidates: () => void;
   onBackToPaperSetup: () => void;
 }
@@ -248,18 +252,34 @@ export function GenerationProgressWorkspace({
   candidates,
   candidatesLoading,
   candidatesError,
+  accepting,
+  acceptError,
+  initialRejectedCandidateIds = [],
   onRunInBackground,
   onTryAgain,
+  onAcceptCandidates,
   onRetryCandidates,
   onBackToPaperSetup,
 }: GenerationProgressWorkspaceProps) {
-  const [rejectedCandidateIds, setRejectedCandidateIds] = useState<Set<number>>(new Set());
+  const [rejectedCandidateIds, setRejectedCandidateIds] = useState<Set<number>>(
+    () => new Set(initialRejectedCandidateIds),
+  );
   const noValidQuestions = batch ? shouldShowNoValidQuestionsMessage(batch) : false;
   const active = batch ? isActiveGenerationStatus(batch.status) : false;
   const reviewCounts = candidateReviewCounts(candidates, rejectedCandidateIds);
 
   function toggleRejected(candidateId: number) {
     setRejectedCandidateIds((current) => toggleRejectedCandidate(current, candidateId));
+  }
+
+  function acceptedCandidateIds() {
+    return candidates
+      .filter((candidate) => !rejectedCandidateIds.has(candidate.id))
+      .map((candidate) => candidate.id);
+  }
+
+  function importAcceptedCandidates() {
+    onAcceptCandidates(acceptedCandidateIds());
   }
 
   return (
@@ -333,8 +353,8 @@ export function GenerationProgressWorkspace({
                       <h2 className="font-medium">Review generated Q&amp;A</h2>
                       <p className="mt-1 text-sm text-muted-foreground">
                         Answers are visible by default. All candidates are accepted
-                        locally until you reject them; nothing enters the Question bank
-                        from this review screen yet.
+                        locally until you reject them; the final import sends only
+                        accepted candidates to the Question bank.
                       </p>
                     </div>
                     <div className="rounded-md border px-3 py-2 text-sm">
@@ -416,6 +436,40 @@ export function GenerationProgressWorkspace({
                       })}
                     </ul>
                   )}
+
+                  {acceptError && (
+                    <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3" role="alert">
+                      <p className="text-sm font-medium">Import failed.</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{acceptError}</p>
+                    </div>
+                  )}
+
+                  <div className="sticky bottom-0 -mx-6 border-t bg-background/95 px-6 py-4 shadow-lg backdrop-blur">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-sm">
+                        <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}
+                        <span className="font-medium">{reviewCounts.rejected}</span> rejected
+                      </p>
+                      <Button
+                        type="button"
+                        onClick={importAcceptedCandidates}
+                        disabled={
+                          accepting ||
+                          candidatesLoading ||
+                          Boolean(candidatesError) ||
+                          candidates.length === 0 ||
+                          reviewCounts.accepted === 0
+                        }
+                      >
+                        {accepting ? 'Importing accepted Q&A…' : 'Import accepted Q&A'}
+                      </Button>
+                    </div>
+                    {reviewCounts.accepted === 0 && candidates.length > 0 && (
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Restore at least one candidate to import into the Question bank.
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -425,7 +479,21 @@ export function GenerationProgressWorkspace({
                 </Button>
               )}
 
-              {(batch.status === 'accepted' || batch.status === 'expired') && (
+              {batch.status === 'accepted' && (
+                <div className="border-t pt-4 space-y-3">
+                  <div>
+                    <h2 className="font-medium">Generation batch accepted</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Accepted Q&amp;A candidates have been imported into the Question bank.
+                    </p>
+                  </div>
+                  <Button type="button" variant="outline" onClick={onBackToPaperSetup}>
+                    Back to paper setup
+                  </Button>
+                </div>
+              )}
+
+              {batch.status === 'expired' && (
                 <Button type="button" variant="outline" onClick={onBackToPaperSetup}>
                   Back to paper setup
                 </Button>
