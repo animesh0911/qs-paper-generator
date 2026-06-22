@@ -164,13 +164,16 @@ def _render_reportlab_pdf(document: dict) -> bytes:
     return pdf
 
 
-def render_answer_key_pdf(document: dict, answers_by_id: dict[str, str]) -> bytes:
+def render_answer_key_pdf(document: dict, answers_by_slot: dict[str, str]) -> bytes:
     """Render the marking-scheme PDF for a paper.
 
-    ``answers_by_id`` maps the contract question id (``"q_{pk}"``) to its answer
-    text — supplied by the view from the answer-revealing serializer, never from
-    the document (the document deliberately omits answers). Walks the canonical
-    slot order so the key numbering matches the question paper exactly.
+    ``answers_by_slot`` maps the contract **slot id** to printable answer text —
+    supplied by the view from the saved ``paper_answer_document.v1`` (issue
+    #122), never from ``document`` (which deliberately omits answers). Keying by
+    slot id means a swapped question prints its current answer in current order.
+    Walks the canonical slot order so the key numbering matches the question
+    paper exactly. A filled slot with no printable answer renders
+    ``Answer not available``.
     """
     paper = document["paper"]
     title = paper["title"]
@@ -211,15 +214,15 @@ def render_answer_key_pdf(document: dict, answers_by_id: dict[str, str]) -> byte
             marks = slot["marks"]
             mark_label = f"{marks} mark{'s' if marks != 1 else ''}"
             qid = slot.get("selectedQuestionId")
-            answer = answers_by_id.get(qid) if qid else None
+            answer = answers_by_slot.get(_slot_id(slot)) if qid else None
             if qid is None:
                 body = "<i>(unfilled)</i>"
             elif answer:
                 body = answer
             else:
-                # Filled slot whose source carries no stored answer: surface the
-                # gap instead of silently printing a blank marking entry.
-                body = "<i>(no answer on file)</i>"
+                # Filled slot whose saved answer is missing or not yet verified:
+                # surface the gap instead of silently printing a blank entry.
+                body = "<i>Answer not available</i>"
             story.append(Paragraph(f"<b>Q{number}.</b> ({mark_label}) {body}", a_style))
 
     doc.build(story)
@@ -261,6 +264,11 @@ def _question_id(question: dict) -> str:
 def _slot_number(slot: dict) -> str:
     """Return the slot display number across current and legacy document keys."""
     return slot.get("number") or slot["displayNumber"]
+
+
+def _slot_id(slot: dict) -> str:
+    """Return the slot id across current and legacy document keys."""
+    return slot.get("id") or slot["slotId"]
 
 
 def _option_text(option: dict, overrides: dict) -> str:

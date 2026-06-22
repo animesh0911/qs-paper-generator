@@ -260,20 +260,27 @@ def _first_selected_qid(document: dict) -> str:
 
 
 @pytest.mark.django_db
-def test_answer_key_pdf_endpoint_renders_stored_answers(api_client, seeded_bank):
-    """The marking-scheme endpoint joins the canonical paper with bank answers.
+def test_answer_key_pdf_endpoint_renders_saved_answers(api_client, seeded_bank):
+    """The marking-scheme endpoint renders the saved paper-local answer document.
 
-    The answer text lives only on the Question row (never the document), so this
-    proves the gated join reaches the PDF — not that a constant was printed.
+    Since #122 the answer is a paper-local snapshot (``Paper.answer_document``)
+    edited in the editor, not a live bank join — so a teacher-edited answer
+    prints. This proves the saved document reaches the PDF.
     """
-    from bank.models import Question
+    from papers.models import Paper
 
     create = api_client.post("/api/papers/assemble", {}, format="json")
     document = create.data
-    paper_pk = document["paper"]["id"].removeprefix("paper_")
-    qid = _first_selected_qid(document)
-    selected_pk = int(qid.removeprefix("q_"))
-    Question.objects.filter(pk=selected_pk).update(answer="UNIQUE_MARKING_ANSWER_42")
+    paper_pk = int(document["paper"]["id"].removeprefix("paper_"))
+
+    # Edit a saved answer the way the editor would (paper-local, modified), then
+    # prove that saved answer — not the bank row — is what the PDF renders.
+    paper = Paper.objects.get(pk=paper_pk)
+    slot_id = next(iter(paper.answer_document["answersBySlotId"]))
+    entry = paper.answer_document["answersBySlotId"][slot_id]
+    entry["content"] = [{"type": "paragraph", "text": "UNIQUE_MARKING_ANSWER_42"}]
+    entry["modified"] = True
+    paper.save(update_fields=["answer_document"])
 
     resp = api_client.get(f"/api/papers/{paper_pk}/answer-key/pdf/")
 
@@ -281,6 +288,33 @@ def test_answer_key_pdf_endpoint_renders_stored_answers(api_client, seeded_bank)
     assert resp["Content-Type"] == "application/pdf"
     assert resp.content[:4] == b"%PDF"
     assert "UNIQUE_MARKING_ANSWER_42" in _pdf_text(resp.content)
+
+
+@pytest.mark.django_db
+def test_assemble_persists_answer_document_keyed_by_slot(api_client, seeded_bank):
+    """Assembly must persist a paper-local answer document so the editor has an
+    answer lane immediately (issue #122) — keyed by the same slot ids the paper
+    document uses, never leaked into the paper document itself.
+    """
+    from papers.answer_document import ANSWER_SCHEMA_VERSION
+    from papers.models import Paper
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    document = create.data
+    paper_pk = int(document["paper"]["id"].removeprefix("paper_"))
+
+    paper = Paper.objects.get(pk=paper_pk)
+    assert paper.answer_document["schemaVersion"] == ANSWER_SCHEMA_VERSION
+    entries = paper.answer_document["answersBySlotId"]
+
+    filled_slot_ids = {
+        slot["id"]
+        for section in document["paper"]["sections"]
+        for slot in section["slots"]
+        if slot.get("selectedQuestionId")
+    }
+    assert filled_slot_ids
+    assert set(entries) == filled_slot_ids
 
 
 @pytest.mark.django_db

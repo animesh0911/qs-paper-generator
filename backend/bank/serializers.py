@@ -7,10 +7,10 @@ paper-assemble and paper-detail responses never leak the answer key.
 ``ChapterSerializer`` is used both standalone (``GET /api/bank/chapters/``)
 and nested inside the question shape.
 
-``AnswerKeySerializer`` is the only shape that reveals ``answer``. It exists
-solely to build the marking-scheme PDF and must never be nested in a
-client-facing question/paper response — answers stay gated behind the
-owner-scoped answer-key endpoint (``papers.views.PaperAnswerKeyPdfView``).
+No serializer here exposes ``answer``. Answers reach the paper owner only
+through the paper-local answer document (``papers.answer_document``), which reads
+``Question.answer``/``answer_source`` directly; they are never serialized into a
+client-facing question/paper response.
 """
 
 from rest_framework import serializers
@@ -51,20 +51,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             "text",
             "options",
         ]
-
-
-class AnswerKeySerializer(serializers.ModelSerializer):
-    """Answer-revealing question shape — the one place ``answer`` is exposed.
-
-    Used only by the answer-key endpoint to assemble the marking scheme. The
-    access rule (paper owner only) lives at the view, which also uses
-    ``answer_source`` to suppress unverified generated answers. Carries only
-    those fields — nothing renderable to clients.
-    """
-
-    class Meta:
-        model = Question
-        fields = ["id", "marks", "answer", "answer_source"]
 
 
 class IngestionUploadSerializer(serializers.Serializer):
