@@ -175,6 +175,7 @@ class _Provider:
     env_prefix: str  # <PREFIX>_MODEL / <PREFIX>_API_KEY (matches docker-compose)
     api_key_kwarg: str | None  # constructor kwarg the integration reads, if any
     default_model: str | None
+    default_base_url: str | None = None
 
 
 # Short names are what LLM_PROVIDER carries (docker-compose passes GEMINI_*/
@@ -185,6 +186,23 @@ _PROVIDERS: dict[str, _Provider] = {
     "gemini": _Provider("google_genai", "GEMINI", "google_api_key", _DEFAULT_MODEL),
     "anthropic": _Provider("anthropic", "ANTHROPIC", "api_key", None),
     "openai": _Provider("openai", "OPENAI", "api_key", None),
+    "openrouter": _Provider(
+        "openai",
+        "OPENROUTER",
+        "api_key",
+        None,
+        "https://openrouter.ai/api/v1",
+    ),
+    # DeepSeek is OpenAI-compatible. Keep it behind the provider-neutral seam so
+    # the generation path can compare the selected low-cost model without
+    # importing a DeepSeek-specific SDK into feature code.
+    "deepseek": _Provider(
+        "openai",
+        "DEEPSEEK",
+        "api_key",
+        "deepseek-chat",
+        "https://api.deepseek.com",
+    ),
     "ollama": _Provider("ollama", "OLLAMA", None, None),
 }
 
@@ -250,6 +268,9 @@ def resolve_chat_model_config(purpose: ModelPurpose) -> ChatModelConfig:
         key = os.getenv(f"{provider.env_prefix}_API_KEY")
         if key:
             init_kwargs[provider.api_key_kwarg] = key
+    base_url = os.getenv(f"{provider.env_prefix}_BASE_URL") or provider.default_base_url
+    if base_url and provider.init_id == "openai":
+        init_kwargs["base_url"] = base_url
     return ChatModelConfig(
         provider=provider.init_id, model=model, init_kwargs=init_kwargs
     )
