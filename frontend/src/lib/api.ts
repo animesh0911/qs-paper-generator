@@ -187,3 +187,14 @@ export async function fetchGenerationCandidates(
   });
   return res.json();
 }
+
+export async function acceptGenerationCandidates(
+  batchId: number | string,
+  acceptedCandidateIds: number[],
+): Promise<GenerationBatch> {
+  const res = await request(`/bank/generation-batches/${batchId}/accept/`, {
+    method: 'POST',
+    body: JSON.stringify({ accepted_candidate_ids: acceptedCandidateIds }),
+  });
+  return res.json();
+}

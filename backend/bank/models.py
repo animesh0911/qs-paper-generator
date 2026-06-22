@@ -425,6 +425,7 @@ class GeneratedQuestionCandidateStatus(models.TextChoices):
 
     READY_FOR_REVIEW = "ready_for_review", "Ready for review"
     ACCEPTED = "accepted", "Accepted"
+    REJECTED = "rejected", "Rejected"
     EXPIRED = "expired", "Expired"
 
 
@@ -454,6 +455,7 @@ class GeneratedQuestionCandidate(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     accepted_at = models.DateTimeField(null=True, blank=True)
+    rejected_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["id"]

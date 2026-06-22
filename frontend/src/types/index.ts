@@ -118,6 +118,7 @@ export interface GeneratedQuestionCandidate {
   grounding_manifest?: unknown;
   question_id: number | null;
   accepted_at: string | null;
+  rejected_at?: string | null;
   created_at: string;
   updated_at: string;
 }
