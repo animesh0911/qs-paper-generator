@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { GenerationBatch } from '@/types';
-import { fetchGenerationBatch } from '@/lib/api';
+import type { GeneratedQuestionCandidate, GenerationBatch } from '@/types';
+import { fetchGenerationBatch, fetchGenerationCandidates } from '@/lib/api';
 import { GenerationProgressWorkspace } from '@/components/question-generation';
 
 const POLL_MS = 3000;
@@ -15,6 +15,10 @@ export default function GenerationProgressPage() {
   const [error, setError] = useState('');
   const [lastCheckedAt, setLastCheckedAt] = useState('');
   const [retryTick, setRetryTick] = useState(0);
+  const [candidates, setCandidates] = useState<GeneratedQuestionCandidate[]>([]);
+  const [candidatesLoading, setCandidatesLoading] = useState(false);
+  const [candidatesError, setCandidatesError] = useState('');
+  const [candidatesRetryTick, setCandidatesRetryTick] = useState(0);
   const hasLoadedBatch = useRef(false);
 
   useEffect(() => {
@@ -53,9 +57,44 @@ export default function GenerationProgressPage() {
     };
   }, [batchId, retryTick]);
 
+  useEffect(() => {
+    if (!batchId || batch?.status !== 'ready_for_review') {
+      setCandidates([]);
+      setCandidatesError('');
+      setCandidatesLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setCandidatesLoading(true);
+    setCandidatesError('');
+    fetchGenerationCandidates(batchId)
+      .then((nextCandidates) => {
+        if (cancelled) return;
+        setCandidates(nextCandidates);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setCandidates([]);
+        setCandidatesError((err as Error).message);
+      })
+      .finally(() => {
+        if (!cancelled) setCandidatesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [batchId, batch?.status, candidatesRetryTick]);
+
   function tryAgain() {
     setError('');
     setRetryTick((current) => current + 1);
+  }
+
+  function retryCandidates() {
+    setCandidatesError('');
+    setCandidatesRetryTick((current) => current + 1);
   }
 
   function backToPaperSetup() {
@@ -69,8 +108,12 @@ export default function GenerationProgressPage() {
       error={error}
       lastCheckedAt={lastCheckedAt}
       pollIntervalMs={POLL_MS}
+      candidates={candidates}
+      candidatesLoading={candidatesLoading}
+      candidatesError={candidatesError}
       onRunInBackground={backToPaperSetup}
       onTryAgain={tryAgain}
+      onRetryCandidates={retryCandidates}
       onBackToPaperSetup={backToPaperSetup}
     />
   );

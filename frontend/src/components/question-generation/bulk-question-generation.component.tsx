@@ -1,4 +1,10 @@
-import type { Chapter, GenerationBatch, GenerationDifficultyLabel } from '@/types';
+import { useState } from 'react';
+import type {
+  Chapter,
+  GenerationBatch,
+  GeneratedQuestionCandidate,
+  GenerationDifficultyLabel,
+} from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   GENERATION_DIFFICULTIES,
@@ -6,6 +12,14 @@ import {
   generationStageLabel,
   shouldShowNoValidQuestionsMessage,
 } from '@/lib/question-generation';
+import {
+  candidateAnswerText,
+  candidateGroundingText,
+  candidateQuestionText,
+  candidateReviewCounts,
+  candidateTopicLabels,
+  toggleRejectedCandidate,
+} from './candidate-review';
 
 const ACTIVE_GENERATION_STATUSES: GenerationBatch['status'][] = [
   'queued',
@@ -193,8 +207,12 @@ export interface GenerationProgressWorkspaceProps {
   error: string;
   lastCheckedAt: string;
   pollIntervalMs: number;
+  candidates: GeneratedQuestionCandidate[];
+  candidatesLoading: boolean;
+  candidatesError: string;
   onRunInBackground: () => void;
   onTryAgain: () => void;
+  onRetryCandidates: () => void;
   onBackToPaperSetup: () => void;
 }
 
@@ -211,18 +229,39 @@ function formatStatusTime(value: string): string {
   }).format(new Date(value));
 }
 
+function candidateTypeLabel(candidate: GeneratedQuestionCandidate): string {
+  const parts = [
+    candidate.payload.qtype,
+    typeof candidate.payload.marks === 'number'
+      ? `${candidate.payload.marks} mark${candidate.payload.marks === 1 ? '' : 's'}`
+      : '',
+    candidate.payload.chapter_slug,
+  ].filter((part): part is string => typeof part === 'string' && Boolean(part));
+  return parts.join(' · ');
+}
+
 export function GenerationProgressWorkspace({
   batch,
   loading,
   error,
   lastCheckedAt,
   pollIntervalMs,
+  candidates,
+  candidatesLoading,
+  candidatesError,
   onRunInBackground,
   onTryAgain,
+  onRetryCandidates,
   onBackToPaperSetup,
 }: GenerationProgressWorkspaceProps) {
+  const [rejectedCandidateIds, setRejectedCandidateIds] = useState<Set<number>>(new Set());
   const noValidQuestions = batch ? shouldShowNoValidQuestionsMessage(batch) : false;
   const active = batch ? isActiveGenerationStatus(batch.status) : false;
+  const reviewCounts = candidateReviewCounts(candidates, rejectedCandidateIds);
+
+  function toggleRejected(candidateId: number) {
+    setRejectedCandidateIds((current) => toggleRejectedCandidate(current, candidateId));
+  }
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -289,22 +328,106 @@ export function GenerationProgressWorkspace({
               )}
 
               {batch.status === 'ready_for_review' && (
-                <div className="border-t pt-4 space-y-3">
-                  <div>
-                    <h2 className="font-medium">Ready for review</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {batch.candidate_count} generated Questions and answers are
-                      ready. Review is required before they enter the Question bank.
-                    </p>
+                <div className="border-t pt-4 space-y-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h2 className="font-medium">Review generated Q&amp;A</h2>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Answers are visible by default. All candidates are accepted
+                        locally until you reject them; nothing enters the Question bank
+                        from this review screen yet.
+                      </p>
+                    </div>
+                    <div className="rounded-md border px-3 py-2 text-sm">
+                      <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}
+                      <span className="font-medium">{reviewCounts.rejected}</span> rejected
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <Button type="button" disabled>
-                      Review generated Questions
-                    </Button>
+
+                  {candidatesLoading && (
+                    <p className="text-sm">Loading generated candidates…</p>
+                  )}
+
+                  {!candidatesLoading && candidatesError && (
+                    <div role="alert" className="space-y-2">
+                      <div>
+                        <p className="text-sm font-medium">Candidates could not be loaded.</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{candidatesError}</p>
+                      </div>
+                      <Button type="button" size="sm" onClick={onRetryCandidates}>
+                        Try loading candidates again
+                      </Button>
+                    </div>
+                  )}
+
+                  {!candidatesLoading && !candidatesError && candidates.length === 0 && (
                     <p className="text-sm text-muted-foreground">
-                      Review workspace is not connected in this release yet.
+                      This batch is ready, but no generated candidates were returned.
                     </p>
-                  </div>
+                  )}
+
+                  {!candidatesLoading && !candidatesError && candidates.length > 0 && (
+                    <ul className="max-h-[64vh] overflow-y-auto rounded-md border" aria-label="Generated Q&A candidates">
+                      {candidates.map((candidate) => {
+                        const rejected = rejectedCandidateIds.has(candidate.id);
+                        const topics = candidateTopicLabels(candidate);
+                        const grounding = candidateGroundingText(candidate);
+                        return (
+                          <li
+                            key={candidate.id}
+                            className={`space-y-3 border-b p-4 last:border-b-0 ${
+                              rejected ? 'bg-secondary/70' : 'bg-background'
+                            }`}
+                          >
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                              <div className="space-y-1">
+                                <p className="font-medium">{candidateQuestionText(candidate)}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {candidateTypeLabel(candidate) || 'Generated candidate'}
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={rejected ? 'outline' : 'ghost'}
+                                onClick={() => toggleRejected(candidate.id)}
+                              >
+                                {rejected ? 'Undo reject' : 'Reject'}
+                              </Button>
+                            </div>
+
+                            <div className="rounded-md border bg-secondary/50 p-3">
+                              <p className="text-xs font-medium text-muted-foreground">Answer</p>
+                              <p className="mt-1 text-sm">{candidateAnswerText(candidate)}</p>
+                            </div>
+
+                            {topics.length > 0 && (
+                              <p className="text-sm text-muted-foreground">
+                                Topics: {topics.join(', ')}
+                              </p>
+                            )}
+
+                            {grounding && (
+                              <div className="rounded-md border p-3">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Grounding / citation context
+                                </p>
+                                <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
+                                  {grounding}
+                                </p>
+                              </div>
+                            )}
+
+                            {rejected && (
+                              <p className="text-sm font-medium" role="status">
+                                Rejected locally. Use Undo to include this candidate again.
+                              </p>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </div>
               )}
 
