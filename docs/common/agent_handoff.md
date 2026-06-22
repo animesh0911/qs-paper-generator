@@ -16,7 +16,7 @@ next steps only.
 
 ### 2026-06-21 — Issue 177 GPT-OSS Grounded Generation POC
 
-Commit: `f7f3ab2`
+Commit: `f7f3ab2` (+ artifacts `fdc0430`, Antigravity follow-up fix in latest commit)
 Owner: Varad / Codex
 
 Changed: issue #177 final model/count recommendation is `google/gemini-3.1-flash-lite` via OpenRouter at count=15; semantic review of batches 47–51 found 74/75 supported candidates and one candidate (`438`) needing teacher edit/discard.

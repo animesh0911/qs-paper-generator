@@ -357,7 +357,7 @@ docker compose exec -T web pytest \
   corpus/tests/test_retrieval.py -q
 ```
 
-Latest focused result after final candidate review: `48 passed, 1 warning in 3.01s`.
+Latest focused result after Antigravity follow-up fixes: `49 passed, 1 warning in 2.97s`.
 
 ## Switchable model configuration
 
@@ -664,6 +664,40 @@ Final #177 acceptance readout:
 | Production recommendation | Pass | Use `google/gemini-3.1-flash-lite` at count=15; do not use GPT-OSS or Gemini 2.5 Flash Lite above count=10 as default. |
 
 Decision: #177's model/count acceptance gate is satisfied for a teacher-review workflow, provided generated candidates remain review-gated and candidate `438` is edited/discarded before acceptance into the bank.
+
+## Antigravity review follow-up — 2026-06-22
+
+Antigravity review was run on implementation commit `f7f3ab2` using the required `Gemini 3.5 Flash (High)` model. The first attempt against the artifact-heavy commit timed out, so commits were split into implementation/report and artifact commits, then the review succeeded.
+
+Review findings and disposition:
+
+| Finding | Disposition | Follow-up |
+| --- | --- | --- |
+| Acceptance report did not explicitly cover several issue acceptance criteria | Accepted | Added the pass/fail checklist below, including unresolved caveats. |
+| `review_candidate_citation_support` is disconnected from production | Rejected as a product-scope blocker | The helper is intentionally a deterministic review aid for the acceptance gate; production bank insertion remains teacher-review gated. The final manual-review artifact demonstrates it was executed against batches 47–51. Future product work can persist review flags if desired. |
+| Tokenizer drops numerals/short tokens/non-English text | Accepted | Updated tokenization to include unicode/numeric tokens and added regression coverage. A follow-up Antigravity rerun flagged combining-mark splitting, so tokenization now preserves Devanagari words by splitting on separators instead of ASCII/word-character classes. |
+| JSON schema not OpenAI strict-mode compatible because `content.options` is optional | Rejected for this acceptance slice | The current LangChain/OpenRouter path accepted the schema across the selected models, and making `options` required for non-MCQ questions would change the emitted payload contract. Track separately if strict OpenAI structured outputs become the required backend. |
+
+## Original issue #177 acceptance-criteria checklist
+
+| Criterion | Result | Evidence / caveat |
+| --- | --- | --- |
+| Explicit consent before live runs | Pass | Each provider/model/count scope was approved in-chat before live calls; no silent retries were run after malformed outputs. |
+| Compare grounded candidates with earlier ungrounded generation | Partial | This branch records extensive grounded-model evidence and shows citation-backed outputs outperform ungrounded-style/provider-memory failures, but it does not rerun a fresh ungrounded baseline because the issue was treated as a cost/HITL gate. |
+| One bounded generation call per selected major topic | Pass | Final selected run used one call per topic, no topic splitting, count=15. |
+| V1 context filtering policy | Pass | Context diagnostics confirm selected subtree chunks under cap; excluded exercises/questions, captionless picture-only, and formula-only chunks by policy. |
+| Generate question and answer together | Pass | All selected payloads include question text/content and answer in the same candidate. |
+| Verify accepted candidate citations support Q+A | Pass with caveat | Final selected batches 47–51 were reviewed: 74/75 supported; candidate 438 must be edited/discarded before bank acceptance. |
+| Review extraction losses/retrieval misses; decide on second extractor | Partial | No extraction/retrieval miss blocked selected-topic grounding for `jesc104`; context covered all five major topics under cap. A second extractor is not justified for this selected path, but this is not a full extraction-quality audit. |
+| Record ingestion/run metrics/cost | Pass | Report includes import time, element/chunk/index metrics, prompt sizes, cap status, live-call counts, latency, and estimated costs. |
+| Dense/hybrid retrieval latency if included | Pass / not applicable | Dense/hybrid retrieval was intentionally skipped; selected-topic generation uses deterministic ChapterMapNode subtree context. |
+| Chapter-map review with teacher workflow | Partial | The selected major-topic ChapterMapNode workflow was exercised through GenerationBatch-style topic selection and context assembly; no separate polished-graph UI teacher walkthrough was performed in this backend acceptance branch. |
+| Deterministic tests and skipped checks | Pass | Latest focused result: `48 passed, 1 warning in 3.01s`; unresolved uncertainty is manual review of future generated candidates. |
+| Mandatory Antigravity review gate | Pass for current implementation commit | Antigravity reviewed `f7f3ab2`; accepted findings were addressed here. Historical per-PR gates before this branch were not re-audited. |
+| Committed report with recommendation | Pass | Final recommendation: proceed to a separate corpus-rollout plan using Gemini 3.1 Flash Lite count=15, with teacher review and candidate 438 edit/discard caveat. |
+| Do not ingest other NCERT chapters | Pass | Only `jesc104` / `carbon-and-its-compounds` was used. |
+
+Final recommendation: **proceed to a separate corpus-rollout plan**, not automatic full-corpus generation. Use `google/gemini-3.1-flash-lite` at `count=15` per selected major topic, keep generated candidates teacher-review gated, and require edit/discard for unsupported candidates like `438`.
 
 ## Pending acceptance work
 

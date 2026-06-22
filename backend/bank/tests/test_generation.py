@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ai_services.llm import ModelPurpose, resolve_chat_model_config
-from bank.citation_support import review_candidate_citation_support
+from bank.citation_support import _tokens, review_candidate_citation_support
 from bank.generated_question_gate import (
     validate_generated_questions as validate_with_gate,
 )
@@ -292,6 +292,33 @@ def test_citation_support_review_flags_formula_or_diagram_heavy_questions():
     assert "formula_or_diagram_review_required" in {
         issue.code for issue in review.issues
     }
+
+
+def test_citation_support_review_handles_numeric_and_unicode_tokens():
+    """Citation review must not drop formulas, numerals, or non-English text."""
+    candidate = _question(
+        raw_text="कार्बन की संयोजकता कितनी है?",
+        content={
+            "stem": [
+                {"type": "paragraph", "text": "कार्बन की संयोजकता कितनी है?"}
+            ]
+        },
+        answer="4",
+    )
+    manifest = {
+        "excerpts": [
+            {
+                "citation_id": "chunk-respiration",
+                "text": "कार्बन की संयोजकता 4 है।",
+            }
+        ]
+    }
+
+    review = review_candidate_citation_support(candidate, manifest)
+
+    assert "कार्बन" in _tokens("कार्बन की संयोजकता")
+    assert "संयोजकता" in _tokens("कार्बन की संयोजकता")
+    assert review.supported
 
 
 def test_question_generation_route_resolves_from_env(monkeypatch):

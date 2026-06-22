@@ -19,7 +19,7 @@ __all__ = [
     "review_candidate_citation_support",
 ]
 
-_TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9\-]*")
+_TOKEN_RE = re.compile(r"[^\s,.;:!?()[\]{}\"'“”‘’]+", re.UNICODE)
 _FORMULA_OR_DIAGRAM_TERMS = frozenset(
     {
         "draw",
@@ -266,9 +266,7 @@ def _blocks_text(blocks: Any) -> str:
 
 
 def _meaningful_tokens(text: str) -> set[str]:
-    return {
-        token for token in _tokens(text) if token not in _STOPWORDS and len(token) > 2
-    }
+    return {token for token in _tokens(text) if token not in _STOPWORDS}
 
 
 def _tokens(text: str) -> set[str]:
