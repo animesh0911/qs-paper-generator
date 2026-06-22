@@ -1,0 +1,633 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-3.1-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 15,
+  "batch_id": 51,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.5",
+  "topic_title": "4.5 SOAPS AND DETERGENTS",
+  "chapter_map_node_id": "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 7,
+    "context_char_count": 7210,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 13551,
+  "approx_input_tokens_4c": 3387,
+  "elapsed_ms": 16793,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What is the primary reason that soap solutions appear cloudy?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the primary reason that soap solutions appear cloudy?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The soap molecules are transparent."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The soap micelles are large enough to scatter light."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The presence of oil droplets in the water."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The presence of dissolved salts from hard water."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "answer_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which part of a soap molecule interacts with oily dirt?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which part of a soap molecule interacts with oily dirt?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The ionic end"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The hydrophilic end"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The hydrophobic carbon chain"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The sodium ion"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Why are detergents preferred over soaps for cleaning in hard water?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why are detergents preferred over soaps for cleaning in hard water?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They produce less foam."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They do not form insoluble precipitates with calcium and magnesium ions."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They are cheaper than soaps."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They have a shorter hydrocarbon chain."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What are soap molecules chemically?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are soap molecules chemically?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sodium or potassium salts of long-chain carboxylic acids."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hydrocarbons with double bonds."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sodium salts of sulphonic acids."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Simple alcohols."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "A",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Define a micelle.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define a micelle."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "A micelle is a cluster of soap molecules formed in water where the hydrophobic tails are in the interior of the cluster and the ionic ends are on the surface.",
+        "question_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "answer_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why is it difficult to get foam in hard water using soap?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is it difficult to get foam in hard water using soap?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "It is difficult because soap reacts with calcium and magnesium salts present in hard water, forming an insoluble substance called scum.",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is the physical difference between hydrophilic and hydrophobic ends of a soap molecule?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the physical difference between hydrophilic and hydrophobic ends of a soap molecule?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "The hydrophilic end interacts with water, while the hydrophobic end (hydrocarbon tail) interacts with hydrocarbons (oils/dirt).",
+        "question_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82"
+        ],
+        "answer_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Define detergents.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define detergents."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Detergents are generally sodium salts of sulphonic acids or ammonium salts with chloride or bromide ions, used as cleansing agents.",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain how soap molecules help in the removal of oily dirt.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain how soap molecules help in the removal of oily dirt."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soap molecules have two ends with different properties. The hydrophobic tail attaches to oil particles, while the hydrophilic end interacts with water. This forms structures called micelles that emulsify the oil and suspend the dirt, allowing it to be rinsed away.",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "Why do soaps not form precipitates with the ions in hard water, but detergents do not have this problem?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why do soaps not form precipitates with the ions in hard water, but detergents do not have this problem?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Hard water contains calcium and magnesium salts which react with soaps to form insoluble curdy precipitates (scum). In contrast, the charged ends of detergents do not form such insoluble precipitates with these ions, allowing them to remain effective in hard water.",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain why soap solutions appear cloudy.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why soap solutions appear cloudy."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soap aggregates into clusters called micelles. These micelles remain in the solution as a colloid and do not precipitate due to ion-ion repulsion. These soap micelles are large enough to scatter light, which causes the soap solution to appear cloudy.",
+        "question_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "answer_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Contrast the behavior of soap in water and how it interacts with oil.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Contrast the behavior of soap in water and how it interacts with oil."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "When soap is in water, the ionic hydrophilic end interacts with water molecules. When oil is present, the hydrophobic hydrocarbon tail is not soluble in water but interacts with the non-polar oil droplet, surrounding it to form a micelle for cleaning.",
+        "question_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "answer_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Describe the cleaning action of soaps and what happens during the formation of micelles.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the cleaning action of soaps and what happens during the formation of micelles."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soap molecules have two distinct ends: a hydrophilic ionic end that interacts with water and a hydrophobic hydrocarbon tail that interacts with oil. Most dirt is oily and does not dissolve in water. When soap is added, the hydrocarbon tails attach to the oil droplets, while the ionic ends face the surrounding water. This orientation pulls the dirt away from the surface and forms a structure called a micelle. These micelles stay in the water as a colloid due to ion-ion repulsion, forming an emulsion that can be easily rinsed away, leaving clothes clean.",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Compare the effectiveness of soap and detergent in hard water, explaining why they differ in performance.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Compare the effectiveness of soap and detergent in hard water, explaining why they differ in performance."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soap is ineffective in hard water because it contains calcium and magnesium ions that react with soap molecules to form an insoluble substance known as scum. This results in the formation of foam with difficulty and requires using more soap. Conversely, detergents are typically sodium salts of sulphonic acids or ammonium salts with chlorides/bromides. These compounds do not form insoluble precipitates with the calcium or magnesium ions present in hard water. Therefore, detergents remain effective cleansing agents in hard water and are widely used in shampoos and clothes-cleaning products.",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Explain the role of functional groups and structural properties of soaps in their cleansing action.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the role of functional groups and structural properties of soaps in their cleansing action."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soaps are sodium or potassium salts of long-chain carboxylic acids. Their cleansing action is entirely dependent on the structural properties of these molecules: having two ends with differing properties. The hydrophilic ionic end facilitates interaction with water, providing solubility. The hydrophobic hydrocarbon tail interacts specifically with non-polar oily substances. In water, these long-chain molecules orient themselves into clusters called micelles, where tails are protected in the interior and ionic ends are in the water. This structure emulsifies oily dirt, keeps the dirt suspended in the solution, and prevents re-deposition, enabling efficient cleaning.",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 15,
+  "valid_count": 15,
+  "validation_errors": [],
+  "persisted_candidate_count": 15
+}

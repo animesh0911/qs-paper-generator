@@ -1,0 +1,465 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 24,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.1",
+  "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+  "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chunk_count": 29,
+    "skipped_chunk_count": 8,
+    "context_char_count": 11027,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 19325,
+  "approx_input_tokens_4c": 4831,
+  "elapsed_ms": 24051,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following describes the bonding in most carbon compounds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following describes the bonding in most carbon compounds?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ionic bonding due to transfer of electrons."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Covalent bonding due to sharing of electrons."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Metallic bonding due to delocalized electrons."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Coordinate covalent bonding involving donation of electron pairs."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following is a simple compound formed by carbon?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is a simple compound formed by carbon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sodium chloride (NaCl)"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Methane (CH4)"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Water (H2O)"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ammonia (NH3)"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+        ],
+        "answer_citation_ids": [
+          "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165",
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is the atomic number of carbon?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the atomic number of carbon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "4"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "6"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "8"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "12"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "cac31e0ad5de8eb8d5b821116cb65b83fe11ac6e7ce799e21f7f9b6e1b201b99"
+        ],
+        "answer_citation_ids": [
+          "cac31e0ad5de8eb8d5b821116cb65b83fe11ac6e7ce799e21f7f9b6e1b201b99"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Why can't carbon form C4+ or C4- ions easily?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why can't carbon form C4+ or C4- ions easily?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Carbon cannot form a C4+ ion because it would require a large amount of energy to lose four electrons, leaving a cation with only two electrons held by six protons. Carbon cannot form a C4- ion because the nucleus with six protons would not be able to hold ten electrons (four extra electrons).",
+        "question_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+        ],
+        "answer_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is meant by a covalent bond?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is meant by a covalent bond?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "A covalent bond is formed by the sharing of an electron pair between two atoms. This sharing allows both atoms to achieve a stable electron configuration.",
+        "question_citation_ids": [
+          "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd",
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why are carbon compounds generally poor conductors of electricity?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why are carbon compounds generally poor conductors of electricity?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Carbon compounds are generally poor conductors of electricity because they are largely covalent compounds. In covalent bonding, electrons are shared between atoms, and no charged particles (ions) are formed, which are necessary for the conduction of electricity.",
+        "question_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Explain the formation of a single covalent bond in the hydrogen molecule (H2).",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the formation of a single covalent bond in the hydrogen molecule (H2)."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "A hydrogen atom has one electron in its outermost (K) shell and needs one more electron to fill this shell and attain the stable electronic configuration of helium. In the H2 molecule, two hydrogen atoms share their single valence electrons. This sharing results in a shared pair of electrons, with each hydrogen atom now having access to two electrons, thus completing its K shell. This shared pair of electrons constitutes a single covalent bond between the two hydrogen atoms, represented as H-H.",
+        "question_citation_ids": [
+          "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd",
+          "29fc4f6587a7c85b0a84be5b9ce43d8694ef4b620a19eb721094e5269c478442"
+        ],
+        "answer_citation_ids": [
+          "29fc4f6587a7c85b0a84be5b9ce43d8694ef4b620a19eb721094e5269c478442",
+          "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Explain why carbon forms covalent bonds by sharing electrons instead of forming ionic bonds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why carbon forms covalent bonds by sharing electrons instead of forming ionic bonds."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Carbon has an atomic number of 6, with 4 valence electrons. To achieve a noble gas configuration, it would need to either gain 4 electrons or lose 4 electrons. Gaining 4 electrons to form a C4- ion is difficult because the nucleus with 6 protons cannot hold 10 electrons effectively. Losing 4 electrons to form a C4+ ion requires a very large amount of energy. Therefore, to achieve stability, carbon overcomes this problem by sharing its 4 valence electrons with other atoms, forming covalent bonds.",
+        "question_citation_ids": [
+          "cac31e0ad5de8eb8d5b821116cb65b83fe11ac6e7ce799e21f7f9b6e1b201b99",
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+          "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd"
+        ],
+        "answer_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+          "cac31e0ad5de8eb8d5b821116cb65b83fe11ac6e7ce799e21f7f9b6e1b201b99",
+          "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the formation of a double covalent bond with reference to the oxygen molecule (O2). Discuss why covalent compounds have low melting and boiling points.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the formation of a double covalent bond with reference to the oxygen molecule (O2). Discuss why covalent compounds have low melting and boiling points."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "The oxygen atom has an atomic number of 8, with an electronic configuration of 2, 6. It has 6 valence electrons and requires 2 more electrons to achieve a stable octet. In an oxygen molecule (O2), two oxygen atoms share their valence electrons. Each oxygen atom contributes 2 electrons, forming two shared pairs. These two shared pairs constitute a double covalent bond between the two oxygen atoms, represented as O=O. This allows each oxygen atom to complete its octet. \nCovalent compounds typically have low melting and boiling points because the forces of attraction between their molecules (intermolecular forces) are weak. While the covalent bonds within a molecule are strong, the forces holding different molecules together are not as strong as the electrostatic forces holding ions together in ionic compounds. Therefore, less energy is required to overcome these weak intermolecular forces and separate the molecules, resulting in low melting and boiling points.",
+        "question_citation_ids": [
+          "2a0d297249cf18e955f25c0257eb282352f619d77510863f27aa520b15088268",
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "2a0d297249cf18e955f25c0257eb282352f619d77510863f27aa520b15088268",
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Describe the allotropes of carbon, namely diamond and graphite, focusing on their structure and how it relates to their physical properties.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the allotropes of carbon, namely diamond and graphite, focusing on their structure and how it relates to their physical properties."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Carbon exists in different forms in nature called allotropes, with diamond and graphite being notable examples. In diamond, each carbon atom is covalently bonded to four other carbon atoms in a tetrahedral arrangement, forming a rigid three-dimensional crystal lattice. This strong, extensive network of covalent bonds makes diamond extremely hard and gives it a very high melting point. It does not have free electrons, making it a poor conductor of electricity.\nIn graphite, each carbon atom is bonded to three other carbon atoms in the same plane, arranged in hexagonal rings. This forms layered sheets where each layer consists of a hexagonal array of carbon atoms. Within these layers, the carbon atoms are held by covalent bonds, but one of these bonds is a double bond. The layers are held together by weak van der Waals forces. This layered structure makes graphite soft and slippery, and it can be used as a lubricant. Unlike diamond, graphite has delocalized electrons (due to the double bonds), which allows it to conduct electricity.",
+        "question_citation_ids": [
+          "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+          "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6",
+          "073a02ac1d66151580391bddb78338dea1356e72b21840302ed0b1bce95c7206",
+          "8d12db0da8f76674ec2c22ead9c53c375e452626ea79c4dadcd1b4a789b84d67"
+        ],
+        "answer_citation_ids": [
+          "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+          "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6",
+          "073a02ac1d66151580391bddb78338dea1356e72b21840302ed0b1bce95c7206"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 10,
+  "validation_errors": [],
+  "persisted_candidate_count": 10
+}

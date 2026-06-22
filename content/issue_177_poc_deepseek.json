@@ -1,0 +1,37 @@
+{
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-v4-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "batch_id": 4,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "elapsed_ms": 29811,
+  "error": null,
+  "generated_count": 0,
+  "valid_count": 0,
+  "validation_errors": [],
+  "candidates": []
+}

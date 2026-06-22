@@ -1,0 +1,662 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 15,
+  "batch_id": 44,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.3",
+  "topic_title": "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+  "chapter_map_node_id": "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131"
+    ],
+    "included_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+      "41d0334215e1625cf1ebe01cba630ac32041a607bc29e0a9ec51e2ac71e56091",
+      "51793358677d1704ca4284eadc447502951e7761799c1e37f21da694cef7fa91",
+      "93c240ac3922f2da865cac506987cb7e1e6a3b9367eb333d842a15209f3ffafe",
+      "9e7495d88888d8662c6ae34ae6f2b56a9bc29cbf5b5a3b7af54159278581d004"
+    ],
+    "included_chunk_count": 15,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7115,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 12609,
+  "approx_input_tokens_4c": 3152,
+  "elapsed_ms": 21957,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which of the following is a characteristic of saturated hydrocarbons when burnt?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is a characteristic of saturated hydrocarbons when burnt?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Produces a yellow, sooty flame."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Produces a clean blue flame."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Produces a lot of smoke."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Results in incomplete combustion."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What is the primary reason for a yellow, sooty flame during the combustion of carbon compounds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the primary reason for a yellow, sooty flame during the combustion of carbon compounds?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Complete combustion with sufficient oxygen."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Incomplete combustion due to limited supply of air."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Presence of unsaturated carbon chains."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "High concentration of carbon dioxide produced."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which of the following is an oxidising agent that can convert alcohols to carboxylic acids?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is an oxidising agent that can convert alcohols to carboxylic acids?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Water (H2O)"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon dioxide (CO2)"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alkaline potassium permanganate"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hydrogen gas (H2)"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "answer_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "The reaction in which chlorine is added to hydrocarbons in the presence of sunlight, replacing hydrogen atoms one by one, is called:",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "The reaction in which chlorine is added to hydrocarbons in the presence of sunlight, replacing hydrogen atoms one by one, is called:"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Addition reaction"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Oxidation reaction"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Combustion reaction"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Substitution reaction"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.4 Substitution Reaction"
+        ],
+        "answer": "D",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is observed when carbon compounds undergo combustion?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is observed when carbon compounds undergo combustion?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "When carbon compounds undergo combustion, they release a large amount of heat and light.",
+        "question_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f"
+        ],
+        "answer_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Why does a candle or LPG stove burn with a flame, while coal or charcoal in an 'angithi' may just glow?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why does a candle or LPG stove burn with a flame, while coal or charcoal in an 'angithi' may just glow?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "A flame is produced only when gaseous substances burn. While a candle or LPG is gaseous, coal or charcoal in an 'angithi' burns only after vaporizing the volatile substances, and may glow if only solid carbon is burning.",
+        "question_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Define the term 'oxidising agent' as used in the context of carbon compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define the term 'oxidising agent' as used in the context of carbon compounds."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation"
+        ],
+        "answer": "An oxidising agent is a substance that is capable of adding oxygen to other substances.",
+        "question_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "answer_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is the role of a catalyst in the addition reaction of unsaturated hydrocarbons?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the role of a catalyst in the addition reaction of unsaturated hydrocarbons?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.3 Addition Reaction"
+        ],
+        "answer": "A catalyst is a substance that causes a reaction to occur or proceed at a different rate without the reaction itself being affected.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Explain why saturated hydrocarbons generally burn with a clean blue flame while unsaturated hydrocarbons produce a yellow, sooty flame.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why saturated hydrocarbons generally burn with a clean blue flame while unsaturated hydrocarbons produce a yellow, sooty flame."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "Saturated hydrocarbons (like methane) undergo complete combustion in a sufficient supply of air, producing carbon dioxide and water, which results in a clean blue flame. Unsaturated hydrocarbons (like ethene or ethyne) have a higher proportion of carbon and do not burn as completely. They produce soot (unburnt carbon particles) which get heated and glow, giving a yellow, sooty flame.",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "Describe the process of oxidation of an alcohol to a carboxylic acid using an oxidizing agent.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the process of oxidation of an alcohol to a carboxylic acid using an oxidizing agent."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation"
+        ],
+        "answer": "When an alcohol is treated with a strong oxidizing agent like alkaline potassium permanganate or acidified potassium dichromate upon heating, it gets oxidized to a carboxylic acid. In this reaction, oxygen is added to the alcohol molecule, and the oxidizing agent itself gets reduced. For example, ethanol can be oxidized to ethanoic acid.",
+        "question_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "answer_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Explain the difference between addition reactions and substitution reactions in hydrocarbons.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the difference between addition reactions and substitution reactions in hydrocarbons."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.3 Addition Reaction",
+          "4.3.4 Substitution Reaction"
+        ],
+        "answer": "Addition reactions involve the addition of atoms to unsaturated hydrocarbons across a double or triple bond, without the loss of any atoms. For example, hydrogenation of vegetable oils. Substitution reactions involve the replacement of one atom or a group of atoms by another atom or group of atoms, typically occurring in saturated hydrocarbons under specific conditions like sunlight. For example, the reaction of methane with chlorine.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Explain why limiting the supply of air can lead to incomplete combustion of even saturated hydrocarbons.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why limiting the supply of air can lead to incomplete combustion of even saturated hydrocarbons."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "Combustion is a reaction with oxygen. Saturated hydrocarbons require a sufficient amount of oxygen for complete combustion, which produces carbon dioxide and water. If the supply of air (and thus oxygen) is limited, the combustion becomes incomplete. This means that not all the hydrocarbon reacts fully, and instead, products like soot (carbon), carbon monoxide, and water are formed, resulting in a sooty flame.",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "Describe the process of combustion of carbon compounds, including the types of flames produced and factors influencing them.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the process of combustion of carbon compounds, including the types of flames produced and factors influencing them."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "Combustion is a chemical process involving the rapid reaction between a substance with an oxidant, usually oxygen, to produce heat and light. Carbon and most of its compounds burn in oxygen to produce carbon dioxide and water, releasing significant amounts of heat and light. The nature of the flame produced depends on the completeness of combustion, which is influenced by the type of hydrocarbon and the supply of air. Saturated hydrocarbons, when supplied with sufficient air, undergo complete combustion, yielding a clean blue flame. Unsaturated hydrocarbons, due to their higher carbon content, tend to undergo incomplete combustion, especially when air supply is limited. This incomplete combustion produces soot (unburnt carbon particles) and carbon monoxide, resulting in a luminous yellow flame that deposits soot. Limiting the air supply, even for saturated hydrocarbons, can lead to incomplete combustion and a sooty flame. For instance, a gas stove with air inlets adjusted to provide an oxygen-rich mixture burns with a blue flame, whereas blocked inlets lead to incomplete combustion and a sooty flame.",
+        "question_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Discuss the chemical properties of carbon compounds related to oxidation and addition reactions, providing examples.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Discuss the chemical properties of carbon compounds related to oxidation and addition reactions, providing examples."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation",
+          "4.3.3 Addition Reaction"
+        ],
+        "answer": "Carbon compounds exhibit various chemical properties, including oxidation and addition reactions. Oxidation reactions involve the addition of oxygen or removal of hydrogen. Strong oxidizing agents like alkaline potassium permanganate or acidified potassium dichromate can oxidize alcohols to carboxylic acids. For example, ethanol (an alcohol) is oxidized to ethanoic acid (a carboxylic acid). Addition reactions are characteristic of unsaturated hydrocarbons, which contain double or triple bonds. In the presence of catalysts like nickel or palladium, these compounds add hydrogen across the multiple bonds to form saturated hydrocarbons. A significant application of this is the hydrogenation of vegetable oils (which contain unsaturated fatty acids) to convert them into fats (which contain saturated fatty acids), often using a nickel catalyst.",
+        "question_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "answer_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the phenomenon of substitution reactions in saturated hydrocarbons, using methane and chlorine as an example.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the phenomenon of substitution reactions in saturated hydrocarbons, using methane and chlorine as an example."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.4 Substitution Reaction"
+        ],
+        "answer": "Saturated hydrocarbons are generally unreactive due to the presence of strong covalent bonds between carbon atoms and between carbon and hydrogen atoms, which require a high activation energy to break. However, in the presence of sunlight, they can undergo substitution reactions. In a substitution reaction, one atom or a group of atoms is replaced by another. For example, when methane (CH4) reacts with chlorine (Cl2) in the presence of sunlight, the hydrogen atoms of methane are replaced one by one by chlorine atoms. The first step of this reaction yields chloromethane (CH3Cl) and hydrogen chloride (HCl). Further reactions can occur to replace the remaining hydrogen atoms with chlorine, leading to the formation of dichloromethane (CH2Cl2), trichloromethane (CHCl3), and tetrachloromethane (CCl4). This reaction proceeds via a free radical mechanism.",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 15,
+  "valid_count": 15,
+  "validation_errors": [],
+  "persisted_candidate_count": 15
+}

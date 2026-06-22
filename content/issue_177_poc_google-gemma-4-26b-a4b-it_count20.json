@@ -1,0 +1,138 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemma-4-26b-a4b-it",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 15,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25494,
+  "approx_input_tokens_4c": 6374,
+  "elapsed_ms": 3857,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its"
+      }
+    ]
+  },
+  "raw_question_count": 1,
+  "valid_count": 0,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "qtype"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "marks"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "cognitive_level"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "raw_text"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "content"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "source"
+    },
+    {
+      "index": 0,
+      "code": "bad_qtype",
+      "detail": "None"
+    },
+    {
+      "index": 0,
+      "code": "bad_chapter_slug",
+      "detail": "carbon-and-its"
+    },
+    {
+      "index": 0,
+      "code": "bad_cognitive_level",
+      "detail": "None"
+    },
+    {
+      "index": 0,
+      "code": "bad_content",
+      "detail": "content"
+    },
+    {
+      "index": 0,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 0,
+      "code": "empty_answer",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "bad_topic_names",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "bad_source",
+      "detail": "source.type"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "question_citation_ids"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "answer_citation_ids"
+    }
+  ],
+  "persisted_candidate_count": 0
+}

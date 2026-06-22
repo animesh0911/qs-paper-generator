@@ -1,0 +1,837 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-3.1-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 38,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.2",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25494,
+  "approx_input_tokens_4c": 6373,
+  "elapsed_ms": 29123,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is the unique ability of carbon to form bonds with other atoms of carbon to give rise to large molecules called?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the unique ability of carbon to form bonds with other atoms of carbon to give rise to large molecules called?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Isomerism"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Tetravalency"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Catenation"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Substitution"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "C, Catenation",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which of the following describes the compounds of carbon linked by only single bonds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following describes the compounds of carbon linked by only single bonds?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Unsaturated compounds"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Saturated compounds"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Isomeric compounds"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Functional groups"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "B, Saturated compounds",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What is the general formula for alkenes?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the general formula for alkenes?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n+2"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n-2"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnHn"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "B, CnH2n",
+        "question_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "answer_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Identify the functional group represented by -OH.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Identify the functional group represented by -OH."
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Aldehyde"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ketone"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alcohol"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carboxylic acid"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "C, Alcohol",
+        "question_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "answer_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Compounds with identical molecular formula but different structures are called:",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Compounds with identical molecular formula but different structures are called:"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Homologues"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Isotopes"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Structural isomers"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Allotropes"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "C, Structural isomers",
+        "question_citation_ids": [
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "answer_citation_ids": [
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Define catenation.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define catenation."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Catenation is the unique ability of carbon to form bonds with other atoms of carbon, giving rise to large molecules such as long chains, branched chains, or rings.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why do carbon compounds form strong bonds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why do carbon compounds form strong bonds?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "One reason for the formation of strong bonds by carbon is its small size. This enables the nucleus to hold on to the shared pairs of electrons strongly.",
+        "question_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "answer_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is a heteroatom in the context of carbon compounds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is a heteroatom in the context of carbon compounds?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "In a hydrocarbon chain, when one or more hydrogen atoms are replaced by elements such as halogens, oxygen, nitrogen, or sulphur, the replacing element is referred to as a heteroatom.",
+        "question_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "answer_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What are hydrocarbons?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are hydrocarbons?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Carbon compounds which contain only carbon and hydrogen atoms are called hydrocarbons.",
+        "question_citation_ids": [
+          "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc"
+        ],
+        "answer_citation_ids": [
+          "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Define a homologous series.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define a homologous series."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "A homologous series is a series of compounds in which the same functional group substitutes for hydrogen in a carbon chain, which leads to similar chemical properties.",
+        "question_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "answer_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Differentiate between saturated and unsaturated carbon compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Differentiate between saturated and unsaturated carbon compounds."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Saturated carbon compounds are those in which carbon atoms are linked by only single bonds. Unsaturated carbon compounds are those containing one or more double or triple bonds between carbon atoms. Unsaturated compounds are generally more reactive than saturated compounds.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain why carbon atom is versatile in forming a vast number of compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why carbon atom is versatile in forming a vast number of compounds."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "The versatility of carbon arises from two main factors: (i) Catenation, which is the ability of carbon atoms to bond with other carbon atoms to form long, branched, or cyclic chains, and (ii) Tetravalency, as carbon has a valency of four, allowing it to bond with four other atoms of carbon or other mono-valent elements.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Describe the change in physical and chemical properties along a homologous series.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the change in physical and chemical properties along a homologous series."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Along a homologous series, as molecular mass increases, gradations in physical properties such as melting point, boiling point, and solubility occur, causing these values to increase. In contrast, chemical properties remain consistent because they are determined solely by the functional group present in the series.",
+        "question_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "answer_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "What are functional groups? Explain their significance.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are functional groups? Explain their significance."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Functional groups are specific atoms or groups of atoms that replace hydrogen in a hydrocarbon chain. These groups are significant because they confer specific chemical properties to the compound, regardless of the length or nature of the carbon chain.",
+        "question_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "answer_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "If a three-carbon chain has a ketone group, how is it named using IUPAC suffix rules?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "If a three-carbon chain has a ketone group, how is it named using IUPAC suffix rules?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "For a three-carbon chain (propane) with a ketone group, the name is derived by deleting the final 'e' of propane and adding the suffix '-one'. This results in the name propanone.",
+        "question_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "answer_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Discuss the properties of carbon that allow it to form an exceptionally large number of compounds compared to other elements.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Discuss the properties of carbon that allow it to form an exceptionally large number of compounds compared to other elements."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Carbon's ability to form millions of compounds is primarily due to its unique bonding characteristics. First, it exhibits catenation, allowing it to form long chains, branched chains, or ring structures of carbon atoms. These carbon-carbon bonds are strong and stable, a property not found to the same extent in other elements like silicon. Second, carbon is tetravalent, meaning it has a valency of four, enabling it to bond with four other atoms, such as hydrogen, oxygen, nitrogen, and halogens. Finally, its small atomic size allows the nucleus to hold onto shared electron pairs strongly, resulting in very strong and stable bonds with most other elements. Together, these properties allow for an immense variety of stable molecules.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the concept of structural isomerism with the help of the butane molecule.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the concept of structural isomerism with the help of the butane molecule."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Structural isomers are compounds that possess the identical molecular formula but exhibit different structural arrangements. Taking butane as an example (C4H10), while the molecular formula remains the same, there are two different ways to arrange the four carbon 'skeleton'. One is a straight-chain structure, where four carbons are connected linearly. The second is a branched-chain structure, where three carbons form a chain and the fourth is attached to a central carbon atom. After filling the remaining valencies with hydrogen, both arrangements satisfy the carbon atom's requirements but produce different molecules with the same composition.",
+        "question_citation_ids": [
+          "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "answer_citation_ids": [
+          "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Describe the classification of hydrocarbons based on their bonding types giving examples.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the classification of hydrocarbons based on their bonding types giving examples."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Hydrocarbons, which consist only of hydrogen and carbon, are primarily classified into three groups based on their bond types: 1. Alkanes: These are saturated hydrocarbons containing only single bonds between all carbon atoms, such as ethane and propane. 2. Alkenes: These are unsaturated hydrocarbons containing one or more double bonds between carbon atoms, such as ethene (C2H4). 3. Alkynes: These are unsaturated hydrocarbons containing one or more triple bonds between carbon atoms, such as ethyne (C2H2). Generally, unsaturated compounds with double or triple bonds are more reactive than the corresponding saturated alkanes.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "What is the historical significance of the preparation of urea by Friedrich Wöhler?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the historical significance of the preparation of urea by Friedrich Wöhler?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Historically, it was commonly believed that carbon compounds (organic compounds) could only be synthesized within a living system and that a 'vital force' was necessary for their creation. Scientists assumed that these could not be produced using non-living materials. Friedrich Wöhler disproved this theory in 1828 by successfully preparing urea from ammonium cyanate. This achievement demonstrated that organic compounds could indeed be formed outside of living systems, essentially debunking the 'vital force' hypothesis and paving the way for modern organic chemistry.",
+        "question_citation_ids": [
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "answer_citation_ids": [
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the general rules for naming carbon compounds with functional groups according to IUPAC guidelines.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the general rules for naming carbon compounds with functional groups according to IUPAC guidelines."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "The nomenclature of carbon compounds follows structured rules based on the length of the carbon chain and the presence of functional groups. First, the total number of carbon atoms in the chain is counted to determine the primary name (e.g., propane for 3 carbons). Second, if a functional group is present, it is indicated by a prefix or suffix. Third, if the indicator is a suffix and begins with a vowel (a, e, i, o, u), the final 'e' of the chain name is deleted, and the suffix is added (e.g., propane - 'e' + 'one' = propanone). Finally, if the chain is unsaturated, the 'ane' suffix is replaced by 'ene' for double bonds or 'yne' for triple bonds, such as changing propane to propene or propyne.",
+        "question_citation_ids": [
+          "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "answer_citation_ids": [
+          "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 20,
+  "valid_count": 20,
+  "validation_errors": [],
+  "persisted_candidate_count": 20
+}

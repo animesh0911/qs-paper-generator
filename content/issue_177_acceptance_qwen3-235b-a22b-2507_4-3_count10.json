@@ -1,0 +1,417 @@
+{
+  "provider": "openrouter",
+  "model": "qwen/qwen3-235b-a22b-2507",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 22,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.3",
+  "topic_title": "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+  "chapter_map_node_id": "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131"
+    ],
+    "included_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+      "41d0334215e1625cf1ebe01cba630ac32041a607bc29e0a9ec51e2ac71e56091",
+      "51793358677d1704ca4284eadc447502951e7761799c1e37f21da694cef7fa91",
+      "93c240ac3922f2da865cac506987cb7e1e6a3b9367eb333d842a15209f3ffafe",
+      "9e7495d88888d8662c6ae34ae6f2b56a9bc29cbf5b5a3b7af54159278581d004"
+    ],
+    "included_chunk_count": 15,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7115,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 12609,
+  "approx_input_tokens_4c": 3152,
+  "elapsed_ms": 83151,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "answer": "Unsaturated hydrocarbons undergo addition reactions because they contain double or triple bonds which can break to add hydrogen or other atoms. For example, ethene (C₂H₄) reacts with hydrogen in the presence of a nickel catalyst to form ethane (C₂H₆). This reaction is used industrially to hydrogenate vegetable oils to produce saturated fats.",
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Explain why unsaturated hydrocarbons undergo addition reactions. Give one example of an addition reaction.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "raw_text": "Explain why unsaturated hydrocarbons undergo addition reactions. Give one example of an addition reaction.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "C",
+        "answer_citation_ids": [
+          "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "R",
+        "content": {
+          "options": [
+            {
+              "content": [
+                {
+                  "text": "Combustion of methane",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "A"
+            },
+            {
+              "content": [
+                {
+                  "text": "Oxidation of ethanol",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "B"
+            },
+            {
+              "content": [
+                {
+                  "text": "Substitution of methane with chlorine",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "C"
+            },
+            {
+              "content": [
+                {
+                  "text": "Hydrogenation of vegetable oil",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "D"
+            }
+          ],
+          "stem": [
+            {
+              "text": "Which of the following is a substitution reaction?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "raw_text": "Which of the following is a substitution reaction? A) Combustion of methane B) Oxidation of ethanol C) Substitution of methane with chlorine D) Hydrogenation of vegetable oil",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "Alkaline potassium permanganate is an oxidizing agent. It oxidizes alcohols to carboxylic acids by adding oxygen to them. When ethanol is warmed with alkaline KMnO₄, it gets oxidized to ethanoic acid.",
+        "answer_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "2276e795cb2a334faa8867399c2f38b80f54f41ff9b6e4098af5300269de6694"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "Why is alkaline potassium permanganate used during the oxidation of alcohols?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "raw_text": "Why is alkaline potassium permanganate used during the oxidation of alcohols?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "The yellow, sooty flame is due to incomplete combustion of carbon particles. When the oxygen supply is limited, carbon particles do not burn completely and are deposited as soot. These unburnt particles get heated and glow, producing a luminous yellow flame.",
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "818d003fa6e0b96d4b0c7be83c8ca0d55b0e109f6abb459733defdc6c9f52326"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Explain why a candle flame is yellow and luminous.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "raw_text": "Explain why a candle flame is yellow and luminous.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "Combustion of carbon compounds is an exothermic reaction because it releases heat and light energy. For example, when methane burns in excess oxygen, it produces carbon dioxide, water, and a large amount of heat.",
+        "answer_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "R",
+        "content": {
+          "stem": [
+            {
+              "text": "Why is the combustion of carbon compounds considered exothermic?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f"
+        ],
+        "raw_text": "Why is the combustion of carbon compounds considered exothermic?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "B",
+        "answer_citation_ids": [
+          "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "R",
+        "content": {
+          "options": [
+            {
+              "content": [
+                {
+                  "text": "Soot is produced due to complete combustion.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "A"
+            },
+            {
+              "content": [
+                {
+                  "text": "Soot is unburnt carbon particles formed during incomplete combustion.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "B"
+            },
+            {
+              "content": [
+                {
+                  "text": "Soot is formed only in saturated hydrocarbons.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "C"
+            },
+            {
+              "content": [
+                {
+                  "text": "Soot is a byproduct of oxidation with sufficient oxygen.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "D"
+            }
+          ],
+          "stem": [
+            {
+              "text": "Which of the following statements correctly describes soot formation in a flame?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "f1c4b32b073ab437ecf1937d19a14b7e262cc2a6f393bf7128595055cf5b0983"
+        ],
+        "raw_text": "Which of the following statements correctly describes soot formation in a flame? A) Soot is produced due to complete combustion. B) Soot is unburnt carbon particles formed during incomplete combustion. C) Soot is formed only in saturated hydrocarbons. D) Soot is a byproduct of oxidation with sufficient oxygen.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "Catalysts like nickel or palladium are required in addition reactions of unsaturated hydrocarbons to speed up the reaction. They provide a surface for the hydrogen and hydrocarbon molecules to react, lowering the activation energy without being consumed.",
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "Why are catalysts like nickel used in the hydrogenation of vegetable oils?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "raw_text": "Why are catalysts like nickel used in the hydrogenation of vegetable oils?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "Substitution reaction is a chemical reaction in which one atom or group of atoms replaces another atom in a molecule. For example, when methane reacts with chlorine in the presence of sunlight, one hydrogen atom is replaced by a chlorine atom to form chloromethane (CH₃Cl) and HCl.",
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "R",
+        "content": {
+          "stem": [
+            {
+              "text": "What is a substitution reaction? Give one example with a chemical equation.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "raw_text": "What is a substitution reaction? Give one example with a chemical equation.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "Fossil fuels are called so because they are formed from the dead remains of plants and animals that lived millions of years ago. Coal comes from forests buried under the earth, and petroleum originates from marine organisms buried under the sea floor, both transformed over time by heat, pressure, and bacterial activity.",
+        "answer_citation_ids": [
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "R",
+        "content": {
+          "stem": [
+            {
+              "text": "Why are coal and petroleum called fossil fuels?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "raw_text": "Why are coal and petroleum called fossil fuels?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      },
+      {
+        "answer": "Ethanol undergoes oxidation when heated with alkaline potassium permanganate. The purple color of KMnO₄ disappears initially as it oxidizes ethanol to ethanoic acid. The color persists when excess KMnO₄ is added because all the ethanol has been oxidized and no more reducing agent (ethanol) is left to react.",
+        "answer_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Describe what happens when ethanol is heated with alkaline potassium permanganate. Why does the color persist after some time?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "raw_text": "Describe what happens when ethanol is heated with alkaline potassium permanganate. Why does the color persist after some time?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ]
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 10,
+  "validation_errors": [],
+  "persisted_candidate_count": 10
+}

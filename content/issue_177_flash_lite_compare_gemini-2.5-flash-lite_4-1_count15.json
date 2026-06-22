@@ -1,0 +1,187 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 15,
+  "batch_id": 42,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.1",
+  "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+  "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chunk_count": 29,
+    "skipped_chunk_count": 8,
+    "context_char_count": 11027,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 19325,
+  "approx_input_tokens_4c": 4831,
+  "elapsed_ms": 6113,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which of the following statements is incorrect regarding carbon compounds?\n",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following statements is incorrect regarding carbon compounds?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They are generally poor conductors of electricity."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They have strong inter-molecular forces."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They have low melting and boiling points."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Their bonds are formed by sharing of electrons."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which of the following is a allotrope of carbon?\n",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is a allotrope of carbon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Graphite"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Methane"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethanol"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Acetic acid"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "A",
+        "question_citation_ids": [
+          "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+        ],
+        "answer_citation_ids": [
+          "45ef9050f0f931861ab63e1b47eb3"
+        ]
+      }
+    ]
+  },
+  "raw_question_count": 2,
+  "valid_count": 1,
+  "validation_errors": [
+    {
+      "index": 1,
+      "code": "missing_field",
+      "detail": "source"
+    },
+    {
+      "index": 1,
+      "code": "bad_source",
+      "detail": "source.type"
+    },
+    {
+      "index": 1,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 45ef9050f0f931861ab63e1b47eb3"
+    }
+  ],
+  "persisted_candidate_count": 1
+}

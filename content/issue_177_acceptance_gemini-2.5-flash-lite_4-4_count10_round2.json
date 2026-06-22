@@ -1,0 +1,448 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 25,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.4",
+  "topic_title": "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID",
+  "chapter_map_node_id": "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2"
+    ],
+    "included_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+      "47828774c1697ed4537abf2ebbcbe4e1292cd4d01f7be05ed6e31a1ba5525c5a",
+      "16843beccb844b58739c2834f698800fb669fe36832012cf30f9300e836ad961"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7971,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 14413,
+  "approx_input_tokens_4c": 3603,
+  "elapsed_ms": 16690,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following is the common name for ethanoic acid?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is the common name for ethanoic acid?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alcohol"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Vinegar"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Acetic acid"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Glacial acetic acid"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is the name given to ethanol when it is made unfit for drinking by adding poisonous substances like methanol?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the name given to ethanol when it is made unfit for drinking by adding poisonous substances like methanol?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Absolute alcohol"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Denatured alcohol"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Industrial alcohol"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Pure alcohol"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "answer_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which gas is evolved when ethanol reacts with sodium?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which gas is evolved when ethanol reacts with sodium?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon dioxide"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Oxygen"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hydrogen"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Nitrogen"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is meant by denatured alcohol?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is meant by denatured alcohol?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Denatured alcohol is ethanol that has been made unfit for drinking by adding poisonous substances like methanol and dyes. This is done to prevent the misuse of industrial ethanol.",
+        "question_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "answer_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is the common name for ethanoic acid and what is its 5-8% solution in water called?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the common name for ethanoic acid and what is its 5-8% solution in water called?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "The common name for ethanoic acid is acetic acid. Its 5-8% solution in water is called vinegar.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why is concentrated sulfuric acid used when heating ethanol to produce ethene?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is concentrated sulfuric acid used when heating ethanol to produce ethene?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Concentrated sulfuric acid acts as a dehydrating agent. It removes a molecule of water from ethanol, leading to the formation of ethene.",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain why vinegar is used as a preservative.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why vinegar is used as a preservative."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Vinegar is a 5-8% solution of ethanoic acid (acetic acid) in water. The acidic nature of ethanoic acid prevents the growth of microorganisms, such as bacteria and fungi, that can spoil food. This antimicrobial property helps in preserving food items like pickles.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Describe how alcohols affect living beings, citing specific examples.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe how alcohols affect living beings, citing specific examples."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Large quantities of ethanol can slow down metabolic processes and depress the central nervous system, leading to lack of coordination and impaired judgment. For example, methanol is highly toxic; even small quantities can cause death due to its oxidation to methanal in the liver, which coagulates cell components and damages the optic nerve causing blindness.",
+        "question_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "answer_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the esterification reaction involving ethanoic acid and ethanol, including the conditions required and the properties of the product formed.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the esterification reaction involving ethanoic acid and ethanol, including the conditions required and the properties of the product formed."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Esterification is a reaction between a carboxylic acid and an alcohol to form an ester and water. In this case, ethanoic acid reacts with absolute ethanol in the presence of an acid catalyst, typically concentrated sulfuric acid, to produce ethyl ethanoate (an ester) and water. The reaction is usually carried out by heating the reactants with the catalyst. The general equation is: CH3COOH (Ethanoic acid) + CH3CH2OH (Ethanol) ⇌ CH3COOCH2CH3 (Ethyl ethanoate) + H2O (Water). Esters are generally characterized by their sweet-smelling nature and are used in the manufacture of perfumes and as flavouring agents.",
+        "question_citation_ids": [
+          "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3",
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "answer_citation_ids": [
+          "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3",
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Describe the reactions of ethanoic acid with sodium carbonate and sodium hydrogencarbonate. Include the products formed and the observations made.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the reactions of ethanoic acid with sodium carbonate and sodium hydrogencarbonate. Include the products formed and the observations made."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Ethanoic acid reacts with sodium carbonate and sodium hydrogencarbonate to produce a salt, carbon dioxide gas, and water. When ethanoic acid is added to sodium carbonate, effervescence is observed due to the evolution of carbon dioxide gas. The gas produced, when passed through freshly prepared lime water, turns it milky, confirming the presence of carbon dioxide. The salt formed is sodium acetate. The reaction with sodium carbonate is: 2CH3COOH + Na2CO3 → 2CH3COONa + H2O + CO2. Similarly, when ethanoic acid reacts with sodium hydrogencarbonate, similar observations are made, and the products are sodium acetate, water, and carbon dioxide. The reaction is: CH3COOH + NaHCO3 → CH3COONa + H2O + CO2.",
+        "question_citation_ids": [
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+        ],
+        "answer_citation_ids": [
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 10,
+  "validation_errors": [],
+  "persisted_candidate_count": 10
+}
