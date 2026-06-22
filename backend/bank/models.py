@@ -349,6 +349,7 @@ class GenerationBatch(models.Model):
         related_name="generation_batches",
     )
     chapters = models.ManyToManyField(Chapter, related_name="generation_batches")
+    chapter_map_node_ids = models.JSONField(default=list, blank=True)
     topic_names = models.JSONField(default=list, blank=True)
     difficulty_preset = models.CharField(max_length=40, default="balanced")
     requested_count = models.PositiveSmallIntegerField(default=10)

@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import type { GenerationBatch } from '@/types';
+import type { ChapterTopicNode, GenerationBatch } from '@/types';
 import {
   BulkQuestionGenerationSetup,
   GenerationProgressWorkspace,
@@ -11,20 +11,47 @@ const chapters = [
   { id: 2, slug: 'electricity', name: 'Electricity', order: 12 },
 ];
 
+const topics: ChapterTopicNode[] = [
+  {
+    id: 'life-processes:5.1',
+    type: 'section',
+    title: '5.1 Life Processes',
+    parent_id: null,
+    source_element_id: 'element-1',
+    source_range: { start: 1, end: 8 },
+    page_range: { start: 81, end: 83 },
+    element_count: 8,
+    preview: 'Nutrition and respiration in living organisms.',
+  },
+  {
+    id: 'life-processes:activity-5.1',
+    type: 'activity',
+    title: 'Activity 5.1',
+    parent_id: 'life-processes:5.1',
+    source_element_id: 'element-4',
+    source_range: { start: 4, end: 6 },
+    page_range: { start: 82, end: 82 },
+    element_count: 3,
+    preview: 'Observe the experiment.',
+  },
+];
+
 function setupProps(overrides = {}) {
   return {
     chapters,
     chaptersLoading: false,
     chaptersError: '',
-    selectedSlugs: new Set(['life-processes']),
-    topicNamesByChapter: { 'life-processes': 'Nutrition' },
+    selectedChapterSlug: 'life-processes',
+    topics,
+    topicsLoading: false,
+    topicsError: '',
+    selectedTopicIds: new Set(['life-processes:5.1']),
     difficulty: 'Standard' as const,
     busy: false,
     error: '',
-    onToggleChapter: vi.fn(),
-    onSelectAllChapters: vi.fn(),
-    onClearChapters: vi.fn(),
-    onTopicNamesChange: vi.fn(),
+    onSelectChapter: vi.fn(),
+    onToggleTopic: vi.fn(),
+    onClearTopics: vi.fn(),
     onDifficultyChange: vi.fn(),
     onStart: vi.fn(),
     ...overrides,
@@ -32,48 +59,67 @@ function setupProps(overrides = {}) {
 }
 
 describe('BulkQuestionGenerationSetup', () => {
-  it('shows the separate Question bank action controls without backend-owned knobs', () => {
+  it('shows the separate topic-scoped Q&A controls without backend-owned knobs', () => {
     const html = renderToStaticMarkup(
       <BulkQuestionGenerationSetup {...setupProps()} />,
     );
 
-    expect(html).toContain('Generation setup');
-    expect(html).toContain('Select all Chapters');
-    expect(html).toContain('Clear selection');
-    expect(html).toContain('Optional Topic hints for Life Processes');
+    expect(html).toContain('Generate AI Q&amp;A');
+    expect(html).toContain('NCERT Chapter');
+    expect(html).toContain('Topic scope');
+    expect(html).toContain('5.1 Life Processes');
+    expect(html).toContain('Section · pp. 81–83');
+    expect(html).toContain('Generated Q&amp;A stays separate from the Question bank');
     expect(html).toContain('Easy');
     expect(html).toContain('Standard');
     expect(html).toContain('Challenging');
-    expect(html).not.toMatch(/batch size|provider|model|fallback|cost|marks distribution/i);
+    expect(html).not.toMatch(/batch size|provider|model|fallback|cost|marks distribution|prompt|instructions|topic hints/i);
   });
 
-  it('prevents generation until at least one Chapter is selected', () => {
+  it('prevents generation until at least one topic is selected', () => {
     const html = renderToStaticMarkup(
-      <BulkQuestionGenerationSetup {...setupProps({ selectedSlugs: new Set() })} />,
+      <BulkQuestionGenerationSetup
+        {...setupProps({ selectedTopicIds: new Set() })}
+      />,
     );
 
-    expect(html).toContain('Select at least one Chapter to enable generation.');
+    expect(html).toContain('Select at least one NCERT topic to enable generation.');
     expect(html).toContain('disabled=""');
   });
 
-  it('shows Chapter loading and error states', () => {
+  it('explains that the MVP is one Chapter per generation run', () => {
+    const html = renderToStaticMarkup(
+      <BulkQuestionGenerationSetup {...setupProps()} />,
+    );
+
+    expect(html).toContain('The MVP supports one Chapter per run');
+    expect(html).toContain('type="radio"');
+  });
+
+  it('shows Chapter and topic loading and error states', () => {
     const loadingHtml = renderToStaticMarkup(
       <BulkQuestionGenerationSetup
         {...setupProps({ chapters: [], chaptersLoading: true })}
       />,
     );
-    const errorHtml = renderToStaticMarkup(
+    const chapterErrorHtml = renderToStaticMarkup(
       <BulkQuestionGenerationSetup
         {...setupProps({
           chapters: [],
           chaptersError: 'Request failed (500)',
-          selectedSlugs: new Set(),
+          selectedChapterSlug: '',
         })}
+      />,
+    );
+    const topicsErrorHtml = renderToStaticMarkup(
+      <BulkQuestionGenerationSetup
+        {...setupProps({ topics: [], topicsError: 'Request failed (500)' })}
       />,
     );
 
     expect(loadingHtml).toContain('Loading Chapters…');
-    expect(errorHtml).toContain('Chapters could not be loaded.');
+    expect(chapterErrorHtml).toContain('Chapters could not be loaded.');
+    expect(topicsErrorHtml).toContain('Topics could not be loaded.');
   });
 });
 
@@ -82,6 +128,7 @@ describe('GenerationProgressWorkspace', () => {
     id: 144,
     status: 'generating_questions',
     chapter_slugs: ['life-processes'],
+    chapter_map_node_ids: ['life-processes:5.1'],
     topic_names: [],
     difficulty_preset: 'balanced',
     requested_count: 10,

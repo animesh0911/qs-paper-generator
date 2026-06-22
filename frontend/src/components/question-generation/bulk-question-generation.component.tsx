@@ -1,4 +1,9 @@
-import type { Chapter, GenerationBatch, GenerationDifficultyLabel } from '@/types';
+import type {
+  Chapter,
+  ChapterTopicNode,
+  GenerationBatch,
+  GenerationDifficultyLabel,
+} from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   GENERATION_DIFFICULTIES,
@@ -17,45 +22,62 @@ export interface BulkQuestionGenerationSetupProps {
   chapters: Chapter[];
   chaptersLoading: boolean;
   chaptersError: string;
-  selectedSlugs: Set<string>;
-  topicNamesByChapter: Record<string, string>;
+  selectedChapterSlug: string;
+  topics: ChapterTopicNode[];
+  topicsLoading: boolean;
+  topicsError: string;
+  selectedTopicIds: Set<string>;
   difficulty: GenerationDifficultyLabel;
   busy: boolean;
   error: string;
-  onToggleChapter: (slug: string) => void;
-  onSelectAllChapters: () => void;
-  onClearChapters: () => void;
-  onTopicNamesChange: (slug: string, value: string) => void;
+  onSelectChapter: (slug: string) => void;
+  onToggleTopic: (nodeId: string) => void;
+  onClearTopics: () => void;
   onDifficultyChange: (difficulty: GenerationDifficultyLabel) => void;
   onStart: () => void;
+}
+
+function formatPageRange(topic: ChapterTopicNode): string {
+  if (topic.page_range.start === topic.page_range.end) {
+    return `p. ${topic.page_range.start}`;
+  }
+  return `pp. ${topic.page_range.start}–${topic.page_range.end}`;
+}
+
+function nodeTypeLabel(type: string): string {
+  return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
 export function BulkQuestionGenerationSetup({
   chapters,
   chaptersLoading,
   chaptersError,
-  selectedSlugs,
-  topicNamesByChapter,
+  selectedChapterSlug,
+  topics,
+  topicsLoading,
+  topicsError,
+  selectedTopicIds,
   difficulty,
   busy,
   error,
-  onToggleChapter,
-  onSelectAllChapters,
-  onClearChapters,
-  onTopicNamesChange,
+  onSelectChapter,
+  onToggleTopic,
+  onClearTopics,
   onDifficultyChange,
   onStart,
 }: BulkQuestionGenerationSetupProps) {
-  const selectedCount = selectedSlugs.size;
-  const canStart = selectedCount > 0 && !busy;
+  const selectedTopicCount = selectedTopicIds.size;
+  const selectedChapter = chapters.find((chapter) => chapter.slug === selectedChapterSlug);
+  const canStart = Boolean(selectedChapterSlug) && selectedTopicCount > 0 && !busy;
 
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <p className="text-sm font-medium">Generation setup</p>
+        <p className="text-sm font-medium">Generate AI Q&amp;A</p>
         <p className="max-w-prose text-sm text-muted-foreground">
-          Choose the Chapter scope for the request. Topic hints are optional and
-          only guide the generated Question-and-answer candidates.
+          Choose one NCERT Chapter, then select the grounded topic nodes that should
+          drive generation. Generated Q&amp;A stays separate from the Question bank
+          until a teacher reviews and accepts it.
         </p>
       </div>
 
@@ -77,43 +99,18 @@ export function BulkQuestionGenerationSetup({
         </div>
       </fieldset>
 
-      <section className="space-y-3" aria-labelledby="generation-chapters-heading">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-1">
-            <p id="generation-chapters-heading" className="text-sm font-medium">
-              Chapters and Topic hints
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {selectedCount === 0
-                ? 'Select at least one Chapter before starting generation.'
-                : `${selectedCount} Chapter${selectedCount === 1 ? '' : 's'} selected.`}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={onSelectAllChapters}
-              disabled={chapters.length === 0 || selectedCount === chapters.length}
-            >
-              Select all Chapters
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={onClearChapters}
-              disabled={selectedCount === 0}
-            >
-              Clear selection
-            </Button>
-          </div>
+      <section className="space-y-3" aria-labelledby="generation-chapter-heading">
+        <div className="space-y-1">
+          <p id="generation-chapter-heading" className="text-sm font-medium">
+            NCERT Chapter
+          </p>
+          <p className="text-sm text-muted-foreground">
+            The MVP supports one Chapter per run, so selecting another Chapter
+            clears the current topic scope.
+          </p>
         </div>
 
-        {chaptersLoading && (
-          <p className="border-t pt-3 text-sm">Loading Chapters…</p>
-        )}
+        {chaptersLoading && <p className="border-t pt-3 text-sm">Loading Chapters…</p>}
 
         {!chaptersLoading && chaptersError && (
           <div className="border-t pt-3" role="alert">
@@ -129,42 +126,106 @@ export function BulkQuestionGenerationSetup({
         )}
 
         {chapters.length > 0 && (
-          <ul className="divide-y">
-            {chapters.map((chapter) => {
-              const selected = selectedSlugs.has(chapter.slug);
-              const topicFieldId = `topic-hints-${chapter.slug}`;
-              return (
-                <li key={chapter.slug} className="py-3 first:pt-0 last:pb-0">
-                  <label className="flex items-center gap-2 text-sm font-medium">
-                    <input
-                      type="checkbox"
-                      checked={selected}
-                      onChange={() => onToggleChapter(chapter.slug)}
-                    />
-                    <span>
-                      {chapter.order}. {chapter.name}
-                    </span>
-                  </label>
-                  {selected && (
-                    <label htmlFor={topicFieldId} className="mt-2 block text-sm">
-                      Optional Topic hints for {chapter.name}
-                      <textarea
-                        id={topicFieldId}
-                        className="mt-1 flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Example: Magnetic effects, domestic electric circuits"
-                        value={topicNamesByChapter[chapter.slug] ?? ''}
-                        onChange={(event) =>
-                          onTopicNamesChange(chapter.slug, event.target.value)
-                        }
-                      />
-                    </label>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="NCERT Chapter">
+            {chapters.map((chapter) => (
+              <label
+                key={chapter.slug}
+                className="flex items-start gap-2 rounded-md border bg-background px-3 py-2 text-sm"
+              >
+                <input
+                  type="radio"
+                  name="generation-chapter"
+                  checked={selectedChapterSlug === chapter.slug}
+                  onChange={() => onSelectChapter(chapter.slug)}
+                />
+                <span>
+                  <span className="block font-medium">
+                    {chapter.order}. {chapter.name}
+                  </span>
+                  <span className="block text-muted-foreground">
+                    Open this Chapter's NCERT topics
+                  </span>
+                </span>
+              </label>
+            ))}
+          </div>
         )}
       </section>
+
+      {selectedChapterSlug && (
+        <section className="space-y-3 border-t pt-4" aria-labelledby="generation-topics-heading">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <p id="generation-topics-heading" className="text-sm font-medium">
+                Topic scope{selectedChapter ? ` — ${selectedChapter.name}` : ''}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {selectedTopicCount === 0
+                  ? 'Select at least one NCERT topic to enable generation.'
+                  : `${selectedTopicCount} topic${selectedTopicCount === 1 ? '' : 's'} selected for generation.`}
+              </p>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={onClearTopics}
+              disabled={selectedTopicCount === 0}
+            >
+              Clear topics
+            </Button>
+          </div>
+
+          {topicsLoading && <p className="text-sm">Loading NCERT topics…</p>}
+
+          {!topicsLoading && topicsError && (
+            <div role="alert">
+              <p className="text-sm font-medium">Topics could not be loaded.</p>
+              <p className="mt-1 text-sm text-muted-foreground">{topicsError}</p>
+            </div>
+          )}
+
+          {!topicsLoading && !topicsError && topics.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No NCERT topic metadata is available for this Chapter yet.
+            </p>
+          )}
+
+          {!topicsLoading && !topicsError && topics.length > 0 && (
+            <ul className="divide-y rounded-md border">
+              {topics.map((topic) => {
+                const topicInputId = `topic-${topic.id}`;
+                return (
+                  <li key={topic.id} className="p-3">
+                    <label htmlFor={topicInputId} className="flex items-start gap-3 text-sm">
+                      <input
+                        id={topicInputId}
+                        type="checkbox"
+                        className="mt-1"
+                        checked={selectedTopicIds.has(topic.id)}
+                        onChange={() => onToggleTopic(topic.id)}
+                      />
+                      <span className="min-w-0 space-y-1">
+                        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                          <span className="font-medium">{topic.title}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {nodeTypeLabel(topic.type)} · {formatPageRange(topic)}
+                          </span>
+                        </span>
+                        {topic.preview && (
+                          <span className="block text-muted-foreground">
+                            {topic.preview}
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      )}
 
       {error && (
         <div className="border-t pt-3" role="alert">
@@ -175,11 +236,11 @@ export function BulkQuestionGenerationSetup({
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Button type="button" onClick={onStart} disabled={!canStart}>
-          {busy ? 'Starting generation…' : 'Generate Question bank'}
+          {busy ? 'Starting generation…' : 'Generate AI Q&A'}
         </Button>
-        {selectedCount === 0 && (
+        {!canStart && !busy && (
           <p className="text-sm text-muted-foreground">
-            Select at least one Chapter to enable generation.
+            Select one Chapter and at least one topic to queue generation.
           </p>
         )}
       </div>
