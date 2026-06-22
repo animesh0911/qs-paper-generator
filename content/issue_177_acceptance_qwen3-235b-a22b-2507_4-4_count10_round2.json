@@ -1,0 +1,446 @@
+{
+  "provider": "openrouter",
+  "model": "qwen/qwen3-235b-a22b-2507",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 27,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.4",
+  "topic_title": "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID",
+  "chapter_map_node_id": "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2"
+    ],
+    "included_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+      "47828774c1697ed4537abf2ebbcbe4e1292cd4d01f7be05ed6e31a1ba5525c5a",
+      "16843beccb844b58739c2834f698800fb669fe36832012cf30f9300e836ad961"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7971,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 14413,
+  "approx_input_tokens_4c": 3603,
+  "elapsed_ms": 130580,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "An",
+        "raw_text": "Which of the following gases is evolved when ethanol reacts with sodium metal?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following gases is evolved when ethanol reacts with sodium metal?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Oxygen"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon dioxide"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hydrogen"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Nitrogen"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "C Hydrogen",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is the common name for a 5-8% solution of ethanoic acid in water?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the common name for a 5-8% solution of ethanoic acid in water?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Glacial acetic acid"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Vinegar"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Denatured alcohol"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sodium acetate"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "B Vinegar",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "Ap",
+        "raw_text": "Which of the following is formed when ethanol is heated with concentrated sulphuric acid at 443 K?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is formed when ethanol is heated with concentrated sulphuric acid at 443 K?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethane"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethene"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ester"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethanal"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "B Ethene",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Why is 5-8% solution of acetic acid in water called vinegar?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is 5-8% solution of acetic acid in water called vinegar?"
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "A 5-8% solution of ethanoic acid in water is called vinegar because it is commonly used as a preservative in food, especially in pickles, and has a characteristic sour taste and smell.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "An",
+        "raw_text": "What gas is produced when ethanoic acid reacts with sodium hydrogencarbonate? How can it be tested?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What gas is produced when ethanoic acid reacts with sodium hydrogencarbonate? How can it be tested?"
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Carbon dioxide gas is produced. It can be tested by passing it through lime water, which turns milky due to the formation of calcium carbonate.",
+        "question_citation_ids": [
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+        ],
+        "answer_citation_ids": [
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why is pure ethanoic acid called glacial acetic acid?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is pure ethanoic acid called glacial acetic acid?"
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Pure ethanoic acid is called glacial acetic acid because it has a melting point of 290 K and often freezes in cold climates, forming ice-like crystals.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "Describe the reaction involved in the esterification of ethanoic acid with ethanol.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the reaction involved in the esterification of ethanoic acid with ethanol."
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Ethanoic acid reacts with ethanol in the presence of a few drops of concentrated sulphuric acid to form an ester and water. The ester formed has a sweet smell and is commonly used in perfumes and flavoring agents. The reaction is reversible and is called esterification.",
+        "question_citation_ids": [
+          "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3"
+        ],
+        "answer_citation_ids": [
+          "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Why is alcohol added to petrol in some countries? Give one reason.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is alcohol added to petrol in some countries? Give one reason."
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Alcohol (ethanol) is added to petrol because it is a cleaner fuel that burns completely to produce carbon dioxide and water, thus causing less pollution compared to petrol alone.",
+        "question_citation_ids": [
+          "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+        ],
+        "answer_citation_ids": [
+          "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "Explain the process of formation of ethanol from molasses. Also, write one use of ethanol.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the process of formation of ethanol from molasses. Also, write one use of ethanol."
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "Ethanol is produced from molasses, which is a byproduct of sugar production from sugarcane. Molasses contains sugars like sucrose and glucose. These sugars are fermented by yeast in anaerobic conditions to produce ethanol and carbon dioxide. The chemical reaction involved is: C6H12O6 → 2C2H5OH + 2CO2. After fermentation, ethanol is recovered by distillation. One important use of ethanol is as a solvent in medicines like tincture iodine and cough syrups, and it is also used as an additive in petrol to reduce pollution.",
+        "question_citation_ids": [
+          "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+        ],
+        "answer_citation_ids": [
+          "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "What happens when ethanol is treated with sodium metal? Write the chemical equation and name the gas evolved. Why is this reaction similar to the reaction of acids with metals?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What happens when ethanol is treated with sodium metal? Write the chemical equation and name the gas evolved. Why is this reaction similar to the reaction of acids with metals?"
+            }
+          ]
+        },
+        "topic_names": [
+          "SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID"
+        ],
+        "answer": "When ethanol is treated with sodium metal, hydrogen gas is evolved and sodium ethoxide is formed. The chemical equation is: 2CH3CH2OH + 2Na → 2CH3CH2ONa + H2. This reaction is similar to the reaction of acids with metals because both produce hydrogen gas. Although ethanol is not an acid, it has a hydroxyl (–OH) group that can release hydrogen under certain conditions, just like acids donate H+ ions, showing slightly acidic character in reactions with highly reactive metals like sodium.",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 10,
+  "validation_errors": [],
+  "persisted_candidate_count": 10
+}

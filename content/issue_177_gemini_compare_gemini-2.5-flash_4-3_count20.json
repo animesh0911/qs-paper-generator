@@ -1,0 +1,110 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 28,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.3",
+  "topic_title": "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+  "chapter_map_node_id": "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131"
+    ],
+    "included_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+      "41d0334215e1625cf1ebe01cba630ac32041a607bc29e0a9ec51e2ac71e56091",
+      "51793358677d1704ca4284eadc447502951e7761799c1e37f21da694cef7fa91",
+      "93c240ac3922f2da865cac506987cb7e1e6a3b9367eb333d842a15209f3ffafe",
+      "9e7495d88888d8662c6ae34ae6f2b56a9bc29cbf5b5a3b7af54159278581d004"
+    ],
+    "included_chunk_count": 15,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7115,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 12609,
+  "approx_input_tokens_4c": 3152,
+  "elapsed_ms": 4433,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is generally produced along with carbon dioxide when carbon in all its allotropic forms burns in oxygen?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is generally produced along with carbon dioxide when carbon in all its allotropic forms burns in oxygen?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "raw_question_count": 1,
+  "valid_count": 0,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "source"
+    },
+    {
+      "index": 0,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    },
+    {
+      "index": 0,
+      "code": "empty_answer",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "bad_topic_names",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "bad_source",
+      "detail": "source.type"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "question_citation_ids"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "answer_citation_ids"
+    }
+  ],
+  "persisted_candidate_count": 0
+}

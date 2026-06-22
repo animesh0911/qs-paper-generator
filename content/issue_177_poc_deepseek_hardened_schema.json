@@ -1,0 +1,502 @@
+{
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-v4-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "batch_id": 6,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25372,
+  "approx_input_tokens_4c": 6343,
+  "elapsed_ms": 281414,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Why can carbon form a large number of compounds? This property is mostly due to its ability to form bonds with other atoms of carbon, called catenation. The carbon-carbon bond is very strong and stable, allowing long chains, branched chains, and rings. Which of the following best describes catenation as observed in carbon?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why can carbon form a large number of compounds? This property is mostly due to its ability to form bonds with other atoms of carbon, called catenation. The carbon-carbon bond is very strong and stable, allowing long chains, branched chains, and rings. Which of the following best describes catenation as observed in carbon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The ability of carbon to form four covalent bonds with other atoms."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The ability of carbon atoms to link with each other to form long chains, branched chains, or rings."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The property of carbon to form bonds with oxygen, hydrogen, and nitrogen."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The capacity of carbon to have both single and double bonds with the same element."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "B. The ability of carbon atoms to link with each other to form long chains, branched chains, or rings.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Carbon compounds can be saturated or unsaturated. Saturated carbon compounds have only single bonds between carbon atoms, while unsaturated compounds contain one or more double or triple bonds between carbon atoms. Which of the following is an example of an unsaturated carbon compound?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Carbon compounds can be saturated or unsaturated. Saturated carbon compounds have only single bonds between carbon atoms, while unsaturated compounds contain one or more double or triple bonds between carbon atoms. Which of the following is an example of an unsaturated carbon compound?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Methane (CH\u2084)"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethane (C\u2082H\u2086)"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethene (C\u2082H\u2084)"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Propane (C\u2083H\u2088)"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "C. Ethene (C\u2082H\u2084)",
+        "question_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "answer_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "In carbon compounds, the element or group of elements that replaces hydrogen in a hydrocarbon chain and gives specific properties to the compound is called a heteroatom or a functional group. Carbon forms strong bonds with heteroatoms like oxygen, nitrogen, halogens, and sulphur. What is the functional group present in alcohols?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "In carbon compounds, the element or group of elements that replaces hydrogen in a hydrocarbon chain and gives specific properties to the compound is called a heteroatom or a functional group. Carbon forms strong bonds with heteroatoms like oxygen, nitrogen, halogens, and sulphur. What is the functional group present in alcohols?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "-CHO (aldehyde group)"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "-OH (hydroxyl group)"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "-COOH (carboxyl group)"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": ">C=O (ketone group)"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "B. -OH (hydroxyl group)",
+        "question_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "answer_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "In a homologous series, compounds have the same functional group and similar chemical properties. For example, the series of alcohols: methanol (CH\u2083OH), ethanol (C\u2082H\u2085OH), propanol (C\u2083H\u2087OH), and butanol (C\u2084H\u2089OH) show a difference of a certain unit between successive members. Which unit do successive members of a homologous series differ by?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "In a homologous series, compounds have the same functional group and similar chemical properties. For example, the series of alcohols: methanol (CH\u2083OH), ethanol (C\u2082H\u2085OH), propanol (C\u2083H\u2087OH), and butanol (C\u2084H\u2089OH) show a difference of a certain unit between successive members. Which unit do successive members of a homologous series differ by?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "-CH\u2083 unit"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "-CH\u2082- unit"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "-OH unit"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "-C\u2082H\u2085 unit"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "B. -CH\u2082- unit",
+        "question_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "answer_citation_ids": [
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53",
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Mention the two characteristic features of carbon that enable it to form a large number of compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Mention the two characteristic features of carbon that enable it to form a large number of compounds."
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "The two characteristic features of carbon are (i) catenation \u2013 the unique ability to form bonds with other carbon atoms to form chains, branches, or rings, and (ii) tetravalency \u2013 a valency of four that allows carbon to bond with four other atoms or groups.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Define a homologous series of carbon compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define a homologous series of carbon compounds."
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "A homologous series is a series of carbon compounds in which the same functional group substitutes for hydrogen in a carbon chain, and each successive member differs by a -CH\u2082- unit.",
+        "question_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "answer_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Differentiate between saturated and unsaturated carbon compounds based on the type of bonds and their reactivity. Give one example of each.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Differentiate between saturated and unsaturated carbon compounds based on the type of bonds and their reactivity. Give one example of each."
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "Saturated carbon compounds have only single bonds between carbon atoms (e.g., ethane, C\u2082H\u2086) and are normally not very reactive. Unsaturated carbon compounds contain one or more double or triple bonds between carbon atoms (e.g., ethene, C\u2082H\u2084) and are more reactive than saturated compounds.",
+        "question_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "answer_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain why carbon forms strong bonds with other atoms. What property of carbon contributes to the stability of its compounds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why carbon forms strong bonds with other atoms. What property of carbon contributes to the stability of its compounds?"
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "Carbon has a small size, which enables its nucleus to hold on to the shared pairs of electrons strongly. This makes the bonds formed by carbon very strong and stable. Additionally, the carbon-carbon bond is very strong, contributing to the overall stability of carbon compounds.",
+        "question_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "answer_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Describe the stepwise method for naming carbon compounds as per IUPAC nomenclature. Use a three-carbon chain with a double bond (propene) as an example to illustrate the rules.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the stepwise method for naming carbon compounds as per IUPAC nomenclature. Use a three-carbon chain with a double bond (propene) as an example to illustrate the rules."
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "The naming of carbon compounds involves the following steps:\n(i) Identify the number of carbon atoms in the longest chain. For a three-carbon chain, the root name is 'prop'.\n(ii) If a functional group is present, it is indicated with a prefix or suffix. For a double bond, the suffix is 'ene'.\n(iii) If the carbon chain is unsaturated, the final 'ane' of the alkane name is replaced by 'ene' for a double bond or 'yne' for a triple bond.\n(iv) The suffix is added to the modified root. For example, 'prop' (for three carbons) + 'ene' gives 'propene'. If the suffix begins with a vowel, the final 'e' of the carbon chain name is dropped (not applicable here as 'propane' becomes 'prop' before adding 'ene').\nThus, a three-carbon chain with a double bond is named propene.",
+        "question_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "answer_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Explain the concept of structural isomerism with reference to the compound butane (C\u2084H\u2081\u2080). Draw the structures of its isomers and mention their IUPAC names.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the concept of structural isomerism with reference to the compound butane (C\u2084H\u2081\u2080). Draw the structures of its isomers and mention their IUPAC names."
+            }
+          ]
+        },
+        "topic_names": [],
+        "answer": "Structural isomers are compounds that have the same molecular formula but different structures. For the molecular formula C\u2084H\u2081\u2080, two structural isomers exist:\n1. A straight-chain isomer with all four carbon atoms in a continuous chain: H\u2083C-CH\u2082-CH\u2082-CH\u2083, named butane.\n2. A branched-chain isomer where one carbon atom is attached to three other carbon atoms: H\u2083C-CH(CH\u2083)-CH\u2083, named 2-methylpropane (or isobutane).\nThese different arrangements of atoms lead to different physical properties while having the same molecular formula.",
+        "question_citation_ids": [
+          "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+          "07a7d439bbbd03f79dd18ff04a437766be33a1e917d91828eb61a239ca81aa40"
+        ],
+        "answer_citation_ids": [
+          "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+          "07a7d439bbbd03f79dd18ff04a437766be33a1e917d91828eb61a239ca81aa40"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 8,
+  "validation_errors": [
+    {
+      "index": 3,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    },
+    {
+      "index": 5,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    },
+    {
+      "index": 5,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    }
+  ],
+  "persisted_candidate_count": 8
+}

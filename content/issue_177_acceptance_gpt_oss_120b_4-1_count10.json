@@ -1,0 +1,357 @@
+{
+  "provider": "openrouter",
+  "model": "openai/gpt-oss-120b",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 16,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.1",
+  "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+  "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chunk_count": 29,
+    "skipped_chunk_count": 8,
+    "context_char_count": 11027,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 19325,
+  "approx_input_tokens_4c": 4831,
+  "elapsed_ms": 30443,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "answer": "Option A. A single covalent bond is represented by a single line between two hydrogen atoms (H–H).",
+        "answer_citation_ids": [
+          "3a65e65c81ef5a4f93b0949d89be029c1a3102525f5a40f0af89009afcc42b48"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Which of the following correctly represents the covalent bond formed between two hydrogen atoms in a hydrogen molecule (H₂)?",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "3a65e65c81ef5a4f93b0949d89be029c1a3102525f5a40f0af89009afcc42b48"
+        ],
+        "raw_text": "Which of the following correctly represents the covalent bond formed between two hydrogen atoms in a hydrogen molecule (H₂)?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "Option C. Carbon shares its valence electrons with other atoms to attain a stable configuration, forming covalent bonds rather than gaining or losing four electrons.",
+        "answer_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+          "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Why does carbon predominantly form covalent bonds rather than ionic bonds?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+        ],
+        "raw_text": "Why does carbon predominantly form covalent bonds rather than ionic bonds?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "Option D. In diamond each carbon atom is tetra‑co‑ordinated (bonded to four others) forming a rigid three‑dimensional network, whereas in graphite each carbon is bonded to three others in planar sheets with one double bond, giving graphite its softness and conductivity.",
+        "answer_citation_ids": [
+          "490c68ad41503ce2fc03ad092489eefe0e6c8e1098f3adb2d7e7b434d1f8a9ca",
+          "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Which statement best explains why diamond and graphite, though both made of carbon, have very different physical properties?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "490c68ad41503ce2fc03ad092489eefe0e6c8e1098f3adb2d7e7b434d1f8a9ca"
+        ],
+        "raw_text": "Which statement best explains why diamond and graphite, though both made of carbon, have very different physical properties?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "A covalent bond is a chemical bond formed by the sharing of one or more pairs of electrons between two atoms.",
+        "answer_citation_ids": [
+          "93e7a6e48871d0ae1e147da5aa6d1493ec381fc5043a76a7d768265ab3ee061b"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Define a covalent bond.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "93e7a6e48871d0ae1e147da5aa6d1493ec381fc5043a76a7d768265ab3ee061b"
+        ],
+        "raw_text": "Define a covalent bond.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "Carbon compounds have low melting and boiling points because the covalent bonds inside the molecules are strong, but the forces between different molecules (inter‑molecular forces) are weak.",
+        "answer_citation_ids": [
+          "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "State why most carbon compounds have relatively low melting and boiling points compared to ionic compounds.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7"
+        ],
+        "raw_text": "State why most carbon compounds have relatively low melting and boiling points compared to ionic compounds.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "The electronic configuration of carbon is 1s² 2s² 2p². Hence it has four valence electrons in its outermost (second) shell.",
+        "answer_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Write the electronic configuration of a carbon atom and state the number of valence electrons it possesses.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+        ],
+        "raw_text": "Write the electronic configuration of a carbon atom and state the number of valence electrons it possesses.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "Methane (CH₄) is formed when one carbon atom, which has four valence electrons, shares each of these electrons with the single valence electron of four hydrogen atoms. In this way four single covalent bonds (C–H) are created, and every atom attains the stable electronic arrangement of the nearest noble gas.\n\n(The electron‑dot structure shows carbon at the centre with four hydrogen atoms surrounding it, each connected by a single line representing a shared electron pair.)",
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+          "38de64a3053c9308010ddd55fd609293636bed83892357e400d97fb83fc61188"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Explain how the methane (CH₄) molecule is formed by covalent bonding, describing the electron sharing involved.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "raw_text": "Explain how the methane (CH₄) molecule is formed by covalent bonding, describing the electron sharing involved.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "Diamond: Each carbon atom is tetrahedrally bonded to four other carbon atoms, producing a three‑dimensional network that is extremely strong. This rigid structure makes diamond the hardest known natural material and it does not allow free movement of electrons, so diamond is a poor conductor of electricity.\n\nGraphite: Each carbon atom is bonded to three other carbon atoms in the same plane, forming flat hexagonal sheets. One electron from each carbon atom remains delocalised above and below the planes, creating a layer of mobile π‑electrons. These layers are weakly held together, so they can slide over one another, giving graphite its lubricating property and making it soft. The delocalised electrons also enable graphite to conduct electricity.\n\nThus, the difference in bonding—3‑D tetrahedral network in diamond vs. 2‑D planar sheets with delocalised electrons in graphite—explains their contrasting hardness and electrical conductivity.",
+        "answer_citation_ids": [
+          "490c68ad41503ce2fc03ad092489eefe0e6c8e1098f3adb2d7e7b434d1f8a9ca",
+          "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Compare the structures of diamond and graphite and relate these structures to their respective hardness and electrical conductivity.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "490c68ad41503ce2fc03ad092489eefe0e6c8e1098f3adb2d7e7b434d1f8a9ca"
+        ],
+        "raw_text": "Compare the structures of diamond and graphite and relate these structures to their respective hardness and electrical conductivity.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "A covalent bond is formed when atoms share one or more pairs of electrons.\n\n* Single bond – one pair of electrons is shared. Example: In H₂ each hydrogen atom contributes one electron, giving a single H–H bond.\n* Double bond – two pairs of electrons are shared. Example: O₂ has each oxygen atom sharing two electrons, forming an O=O double bond.\n* Triple bond – three pairs of electrons are shared. Example: N₂ consists of a N≡N triple bond, each nitrogen sharing three electron pairs.\n\nIn a water molecule (H₂O) the oxygen atom (six valence electrons) shares one electron pair with each of the two hydrogen atoms. Both O–H connections are single covalent bonds; there is no double or triple bond in water.\n\nThus, the number of shared electron pairs determines whether the covalent bond is single, double or triple, and molecular structures such as H₂, O₂, N₂ and H₂O illustrate these concepts.",
+        "answer_citation_ids": [
+          "3a65e65c81ef5a4f93b0949d89be029c1a3102525f5a40f0af89009afcc42b48",
+          "81bc69b5f6c0ade2a0cdd22c4c1bce10ea1d4206308b4a6f634b51cde9cb08b3",
+          "5143ecc8d2109121fbdf02c342fac13371f6cf53d9bb43a0c717504505a17682"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Describe how single, double and triple covalent bonds are formed, giving suitable examples (H₂, O₂, N₂). Also state the type of covalent bonds present in a water (H₂O) molecule.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "3a65e65c81ef5a4f93b0949d89be029c1a3102525f5a40f0af89009afcc42b48"
+        ],
+        "raw_text": "Describe how single, double and triple covalent bonds are formed, giving suitable examples (H₂, O₂, N₂). Also state the type of covalent bonds present in a water (H₂O) molecule.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      },
+      {
+        "answer": "Carbon’s tetravalent nature (four valence electrons) enables it to form up to four covalent bonds with other atoms, including other carbon atoms. This ability to bond to itself—called catenation—allows the construction of long chains, branched structures and various rings. Consequently, an enormous variety of organic molecules can be built, ranging from simple gases like methane to complex biomolecules such as carbohydrates, proteins and plastics. The versatility of carbon, together with its ability to form stable covalent bonds, is the reason why carbon compounds constitute the basis of life and the basis of many materials used in daily life.\n\n(The importance of carbon’s versatility is highlighted in the text describing its small natural abundance yet immense significance.)",
+        "answer_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+          "93e7a6e48871d0ae1e147da5aa6d1493ec381fc5043a76a7d768265ab3ee061b"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Discuss the importance of carbon’s ability to catenate and its tetravalent nature in leading to the large variety of organic compounds.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+        ],
+        "raw_text": "Discuss the importance of carbon’s ability to catenate and its tetravalent nature in leading to the large variety of organic compounds.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "bonding-in-carbon-the-covalent-bond"
+        ]
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 7,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    },
+    {
+      "index": 1,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    },
+    {
+      "index": 2,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    }
+  ],
+  "persisted_candidate_count": 7
+}

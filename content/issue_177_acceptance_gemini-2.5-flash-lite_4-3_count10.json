@@ -1,0 +1,465 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 20,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.3",
+  "topic_title": "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+  "chapter_map_node_id": "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131"
+    ],
+    "included_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+      "41d0334215e1625cf1ebe01cba630ac32041a607bc29e0a9ec51e2ac71e56091",
+      "51793358677d1704ca4284eadc447502951e7761799c1e37f21da694cef7fa91",
+      "93c240ac3922f2da865cac506987cb7e1e6a3b9367eb333d842a15209f3ffafe",
+      "9e7495d88888d8662c6ae34ae6f2b56a9bc29cbf5b5a3b7af54159278581d004"
+    ],
+    "included_chunk_count": 15,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7115,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 12609,
+  "approx_input_tokens_4c": 3152,
+  "elapsed_ms": 19105,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following hydrocarbons undergo addition reactions?\nA. Saturated hydrocarbons\nB. Unsaturated hydrocarbons\nC. Both saturated and unsaturated hydrocarbons\nD. Neither saturated nor unsaturated hydrocarbons",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following hydrocarbons undergo addition reactions?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Saturated hydrocarbons"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Unsaturated hydrocarbons"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Both saturated and unsaturated hydrocarbons"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Neither saturated nor unsaturated hydrocarbons"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.3 Addition Reaction"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which type of flame is produced by saturated hydrocarbons while burning?\nA. Yellow, sooty flame\nB. Blue flame\nC. Green flame\nD. Red flame",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which type of flame is produced by saturated hydrocarbons while burning?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Yellow, sooty flame"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Blue flame"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Green flame"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Red flame"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following is an oxidising agent?\nA. Methane\nB. Ethanol\nC. Alkaline potassium permanganate\nD. Carbon dioxide",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is an oxidising agent?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Methane"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethanol"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alkaline potassium permanganate"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon dioxide"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "answer_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why do saturated hydrocarbons produce a clean blue flame on burning in sufficient supply of air?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why do saturated hydrocarbons produce a clean blue flame on burning in sufficient supply of air?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "Saturated hydrocarbons undergo complete combustion in the presence of sufficient oxygen, producing primarily carbon dioxide and water, which results in a clean blue flame without significant soot.",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is a catalyst in a chemical reaction?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is a catalyst in a chemical reaction?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.3 Addition Reaction"
+        ],
+        "answer": "A catalyst is a substance that increases the rate of a chemical reaction without itself undergoing any permanent chemical change.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why does a candle flame have a yellow colour?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why does a candle flame have a yellow colour?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "The yellow colour of a candle flame is due to the incomplete combustion of the wax vapour, which leads to the formation of fine particles of unburnt carbon. These particles get heated to incandescence, producing a yellow, luminous flame.",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain why cooking vessels get blackened if the air holes are blocked.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why cooking vessels get blackened if the air holes are blocked."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "When the air holes of a cooking stove are blocked, the supply of oxygen is reduced. This leads to incomplete combustion of the fuel. Incomplete combustion produces unburnt carbon particles (soot), which deposit on the bottom of the cooking vessels, causing them to get blackened.",
+        "question_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "What are oxidation reactions? Give an example of oxidation in carbon compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are oxidation reactions? Give an example of oxidation in carbon compounds."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation"
+        ],
+        "answer": "Oxidation is a reaction that involves the gain of oxygen or loss of hydrogen. In carbon compounds, alcohols can be oxidised to carboxylic acids. For example, ethanol can be oxidised to ethanoic acid using an oxidising agent like alkaline potassium permanganate.",
+        "question_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "answer_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the difference between combustion with a flame and combustion without a flame, providing examples from the burning of carbon compounds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the difference between combustion with a flame and combustion without a flame, providing examples from the burning of carbon compounds."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "Combustion is a process where a substance reacts rapidly with oxygen, producing heat and light. The nature of the flame depends on the physical state of the substance being burnt and the completeness of combustion.\n\nCombustion With Flame: This occurs when gaseous substances burn. For example, when a candle burns, the solid wax vaporises and then burns in the gaseous state, producing a luminous yellow flame due to the presence of heated carbon particles. Similarly, LPG (Liquefied Petroleum Gas) burns with a clean blue flame because it is a gas and undergoes complete combustion when supplied with sufficient air.\n\nCombustion Without Flame: This occurs when solid substances burn, but do not vaporise. For instance, coal or charcoal in an 'angithi' glows red and produces heat without a visible flame. This is because the solid fuel is burning directly without significant vaporisation. While some volatile substances might burn with a flame initially, the glowing embers are characteristic of solid-state combustion without a distinct flame.",
+        "question_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Describe the substitution reaction of methane with chlorine, mentioning the conditions required and the outcome.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the substitution reaction of methane with chlorine, mentioning the conditions required and the outcome."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.4 Substitution Reaction"
+        ],
+        "answer": "Methane reacts with chlorine in the presence of sunlight through a substitution reaction. In this reaction, one or more hydrogen atoms of methane are replaced by chlorine atoms. The reaction occurs in steps. For example, methane reacting with chlorine in the presence of sunlight produces chloromethane and hydrogen chloride. This is a substitution reaction because a chlorine atom (or a group of atoms) replaces a hydrogen atom. Higher homologues of alkanes can form a mixture of products as multiple substitutions can occur.",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 10,
+  "validation_errors": [],
+  "persisted_candidate_count": 10
+}

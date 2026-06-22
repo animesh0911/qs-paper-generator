@@ -1,0 +1,476 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-3.5-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 9,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25370,
+  "approx_input_tokens_4c": 6342,
+  "elapsed_ms": 49102,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following terms refers to the unique property of carbon to form bonds with other atoms of carbon, giving rise to large chains, branched chains, or cyclic structures?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following terms refers to the unique property of carbon to form bonds with other atoms of carbon, giving rise to large chains, branched chains, or cyclic structures?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Tetravalency"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Isomerism"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Catenation"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Homology"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "C. Catenation",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What is the difference in the molecular mass between any two successive members of a homologous series? (Take the atomic mass of C = 12 u and H = 1 u)",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the difference in the molecular mass between any two successive members of a homologous series? (Take the atomic mass of C = 12 u and H = 1 u)"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "12 u"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "14 u"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "16 u"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "28 u"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.4 Homologous Series"
+        ],
+        "answer": "B. 14 u",
+        "question_citation_ids": [
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "answer_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "An",
+        "raw_text": "Two organic compounds have the identical molecular formula, C4H10, but have different carbon skeleton structures (straight chain and branched chain). Which of the following statements is correct regarding these compounds?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Two organic compounds have the identical molecular formula, C4H10, but have different carbon skeleton structures (straight chain and branched chain). Which of the following statements is correct regarding these compounds?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They represent homologous series members which differ from each other by a single -CH2- unit."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They are called structural isomers and they have different structures despite sharing the exact same molecular formula."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They are unsaturated hydrocarbons because the branched skeleton requires double bonds to satisfy carbon's valency."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "They are cyclic hydrocarbons commonly referred to as cyclohexane structures."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.2 Chains, Branches and Rings"
+        ],
+        "answer": "B. They are called structural isomers and they have different structures despite sharing the exact same molecular formula.",
+        "question_citation_ids": [
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "answer_citation_ids": [
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Who disproved the hypothesis that organic compounds could only be synthesized within a living system under a 'vital force' in 1828, and how?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Who disproved the hypothesis that organic compounds could only be synthesized within a living system under a 'vital force' in 1828, and how?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Friedrich W\u00f6hler disproved the 'vital force' theory in 1828 by preparing urea (an organic compound) from ammonium cyanate (an inorganic compound).",
+        "question_citation_ids": [
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "answer_citation_ids": [
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Silicon forms compounds with hydrogen containing chains of up to seven or eight atoms, yet these differ significantly from carbon chains. Explain the difference in terms of reactivity and stability.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Silicon forms compounds with hydrogen containing chains of up to seven or eight atoms, yet these differ significantly from carbon chains. Explain the difference in terms of reactivity and stability."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Unlike carbon-carbon bonds which are exceptionally strong and stable, the silicon-silicon bonds are much weaker because of silicon's larger atomic size. Consequently, the silicon-hydrogen chain compounds are highly reactive and unstable.",
+        "question_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "answer_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is meant by a heteroatom in a hydrocarbon chain? Give two structural examples of heteroatoms present in organic functional groups.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is meant by a heteroatom in a hydrocarbon chain? Give two structural examples of heteroatoms present in organic functional groups."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.3 Will you be my Friend?"
+        ],
+        "answer": "In a hydrocarbon chain, a heteroatom is an element other than carbon and hydrogen (such as halogens, oxygen, nitrogen, or sulphur) that replaces one or more hydrogen atoms while maintaining the valency of carbon. Examples of heteroatoms include chlorine (or bromine) and oxygen.",
+        "question_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "answer_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Define a 'homologous series' of carbon compounds. Give the names and chemical formulae of the first three members of the saturated hydrocarbon series (alkanes).",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define a 'homologous series' of carbon compounds. Give the names and chemical formulae of the first three members of the saturated hydrocarbon series (alkanes)."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.4 Homologous Series"
+        ],
+        "answer": "A homologous series is a series of carbon compounds in which the same functional group substitutes for hydrogen in a carbon chain, which imparts similar chemical properties regardless of the chain length. The first three members of the alkane homologous series are:\n1. Methane (CH4)\n2. Ethane (C2H6)\n3. Propane (C3H8)",
+        "question_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "answer_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0",
+          "da4665d36a969f249ff4f9f87eaa7d7097f29594e2f7997d6e6d4e7162bb89c0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Compare saturated and unsaturated carbon compounds on the basis of: (a) types of covalent bonds present between carbon atoms, (b) chemical reactivity, and (c) give one example with molecular formula for each class.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Compare saturated and unsaturated carbon compounds on the basis of: (a) types of covalent bonds present between carbon atoms, (b) chemical reactivity, and (c) give one example with molecular formula for each class."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.1 Saturated and Unsaturated Carbon Compounds"
+        ],
+        "answer": "(a) Bond types: Saturated carbon compounds contain only single covalent bonds between the carbon atoms. Unsaturated carbon compounds contain at least one double or triple covalent bond between the carbon atoms.\n(b) Chemical Reactivity: Saturated carbon compounds are generally stable and not very reactive. In contrast, unsaturated carbon compounds are more reactive than saturated ones.\n(c) Examples: Ethane (C2H6) is a saturated carbon compound. Ethene (C2H4) is an unsaturated carbon compound.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "dcabe4f8ff04ba02c9427192203f2f06a542dcc3c15d3b4368085b93804dc890",
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "dcabe4f8ff04ba02c9427192203f2f06a542dcc3c15d3b4368085b93804dc890",
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "Describe the systematic steps used in the rules of naming a carbon compound containing a functional group. Explain the nomenclature process specifically using a three-carbon chain ketone as an example.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the systematic steps used in the rules of naming a carbon compound containing a functional group. Explain the nomenclature process specifically using a three-carbon chain ketone as an example."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.5 Nomenclature of Carbon Compounds"
+        ],
+        "answer": "According to the systematic method of nomenclature:\n1) Step 1: Identify the total number of carbon atoms in the longest chain of the compound. For a compound containing three carbon atoms, the basic alkane chain name is 'propane'\n2) Step 2: Determine if a functional group is present, which is indicated in the compound's name using either a prefix or a suffix.\n3) Step 3: If the functional group's name is to be appended as a suffix, and that suffix begins with a vowel (such as a, e, i, o, u), modify the parent carbon chain name by deleting the final letter 'e' before adding the relevant suffix.\n4) Applying this to a three-carbon chain with a ketone group (where suffix is '-one' which begins with 'o'), we delete 'e' from 'propane' and add '-one' to get: Propane - 'e' = propan + 'one' = propanone.\n5) Step 4: If the carbon chain is unsaturated, replace the final '-ane' with '-ene' (for a double bond) or '-yne' (for a triple bond).",
+        "question_citation_ids": [
+          "9db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "answer_citation_ids": [
+          "9db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "The known carbon compounds are in the millions, outnumbering compounds of all other elements put together. (a) Discuss the two unique characteristics of carbon that put together account for this massive number of compounds. (b) Explain why the carbon-carbon covalent bonds and its bonds with other elements are exceptionally stable. (c) How do physical properties like melting and boiling points change within a homologous series, and why?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "The known carbon compounds are in the millions, outnumbering compounds of all other elements put together. (a) Discuss the two unique characteristics of carbon that put together account for this massive number of compounds. (b) Explain why the carbon-carbon covalent bonds and its bonds with other elements are exceptionally stable. (c) How do physical properties like melting and boiling points change within a homologous series, and why?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON",
+          "4.2.4 Homologous Series"
+        ],
+        "answer": "(a) The versatile nature of carbon is caused by two fundamental factors:\n1. Catenation: It is the unique ability of carbon to link with other carbon atoms through strong covalent bonds, forming very long chains, branched structures, or ring designs. The linkages can involve single, double, or triple covalent bonds.\n2. Tetravalency: Since carbon has a valency of four, it can bond with up to four other carbon atoms or other monovalent atoms. It easily forms functionalized compounds with diverse elements like oxygen, hydrogen, sulphur, chlorine, and nitrogen.\n\n(b) Carbon forms exceptionally stable, strong bonds because of its small atomic size. The small size allows the atomic nucleus to strongly hold on to the shared electron pairs in the covalent bonds. Elements with larger atoms form much weaker and more reactive bonds.\n\n(c) As the molecular mass increases in any homologous series, a regular gradation in physical properties is observed. This occurs because the melting and boiling points of the compounds increase with increasing molecular mass. Other properties, such as solubility in a given solvent, show a similar regular trend, while the chemical properties remain similar because they are determined strictly by the identical functional group.",
+        "question_citation_ids": [
+          "deed9865a4b1a6e59c6d77e0146d2a534084b57cbf3d3c030e9b228e4f987935",
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5",
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 9,
+  "validation_errors": [
+    {
+      "index": 8,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 9db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472"
+    },
+    {
+      "index": 8,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 9db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472"
+    }
+  ],
+  "persisted_candidate_count": 9
+}
