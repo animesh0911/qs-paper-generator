@@ -18,6 +18,7 @@ from accounts.models import School
 from bank.management.commands import drain_generation_batches as drain_mod
 from bank.models import (
     AnswerSource,
+    Chapter,
     GeneratedQuestionCandidate,
     GeneratedQuestionCandidateStatus,
     GenerationBatch,
@@ -25,6 +26,7 @@ from bank.models import (
     Question,
     SourceType,
 )
+from corpus.models import ChapterMapNode, TextbookDocument
 
 
 def _payload(**overrides):
@@ -67,6 +69,32 @@ def _create_batch(api_client, *, chapter_slugs=None):
     )
 
 
+def _create_chapter_map_node(chapter_slug="life-processes", stable_node_id="lp-5.1"):
+    chapter = Chapter.objects.get(slug=chapter_slug)
+    document = TextbookDocument.objects.create(
+        chapter=chapter,
+        source_file_name=f"{chapter_slug}.pdf",
+        source_hash="a" * 64,
+        extractor_name="Docling",
+        extractor_version="2.102.1",
+        canonical_json_path=f"content/ncert/{chapter_slug}.json",
+        canonical_json_hash="b" * 64,
+        page_count=2,
+    )
+    return ChapterMapNode.objects.create(
+        document=document,
+        stable_node_id=stable_node_id,
+        node_type=ChapterMapNode.NodeType.SECTION,
+        title="5.1 Life Processes",
+        source_start=1,
+        source_end=3,
+        page_start=81,
+        page_end=82,
+        element_count=3,
+        preview="Nutrition and respiration.",
+    )
+
+
 class FakeGenerator:
     payloads: list[dict] = [_payload()]
     boom: Exception | None = None
@@ -105,6 +133,45 @@ def test_create_batch_persists_teacher_scope_and_request(api_client, user):
     assert Question.objects.count() == 0
 
 
+def test_create_batch_persists_selected_chapter_map_nodes(api_client):
+    """Topic-scoped generation stores the grounded NCERT node ids."""
+    node = _create_chapter_map_node()
+
+    resp = api_client.post(
+        "/api/bank/generation-batches/",
+        {
+            "chapter_slugs": ["life-processes"],
+            "chapter_map_node_ids": [node.stable_node_id],
+            "difficulty_preset": "hard",
+        },
+        format="json",
+    )
+
+    assert resp.status_code == 202
+    assert resp.data["chapter_map_node_ids"] == [node.stable_node_id]
+    batch = GenerationBatch.objects.get(pk=resp.data["id"])
+    assert batch.chapter_map_node_ids == [node.stable_node_id]
+    assert batch.requested_count == 10
+
+
+def test_create_batch_rejects_topic_nodes_from_more_than_one_chapter(api_client):
+    """The MVP allows exactly one Chapter when topic node ids are present."""
+    node = _create_chapter_map_node()
+
+    resp = api_client.post(
+        "/api/bank/generation-batches/",
+        {
+            "chapter_slugs": ["life-processes", "electricity"],
+            "chapter_map_node_ids": [node.stable_node_id],
+            "difficulty_preset": "balanced",
+        },
+        format="json",
+    )
+
+    assert resp.status_code == 400
+    assert "exactly one chapter_slug" in str(resp.data)
+
+
 def test_create_batch_enforces_one_active_batch_per_teacher(api_client):
     """A teacher cannot start another review-pending generation batch."""
     first = _create_batch(api_client)
@@ -138,7 +205,7 @@ def test_ready_expired_batch_no_longer_blocks_new_batch(api_client, user):
         status=GenerationBatchStatus.READY_FOR_REVIEW,
         ready_at=timezone.now() - timedelta(days=31),
     )
-    batch.chapters.set([1])
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
 
     resp = _create_batch(api_client)
 
@@ -198,7 +265,7 @@ def test_drain_generates_valid_candidates_without_inserting_questions(
         difficulty_preset="balanced",
         requested_count=2,
     )
-    batch.chapters.set([1])
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
 
     call_command("drain_generation_batches")
 
@@ -218,7 +285,7 @@ def test_drain_records_failure_without_exposing_candidates(db, user, monkeypatch
     """A generation exception is a failed batch, not a leaked partial review list."""
     _install_fake_generator(monkeypatch, boom=RuntimeError("model unavailable"))
     batch = GenerationBatch.objects.create(school=user.school, created_by=user)
-    batch.chapters.set([1])
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
 
     call_command("drain_generation_batches")
 

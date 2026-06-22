@@ -145,6 +145,7 @@ def generation_batch_create(request):
         batch = GenerationBatch.objects.create(
             school=user.school,
             created_by=user,
+            chapter_map_node_ids=list(data["chapter_map_node_ids"]),
             topic_names=list(data["topic_names"]),
             difficulty_preset=data["difficulty_preset"],
             requested_count=data["count"],
