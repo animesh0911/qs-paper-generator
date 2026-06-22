@@ -15,6 +15,7 @@ import {
   clearToken,
   createGenerationBatch,
   fetchGenerationBatch,
+  fetchGenerationCandidates,
   fetchPaperFormats,
   fetchPaperDocument,
   getToken,
@@ -102,6 +103,7 @@ describe('generation batches', () => {
       difficulty_preset: 'balanced',
     });
     await fetchGenerationBatch(144);
+    await fetchGenerationCandidates(144);
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
@@ -118,6 +120,11 @@ describe('generation batches', () => {
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
       '/api/bank/generation-batches/144/',
+      expect.objectContaining({ method: 'GET' }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      '/api/bank/generation-batches/144/candidates/',
       expect.objectContaining({ method: 'GET' }),
     );
   });
