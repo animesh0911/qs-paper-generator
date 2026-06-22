@@ -419,6 +419,33 @@ def test_editor_draft_get_refreshes_answer_after_legacy_swap(api_client, user):
 
 
 @pytest.mark.django_db
+def test_editor_draft_get_resolves_asset_urls(api_client, user):
+    """The editor-draft document carries a loadable url beside each assetId so
+    BlockNote can render images; the canonical assetId is preserved and the
+    stored document stays url-free (grill decision on #122)."""
+    document = {
+        "schemaVersion": PAPER_SCHEMA,
+        "paper": {"sections": [{"id": "A", "slots": []}]},
+        "questions": [
+            {
+                "id": "q_1",
+                "content": {"stem": [{"type": "image", "assetId": "diagrams/x.png"}]},
+            }
+        ],
+    }
+    paper = Paper.objects.create(created_by=user, document=document)
+
+    resp = api_client.get(f"/api/papers/{paper.pk}/editor-draft/")
+
+    item = resp.data["document"]["questions"][0]["content"]["stem"][0]
+    assert item["assetId"] == "diagrams/x.png"
+    assert item["url"].endswith("/media/diagrams/x.png")
+    # Base paper detail stays canonical (assetId-only, no resolved url).
+    detail = api_client.get(f"/api/papers/{paper.pk}/")
+    assert "url" not in detail.data["questions"][0]["content"]["stem"][0]
+
+
+@pytest.mark.django_db
 def test_editor_draft_get_is_owner_scoped(api_client):
     """Answers are private to the paper owner — another teacher gets a 404."""
     paper = Paper.objects.create(

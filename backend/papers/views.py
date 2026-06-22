@@ -12,6 +12,7 @@ Domain rules live in ``papers.builder`` and ``papers.picker``.
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.storage import default_storage
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -26,6 +27,7 @@ from .answer_document import (
     printable_answers_by_slot,
     validate_answer_document,
 )
+from .assets import with_resolved_asset_urls
 from .builder import PaperBuilder
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
@@ -111,10 +113,26 @@ class PaperEditorDraftView(APIView):
 
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        answer_document = self._reconciled_answer_document(paper)
+
+        # Enrich the response copies with backend-issued asset URLs the editor
+        # can load (grill decision on #122). The stored documents keep the lean
+        # canonical assetId-only shape; the url is non-canonical and request-
+        # absolute, so it must never be persisted.
+        def url_for(asset_id: str) -> str:
+            url = default_storage.url(asset_id)
+            # Local storage returns a path-relative URL (MEDIA_URL has no leading
+            # slash); force it root-relative so build_absolute_uri anchors it at
+            # the host, not the API path. A remote backend (signed S3/CDN) already
+            # returns an absolute URL, which is left untouched.
+            if "://" not in url and not url.startswith("/"):
+                url = "/" + url
+            return request.build_absolute_uri(url)
+
         return Response(
             {
-                "document": paper.document,
-                "answer_document": self._reconciled_answer_document(paper),
+                "document": with_resolved_asset_urls(paper.document, url_for),
+                "answer_document": with_resolved_asset_urls(answer_document, url_for),
                 "status": paper.status,
             }
         )

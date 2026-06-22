@@ -425,6 +425,15 @@ built lazily, and a slot whose question was swapped through the legacy
 bank rather than returned stale. Teacher edits on still-matching slots are
 preserved. The reconciled document is persisted when it changed.
 
+The GET also enriches its returned documents (both `document` and
+`answer_document`) for the editor: every content item that references an asset by
+`assetId` gains a sibling `url`. The `assetId` stays canonical; the `url` is
+backend-issued and **non-canonical** — it may later become a signed S3/CDN URL
+without changing the document model, so the frontend must use `url` to load
+images and must never derive a storage path from `assetId`. This `url` is present
+only on the editor-draft response; the base `paper_document.v1` (assemble,
+detail, print) keeps the lean `assetId`-only shape from §9.
+
 `PATCH` saves both documents together while the paper is a draft. The save
 is rejected (`400`, with `details[]`) when the two documents disagree, so a
 swapped question can never leave a stale answer behind:
