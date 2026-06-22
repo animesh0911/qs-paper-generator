@@ -42,9 +42,13 @@ dist/
 .playwright-mcp/
 frontend/tsconfig.tsbuildinfo
 
-# Codex / design-tool local state
+# Agent / design-tool local state
 .codex/
 .impeccable/
+.agents/
+.agy-bridge-artifacts/
+.claude/skills/
+.pi/
 
 AGENTS.md*
 CLAUDE.md*
