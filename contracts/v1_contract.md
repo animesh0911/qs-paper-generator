@@ -418,17 +418,27 @@ question replaces the answer at that position. Each entry carries:
 ### Editor-draft endpoint
 
 `GET /api/papers/{id}/editor-draft/` returns `{ document, answer_document, status }`
-for the owner. `PATCH` saves both together while the paper is a draft. The save
+for the owner. The GET reconciles the answer document against the current paper
+document before returning it: an older draft with no answer document gets one
+built lazily, and a slot whose question was swapped through the legacy
+`PATCH /api/papers/{id}/` (which does not maintain answers) is refreshed from the
+bank rather than returned stale. Teacher edits on still-matching slots are
+preserved. The reconciled document is persisted when it changed.
+
+`PATCH` saves both documents together while the paper is a draft. The save
 is rejected (`400`, with `details[]`) when the two documents disagree, so a
 swapped question can never leave a stale answer behind:
 
 - a filled slot has no answer entry;
 - an answer entry references a `slotId` absent from the paper document;
-- an answer entry's `questionId` does not match that slot's `selectedQuestionId`.
+- an answer entry's `questionId` does not match that slot's `selectedQuestionId`;
+- an answer entry's `content` is present but is not a `ContentItem[]`.
 
 Unfilled slots (no `selectedQuestionId`) are excluded from the answer document.
 The walk for the answer-key print/PDF is: iterate `document.paper.sections[].slots[]`
-in order, then look up `answer_document.answersBySlotId[slot.id]`.
+in order, then look up `answer_document.answersBySlotId[slot.id]`; the PDF
+reconciles against the current document so a swapped slot prints the current
+question's answer.
 
 ## 14. V2 Notes
 

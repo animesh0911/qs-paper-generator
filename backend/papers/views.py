@@ -21,7 +21,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .answer_document import printable_answers_by_slot, validate_answer_document
+from .answer_document import (
+    build_answer_document,
+    printable_answers_by_slot,
+    validate_answer_document,
+)
 from .builder import PaperBuilder
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
@@ -110,10 +114,28 @@ class PaperEditorDraftView(APIView):
         return Response(
             {
                 "document": paper.document,
-                "answer_document": paper.answer_document,
+                "answer_document": self._reconciled_answer_document(paper),
                 "status": paper.status,
             }
         )
+
+    def _reconciled_answer_document(self, paper: Paper) -> dict | None:
+        """Answer document consistent with the paper's current document.
+
+        Older drafts assembled before this field gain one lazily; a slot whose
+        question was swapped through the legacy paper PATCH (which does not touch
+        answers) is refreshed instead of returned stale. The reconciled document
+        is persisted when it changed so the fix is durable, not recomputed each
+        load. Teacher edits on still-matching slots are preserved by
+        ``build_answer_document``.
+        """
+        if paper.document is None:
+            return paper.answer_document
+        reconciled = build_answer_document(paper)
+        if reconciled != paper.answer_document:
+            paper.answer_document = reconciled
+            paper.save(update_fields=["answer_document"])
+        return reconciled
 
     def patch(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
@@ -202,7 +224,10 @@ class PaperAnswerKeyPdfView(APIView):
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
         document = paper.document or {}
-        answers = printable_answers_by_slot(paper.answer_document or {})
+        # Reconcile against the current document so a question swapped through the
+        # legacy paper PATCH prints its current answer, never a stale one — the
+        # join the old live-bank path gave for free, restored at the snapshot.
+        answers = printable_answers_by_slot(build_answer_document(paper))
         if paper.status == PaperStatus.APPROVED:
             cache_key = f"paper-answer-key-pdf:{paper.pk}"
             pdf = cache.get(cache_key)

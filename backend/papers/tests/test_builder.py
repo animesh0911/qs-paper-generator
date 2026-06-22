@@ -263,26 +263,23 @@ def _first_selected_qid(document: dict) -> str:
 def test_answer_key_pdf_endpoint_renders_saved_answers(api_client, seeded_bank):
     """The marking-scheme endpoint renders the saved paper-local answer document.
 
-    Since #122 the answer is a paper-local snapshot (``Paper.answer_document``),
-    not a live bank join — so an edited/saved answer prints. This proves the
-    saved document reaches the PDF, not that a constant was printed.
+    Since #122 the answer is a paper-local snapshot (``Paper.answer_document``)
+    edited in the editor, not a live bank join — so a teacher-edited answer
+    prints. This proves the saved document reaches the PDF.
     """
-    from bank.models import AnswerSource, Question
-    from papers.answer_document import build_answer_document
     from papers.models import Paper
 
     create = api_client.post("/api/papers/assemble", {}, format="json")
     document = create.data
     paper_pk = int(document["paper"]["id"].removeprefix("paper_"))
-    qid = _first_selected_qid(document)
-    selected_pk = int(qid.removeprefix("q_"))
-    Question.objects.filter(pk=selected_pk).update(
-        answer="UNIQUE_MARKING_ANSWER_42", answer_source=AnswerSource.HUMAN
-    )
-    # Re-snapshot so the saved answer document reflects the bank edit, then prove
-    # that *saved* document — not the live bank row — is what the PDF renders.
+
+    # Edit a saved answer the way the editor would (paper-local, modified), then
+    # prove that saved answer — not the bank row — is what the PDF renders.
     paper = Paper.objects.get(pk=paper_pk)
-    paper.answer_document = build_answer_document(paper)
+    slot_id = next(iter(paper.answer_document["answersBySlotId"]))
+    entry = paper.answer_document["answersBySlotId"][slot_id]
+    entry["content"] = [{"type": "paragraph", "text": "UNIQUE_MARKING_ANSWER_42"}]
+    entry["modified"] = True
     paper.save(update_fields=["answer_document"])
 
     resp = api_client.get(f"/api/papers/{paper_pk}/answer-key/pdf/")

@@ -133,6 +133,81 @@ def test_build_skips_unfilled_slots(user):
     assert build_answer_document(paper)["answersBySlotId"] == {}
 
 
+@pytest.mark.django_db
+def test_build_tolerates_legacy_slot_id_key(user):
+    """A document using the legacy ``slotId`` key must not crash the build."""
+    q = QuestionFactory(answer="Real", answer_source=AnswerSource.HUMAN)
+    document = {
+        "schemaVersion": PAPER_SCHEMA,
+        "paper": {
+            "sections": [
+                {"slots": [{"slotId": "slot_A_01", "selectedQuestionId": f"q_{q.pk}"}]}
+            ]
+        },
+    }
+    paper = Paper.objects.create(created_by=user, document=document)
+
+    assert "slot_A_01" in build_answer_document(paper)["answersBySlotId"]
+
+
+@pytest.mark.django_db
+def test_build_preserves_edit_when_question_unchanged(user):
+    """A teacher's saved edit survives a rebuild while the slot keeps the same
+    question — a later bank change must not clobber the paper-local answer."""
+    q = QuestionFactory(answer="Bank answer", answer_source=AnswerSource.HUMAN)
+    paper = Paper.objects.create(
+        created_by=user, document=_document(_slot("slot_A_01", f"q_{q.pk}"))
+    )
+    paper.answer_document = {
+        "schemaVersion": ANSWER_SCHEMA_VERSION,
+        "paperId": f"paper_{paper.pk}",
+        "answersBySlotId": {
+            "slot_A_01": {
+                "slotId": "slot_A_01",
+                "questionId": f"q_{q.pk}",
+                "content": [{"type": "paragraph", "text": "Teacher edit"}],
+                "source": "source",
+                "modified": True,
+            }
+        },
+    }
+
+    entry = build_answer_document(paper)["answersBySlotId"]["slot_A_01"]
+
+    assert entry["content"] == [{"type": "paragraph", "text": "Teacher edit"}]
+    assert entry["modified"] is True
+
+
+@pytest.mark.django_db
+def test_build_refreshes_answer_when_question_swapped(user):
+    """If a slot now holds a different question than its saved answer (e.g. a
+    legacy document-only swap), the answer is rebuilt from the new question —
+    never carried forward stale (issue #125 at the snapshot)."""
+    old = QuestionFactory(answer="Old", answer_source=AnswerSource.HUMAN)
+    new = QuestionFactory(answer="New", answer_source=AnswerSource.HUMAN)
+    paper = Paper.objects.create(
+        created_by=user, document=_document(_slot("slot_A_01", f"q_{new.pk}"))
+    )
+    paper.answer_document = {
+        "schemaVersion": ANSWER_SCHEMA_VERSION,
+        "paperId": f"paper_{paper.pk}",
+        "answersBySlotId": {
+            "slot_A_01": {
+                "slotId": "slot_A_01",
+                "questionId": f"q_{old.pk}",
+                "content": [{"type": "paragraph", "text": "Old"}],
+                "source": "source",
+                "modified": True,
+            }
+        },
+    }
+
+    entry = build_answer_document(paper)["answersBySlotId"]["slot_A_01"]
+
+    assert entry["questionId"] == f"q_{new.pk}"
+    assert entry["content"] == [{"type": "paragraph", "text": "New"}]
+
+
 # --- validate_answer_document (issue #125) --------------------------------
 
 
@@ -199,6 +274,24 @@ def test_validate_rejects_orphan_answer_entry():
     errors = validate_answer_document(document, answer_document)
 
     assert any("slot_A_99" in e and "not in the paper" in e for e in errors)
+
+
+def test_validate_rejects_non_list_content():
+    """A non-list ``content`` would crash the answer-key PDF later; the save-time
+    gate must reject it so corrupt state never reaches the print path."""
+    document = _document(_slot("slot_A_01", "q_1"))
+    answer_document = _answer_doc(
+        {
+            "slotId": "slot_A_01",
+            "questionId": "q_1",
+            "content": "oops not a list",
+            "source": "source",
+        }
+    )
+
+    errors = validate_answer_document(document, answer_document)
+
+    assert any("content must be a list" in e for e in errors)
 
 
 def test_validate_rejects_wrong_schema_version():
@@ -281,6 +374,48 @@ def test_editor_draft_get_returns_both_documents(api_client, user):
     assert resp.data["document"] == document
     assert resp.data["status"] == PaperStatus.DRAFT
     assert resp.data["answer_document"]["answersBySlotId"]["slot_A_01"]["content"]
+
+
+@pytest.mark.django_db
+def test_editor_draft_get_lazily_creates_answer_document(api_client, user):
+    """An older draft with a document but no answer document gains one on first
+    load, persisted so the fix is durable (grill decision on #122)."""
+    q = QuestionFactory(answer="Real", answer_source=AnswerSource.HUMAN)
+    paper = Paper.objects.create(
+        created_by=user, document=_document(_slot("slot_A_01", f"q_{q.pk}"))
+    )
+    assert paper.answer_document is None
+
+    resp = api_client.get(f"/api/papers/{paper.pk}/editor-draft/")
+
+    assert resp.status_code == 200
+    entry = resp.data["answer_document"]["answersBySlotId"]["slot_A_01"]
+    assert entry["content"] == [{"type": "paragraph", "text": "Real"}]
+    paper.refresh_from_db()
+    assert paper.answer_document is not None  # persisted, not recomputed each load
+
+
+@pytest.mark.django_db
+def test_editor_draft_get_refreshes_answer_after_legacy_swap(api_client, user):
+    """A question swapped through the legacy paper PATCH leaves answer_document
+    stale; the editor-draft GET refreshes it rather than returning a wrong
+    answer for the slot."""
+    old = QuestionFactory(answer="Old", answer_source=AnswerSource.HUMAN)
+    new = QuestionFactory(answer="New", answer_source=AnswerSource.HUMAN)
+    paper = Paper.objects.create(
+        created_by=user, document=_document(_slot("slot_A_01", f"q_{old.pk}"))
+    )
+    paper.answer_document = build_answer_document(paper)
+    paper.save(update_fields=["answer_document"])
+    # Simulate a legacy document-only swap (PaperDetailView.patch path).
+    paper.document = _document(_slot("slot_A_01", f"q_{new.pk}"))
+    paper.save(update_fields=["document"])
+
+    resp = api_client.get(f"/api/papers/{paper.pk}/editor-draft/")
+
+    entry = resp.data["answer_document"]["answersBySlotId"]["slot_A_01"]
+    assert entry["questionId"] == f"q_{new.pk}"
+    assert entry["content"] == [{"type": "paragraph", "text": "New"}]
 
 
 @pytest.mark.django_db

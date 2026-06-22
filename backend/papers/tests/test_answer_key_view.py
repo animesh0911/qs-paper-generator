@@ -12,10 +12,22 @@ directly and through the owner-scoped PDF endpoint.
 
 from __future__ import annotations
 
+import fitz
 import pytest
 
-from papers.answer_document import ANSWER_SCHEMA_VERSION, printable_answers_by_slot
+from bank.models import AnswerSource
+from conftest import QuestionFactory
+from papers.answer_document import (
+    ANSWER_SCHEMA_VERSION,
+    build_answer_document,
+    printable_answers_by_slot,
+)
 from papers.models import Paper, PaperStatus
+
+
+def _pdf_text(pdf_bytes: bytes) -> str:
+    with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
+        return "\n".join(page.get_text() for page in doc)
 
 
 def _answer_document(*entries: dict) -> dict:
@@ -97,3 +109,51 @@ def test_answer_key_pdf_renders_from_saved_answer_document(api_client, user):
     assert resp.status_code == 200
     assert resp["Content-Type"] == "application/pdf"
     assert resp.content[:4] == b"%PDF"
+
+
+@pytest.mark.django_db
+def test_answer_key_pdf_never_prints_stale_answer_after_legacy_swap(api_client, user):
+    """Regression: before #122 the PDF joined live bank answers by the slot's
+    current question, so a swap printed the new answer. The saved snapshot must
+    not reintroduce stale answers when a question is swapped through the legacy
+    paper PATCH — the marking scheme prints the current question's answer.
+    """
+    old = QuestionFactory(answer="STALE_OLD_ANSWER", answer_source=AnswerSource.HUMAN)
+    new = QuestionFactory(answer="FRESH_NEW_ANSWER", answer_source=AnswerSource.HUMAN)
+
+    def _doc(qid: str) -> dict:
+        return {
+            "schemaVersion": "paper_document.v1",
+            "paper": {
+                "title": "Science",
+                "sections": [
+                    {
+                        "id": "A",
+                        "title": "Section A",
+                        "slots": [
+                            {
+                                "id": "slot_A_01",
+                                "number": "1",
+                                "marks": 1,
+                                "type": "mcq",
+                                "selectedQuestionId": qid,
+                            }
+                        ],
+                    }
+                ],
+            },
+        }
+
+    paper = Paper.objects.create(
+        created_by=user, status=PaperStatus.DRAFT, document=_doc(f"q_{old.pk}")
+    )
+    paper.answer_document = build_answer_document(paper)
+    paper.save(update_fields=["answer_document"])
+    # Legacy document-only swap leaves answer_document pointing at the old answer.
+    paper.document = _doc(f"q_{new.pk}")
+    paper.save(update_fields=["document"])
+
+    text = _pdf_text(api_client.get(f"/api/papers/{paper.pk}/answer-key/pdf/").content)
+
+    assert "FRESH_NEW_ANSWER" in text
+    assert "STALE_OLD_ANSWER" not in text
