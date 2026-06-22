@@ -159,8 +159,8 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain('Which process releases energy from glucose?');
     expect(html).toContain('A. Respiration');
     expect(html).toContain('Respiration');
-    expect(html).toContain('Grounding / citation context');
-    expect(html).toContain('NCERT p. 84');
+    expect(html).not.toContain('Grounding / citation context');
+    expect(html).not.toContain('NCERT p. 84');
     expect(html).toContain('Reject');
     expect(html).not.toContain('Run in background');
   });

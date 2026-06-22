@@ -14,7 +14,6 @@ import {
 } from '@/lib/question-generation';
 import {
   candidateAnswerText,
-  candidateGroundingText,
   candidateQuestionText,
   candidateReviewCounts,
   candidateTopicLabels,
@@ -371,7 +370,6 @@ export function GenerationProgressWorkspace({
                       {candidates.map((candidate) => {
                         const rejected = rejectedCandidateIds.has(candidate.id);
                         const topics = candidateTopicLabels(candidate);
-                        const grounding = candidateGroundingText(candidate);
                         return (
                           <li
                             key={candidate.id}
@@ -407,16 +405,6 @@ export function GenerationProgressWorkspace({
                               </p>
                             )}
 
-                            {grounding && (
-                              <div className="rounded-md border p-3">
-                                <p className="text-xs font-medium text-muted-foreground">
-                                  Grounding / citation context
-                                </p>
-                                <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
-                                  {grounding}
-                                </p>
-                              </div>
-                            )}
 
                             {rejected && (
                               <p className="text-sm font-medium" role="status">
