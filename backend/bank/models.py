@@ -133,9 +133,9 @@ class Question(models.Model):
     Owns enough metadata for ``QuestionPicker`` to allocate it under chapter
     weights and difficulty profiles: ``chapter`` (FK), ``cognitive_level``,
     ``section``, ``qtype``, ``marks``. ``answer`` is stored alongside but is
-    omitted by ``QuestionSerializer``; it is exposed only by
-    ``AnswerKeySerializer`` behind the owner-scoped answer-key endpoint
-    (``papers.views.PaperAnswerKeyPdfView``). ``answer_source`` records its
+    omitted by ``QuestionSerializer``; it reaches the paper owner only through
+    the paper-local answer document (``papers.answer_document``), which seeds the
+    editor-draft and answer-key endpoints. ``answer_source`` records its
     provenance and gates unverified generated answers out of the marking scheme.
     """
 

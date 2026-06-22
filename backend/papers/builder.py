@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 from django.db import transaction
 
+from .answer_document import build_answer_document
 from .document import PaperDocumentBuilder
 from .models import Paper, PaperFormat, PaperQuestion
 from .picker import DEFAULT_DIFFICULTY, FilledTemplate, PaperOptions, QuestionPicker
@@ -55,7 +56,10 @@ class PaperBuilder:
         paper = self._persist(user, title, result)
         document = PaperDocumentBuilder().build(paper, result, opts, paper_format)
         paper.document = document
-        paper.save(update_fields=["document"])
+        # The answer document is keyed by slot id, so it is built from the
+        # finished document (which owns slot ids), not from the raw template.
+        paper.answer_document = build_answer_document(paper)
+        paper.save(update_fields=["document", "answer_document"])
         return AssemblyResult(paper=paper, document=document)
 
     @transaction.atomic

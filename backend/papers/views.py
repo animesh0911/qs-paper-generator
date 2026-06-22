@@ -21,9 +21,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from bank.models import AnswerSource, Question
-from bank.serializers import AnswerKeySerializer
-
+from .answer_document import printable_answers_by_slot, validate_answer_document
 from .builder import PaperBuilder
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
@@ -93,6 +91,67 @@ class PaperDetailView(APIView):
         return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
 
 
+class PaperEditorDraftView(APIView):
+    """Combined editor draft: the paper document plus its answer key (issue #122).
+
+    GET returns ``{document, answer_document, status}`` for the owner so the
+    editor loads both lanes as one review state. PATCH saves both together while
+    the paper is a draft, rejecting an answer document that disagrees with the
+    paper document (issue #125) so a swapped question can never leave a stale
+    answer behind. A separate endpoint from ``PaperDetailView`` so the existing
+    exam-document load/save (and the print/PDF consumers) keep their answer-free
+    shape untouched.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        return Response(
+            {
+                "document": paper.document,
+                "answer_document": paper.answer_document,
+                "status": paper.status,
+            }
+        )
+
+    def patch(self, request, pk):
+        paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        if paper.status != PaperStatus.DRAFT:
+            return Response(
+                {"error": "Only draft papers can be edited."},
+                status=status.HTTP_409_CONFLICT,
+            )
+        document = request.data.get("document")
+        if (
+            not isinstance(document, dict)
+            or document.get("schemaVersion") != _SCHEMA_VERSION
+        ):
+            return Response(
+                {"error": f"document.schemaVersion must be '{_SCHEMA_VERSION}'."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        answer_document = request.data.get("answer_document")
+        errors = validate_answer_document(document, answer_document)
+        if errors:
+            return Response(
+                {
+                    "error": "Paper and answer documents are inconsistent.",
+                    "details": errors,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        paper.document = document
+        paper.answer_document = answer_document
+        # Bump the revision so a queued AI job (#31) whose base_revision predates
+        # this edit is cancelled by the drain instead of spending paid tokens on
+        # a now-stale proposal (Rule 13).
+        paper.revision = F("revision") + 1
+        paper.save(update_fields=["document", "answer_document", "revision"])
+        paper.refresh_from_db(fields=["revision"])
+        return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
+
+
 class PaperApproveView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -131,10 +190,11 @@ class PaperAnswerKeyPdfView(APIView):
     """Render the marking-scheme PDF — the one endpoint that reveals answers.
 
     Owner-scoped (``created_by=request.user``) so answers never reach another
-    teacher's request. Answers are read through ``AnswerKeySerializer`` and
-    joined to the canonical document by question id; the document itself still
-    carries no answers. Cached 24h once the paper is approved, matching the
-    exam PDF.
+    teacher's request. Answers are read from the paper-local
+    ``answer_document`` (issue #122) by slot id, so the marking scheme reflects
+    the teacher's saved/edited answers in current slot order — not live bank
+    answers. The exam ``document`` itself still carries no answers. Cached 24h
+    once the paper is approved, matching the exam PDF.
     """
 
     permission_classes = [IsAuthenticated]
@@ -142,33 +202,20 @@ class PaperAnswerKeyPdfView(APIView):
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
         document = paper.document or {}
+        answers = printable_answers_by_slot(paper.answer_document or {})
         if paper.status == PaperStatus.APPROVED:
             cache_key = f"paper-answer-key-pdf:{paper.pk}"
             pdf = cache.get(cache_key)
             if pdf is None:
-                pdf = render_answer_key_pdf(document, self._answers_by_id(paper))
+                pdf = render_answer_key_pdf(document, answers)
                 cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
         else:
-            pdf = render_answer_key_pdf(document, self._answers_by_id(paper))
+            pdf = render_answer_key_pdf(document, answers)
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = (
             f'inline; filename="paper-{paper.pk}-answer-key.pdf"'
         )
         return response
-
-    def _answers_by_id(self, paper: Paper) -> dict[str, str]:
-        """Map contract question id (``"q_{pk}"``) to answer for selected slots.
-
-        ``generated_unverified`` answers are suppressed — they fall through to
-        the ``(no answer on file)`` placeholder until a teacher approves them.
-        """
-        pks = paper._referenced_question_ids()
-        rows = AnswerKeySerializer(Question.objects.filter(pk__in=pks), many=True).data
-        return {
-            f"q_{row['id']}": row["answer"]
-            for row in rows
-            if row["answer_source"] != AnswerSource.GENERATED_UNVERIFIED
-        }
 
 
 def _paper_print_url(user, paper_pk: int) -> str | None:

@@ -119,10 +119,10 @@ def test_answer_key_pdf_contains_answers_in_slot_order():
     """The marking scheme is worthless if the supplied answer text is absent.
 
     Answers come from the caller's map (the document never carries them), keyed
-    by the same id the slot references — so this also pins the join.
+    by the slot id the renderer walks — so this also pins the join (issue #122).
     """
     text = _pdf_text(
-        render_answer_key_pdf(_doc(), {"q_1": "H2O — water is a compound"})
+        render_answer_key_pdf(_doc(), {"slot_A_01": "H2O — water is a compound"})
     )
 
     assert "Answer Key" in text
@@ -130,14 +130,14 @@ def test_answer_key_pdf_contains_answers_in_slot_order():
 
 
 def test_answer_key_pdf_flags_filled_slot_with_no_answer():
-    """A selected question with no stored answer must surface the gap, not blank.
+    """A selected question with no printable answer must surface the gap, not blank.
 
     Silent blanks in a marking scheme read as 'no marks' — a loud placeholder
     forces the teacher to notice the missing answer (Rule 12, fail loud).
     """
     text = _pdf_text(render_answer_key_pdf(_doc(), {}))
 
-    assert "no answer on file" in text
+    assert "Answer not available" in text
 
 
 def test_answer_key_pdf_marks_unfilled_slot():
@@ -152,6 +152,6 @@ def test_answer_key_pdf_carries_branding():
     document = _doc()
     document["paper"]["branding"] = {"schoolName": "Greenwood High School"}
 
-    text = _pdf_text(render_answer_key_pdf(document, {"q_1": "H2O"}))
+    text = _pdf_text(render_answer_key_pdf(document, {"slot_A_01": "H2O"}))
 
     assert "Greenwood High School" in text
