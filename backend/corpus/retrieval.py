@@ -36,6 +36,11 @@ _DEFAULT_EXCLUDED_CONTEXT_TYPES = {
 }
 _FORMULA_ONLY_CONTENT_TYPES = {"formula", "equation"}
 _CHEMICAL_TERM = re.compile(r"^(?:pH|(?:[A-Z][a-z]?\d*)+)$")
+GROUNDING_UNSUPPORTED_CONTENT_POLICY = (
+    "Excluded by default: existing NCERT question/exercise chunks, "
+    "picture-only chunks without captions, formula-only chunks, "
+    "numerical/formula-only generation, and diagram-image generation."
+)
 
 
 @dataclass(frozen=True)
@@ -65,6 +70,53 @@ class GroundingChunk:
 class GroundingContext:
     results: tuple[GroundingChunk, ...]
     diagnostics: dict[str, object] = field(default_factory=dict)
+
+    def to_generation_manifest(self) -> dict[str, object]:
+        """Return the corpus-owned manifest consumed by Question generation.
+
+        The Bank should not rebuild citation, page, source element, or unsupported
+        content policy details from RetrievalChunks. Those are Corpus and
+        Grounding concerns, so this interface keeps generation callers on the
+        ready-to-use manifest shape while this module owns the implementation.
+        """
+        excerpts = []
+        for result in self.results:
+            chunk = result.chunk
+            excerpts.append(
+                {
+                    "citation_id": chunk.stable_chunk_id,
+                    "chapter_map_node_id": chunk.chapter_map_node.stable_node_id,
+                    "pages": list(
+                        chunk.citation.get(
+                            "pages", range(chunk.page_start, chunk.page_end + 1)
+                        )
+                    ),
+                    "source_element_ids": list(
+                        chunk.citation.get(
+                            "source_element_ids", chunk.source_element_ids
+                        )
+                    ),
+                    "content_types": list(chunk.content_types),
+                    "text": chunk.text,
+                }
+            )
+
+        chapter_slug = self.diagnostics.get("chapter_slug")
+        if not isinstance(chapter_slug, str) and self.results:
+            chapter_slug = self.results[0].chunk.chapter.slug
+
+        return {
+            "chapter_slug": chapter_slug or "",
+            "requested_chapter_map_node_ids": list(
+                self.diagnostics.get("requested_chapter_map_node_ids", [])
+            ),
+            "included_chapter_map_node_ids": list(
+                self.diagnostics.get("included_chapter_map_node_ids", [])
+            ),
+            "excerpts": excerpts,
+            "unsupported_content_policy": GROUNDING_UNSUPPORTED_CONTENT_POLICY,
+            "diagnostics": dict(self.diagnostics),
+        }
 
 
 class TextbookRetriever(Protocol):
