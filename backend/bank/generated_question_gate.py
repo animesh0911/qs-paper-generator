@@ -66,6 +66,7 @@ class GeneratedQuestionRequest(Protocol):
     """Request shape needed by the generated Question gate."""
 
     chapter_slugs: tuple[str, ...]
+    grounding_manifest: dict[str, Any] | None
 
 
 @dataclass(frozen=True)
@@ -115,9 +116,12 @@ def validate_generated_questions(
     errors: list[CandidateValidationError] = []
     allowed_chapters = set(request.chapter_slugs)
     valid_levels = set(CognitiveLevel.values)
+    grounding_manifest = getattr(request, "grounding_manifest", None)
 
     for index, question in enumerate(questions):
-        question_errors = _validate_one(question, index, allowed_chapters, valid_levels)
+        question_errors = _validate_one(
+            question, index, allowed_chapters, valid_levels, grounding_manifest
+        )
         if question_errors:
             errors.extend(question_errors)
         else:
@@ -134,6 +138,7 @@ def _validate_one(
     index: int,
     allowed_chapters: set[str],
     valid_levels: set[str],
+    grounding_manifest: dict[str, Any] | None = None,
 ) -> list[CandidateValidationError]:
     errors: list[CandidateValidationError] = []
     if not isinstance(question, dict):
@@ -200,7 +205,36 @@ def _validate_one(
         errors.append(CandidateValidationError(index, "bad_source", "source.type"))
     elif not _non_empty_string(source.get("name")):
         errors.append(CandidateValidationError(index, "bad_source", "source.name"))
+    if grounding_manifest:
+        _validate_grounding_citations(question, index, grounding_manifest, errors)
     return errors
+
+
+def _validate_grounding_citations(
+    question: dict[str, Any],
+    index: int,
+    grounding_manifest: dict[str, Any],
+    errors: list[CandidateValidationError],
+) -> None:
+    known_ids = {
+        excerpt.get("citation_id")
+        for excerpt in grounding_manifest.get("excerpts", [])
+        if isinstance(excerpt, dict) and isinstance(excerpt.get("citation_id"), str)
+    }
+    for field in ("question_citation_ids", "answer_citation_ids"):
+        value = question.get(field)
+        if not _string_sequence(value) or not value:
+            errors.append(CandidateValidationError(index, "missing_citation", field))
+            continue
+        unknown = [citation_id for citation_id in value if citation_id not in known_ids]
+        if unknown:
+            errors.append(
+                CandidateValidationError(
+                    index,
+                    "unknown_citation",
+                    f"{field}: {', '.join(unknown)}",
+                )
+            )
 
 
 def _validate_content(

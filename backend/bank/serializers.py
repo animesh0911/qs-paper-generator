@@ -7,13 +7,15 @@ paper-assemble and paper-detail responses never leak the answer key.
 ``ChapterSerializer`` is used both standalone (``GET /api/bank/chapters/``)
 and nested inside the question shape.
 
-``AnswerKeySerializer`` is the only shape that reveals ``answer``. It exists
-solely to build the marking-scheme PDF and must never be nested in a
-client-facing question/paper response — answers stay gated behind the
-owner-scoped answer-key endpoint (``papers.views.PaperAnswerKeyPdfView``).
+No serializer here exposes ``answer``. Answers reach the paper owner only
+through the paper-local answer document (``papers.answer_document``), which reads
+``Question.answer``/``answer_source`` directly; they are never serialized into a
+client-facing question/paper response.
 """
 
 from rest_framework import serializers
+
+from corpus.models import ChapterMapNode
 
 from .generation import DIFFICULTY_TARGETS_BY_PRESET
 from .models import (
@@ -49,20 +51,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             "text",
             "options",
         ]
-
-
-class AnswerKeySerializer(serializers.ModelSerializer):
-    """Answer-revealing question shape — the one place ``answer`` is exposed.
-
-    Used only by the answer-key endpoint to assemble the marking scheme. The
-    access rule (paper owner only) lives at the view, which also uses
-    ``answer_source`` to suppress unverified generated answers. Carries only
-    those fields — nothing renderable to clients.
-    """
-
-    class Meta:
-        model = Question
-        fields = ["id", "marks", "answer", "answer_source"]
 
 
 class IngestionUploadSerializer(serializers.Serializer):
@@ -106,6 +94,11 @@ class GenerationBatchCreateSerializer(serializers.Serializer):
         min_length=1,
         allow_empty=False,
     )
+    chapter_map_node_ids = serializers.ListField(
+        child=serializers.CharField(allow_blank=False),
+        required=False,
+        default=list,
+    )
     topic_names = serializers.ListField(
         child=serializers.CharField(allow_blank=False),
         required=False,
@@ -135,6 +128,27 @@ class GenerationBatchCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Unknown difficulty preset: {value}")
         return value
 
+    def validate(self, attrs):
+        node_ids = attrs.get("chapter_map_node_ids") or []
+        if not node_ids:
+            return attrs
+        chapter_slugs = attrs.get("chapter_slugs") or []
+        if len(chapter_slugs) != 1:
+            raise serializers.ValidationError(
+                "chapter_map_node_ids require exactly one chapter_slug in the MVP."
+            )
+        nodes = ChapterMapNode.objects.filter(
+            stable_node_id__in=node_ids,
+            document__chapter__slug=chapter_slugs[0],
+        )
+        found = set(nodes.values_list("stable_node_id", flat=True))
+        missing = [node_id for node_id in node_ids if node_id not in found]
+        if missing:
+            raise serializers.ValidationError(
+                {"chapter_map_node_ids": f"Unknown node id(s): {', '.join(missing)}"}
+            )
+        return attrs
+
 
 class GenerationBatchSerializer(serializers.ModelSerializer):
     """Poll shape for a bulk generation batch."""
@@ -148,6 +162,7 @@ class GenerationBatchSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "chapter_slugs",
+            "chapter_map_node_ids",
             "topic_names",
             "difficulty_preset",
             "requested_count",
@@ -176,6 +191,7 @@ class GeneratedQuestionCandidateSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "payload",
+            "grounding_manifest",
             "question_id",
             "accepted_at",
             "created_at",

@@ -54,10 +54,12 @@ lean; put explanations, workflows, and history in ADRs or issue docs.
 - **QuestionGenerator**: Provider-neutral seam for bulk generated Questions.
   Owner: `bank.generation`.
 - **GenerationBatch**: Durable teacher-owned generation job with selected
-  Chapters, optional topic hints, difficulty, status, timestamps, and failure
-  text. Owner: `bank.models.GenerationBatch`.
+  Chapters, optional canonical ChapterMapNode IDs, optional topic hints,
+  difficulty, status, timestamps, and failure text. Owner:
+  `bank.models.GenerationBatch`.
 - **GeneratedQuestionCandidate**: Valid generated Question payload linked to a
-  GenerationBatch; review-only until accepted into Question bank.
+  GenerationBatch with optional grounding manifest; review-only until accepted
+  into Question bank.
 - **Generated Question Gate**: Deterministic validation before generated payloads
   become candidates. Owner: `bank.generated_question_gate`.
 - **AI-generated provenance**: Source/answer provenance applied to accepted
@@ -81,8 +83,8 @@ lean; put explanations, workflows, and history in ADRs or issue docs.
   Lexical and dense adapters live in `corpus.retrieval`.
 - **EmbeddingClient**: Provider-neutral vector seam with explicit model, version,
   and dimensions. Owner: `corpus.embeddings`.
-- **Selected Topic Grounding Context**: Planned query-free assembly of one
-  selected ChapterMapNode subtree for question-and-answer generation.
+- **Selected Topic Grounding Context**: Query-free assembly of one selected
+  ChapterMapNode subtree for question-and-answer generation.
 
 ## People And Tenancy
 

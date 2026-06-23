@@ -1,0 +1,528 @@
+{
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-v4-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "batch_id": 7,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25372,
+  "approx_input_tokens_4c": 6343,
+  "elapsed_ms": 473433,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "answer": "C",
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "options": [
+            {
+              "content": [
+                {
+                  "text": "Low electronegativity and large atomic size",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "A"
+            },
+            {
+              "content": [
+                {
+                  "text": "High electronegativity and large atomic size",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "B"
+            },
+            {
+              "content": [
+                {
+                  "text": "Small atomic size and strong carbon-carbon bonds",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "C"
+            },
+            {
+              "content": [
+                {
+                  "text": "Ability to form only double bonds with other elements",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "D"
+            }
+          ],
+          "stem": [
+            {
+              "text": "Carbon forms a large number of compounds because of its unique ability to bond with other carbon atoms and with many other elements. Which of the following features of carbon is primarily responsible for this property?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "raw_text": "MCQ: Carbon forms a large number of compounds because of its unique ability to bond with other carbon atoms and with many other elements. Which of the following features of carbon is primarily responsible for this property?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "B",
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "options": [
+            {
+              "content": [
+                {
+                  "text": "Saturated hydrocarbons contain only single bonds between carbon atoms, while unsaturated hydrocarbons contain at least one double or triple bond.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "A"
+            },
+            {
+              "content": [
+                {
+                  "text": "Saturated hydrocarbons contain double or triple bonds between carbon atoms, while unsaturated hydrocarbons contain only single bonds.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "B"
+            },
+            {
+              "content": [
+                {
+                  "text": "Saturated hydrocarbons are more reactive than unsaturated hydrocarbons.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "C"
+            },
+            {
+              "content": [
+                {
+                  "text": "Saturated hydrocarbons are also called alkenes.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "D"
+            }
+          ],
+          "stem": [
+            {
+              "text": "Compounds of carbon which are linked by only single bonds between the carbon atoms are called saturated compounds, while those having double or triple bonds are called unsaturated compounds. Which of the following statements correctly describes the difference between saturated and unsaturated hydrocarbons?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "raw_text": "MCQ: Compounds of carbon which are linked by only single bonds between the carbon atoms are called saturated compounds, while those having double or triple bonds are called unsaturated compounds. Which of the following statements correctly describes the difference between saturated and unsaturated hydrocarbons?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "D",
+        "answer_citation_ids": [
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7",
+          "756a49ee75cbef114090df4d7b057f3e867cacbb036f676e90d12ff2a7721669"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "options": [
+            {
+              "content": [
+                {
+                  "text": "They have different molecular formulae.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "A"
+            },
+            {
+              "content": [
+                {
+                  "text": "They have the same number of carbon atoms but different number of hydrogen atoms.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "B"
+            },
+            {
+              "content": [
+                {
+                  "text": "They have the same structure but different arrangements of atoms.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "C"
+            },
+            {
+              "content": [
+                {
+                  "text": "They have the same molecular formula but different structures.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "D"
+            }
+          ],
+          "stem": [
+            {
+              "text": "Butane and isobutane are two different compounds with the same molecular formula C\u2084H\u2081\u2080. Such compounds are called structural isomers. Which of the following correctly defines structural isomers?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7",
+          "756a49ee75cbef114090df4d7b057f3e867cacbb036f676e90d12ff2a7721669"
+        ],
+        "raw_text": "MCQ: Butane and isobutane are two different compounds with the same molecular formula C\u2084H\u2081\u2080. Such compounds are called structural isomers. Which of the following correctly defines structural isomers?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "A",
+        "answer_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348",
+          "e5a13daa392744746eb6fe22ad6ea2822fc621046895a485896a9d6cbf7262bf"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "options": [
+            {
+              "content": [
+                {
+                  "text": "Ethene (C\u2082H\u2084) and ethyne (C\u2082H\u2082) are unsaturated compounds because they contain double and triple bonds respectively.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "A"
+            },
+            {
+              "content": [
+                {
+                  "text": "Ethene (C\u2082H\u2084) and ethyne (C\u2082H\u2082) are saturated compounds because they contain only single bonds.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "B"
+            },
+            {
+              "content": [
+                {
+                  "text": "Ethene (C\u2082H\u2084) is unsaturated because it has a double bond; ethyne (C\u2082H\u2082) is saturated because it has only a single bond.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "C"
+            },
+            {
+              "content": [
+                {
+                  "text": "Ethene (C\u2082H\u2084) and ethyne (C\u2082H\u2082) are both alkanes.",
+                  "type": "paragraph"
+                }
+              ],
+              "label": "D"
+            }
+          ],
+          "stem": [
+            {
+              "text": "Carbon compounds can be saturated or unsaturated. Which of the following correctly identifies the nature of ethene and ethyne?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d",
+          "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348",
+          "e5a13daa392744746eb6fe22ad6ea2822fc621046895a485896a9d6cbf7262bf"
+        ],
+        "raw_text": "MCQ: Carbon compounds can be saturated or unsaturated. Which of the following correctly identifies the nature of ethene and ethyne?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Catenation is the property of carbon atoms to bond with other atoms of carbon, forming long chains, branched chains, or rings. This ability of carbon to form bonds with itself gives rise to a large number of carbon compounds.",
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "What is meant by the term 'catenation'? How does this property contribute to the large number of carbon compounds?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "raw_text": "Very Short Answer: What is meant by the term 'catenation'? How does this property contribute to the large number of carbon compounds?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "A heteroatom is an atom other than carbon and hydrogen that replaces hydrogen in a hydrocarbon chain. Examples include oxygen, nitrogen, sulphur, or halogens (chlorine, bromine). These heteroatoms confer specific properties to the compound, regardless of the length of the carbon chain, and are part of functional groups.",
+        "answer_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "What is a heteroatom? Give an example of a heteroatom and state its importance in determining the properties of carbon compounds.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "raw_text": "Very Short Answer: What is a heteroatom? Give an example of a heteroatom and state its importance in determining the properties of carbon compounds.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Carbon exhibits tetravalency, meaning it has a valency of four and can form four covalent bonds with other atoms. This allows carbon to bond with four other atoms of carbon or other mono-valent elements. Additionally, carbon's small size enables its nucleus to hold shared electron pairs strongly, leading to the formation of strong and stable bonds. These factors together allow carbon to form millions of stable compounds.",
+        "answer_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "Explain the concept of 'tetravalency' of carbon. How does this property, along with catenation, contribute to the formation of a large number of carbon compounds?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "raw_text": "Short Answer: Explain the concept of 'tetravalency' of carbon. How does this property, along with catenation, contribute to the formation of a large number of carbon compounds?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "A homologous series is a series of organic compounds in which each successive member differs by a -CH\u2082- unit. The members of a homologous series show similar chemical properties because they have the same functional group, but their physical properties show a gradual change with increasing molecular mass. For example, methane (CH\u2084), ethane (C\u2082H\u2086), and propane (C\u2083H\u2088) form a homologous series. They differ by a -CH\u2082- unit, their chemical properties are similar, but their boiling points increase as molecular mass increases.",
+        "answer_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53",
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "What is a homologous series? State any two characteristics of a homologous series. Give an example to illustrate your answer.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53",
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "raw_text": "Short Answer: What is a homologous series? State any two characteristics of a homologous series. Give an example to illustrate your answer.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "The steps for naming a carbon compound are as follows:\n(i) Identify the number of carbon atoms in the compound. The root name is based on the number of carbon atoms (e.g., meth- for 1, eth- for 2, prop- for 3, but- for 4, etc.).\n(ii) If a functional group is present, it is indicated using a prefix or suffix (e.g., -ol for alcohol, -one for ketone, -oic acid for carboxylic acid).\n(iii) If the carbon chain is unsaturated, the suffix '-ane' is replaced by '-ene' for double bonds or '-yne' for triple bonds.\nFor example, a three-carbon chain with a double bond is named propene. A three-carbon chain with a ketone group is named propanone (propane minus 'e' plus 'one').",
+        "answer_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "Describe the steps involved in the nomenclature (naming) of carbon compounds as per the IUPAC system. Give an example of naming a compound with a functional group.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "raw_text": "Long Answer: Describe the steps involved in the nomenclature (naming) of carbon compounds as per the IUPAC system. Give an example of naming a compound with a functional group.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "The versatile nature of carbon arises from two key properties: catenation and tetravalency.\n\nCatenation is the unique ability of carbon atoms to bond with other carbon atoms, forming long straight chains, branched chains, or rings. Carbon forms strong and stable carbon-carbon bonds, allowing it to create large molecules. For example, hydrocarbons can contain chains of many carbon atoms linked through single, double, or triple bonds.\n\nTetravalency refers to carbon having a valency of four, which allows it to form covalent bonds with four other atoms. This enables carbon to bond not only with other carbon atoms but also with atoms of elements like hydrogen, oxygen, nitrogen, sulphur, and halogens. Carbon's small atomic size strengthens these bonds.\n\nBecause of these features, carbon can form an enormous number of compounds with diverse structures and properties. The same molecular formula can give rise to different structural isomers, such as n-butane and isobutane (both C\u2084H\u2081\u2080), which have different arrangements of atoms. Additionally, carbon forms saturated compounds (with only single bonds) and unsaturated compounds (with double or triple bonds), each with different reactivities.",
+        "answer_citation_ids": [
+          "deed9865a4b1a6e59c6d77e0146d2a534084b57cbf3d3c030e9b228e4f987935",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "U",
+        "content": {
+          "stem": [
+            {
+              "text": "Explain the two characteristic features of carbon that make it so versatile. How do these features lead to the formation of a large number of compounds? Support your answer with examples.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "deed9865a4b1a6e59c6d77e0146d2a534084b57cbf3d3c030e9b228e4f987935",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "raw_text": "Long Answer: Explain the two characteristic features of carbon that make it so versatile. How do these features lead to the formation of a large number of compounds? Support your answer with examples.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 9,
+  "validation_errors": [
+    {
+      "index": 7,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    },
+    {
+      "index": 7,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    }
+  ],
+  "persisted_candidate_count": 9
+}

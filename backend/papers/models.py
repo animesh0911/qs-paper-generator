@@ -43,6 +43,13 @@ class Paper(models.Model):
     # cancel a job whose paper changed while it was queued, before spending any
     # paid tokens (Rule 13).
     revision = models.PositiveIntegerField(default=0)
+    # Paper-local answer key (paper_answer_document.v1), built at assemble time
+    # and edited in the editor without ever mutating the shared bank
+    # ``Question.answer`` (issue #122). Answers are deliberately absent from
+    # ``document``; this is the one paper-scoped place they live, exposed only to
+    # the owner through the editor-draft endpoint. Null for papers assembled
+    # before this field existed. Shape owned by papers.answer_document.
+    answer_document = models.JSONField(null=True, blank=True)
     # Selection report. Shape owned by papers.picker.CoverageReport:
     # {coverage: {chapter_slug: int}, cog_coverage: {level: int},
     #  unfilled: [{slot_index, section, qtype, marks, reason}]}

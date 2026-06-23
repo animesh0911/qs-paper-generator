@@ -374,7 +374,82 @@ Frontend modules and seams:
 
 The editor may keep internal view-model names such as `slotId`, `displayNumber`, and `questionId`, but these are not backend contract fields.
 
-## 13. V2 Notes
+## 13. Answer Document (`paper_answer_document.v1`)
+
+Answers are deliberately absent from `paper_document.v1` (§2): the student paper
+and its print/PDF route must never carry the marking scheme. The answer key is a
+separate, paper-local document, edited and saved in the editor without ever
+mutating the shared bank `Question.answer`. It is exposed only to the paper
+owner, through the editor-draft endpoint below — never alongside a normal paper
+response.
+
+```json
+{
+  "schemaVersion": "paper_answer_document.v1",
+  "paperId": "paper_123",
+  "answersBySlotId": {
+    "slot_A_01": {
+      "slotId": "slot_A_01",
+      "questionId": "q_456",
+      "content": [{ "type": "paragraph", "text": "Model answer text" }],
+      "source": "source",
+      "modified": false
+    }
+  }
+}
+```
+
+Entries are keyed by stable **slot id**, not by bank question id, so a swapped
+question replaces the answer at that position. Each entry carries:
+
+| Field        | Purpose                                                                 |
+| ------------ | ----------------------------------------------------------------------- |
+| `slotId`     | The paper slot this answer belongs to.                                  |
+| `questionId` | The question selected in that slot when the answer was last saved.      |
+| `content`    | Rich `ContentItem[]` (§9). Empty/absent means no answer on file.        |
+| `source`     | Editor-facing provenance: `generated` or `source` (see below).          |
+| `modified`   | `true` once a teacher edits the paper-local answer.                     |
+
+`source` is provenance for the editor only, not a third "missing" value:
+
+- `generated` — an unverified LLM answer (bank `answer_source = generated_unverified`). The editor must label it unverified, and the marking-scheme PDF suppresses it (renders `Answer not available`) until a teacher edits it (`modified: true`) — the issue #87 trust boundary.
+- `source` — human, extracted, or human-verified answers; trustworthy and printable.
+
+### Editor-draft endpoint
+
+`GET /api/papers/{id}/editor-draft/` returns `{ document, answer_document, status }`
+for the owner. The GET reconciles the answer document against the current paper
+document before returning it: an older draft with no answer document gets one
+built lazily, and a slot whose question was swapped through the legacy
+`PATCH /api/papers/{id}/` (which does not maintain answers) is refreshed from the
+bank rather than returned stale. Teacher edits on still-matching slots are
+preserved. The reconciled document is persisted when it changed.
+
+The GET also enriches its returned documents (both `document` and
+`answer_document`) for the editor: every content item that references an asset by
+`assetId` gains a sibling `url`. The `assetId` stays canonical; the `url` is
+backend-issued and **non-canonical** — it may later become a signed S3/CDN URL
+without changing the document model, so the frontend must use `url` to load
+images and must never derive a storage path from `assetId`. This `url` is present
+only on the editor-draft response; the base `paper_document.v1` (assemble,
+detail, print) keeps the lean `assetId`-only shape from §9.
+
+`PATCH` saves both documents together while the paper is a draft. The save
+is rejected (`400`, with `details[]`) when the two documents disagree, so a
+swapped question can never leave a stale answer behind:
+
+- a filled slot has no answer entry;
+- an answer entry references a `slotId` absent from the paper document;
+- an answer entry's `questionId` does not match that slot's `selectedQuestionId`;
+- an answer entry's `content` is present but is not a `ContentItem[]`.
+
+Unfilled slots (no `selectedQuestionId`) are excluded from the answer document.
+The walk for the answer-key print/PDF is: iterate `document.paper.sections[].slots[]`
+in order, then look up `answer_document.answersBySlotId[slot.id]`; the PDF
+reconciles against the current document so a swapped slot prints the current
+question's answer.
+
+## 14. V2 Notes
 
 Keep these out of V1 implementation unless explicitly prioritized:
 

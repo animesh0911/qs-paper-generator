@@ -1,0 +1,637 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-3.1-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 15,
+  "batch_id": 50,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.4",
+  "topic_title": "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID",
+  "chapter_map_node_id": "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2"
+    ],
+    "included_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+      "47828774c1697ed4537abf2ebbcbe4e1292cd4d01f7be05ed6e31a1ba5525c5a",
+      "16843beccb844b58739c2834f698800fb669fe36832012cf30f9300e836ad961"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7971,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 14413,
+  "approx_input_tokens_4c": 3603,
+  "elapsed_ms": 17077,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following compounds is commonly known as alcohol and is used as an active ingredient in many medicines like tincture iodine?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following compounds is commonly known as alcohol and is used as an active ingredient in many medicines like tincture iodine?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethanoic acid"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethanol"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Methanol"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sodium ethoxide"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "B, Ethanol",
+        "question_citation_ids": [
+          "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1"
+        ],
+        "answer_citation_ids": [
+          "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Why is pure ethanoic acid commonly referred to as glacial acetic acid?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is pure ethanoic acid commonly referred to as glacial acetic acid?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Because it has a very high boiling point."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Because it freezes during winter in cold climates due to its melting point of 290 K."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Because it is derived from mineral sources."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Because it reacts violently with ice."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanoic Acid"
+        ],
+        "answer": "B, Because it freezes during winter in cold climates due to its melting point of 290 K.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "Ap",
+        "raw_text": "What is the purpose of adding methanol to industrial ethanol?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the purpose of adding methanol to industrial ethanol?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To increase the shelf life of the ethanol."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To improve its efficiency as a solvent."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To make it unfit for drinking, preventing misuse."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To neutralize the acidity of the ethanol."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "C, To make it unfit for drinking, preventing misuse.",
+        "question_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "answer_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Saponification is the chemical process used in the preparation of soap. Which substances are produced when an ester is treated with sodium hydroxide?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Saponification is the chemical process used in the preparation of soap. Which substances are produced when an ester is treated with sodium hydroxide?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Acid and water"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alcohol and sodium salt of carboxylic acid"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ester and carbon dioxide"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ether and sodium hydroxide"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanoic Acid"
+        ],
+        "answer": "B, Alcohol and sodium salt of carboxylic acid",
+        "question_citation_ids": [
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "answer_citation_ids": [
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is the result of heating ethanol with excess concentrated sulphuric acid at 443 K?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the result of heating ethanol with excess concentrated sulphuric acid at 443 K?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "Heating ethanol with excess concentrated sulphuric acid at 443 K causes the dehydration of ethanol to produce ethene and water.",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why are carboxylic acids considered weaker than mineral acids like HCl?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why are carboxylic acids considered weaker than mineral acids like HCl?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanoic Acid"
+        ],
+        "answer": "Mineral acids like HCl completely ionise in water, whereas carboxylic acids are only weakly ionised, making them weaker acids.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What products are formed when ethanol reacts with sodium?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What products are formed when ethanol reacts with sodium?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "When ethanol reacts with sodium, the products formed are sodium ethoxide and hydrogen gas.",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is vinegar and what is its common use?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is vinegar and what is its common use?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanoic Acid"
+        ],
+        "answer": "Vinegar is a 5-8% solution of acetic acid in water, which is widely used as a preservative in pickles.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Explain why the intake of small quantities of pure ethanol (absolute alcohol) can be lethal.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why the intake of small quantities of pure ethanol (absolute alcohol) can be lethal."
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "Consuming large quantities of ethanol slows down metabolic processes and suppresses the central nervous system, leading to lack of coordination, mental confusion, and drowsiness. While dilute ethanol causes drunkenness, absolute alcohol, if consumed, can be lethal due to its concentrated effect on the body's systems.",
+        "question_citation_ids": [
+          "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1",
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "answer_citation_ids": [
+          "f6a1e8c2c2073d3b000f019ff4d80f05f847f8058f62dcc602de5e2ba63032d1",
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Describe the reaction of ethanoic acid with carbonates and hydrogen carbonates.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the reaction of ethanoic acid with carbonates and hydrogen carbonates."
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanoic Acid"
+        ],
+        "answer": "Ethanoic acid reacts with both carbonates and hydrogen carbonates to produce a salt (often called sodium acetate), carbon dioxide, and water. For example, it produces CO2 gas which can be identified by passing it through lime water.",
+        "question_citation_ids": [
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+        ],
+        "answer_citation_ids": [
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "What is an esterification reaction and what are esters used for?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is an esterification reaction and what are esters used for?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanoic Acid"
+        ],
+        "answer": "Esterification is the reaction between an acid (like ethanoic acid) and an alcohol (like ethanol) to form an ester. Esters are generally sweet-smelling substances primarily used as flavouring agents and in the making of perfumes.",
+        "question_citation_ids": [
+          "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3",
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "answer_citation_ids": [
+          "62b91d2c6ad4fd28093df09d5085c1634774371618a0d1eea2204db55ef84eb3",
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Why is alcohol being used as an additive in petrol in some countries?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is alcohol being used as an additive in petrol in some countries?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "Alcohol is used as an additive in petrol because it serves as a cleaner fuel. Burning it in sufficient air results only in the production of carbon dioxide and water, causing less pollution compared to traditional fuel consumption.",
+        "question_citation_ids": [
+          "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+        ],
+        "answer_citation_ids": [
+          "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Compare the toxic effects of methanol and ethanol on the human body.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Compare the toxic effects of methanol and ethanol on the human body."
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "Ethanol, when consumed in large quantities, slows metabolic processes, suppresses the central nervous system, and impairs judgment and coordination. In contrast, methanol is significantly more dangerous even in small amounts. Once ingested, methanol is oxidized to methanal in the liver. Methanal reacts rapidly with cell components, coagulating protoplasm similarly to how heat affects an egg. Furthermore, methanol specifically targets the optic nerve, which can result in permanent blindness, and its ingestion can quickly lead to death.",
+        "question_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "answer_citation_ids": [
+          "bec44198f165e612302a58023622e6ed1dcddb770dfab21ac726e39cdbd2f7a2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "Describe the chemical properties of ethanol, including its reaction with sodium and its dehydration reaction.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the chemical properties of ethanol, including its reaction with sodium and its dehydration reaction."
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanol"
+        ],
+        "answer": "Ethanol exhibits specific chemical properties through its functional group. First, it reacts with sodium metal to evolve hydrogen gas, forming sodium ethoxide; this reaction is characteristic of the hydroxyl group. Second, it undergoes a dehydration reaction when heated with excess concentrated sulphuric acid at 443 K. In this process, the sulphuric acid acts as a dehydrating agent by removing water molecules from the ethanol, resulting in the formation of the unsaturated hydrocarbon, ethene. These reactions demonstrate the utility of ethanol in various organic chemical transformations.",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Discuss the properties of ethanoic acid, including its physical nature, chemical reactions with basics, and the process of saponification.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Discuss the properties of ethanoic acid, including its physical nature, chemical reactions with basics, and the process of saponification."
+            }
+          ]
+        },
+        "topic_names": [
+          "Properties of Ethanoic Acid"
+        ],
+        "answer": "Ethanoic acid, or acetic acid, is a weak carboxylic acid commonly used as a 5-8% solution in water called vinegar. Physically, its melting point is 290 K, causing it to freeze in cold winters, thus earning it the name 'glacial acetic acid'. Chemically, it reacts with carbonates and hydrogen carbonates to produce sodium acetate, carbon dioxide, and water. Moreover, when it reacts with an alcohol, it undergoes esterification to produce sweet-smelling esters. These esters can then undergo a process called saponification, where they are treated with sodium hydroxide to revert into alcohol and a sodium salt of the carboxylic acid, which is the foundational reaction in soap making.",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c",
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26",
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c",
+          "e6690076996ab622d74c50cb8fc119cc83a66afbf46b14b9b48a4148b2dd8d26",
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 15,
+  "valid_count": 15,
+  "validation_errors": [],
+  "persisted_candidate_count": 15
+}

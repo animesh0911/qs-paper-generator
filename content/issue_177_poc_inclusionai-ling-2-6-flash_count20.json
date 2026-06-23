@@ -1,0 +1,1060 @@
+{
+  "provider": "openrouter",
+  "model": "inclusionai/ling-2.6-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 14,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25494,
+  "approx_input_tokens_4c": 6374,
+  "elapsed_ms": 54900,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "answer": "Catenation",
+        "answer_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the unique ability of carbon to form bonds with other atoms of carbon, giving rise to large molecules, called?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "raw_text": "What is the unique ability of carbon to form bonds with other atoms of carbon, giving rise to large molecules, called?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "2",
+        "answer_citation_ids": [
+          "c0282130e08398cce56f608405112ec10683c1c5e259266cda8fe430e526b48b"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "How many bonds can a carbon atom form with other atoms to satisfy its valency?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "c0282130e08398cce56f608405112ec10683c1c5e259266cda8fe430e526b48b"
+        ],
+        "raw_text": "How many bonds can a carbon atom form with other atoms to satisfy its valency?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Saturated compounds",
+        "answer_citation_ids": [
+          "6f2142f0eabe0da083195afc63d4080da68f77676f72004ca04f8f1b10b93b9d"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What are carbon compounds with only single bonds between carbon atoms called?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "6f2142f0eabe0da083195afc63d4080da68f77676f72004ca04f8f1b10b93b9d"
+        ],
+        "raw_text": "What are carbon compounds with only single bonds between carbon atoms called?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "They have identical molecular formulas but different structures",
+        "answer_citation_ids": [
+          "756a49ee75cbef114090df4d7b057f3e867cacbb036f676e90d12ff2a7721669"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What do you call compounds with the same molecular formula but different structures?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "756a49ee75cbef114090df4d7b057f3e867cacbb036f676e90d12ff2a7721669"
+        ],
+        "raw_text": "What do you call compounds with the same molecular formula but different structures?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Functional groups",
+        "answer_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What are the specific properties conferred to carbon compounds by groups such as -OH or -COOH?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "raw_text": "What are the specific properties conferred to carbon compounds by groups such as -OH or -COOH?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Step 1: Link carbon atoms with a single bond. Step 2: Attach hydrogen atoms to satisfy the remaining valencies of carbon.",
+        "answer_citation_ids": [
+          "e6ab6fe5f4dbdcb4f60ac5a10b5b6c7df7f79cfe16b33056b0161fb725164c13"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Describe the steps to draw the structure of ethane (C2H6).",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "e6ab6fe5f4dbdcb4f60ac5a10b5b6c7df7f79cfe16b33056b0161fb725164c13"
+        ],
+        "raw_text": "Describe the steps to draw the structure of ethane (C2H6).",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Catenation",
+        "answer_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Why do carbon compounds exhibit a large variety and number compared to compounds of other elements?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "raw_text": "Why do carbon compounds exhibit a large variety and number compared to compounds of other elements?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Ethene (C2H4) has a double bond between the two carbon atoms; ethyne (C2H2) has a triple bond between the two carbon atoms",
+        "answer_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the difference in bonding between ethene (C2H4) and ethyne (C2H2)?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "raw_text": "What is the difference in bonding between ethene (C2H4) and ethyne (C2H2)?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "342 u",
+        "answer_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Calculate the difference in molecular masses between propane (C3H8) and butane (C4H10).",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "raw_text": "Calculate the difference in molecular masses between propane (C3H8) and butane (C4H10).",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Propanone",
+        "answer_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the IUPAC name of a three-carbon chain with a ketone group?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "raw_text": "What is the IUPAC name of a three-carbon chain with a ketone group?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Homologous series",
+        "answer_citation_ids": [
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the term for a series of compounds with the same functional group and general formula CnH2n for alkenes?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "raw_text": "What is the term for a series of compounds with the same functional group and general formula CnH2n for alkenes?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Catenation and tetravalency",
+        "answer_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What are the two key features of carbon responsible for its versatile nature?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "raw_text": "What are the two key features of carbon responsible for its versatile nature?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "4.2",
+        "answer_citation_ids": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Which chapter of the NCERT Science textbook discusses the Versatile Nature of Carbon?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "raw_text": "Which chapter of the NCERT Science textbook discusses the Versatile Nature of Carbon?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "4.2.1",
+        "answer_citation_ids": [
+          "655506c795839d6ee25ab53d9315f4354da7205d38d98384a61c0dff38e940ad"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Which subsection of Chapter 4.2 discusses the nature of bonding in carbon compounds?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "655506c795839d6ee25ab53d9315f4354da7205d38d98384a61c0dff38e940ad"
+        ],
+        "raw_text": "Which subsection of Chapter 4.2 discusses the nature of bonding in carbon compounds?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Hydrocarbons",
+        "answer_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What are compounds containing only carbon and hydrogen called?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "raw_text": "What are compounds containing only carbon and hydrogen called?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Methane, ethane, propane, butane, pentane, and hexane",
+        "answer_citation_ids": [
+          "da4665d36a969f249ff4f9f87eaa7d7097f29594e2f7997d6e6d4e7162bb89c0"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "List the first six members of the alkane homologous series.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "da4665d36a969f249ff4f9f87eaa7d7097f29594e2f7997d6e6d4e7162bb89c0"
+        ],
+        "raw_text": "List the first six members of the alkane homologous series.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Functional groups",
+        "answer_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What determines the chemical properties of a carbon compound?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "raw_text": "What determines the chemical properties of a carbon compound?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "C6H6",
+        "answer_citation_ids": [
+          "7a407d2d4bdcc3e39461e3d4d3b4cbd7acab088b477ff49095b9ecd74c97b6bb"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the molecular formula of benzene?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "7a407d2d4bdcc3e39461e3d4d3b4cbd7acab088b477ff49095b9ecd74c97b6bb"
+        ],
+        "raw_text": "What is the molecular formula of benzene?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Attaching to a carbon chain through a valency",
+        "answer_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "How is a functional group attached to a carbon chain?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "raw_text": "How is a functional group attached to a carbon chain?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "As the molecular mass increases",
+        "answer_citation_ids": [
+          "92f1f70e881ed5898c58a5093c823492fd34e2521fac0ad8d2bdd4e08464cf12"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What happens to the physical properties of a homologous series as the molecular mass increases?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "92f1f70e881ed5898c58a5093c823492fd34e2521fac0ad8d2bdd4e08464cf12"
+        ],
+        "raw_text": "What happens to the physical properties of a homologous series as the molecular mass increases?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Propanoic acid",
+        "answer_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the IUPAC name of a three-carbon chain with a carboxylic acid group?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "raw_text": "What is the IUPAC name of a three-carbon chain with a carboxylic acid group?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "By replacing one or more hydrogen atoms with a heteroatom",
+        "answer_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "How can other elements be incorporated into a carbon chain?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908"
+        ],
+        "raw_text": "How can other elements be incorporated into a carbon chain?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Ethanol, propanol, butanol",
+        "answer_citation_ids": [
+          "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Generate the homologous series for alcohols containing up to four carbon atoms.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472"
+        ],
+        "raw_text": "Generate the homologous series for alcohols containing up to four carbon atoms.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Elongation of the carbon chain by a -CH2- unit",
+        "answer_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the difference between propane and butane?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "raw_text": "What is the difference between propane and butane?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "The valencies of the atoms are satisfied by single bonds",
+        "answer_citation_ids": [
+          "99ed801effcb95d48b52e9fcc03e6d92dfb6b31268f2f4c5352d96fd65bbdbbd"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Why do saturated compounds have relatively low reactivity?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "99ed801effcb95d48b52e9fcc03e6d92dfb6b31268f2f4c5352d96fd65bbdbbd"
+        ],
+        "raw_text": "Why do saturated compounds have relatively low reactivity?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "They are insoluble in water but soluble in organic solvents",
+        "answer_citation_ids": [
+          "92f1f70e881ed5898c58a5093c823492fd34e2521fac0ad8d2bdd4e08464cf12"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "How do hydrocarbons behave in water and organic solvents?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "92f1f70e881ed5898c58a5093c823492fd34e2521fac0ad8d2bdd4e08464cf12"
+        ],
+        "raw_text": "How do hydrocarbons behave in water and organic solvents?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Methanol, ethanol, propanol, butanol, pentanol, hexanol",
+        "answer_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Write the names of the first six alcohols in the homologous series.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "raw_text": "Write the names of the first six alcohols in the homologous series.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "Carbon shows the property of catenation and has a tetravalency",
+        "answer_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Give a reason for the tetravalency and catenation shown by carbon.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "raw_text": "Give a reason for the tetravalency and catenation shown by carbon.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "They differ by a -CH2- unit and 14 u",
+        "answer_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "Calculate the difference in molecular formulae and masses between propane and butane.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "raw_text": "Calculate the difference in molecular formulae and masses between propane and butane.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      },
+      {
+        "answer": "They differ in the number of carbon atoms and hydrogen atoms",
+        "answer_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "An",
+        "content": {
+          "stem": [
+            {
+              "text": "What is the difference between successive members of a homologous series?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "raw_text": "What is the difference between successive members of a homologous series?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "carbon-and-its-compounds"
+        ]
+      }
+    ]
+  },
+  "raw_question_count": 30,
+  "valid_count": 3,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 1,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 2,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 3,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 4,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 6,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 7,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 9,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 10,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 11,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 12,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 12,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 4.2 VERSATILE NATURE OF CARBON"
+    },
+    {
+      "index": 12,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 4.2 VERSATILE NATURE OF CARBON"
+    },
+    {
+      "index": 13,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 14,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 15,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 16,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 17,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 18,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 19,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 20,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 21,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 22,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 23,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 24,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 25,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 26,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 27,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 29,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    }
+  ],
+  "persisted_candidate_count": 3
+}

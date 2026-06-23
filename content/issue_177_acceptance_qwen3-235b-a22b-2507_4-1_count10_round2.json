@@ -1,0 +1,448 @@
+{
+  "provider": "openrouter",
+  "model": "qwen/qwen3-235b-a22b-2507",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 26,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.1",
+  "topic_title": "4.1 BONDING IN CARBON - THE COVALENT BOND",
+  "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df"
+    ],
+    "included_chunk_count": 29,
+    "skipped_chunk_count": 8,
+    "context_char_count": 11027,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 19325,
+  "approx_input_tokens_4c": 4831,
+  "elapsed_ms": 584000,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What type of bond is formed when atoms share electrons to attain a stable electronic configuration?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What type of bond is formed when atoms share electrons to attain a stable electronic configuration?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ionic bond"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Covalent bond"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Metallic bond"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Coordinate bond"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "B Covalent bond",
+        "question_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Why does carbon not form C⁴⁺ or C⁴⁻ ions?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why does carbon not form C⁴⁺ or C⁴⁻ ions?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon has a small atomic size"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "It requires very high energy to lose four electrons and gain four electrons is not feasible due to nuclear instability"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon always forms covalent bonds"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Carbon has low electronegativity"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "B It requires very high energy to lose four electrons and gain four electrons is not feasible due to nuclear instability",
+        "question_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+        ],
+        "answer_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following best describes the covalent bond in a methane molecule (CH₄)?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following best describes the covalent bond in a methane molecule (CH₄)?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Transfer of electrons from carbon to hydrogen"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sharing of electrons between carbon and four hydrogen atoms"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Complete transfer of electrons from hydrogen to carbon"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Formation of ionic bonds between carbon and hydrogen"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "B Sharing of electrons between carbon and four hydrogen atoms",
+        "question_citation_ids": [
+          "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+        ],
+        "answer_citation_ids": [
+          "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Define covalent bond.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define covalent bond."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "A covalent bond is formed by the sharing of electrons between atoms to achieve a stable electronic configuration, usually the noble gas configuration.",
+        "question_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why do covalent compounds have low melting and boiling points?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why do coval necessity of covalent compounds have low melting and boiling points?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Covalent compounds have low melting and boiling points because the intermolecular forces between molecules are weak.",
+        "question_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+        ],
+        "answer_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "Ap",
+        "raw_text": "Name one property of covalent compounds that makes them poor conductors of electricity.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Name one property of covalent compounds that makes them poor conductors of electricity."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Covalent compounds do not form ions as electrons are shared and not transferred, hence they do not conduct electricity.",
+        "question_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+        ],
+        "answer_citation_ids": [
+          "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "Explain why carbon forms covalent bonds instead of ionic bonds.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why carbon forms covalent bonds instead of ionic bonds."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Carbon has four valence electrons and needs to gain or lose four electrons to attain a noble gas configuration. Losing four electrons requires high energy, and gaining four electrons is difficult due to nuclear instability. Hence, carbon shares electrons through covalent bonding to achieve stability.",
+        "question_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+          "cac31e0ad5de8eb8d5b821116cb65b83fe11ac6e7ce799e21f7f9b6e1b201b99"
+        ],
+        "answer_citation_ids": [
+          "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+          "cac31e0ad5de8eb8d5b821116cb65b83fe11ac6e7ce799e21f7f9b6e1b201b99"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "Why is diamond the hardest natural substance?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is diamond the hardest natural substance?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "Diamond is the hardest natural substance because each carbon atom is bonded to four other carbon atoms in a rigid three-dimensional tetrahedral structure, forming strong covalent bonds throughout the crystal.",
+        "question_citation_ids": [
+          "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+        ],
+        "answer_citation_ids": [
+          "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "Explain the formation of a double covalent bond with an example.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the formation of a double covalent bond with an example."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "A double covalent bond is formed when two atoms share two pairs of electrons. For example, in an oxygen molecule (O₂), each oxygen atom has six valence electrons and needs two more electrons to complete its octet. Hence, each oxygen atom contributes two electrons, forming two shared pairs, which constitutes a double bond. This is represented as O=O. The double bond is stronger and shorter than a single bond, and results in a stable molecule.",
+        "question_citation_ids": [
+          "2a0d297249cf18e955f25c0257eb282352f619d77510863f27aa520b15088268"
+        ],
+        "answer_citation_ids": [
+          "2a0d297249cf18e955f25c0257eb282352f619d77510863f27aa520b15088268"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "Compare the bonding in methane (CH₄) and ammonia (NH₃), focusing on how each atom attains noble gas configuration.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Compare the bonding in methane (CH₄) and ammonia (NH₃), focusing on how each atom attains noble gas configuration."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.1 BONDING IN CARBON - THE COVALENT BOND"
+        ],
+        "answer": "In methane (CH₄), carbon has four valence electrons and shares one electron with each of four hydrogen atoms, forming four single covalent bonds. This allows carbon to attain the electronic configuration of neon (octet) and each hydrogen to attain the configuration of helium (duplet). In ammonia (NH₃), nitrogen has five valence electrons and shares three electrons with three hydrogen atoms, forming three single covalent bonds. Nitrogen thus achieves an octet, and each hydrogen achieves a duplet. Both molecules achieve stability through covalent sharing without forming ions.",
+        "question_citation_ids": [
+          "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165",
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "answer_citation_ids": [
+          "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165",
+          "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 10,
+  "validation_errors": [],
+  "persisted_candidate_count": 10
+}
