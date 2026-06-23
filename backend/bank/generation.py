@@ -166,6 +166,7 @@ class QuestionGenerationRequest:
     """Teacher/request intent that shapes one generation call."""
 
     chapter_slugs: tuple[str, ...]
+    chapter_map_node_ids: tuple[str, ...] = ()
     topic_names: tuple[str, ...] = ()
     difficulty_targets: dict[str, int] | None = None
     question_type_distribution: dict[str, int] | None = None
@@ -194,6 +195,11 @@ def _default_distribution_for_count(count: int) -> dict[str, int]:
 def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
     """Render the production prompt for one bulk Question-generation call."""
     chapters = ", ".join(request.chapter_slugs)
+    topic_nodes = (
+        ", ".join(request.chapter_map_node_ids)
+        if request.chapter_map_node_ids
+        else "none"
+    )
     topics = ", ".join(request.topic_names) if request.topic_names else "none"
     difficulty = request.difficulty_targets or {
         "easy": 30,
@@ -209,6 +215,7 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
             "Generate CBSE Class 10 Science Question-and-answer candidates.",
             f"Language: {request.language}",
             f"Chapters: {chapters}",
+            f"Selected NCERT topic node ids: {topic_nodes}",
             f"Optional topic hints: {topics}",
             f"Total candidates: exactly {request.count}",
             "Distribute candidates approximately equally across selected "

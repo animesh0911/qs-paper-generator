@@ -71,35 +71,6 @@ class TextbookRetriever(Protocol):
     def retrieve(self, request: TextbookRetrievalRequest) -> GroundingContext: ...
 
 
-def _validate_search_request(request: TextbookRetrievalRequest) -> None:
-    if not request.query_text.strip():
-        raise ValueError("query_text must not be blank.")
-    if request.limit < 1:
-        raise ValueError("limit must be positive.")
-    _validate_chapter_map_node(request)
-
-
-def _validate_chapter_map_node(request: TextbookRetrievalRequest) -> None:
-    if (
-        request.chapter_map_node is not None
-        and request.chapter_map_node.document.chapter_id != request.chapter.pk
-    ):
-        raise ValueError("chapter_map_node must belong to the requested Chapter.")
-
-
-def _content_type_filter(content_types: tuple[str, ...]) -> Q:
-    query = Q(content_types__contains=[content_types[0]])
-    for content_type in content_types[1:]:
-        query &= Q(content_types__contains=[content_type])
-    return query
-
-
-def _apply_retrieval_scope(chunks, request: TextbookRetrievalRequest):
-    if request.chapter_map_node is not None:
-        chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
-    if request.content_types:
-        chunks = chunks.filter(_content_type_filter(request.content_types))
-    return chunks
 class ChapterMapContextAssembler:
     """Assemble selected ChapterMapNode subtree context without search."""
 
@@ -198,7 +169,7 @@ class ChapterMapContextAssembler:
         if request.chapter_map_node is not None:
             if request.chapter_map_node.document.chapter_id != request.chapter.pk:
                 raise ValueError(
-                    "chapter_map_node_ids must belong to the requested Chapter."
+                    "chapter_map_node must belong to the requested Chapter."
                 )
             ids = (*ids, request.chapter_map_node.stable_node_id)
         ids = tuple(dict.fromkeys(ids))
@@ -285,6 +256,57 @@ class ChapterMapContextAssembler:
         return True
 
 
+def _validate_search_request(request: TextbookRetrievalRequest) -> None:
+    if not request.query_text.strip():
+        raise ValueError("query_text must not be blank.")
+    if request.limit < 1:
+        raise ValueError("limit must be positive.")
+    _validate_chapter_map_node(request)
+
+
+def _validate_chapter_map_node(request: TextbookRetrievalRequest) -> None:
+    if (
+        request.chapter_map_node is not None
+        and request.chapter_map_node.document.chapter_id != request.chapter.pk
+    ):
+        raise ValueError("chapter_map_node must belong to the requested Chapter.")
+    if request.chapter_map_node_ids:
+        found = set(
+            ChapterMapNode.objects.filter(
+                document__chapter=request.chapter,
+                stable_node_id__in=request.chapter_map_node_ids,
+            ).values_list("stable_node_id", flat=True)
+        )
+        missing = [
+            node_id
+            for node_id in request.chapter_map_node_ids
+            if node_id not in found
+        ]
+        if missing:
+            raise ValueError(
+                "chapter_map_node_ids must belong to the requested Chapter."
+            )
+
+
+def _content_type_filter(content_types: tuple[str, ...]) -> Q:
+    query = Q(content_types__contains=[content_types[0]])
+    for content_type in content_types[1:]:
+        query &= Q(content_types__contains=[content_type])
+    return query
+
+
+def _apply_retrieval_scope(chunks, request: TextbookRetrievalRequest):
+    if request.chapter_map_node is not None:
+        chunks = chunks.filter(chapter_map_node=request.chapter_map_node)
+    if request.chapter_map_node_ids:
+        chunks = chunks.filter(
+            chapter_map_node__stable_node_id__in=request.chapter_map_node_ids
+        )
+    if request.content_types:
+        chunks = chunks.filter(_content_type_filter(request.content_types))
+    return chunks
+
+
 class PostgresTextbookRetriever:
     """Retrieve ranked chunks using only persisted Postgres lexical data."""
 
@@ -318,6 +340,7 @@ class PostgresTextbookRetriever:
         if not terms:
             raise ValueError("query_text must contain a searchable term.")
         return SearchQuery(" | ".join(terms), config="english", search_type="raw")
+
 
 class PostgresVectorTextbookRetriever:
     """Retrieve dense candidates for one injected embedding profile."""

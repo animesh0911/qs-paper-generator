@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { GeneratedQuestionCandidate, GenerationBatch } from '@/types';
-import { fetchGenerationBatch, fetchGenerationCandidates } from '@/lib/api';
+import {
+  acceptGenerationCandidates,
+  fetchGenerationBatch,
+  fetchGenerationCandidates,
+} from '@/lib/api';
 import { GenerationProgressWorkspace } from '@/components/question-generation';
 
 const POLL_MS = 3000;
@@ -19,6 +23,8 @@ export default function GenerationProgressPage() {
   const [candidatesLoading, setCandidatesLoading] = useState(false);
   const [candidatesError, setCandidatesError] = useState('');
   const [candidatesRetryTick, setCandidatesRetryTick] = useState(0);
+  const [accepting, setAccepting] = useState(false);
+  const [acceptError, setAcceptError] = useState('');
   const hasLoadedBatch = useRef(false);
 
   useEffect(() => {
@@ -97,6 +103,24 @@ export default function GenerationProgressPage() {
     setCandidatesRetryTick((current) => current + 1);
   }
 
+  async function acceptCandidates(acceptedCandidateIds: number[]) {
+    if (!batchId || acceptedCandidateIds.length === 0 || accepting) return;
+    setAccepting(true);
+    setAcceptError('');
+    try {
+      const acceptedBatch = await acceptGenerationCandidates(
+        batchId,
+        acceptedCandidateIds,
+      );
+      setBatch(acceptedBatch);
+      setCandidates([]);
+    } catch (err) {
+      setAcceptError((err as Error).message);
+    } finally {
+      setAccepting(false);
+    }
+  }
+
   function backToPaperSetup() {
     navigate('/');
   }
@@ -111,8 +135,11 @@ export default function GenerationProgressPage() {
       candidates={candidates}
       candidatesLoading={candidatesLoading}
       candidatesError={candidatesError}
+      accepting={accepting}
+      acceptError={acceptError}
       onRunInBackground={backToPaperSetup}
       onTryAgain={tryAgain}
+      onAcceptCandidates={acceptCandidates}
       onRetryCandidates={retryCandidates}
       onBackToPaperSetup={backToPaperSetup}
     />
