@@ -194,6 +194,22 @@ class GeneratedQuestionCandidateSerializer(serializers.ModelSerializer):
             "grounding_manifest",
             "question_id",
             "accepted_at",
+            "rejected_at",
             "created_at",
             "updated_at",
         ]
+
+
+class GenerationBatchAcceptSerializer(serializers.Serializer):
+    """Validates the final teacher review selection for a generation batch."""
+
+    accepted_candidate_ids = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=False,
+    )
+
+    def validate_accepted_candidate_ids(self, value):
+        deduped = list(dict.fromkeys(value))
+        if len(deduped) != len(value):
+            raise serializers.ValidationError("Duplicate candidate id in selection.")
+        return deduped

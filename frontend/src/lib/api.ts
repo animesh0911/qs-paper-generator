@@ -16,6 +16,7 @@
 import type {
   AssembleRequest,
   Chapter,
+  ChapterTopicsResponse,
   GenerationBatch,
   GenerationBatchCreateRequest,
   GeneratedQuestionCandidate,
@@ -140,6 +141,13 @@ export async function fetchChapters(): Promise<Chapter[]> {
   return res.json();
 }
 
+export async function fetchChapterTopics(
+  chapterSlug: string,
+): Promise<ChapterTopicsResponse> {
+  const res = await request(`/corpus/chapters/${chapterSlug}/topics/`);
+  return res.json();
+}
+
 export async function fetchPaperFormats(): Promise<PaperFormatSummary[]> {
   const res = await request('/papers/formats', { method: 'GET' });
   return res.json();
@@ -184,6 +192,17 @@ export async function fetchGenerationCandidates(
 ): Promise<GeneratedQuestionCandidate[]> {
   const res = await request(`/bank/generation-batches/${batchId}/candidates/`, {
     method: 'GET',
+  });
+  return res.json();
+}
+
+export async function acceptGenerationCandidates(
+  batchId: number | string,
+  acceptedCandidateIds: number[],
+): Promise<GenerationBatch> {
+  const res = await request(`/bank/generation-batches/${batchId}/accept/`, {
+    method: 'POST',
+    body: JSON.stringify({ accepted_candidate_ids: acceptedCandidateIds }),
   });
   return res.json();
 }
