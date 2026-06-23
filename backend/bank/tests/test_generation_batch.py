@@ -18,12 +18,19 @@ from accounts.models import School
 from bank.management.commands import drain_generation_batches as drain_mod
 from bank.models import (
     AnswerSource,
+    Chapter,
     GeneratedQuestionCandidate,
     GeneratedQuestionCandidateStatus,
     GenerationBatch,
     GenerationBatchStatus,
     Question,
     SourceType,
+)
+from corpus.models import (
+    ChapterMapNode,
+    RetrievalChunk,
+    TextbookDocument,
+    TextbookElement,
 )
 
 
@@ -48,23 +55,81 @@ def _payload(**overrides):
         },
         "topic_names": ["Nutrition"],
         "answer": "A. Respiration",
+        "question_citation_ids": ["chunk-respiration"],
+        "answer_citation_ids": ["chunk-respiration"],
         "source": {"type": "ai_generated", "name": "question-generation"},
     }
     payload.update(overrides)
     return payload
 
 
-def _create_batch(api_client, *, chapter_slugs=None):
+def _create_batch(api_client, *, chapter_slugs=None, chapter_map_node_ids=None):
+    payload = {
+        "chapter_slugs": chapter_slugs or ["life-processes"],
+        "topic_names": ["Nutrition"],
+        "difficulty_preset": "balanced",
+        "count": 2,
+    }
+    if chapter_map_node_ids is not None:
+        payload["chapter_map_node_ids"] = chapter_map_node_ids
     return api_client.post(
         "/api/bank/generation-batches/",
-        {
-            "chapter_slugs": chapter_slugs or ["life-processes"],
-            "topic_names": ["Nutrition"],
-            "difficulty_preset": "balanced",
-            "count": 2,
-        },
+        payload,
         format="json",
     )
+
+
+def _create_grounded_topic(*, empty=False):
+    chapter = Chapter.objects.get(slug="life-processes")
+    document = TextbookDocument.objects.create(
+        chapter=chapter,
+        source_file_name="jesc104.pdf",
+        source_hash="hash-grounded-generation",
+        extractor_name="test",
+        extractor_version="v1",
+        canonical_json_path="content/ncert/jesc104.json",
+        canonical_json_hash="canonical-grounded-generation",
+        page_count=2,
+    )
+    heading = TextbookElement.objects.create(
+        document=document,
+        stable_element_id="element-heading",
+        element_type="heading",
+        source_order=1,
+        page_number=1,
+        text="Life processes",
+    )
+    section = ChapterMapNode.objects.create(
+        document=document,
+        stable_node_id="node-nutrition",
+        node_type=ChapterMapNode.NodeType.SECTION,
+        title="Nutrition",
+        source_element=heading,
+        source_start=1,
+        source_end=2,
+        page_start=1,
+        page_end=2,
+        element_count=2,
+    )
+    if not empty:
+        RetrievalChunk.objects.create(
+            document=document,
+            chapter=chapter,
+            chapter_map_node=section,
+            stable_chunk_id="chunk-respiration",
+            text="Respiration releases energy from glucose in living cells.",
+            source_element_ids=["element-2"],
+            page_start=2,
+            page_end=2,
+            content_types=["paragraph"],
+            citation={
+                "chapter_slug": chapter.slug,
+                "chapter_map_node_id": section.stable_node_id,
+                "source_element_ids": ["element-2"],
+                "pages": [2],
+            },
+        )
+    return section
 
 
 class FakeGenerator:
@@ -130,6 +195,18 @@ def test_create_batch_rejects_unknown_difficulty_preset(api_client):
     assert "difficulty_preset" in resp.data
 
 
+def test_create_batch_persists_selected_chapter_map_node(api_client):
+    """Grounded generation scope uses canonical ChapterMapNode ids, not topics."""
+    section = _create_grounded_topic()
+
+    resp = _create_batch(api_client, chapter_map_node_ids=[section.stable_node_id])
+
+    assert resp.status_code == 202
+    assert resp.data["chapter_map_node_ids"] == ["node-nutrition"]
+    batch = GenerationBatch.objects.get(pk=resp.data["id"])
+    assert batch.chapter_map_node_ids == ["node-nutrition"]
+
+
 def test_ready_expired_batch_no_longer_blocks_new_batch(api_client, user):
     """Ready batches expire after 30 days so the active-batch lock clears."""
     batch = GenerationBatch.objects.create(
@@ -138,7 +215,7 @@ def test_ready_expired_batch_no_longer_blocks_new_batch(api_client, user):
         status=GenerationBatchStatus.READY_FOR_REVIEW,
         ready_at=timezone.now() - timedelta(days=31),
     )
-    batch.chapters.set([1])
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
 
     resp = _create_batch(api_client)
 
@@ -198,7 +275,7 @@ def test_drain_generates_valid_candidates_without_inserting_questions(
         difficulty_preset="balanced",
         requested_count=2,
     )
-    batch.chapters.set([1])
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
 
     call_command("drain_generation_batches")
 
@@ -218,13 +295,91 @@ def test_drain_records_failure_without_exposing_candidates(db, user, monkeypatch
     """A generation exception is a failed batch, not a leaked partial review list."""
     _install_fake_generator(monkeypatch, boom=RuntimeError("model unavailable"))
     batch = GenerationBatch.objects.create(school=user.school, created_by=user)
-    batch.chapters.set([1])
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
 
     call_command("drain_generation_batches")
 
     batch.refresh_from_db()
     assert batch.status == GenerationBatchStatus.FAILED
     assert "model unavailable" in batch.error
+    assert GeneratedQuestionCandidate.objects.count() == 0
+
+
+def test_grounded_batch_persists_manifest_and_sends_one_grounded_request(
+    db, user, monkeypatch
+):
+    """Selected ChapterMapNode generation is grounded by one corpus manifest."""
+    section = _create_grounded_topic()
+    fake = _install_fake_generator(monkeypatch, payloads=[_payload()])
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        difficulty_preset="balanced",
+        requested_count=2,
+        chapter_map_node_ids=[section.stable_node_id],
+    )
+    batch.chapters.set([section.document.chapter])
+
+    call_command("drain_generation_batches")
+
+    batch.refresh_from_db()
+    candidate = GeneratedQuestionCandidate.objects.get()
+    manifest = candidate.grounding_manifest
+    assert batch.status == GenerationBatchStatus.READY_FOR_REVIEW
+    assert len(fake.requests) == 1
+    assert fake.requests[0].grounding_manifest == manifest
+    assert manifest["requested_chapter_map_node_ids"] == ["node-nutrition"]
+    assert manifest["excerpts"][0]["citation_id"] == "chunk-respiration"
+    assert manifest["excerpts"][0]["text"] == (
+        "Respiration releases energy from glucose in living cells."
+    )
+    assert manifest["diagnostics"]["cap_reached"] is False
+
+
+def test_grounded_batch_refuses_generation_when_context_is_empty(db, user, monkeypatch):
+    """No paid/model seam call is made when the selected topic has no excerpts."""
+    section = _create_grounded_topic(empty=True)
+    fake = _install_fake_generator(monkeypatch, payloads=[_payload()])
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        chapter_map_node_ids=[section.stable_node_id],
+    )
+    batch.chapters.set([section.document.chapter])
+
+    call_command("drain_generation_batches")
+
+    batch.refresh_from_db()
+    assert batch.status == GenerationBatchStatus.FAILED
+    assert "No grounded NCERT context" in batch.error
+    assert fake.requests == []
+    assert GeneratedQuestionCandidate.objects.count() == 0
+
+
+def test_grounded_batch_rejects_unknown_citations(db, user, monkeypatch):
+    """Generated candidates must cite only excerpts supplied in the manifest."""
+    section = _create_grounded_topic()
+    _install_fake_generator(
+        monkeypatch,
+        payloads=[
+            _payload(
+                question_citation_ids=["unknown-chunk"],
+                answer_citation_ids=["chunk-respiration"],
+            )
+        ],
+    )
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        chapter_map_node_ids=[section.stable_node_id],
+    )
+    batch.chapters.set([section.document.chapter])
+
+    call_command("drain_generation_batches")
+
+    batch.refresh_from_db()
+    assert batch.status == GenerationBatchStatus.FAILED
+    assert "No valid generated candidates" in batch.error
     assert GeneratedQuestionCandidate.objects.count() == 0
 
 
@@ -276,7 +431,7 @@ def test_expiry_marks_unaccepted_candidates_but_preserves_accepted_questions(db,
     )
     question = Question.objects.create(
         school=user.school,
-        chapter_id=1,
+        chapter=Chapter.objects.get(slug="life-processes"),
         section="A",
         qtype="mcq",
         marks=1,

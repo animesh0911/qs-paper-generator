@@ -52,6 +52,8 @@ DIFFICULTY_TARGETS_BY_PRESET = {
 }
 
 QUESTION_GENERATION_RESPONSE_SCHEMA: dict[str, Any] = {
+    "title": "QuestionGenerationResponse",
+    "description": "Structured CBSE Question-and-answer candidates.",
     "type": "object",
     "properties": {
         "questions": {
@@ -62,23 +64,75 @@ QUESTION_GENERATION_RESPONSE_SCHEMA: dict[str, Any] = {
                     "chapter_slug": {"type": "string"},
                     "qtype": {
                         "type": "string",
-                        "enum": sorted(SUPPORTED_GENERATED_QTYPES),
+                        "enum": sorted(str(qtype) for qtype in SUPPORTED_GENERATED_QTYPES),
                     },
                     "marks": {"type": "integer"},
                     "cognitive_level": {
                         "type": "string",
                         "enum": list(CognitiveLevel.values),
                     },
-                    "raw_text": {"type": "string"},
-                    "content": {"type": "object"},
+                    "raw_text": {"type": "string", "minLength": 1},
+                    "content": {
+                        "type": "object",
+                        "properties": {
+                            "stem": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {"type": "string", "enum": ["paragraph"]},
+                                        "text": {"type": "string"},
+                                    },
+                                    "required": ["type", "text"],
+                                    "additionalProperties": False,
+                                },
+                            },
+                            "options": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "label": {"type": "string"},
+                                        "content": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": ["paragraph"],
+                                                    },
+                                                    "text": {"type": "string"},
+                                                },
+                                                "required": ["type", "text"],
+                                                "additionalProperties": False,
+                                            },
+                                        },
+                                    },
+                                    "required": ["label", "content"],
+                                    "additionalProperties": False,
+                                },
+                            },
+                        },
+                        "required": ["stem"],
+                        "additionalProperties": False,
+                    },
                     "topic_names": {"type": "array", "items": {"type": "string"}},
                     "answer": {"type": "string"},
+                    "question_citation_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
+                    "answer_citation_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
                     "source": {
                         "type": "object",
                         "properties": {
                             "type": {
                                 "type": "string",
-                                "enum": [SourceType.AI_GENERATED],
+                                "enum": [str(SourceType.AI_GENERATED)],
                             },
                             "name": {"type": "string"},
                         },
@@ -94,6 +148,8 @@ QUESTION_GENERATION_RESPONSE_SCHEMA: dict[str, Any] = {
                     "content",
                     "topic_names",
                     "answer",
+                    "question_citation_ids",
+                    "answer_citation_ids",
                     "source",
                 ],
                 "additionalProperties": False,
@@ -113,6 +169,7 @@ class QuestionGenerationRequest:
     topic_names: tuple[str, ...] = ()
     difficulty_targets: dict[str, int] | None = None
     question_type_distribution: dict[str, int] | None = None
+    grounding_manifest: dict[str, Any] | None = None
     count: int = 10
     language: str = "en"
 
@@ -121,6 +178,17 @@ class QuestionGenerator(Protocol):
     """Provider-neutral interface for bulk generated Question candidates."""
 
     def generate(self, request: QuestionGenerationRequest) -> list[dict[str, Any]]: ...
+
+
+def _default_distribution_for_count(count: int) -> dict[str, int]:
+    """Return a small CBSE-shaped type mix whose values sum to ``count``."""
+    if count < 1:
+        return {}
+    order = (QuestionType.MCQ, QuestionType.VSA, QuestionType.SA, QuestionType.LA)
+    distribution = {str(qtype): 0 for qtype in order}
+    for index in range(count):
+        distribution[str(order[index % len(order)])] += 1
+    return {qtype: value for qtype, value in distribution.items() if value}
 
 
 def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
@@ -132,23 +200,28 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
         "medium": 50,
         "hard": 20,
     }
-    distribution = request.question_type_distribution or {
-        QuestionType.MCQ: 4,
-        QuestionType.VSA: 2,
-        QuestionType.SA: 2,
-        QuestionType.LA: 2,
-    }
+    distribution = request.question_type_distribution or _default_distribution_for_count(
+        request.count
+    )
+    grounding_lines = _grounding_prompt_lines(request.grounding_manifest)
     return "\n".join(
         [
             "Generate CBSE Class 10 Science Question-and-answer candidates.",
             f"Language: {request.language}",
             f"Chapters: {chapters}",
             f"Optional topic hints: {topics}",
-            f"Total candidates: {request.count}",
+            f"Total candidates: exactly {request.count}",
             "Distribute candidates approximately equally across selected "
             "Chapters unless the configured distribution says otherwise.",
             f"Difficulty targets: {difficulty}",
-            f"QuestionType/marks distribution: {distribution}",
+            f"Requested counts by QuestionType: {distribution}",
+            "Marks are fixed by QuestionType: mcq=1, very_short_answer=2, "
+            "short_answer=3, long_answer=5.",
+            "raw_text must be a non-empty plain-text copy of the full Question "
+            "stem; do not leave it blank when content.stem is present.",
+            "Use content.stem as an array of paragraph blocks. For MCQ only, "
+            "include content.options as four objects with label A-D and "
+            "paragraph content; non-MCQ content must still include content.stem.",
             "Use only canonical chapter slugs and these QuestionType values: "
             "mcq, very_short_answer, short_answer, long_answer.",
             "Return the structured response schema exactly. Put answer inside "
@@ -165,8 +238,38 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
             "uses a structured paragraph with all key steps.",
             "Keep source.type as ai_generated and source.name as "
             "question-generation.",
+            *grounding_lines,
         ]
     )
+
+
+def _grounding_prompt_lines(grounding_manifest: dict[str, Any] | None) -> list[str]:
+    if not grounding_manifest:
+        return []
+    lines = [
+        "Grounding requirements:",
+        "Use only the NCERT excerpts supplied below for factual claims.",
+        "Use NCERT-faithful terminology and refuse unsupported requests by "
+        "returning no candidate for that unsupported idea.",
+        "For every candidate, include non-empty question_citation_ids and "
+        "answer_citation_ids chosen from the supplied citation_id values.",
+        "Do not generate numerical, formula-only, or diagram-image questions. "
+        "Caption-aware text questions are allowed only when supported by "
+        "caption/prose context below.",
+        "Unsupported content policy: "
+        f"{grounding_manifest.get('unsupported_content_policy', '')}",
+    ]
+    for excerpt in grounding_manifest.get("excerpts", []):
+        lines.extend(
+            [
+                f"[citation_id: {excerpt.get('citation_id')}]",
+                f"ChapterMapNode: {excerpt.get('chapter_map_node_id')}",
+                f"Pages: {excerpt.get('pages')}",
+                f"Content types: {excerpt.get('content_types')}",
+                str(excerpt.get("text", "")),
+            ]
+        )
+    return lines
 
 
 class LangChainQuestionGenerator:

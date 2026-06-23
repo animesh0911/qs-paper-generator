@@ -136,9 +136,9 @@ class Question(models.Model):
     Owns enough metadata for ``QuestionPicker`` to allocate it under chapter
     weights and difficulty profiles: ``chapter`` (FK), ``cognitive_level``,
     ``section``, ``qtype``, ``marks``. ``answer`` is stored alongside but is
-    omitted by ``QuestionSerializer``; it is exposed only by
-    ``AnswerKeySerializer`` behind the owner-scoped answer-key endpoint
-    (``papers.views.PaperAnswerKeyPdfView``). ``answer_source`` records its
+    omitted by ``QuestionSerializer``; it reaches the paper owner only through
+    the paper-local answer document (``papers.answer_document``), which seeds the
+    editor-draft and answer-key endpoints. ``answer_source`` records its
     provenance and gates unverified generated answers out of the marking scheme.
     """
 
@@ -349,6 +349,7 @@ class GenerationBatch(models.Model):
         related_name="generation_batches",
     )
     chapters = models.ManyToManyField(Chapter, related_name="generation_batches")
+    chapter_map_node_ids = models.JSONField(default=list, blank=True)
     topic_names = models.JSONField(default=list, blank=True)
     difficulty_preset = models.CharField(max_length=40, default="balanced")
     requested_count = models.PositiveSmallIntegerField(default=10)
@@ -442,6 +443,7 @@ class GeneratedQuestionCandidate(models.Model):
         db_index=True,
     )
     payload = models.JSONField(default=dict)
+    grounding_manifest = models.JSONField(default=dict, blank=True)
     question = models.ForeignKey(
         Question,
         null=True,

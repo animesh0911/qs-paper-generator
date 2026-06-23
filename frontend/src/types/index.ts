@@ -92,3 +92,32 @@ export interface GenerationBatch {
   created_at: string;
   updated_at: string;
 }
+
+export interface GeneratedQuestionPayload {
+  chapter_slug?: string;
+  qtype?: string;
+  marks?: number;
+  cognitive_level?: string;
+  raw_text?: string;
+  content?: {
+    stem?: { text?: string }[];
+    [key: string]: unknown;
+  };
+  topic_names?: string[];
+  answer?: string;
+  source?: Record<string, unknown>;
+  grounding_manifest?: unknown;
+  grounding_context?: unknown;
+  [key: string]: unknown;
+}
+
+export interface GeneratedQuestionCandidate {
+  id: number;
+  status: string;
+  payload: GeneratedQuestionPayload;
+  grounding_manifest?: unknown;
+  question_id: number | null;
+  accepted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}

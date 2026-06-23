@@ -7,6 +7,7 @@ from .views import (
     PaperAnswerKeyPdfView,
     PaperApproveView,
     PaperDetailView,
+    PaperEditorDraftView,
     PaperFormatsView,
     PaperPdfView,
 )
@@ -15,6 +16,11 @@ urlpatterns = [
     path("formats", PaperFormatsView.as_view(), name="paper-formats"),
     path("assemble", AssemblePaperView.as_view(), name="assemble"),
     path("<int:pk>/", PaperDetailView.as_view(), name="paper-detail"),
+    path(
+        "<int:pk>/editor-draft/",
+        PaperEditorDraftView.as_view(),
+        name="paper-editor-draft",
+    ),
     path("<int:pk>/approve/", PaperApproveView.as_view(), name="paper-approve"),
     path("<int:pk>/pdf/", PaperPdfView.as_view(), name="paper-pdf"),
     path(

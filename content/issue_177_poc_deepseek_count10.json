@@ -1,0 +1,512 @@
+{
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-v4-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 8,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25370,
+  "approx_input_tokens_4c": 6342,
+  "elapsed_ms": 299960,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which property of carbon allows it to form long chains, branched chains, and rings of carbon atoms?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Tetravalency"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Catenation"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Formation of strong bonds with other elements"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Small size of the carbon atom"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "Option B: Catenation",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is a saturated hydrocarbon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "C\u2082H\u2084"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "C\u2082H\u2082"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "C\u2082H\u2086"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "C\u2083H\u2086"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "Option C: C\u2082H\u2086",
+        "question_citation_ids": [
+          "dcabe4f8ff04ba02c9427192203f2f06a542dcc3c15d3b4368085b93804dc890",
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "answer_citation_ids": [
+          "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the functional group present in alcohols?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "\u2013CHO"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "\u2013OH"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "\u2013CO\u2013"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "\u2013COOH"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "Option B: \u2013OH",
+        "question_citation_ids": [
+          "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908",
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "answer_citation_ids": [
+          "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Define catenation."
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "Catenation is the unique ability of carbon atoms to form bonds with other atoms of carbon, giving rise to large molecules.",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is a heteroatom? Give one example."
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "A heteroatom is an element other than carbon and hydrogen that replaces hydrogen in a hydrocarbon chain. Example: chlorine (Cl) or oxygen (O).",
+        "question_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "answer_citation_ids": [
+          "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why are saturated carbon compounds generally less reactive than unsaturated carbon compounds?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "Saturated carbon compounds contain only single bonds between carbon atoms, which are stable and not easily broken, whereas unsaturated compounds contain double or triple bonds that are more reactive.",
+        "question_citation_ids": [
+          "dcabe4f8ff04ba02c9427192203f2f06a542dcc3c15d3b4368085b93804dc890"
+        ],
+        "answer_citation_ids": [
+          "dcabe4f8ff04ba02c9427192203f2f06a542dcc3c15d3b4368085b93804dc890"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain what structural isomers are, using the example of butane."
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "Structural isomers are compounds that have the same molecular formula but different structures. For example, butane (C\u2084H\u2081\u2080) can have a straight chain (n-butane) or a branched chain (isobutane).",
+        "question_citation_ids": [
+          "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "answer_citation_ids": [
+          "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "State the general formula for alkanes and alkenes. Give one example for each."
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "General formula for alkanes: C\u2099H\u2082\u2099\u208a\u2082, e.g., methane (CH\u2084). General formula for alkenes: C\u2099H\u2082\u2099, e.g., ethene (C\u2082H\u2084).",
+        "question_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "answer_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the steps involved in naming a carbon compound according to the IUPAC system. Use propanone as an example."
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "First, identify the number of carbon atoms in the longest chain; for a three-carbon chain, the base name is propane. Second, identify the functional group; for a ketone, the suffix is '-one'. Since the suffix begins with a vowel, drop the final 'e' from propane to get 'propan'. Then add the suffix to get 'propanone'. If the chain is unsaturated, 'ane' is replaced by 'ene' or 'yne' as appropriate.",
+        "question_citation_ids": [
+          "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "answer_citation_ids": [
+          "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the two characteristic features of carbon that make it form a large number of compounds. How do these features give rise to a large variety of organic compounds?"
+            }
+          ]
+        },
+        "topic_names": [
+          "Versatile Nature of Carbon"
+        ],
+        "answer": "The two features are catenation and tetravalency. Catenation is the ability of carbon to form bonds with other carbon atoms, creating long chains, branched chains, and rings. Tetravalency means carbon can form four covalent bonds, allowing it to bond with hydrogen, oxygen, nitrogen, etc. Together, these features allow carbon to form millions of stable compounds with different structures and functional groups.",
+        "question_citation_ids": [
+          "deed9865a4b1a6e59c6d77e0146d2a534084b57cbf3d3c030e9b228e4f987935",
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "answer_citation_ids": [
+          "deed9865a4b1a6e59c6d77e0146d2a534084b57cbf3d3c030e9b228e4f987935",
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 0,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 1,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 2,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 3,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 4,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 5,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 6,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 7,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 8,
+      "code": "empty_question",
+      "detail": "raw_text"
+    },
+    {
+      "index": 9,
+      "code": "empty_question",
+      "detail": "raw_text"
+    }
+  ],
+  "persisted_candidate_count": 0
+}

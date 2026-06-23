@@ -1,0 +1,132 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 15,
+  "batch_id": 45,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.4",
+  "topic_title": "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID",
+  "chapter_map_node_id": "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2"
+    ],
+    "included_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+      "47828774c1697ed4537abf2ebbcbe4e1292cd4d01f7be05ed6e31a1ba5525c5a",
+      "16843beccb844b58739c2834f698800fb669fe36832012cf30f9300e836ad961"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7971,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 14413,
+  "approx_input_tokens_4c": 3603,
+  "elapsed_ms": 2049,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following is the common name for ethanoic acid?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is the common name for ethanoic acid?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alcohol"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Acetic acid"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Vinegar"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "raw_question_count": 1,
+  "valid_count": 0,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "source"
+    },
+    {
+      "index": 0,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    },
+    {
+      "index": 0,
+      "code": "empty_answer",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "bad_topic_names",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "bad_source",
+      "detail": "source.type"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "question_citation_ids"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "answer_citation_ids"
+    }
+  ],
+  "persisted_candidate_count": 0
+}

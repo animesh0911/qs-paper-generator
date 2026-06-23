@@ -1,0 +1,683 @@
+{
+  "provider": "openrouter",
+  "model": "mistralai/mistral-nemo",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 13,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25494,
+  "approx_input_tokens_4c": 6374,
+  "elapsed_ms": 168419,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "An",
+        "raw_text": "Which of the following is NOT a characteristic feature of carbon compounds? (a) Tetravalency (b) Catenation (c) Ability to form bonds with all other elements (d) Ability to form only single bonds",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is NOT a characteristic feature of carbon compounds? (a) Tetravalency (b) Catenation (c) Ability to form bonds with all other elements (d) Ability to form only single bonds"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "(a) Tetravalency"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "(b) Catenation"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "(c) Ability to form bonds with all other elements"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "(d) Ability to form only single bonds"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "D",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "An",
+        "raw_text": "What is catenation?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is catenation?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Catenation is the ability of carbon atoms to link together to form chains.",
+        "question_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "answer_citation_ids": [
+          "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Why is carbon able to form a large number of compounds? Explain with two points.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why is carbon able to form a large number of compounds? Explain with two points."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Carbon is able to form a large number of compounds due to two main reasons: (i) The nature of the covalent bond enables carbon to form a large number of compounds. (ii) Carbon has the unique ability to form bonds with other atoms of carbon, giving rise to large molecules.",
+        "question_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "answer_citation_ids": [
+          "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Draw the electron dot structure for ethane (C2H6). Also, draw the structure of propane (C3H8) in a similar manner.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Draw the electron dot structure for ethane (C2H6). Also, draw the structure of propane (C3H8) in a similar manner."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.1 Saturated and Unsaturated Carbon Compounds"
+        ],
+        "answer": "The electron dot structure for ethane (C2H6) is as follows:\n\nH - C - C - H\nH | | | H\n\nTo draw the structure of propane (C3H8) in a similar manner, we first link the carbon atoms together with single bonds:\n\nH - C - C - C - H\nH | | | | | H\n\nThen, we fill the remaining valencies with hydrogen atoms:\n\nH - C - C - C - H\nH | | | | | H\n\nTherefore, the structure of propane (C3H8) is:\n\nH - C - C - C - H\nH | | | | | H",
+        "question_citation_ids": [
+          "655506c795839d6ee25ab53d9315f4354da7205d38d98384a61c0dff38e940ad",
+          "e6ab6fe5f4dbdcb4f60ac5a10b5b6c7df7f79cfe16b33056b0161fb725164c13"
+        ],
+        "answer_citation_ids": [
+          "655506c795839d6ee25ab53d9315f4354da7205d38d98384a61c0dff38e940ad",
+          "e6ab6fe5f4dbdcb4f60ac5a10b5b6c7df7f79cfe16b33056b0161fb725164c13"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "An",
+        "raw_text": "What is the formula for ethene?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the formula for ethene?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CH4"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "C2H6"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "C2H4"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "C3H8"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.1 Saturated and Unsaturated Carbon Compounds"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "answer_citation_ids": [
+          "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "An",
+        "raw_text": "What are structural isomers?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are structural isomers?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.2 Chains, Branches and Rings"
+        ],
+        "answer": "Structural isomers are compounds with identical molecular formula but different structures.",
+        "question_citation_ids": [
+          "da4665d36a969f249ff4f9f87eaa7d7097f29594e2f7997d6e6d4e7162bb89c0"
+        ],
+        "answer_citation_ids": [
+          "da4665d36a969f249ff4f9f87eaa7d7097f29594e2f7997d6e6d4e7162bb89c0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Draw the structure of cyclohexane (C6H12).",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Draw the structure of cyclohexane (C6H12)."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.2 Chains, Branches and Rings"
+        ],
+        "answer": "Cyclohexane has the formula C6H12 and the following structure:\n\nH - C - C - C - C - C - H\nH | | | | | | | H\n\nThe carbon atoms are arranged in a ring, with each carbon bonded to two other carbons and two hydrogen atoms.",
+        "question_citation_ids": [
+          "756a49ee75cbef114090df4d7b057f3e867cacbb036f676e90d12ff2a7721669"
+        ],
+        "answer_citation_ids": [
+          "756a49ee75cbef114090df4d7b057f3e867cacbb036f676e90d12ff2a7721669"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "What is the general formula for alkanes? Generate the general formula for alkynes as well.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the general formula for alkanes? Generate the general formula for alkynes as well."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.4 Homologous Series"
+        ],
+        "answer": "The general formula for alkanes is CnH2n+2, where n is the number of carbon atoms. For example, methane has the formula CH4, ethane has the formula C2H6, and so on.\n\nThe general formula for alkynes can be written as CnH2n-2, where n is the number of carbon atoms. For example, ethyne has the formula C2H2, and so on.",
+        "question_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "answer_citation_ids": [
+          "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "An",
+        "raw_text": "What is the difference in molecular masses between propane (C3H8) and butane (C4H10)?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the difference in molecular masses between propane (C3H8) and butane (C4H10)?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "16 u"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "24 u"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "32 u"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "40 u"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.4 Homologous Series"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "answer_citation_ids": [
+          "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "An",
+        "raw_text": "What is the difference in molecular masses between CH3OH and C2H5OH?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the difference in molecular masses between CH3OH and C2H5OH?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.4 Homologous Series"
+        ],
+        "answer": "The difference in molecular masses between CH3OH and C2H5OH is 16 u.",
+        "question_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "answer_citation_ids": [
+          "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "What is the general formula for alcohols? Generate the homologous series for alcohols containing up to four carbon atoms.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the general formula for alcohols? Generate the homologous series for alcohols containing up to four carbon atoms."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.4 Homologous Series"
+        ],
+        "answer": "The general formula for alcohols is CnH2n+1OH, where n is the number of carbon atoms. The homologous series for alcohols containing up to four carbon atoms is CH3OH, C2H5OH, C3H7OH, and C4H9OH.",
+        "question_citation_ids": [
+          "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c"
+        ],
+        "answer_citation_ids": [
+          "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "What is the name of the carbon compound with the formula C2H6? Draw its structure.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the name of the carbon compound with the formula C2H6? Draw its structure."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.5 Nomenclature of Carbon Compounds"
+        ],
+        "answer": "The name of the carbon compound with the formula C2H6 is ethane. Its structure is as follows:\n\nH - C - C - H\nH | | | H\n\nEach carbon atom is bonded to two other carbon atoms and two hydrogen atoms.",
+        "question_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "answer_citation_ids": [
+          "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "An",
+        "raw_text": "What is the name of the carbon compound with the formula C2H4?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the name of the carbon compound with the formula C2H4?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethane"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethene"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethyne"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethane"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.5 Nomenclature of Carbon Compounds"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc"
+        ],
+        "answer_citation_ids": [
+          "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "An",
+        "raw_text": "What is the name of the carbon compound with the formula C3H6?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the name of the carbon compound with the formula C3H6?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.5 Nomenclature of Carbon Compounds"
+        ],
+        "answer": "Propane",
+        "question_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "answer_citation_ids": [
+          "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "What is the name of the carbon compound with the formula C3H8? Draw its structure.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the name of the carbon compound with the formula C3H8? Draw its structure."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.5 Nomenclature of Carbon Compounds"
+        ],
+        "answer": "The name of the carbon compound with the formula C3H8 is propane. Its structure is as follows:\n\nH - C - C - C - H\nH | | | | | H\n\nEach carbon atom is bonded to two other carbon atoms and two hydrogen atoms.",
+        "question_citation_ids": [
+          "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+        ],
+        "answer_citation_ids": [
+          "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "What is the name of the carbon compound with the formula C6H12? Draw its structure.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the name of the carbon compound with the formula C6H12? Draw its structure."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.2.5 Nomenclature of Carbon Compounds"
+        ],
+        "answer": "The name of the carbon compound with the formula C6H12 is cyclohexane. Its structure is as follows:\n\nH - C - C - C - C - C - H\nH | | | | | | | H\n\nThe carbon atoms are arranged in a ring, with each carbon bonded to two other carbons and two hydrogen atoms.",
+        "question_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+        ],
+        "answer_citation_ids": [
+          "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 16,
+  "valid_count": 14,
+  "validation_errors": [
+    {
+      "index": 14,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    },
+    {
+      "index": 14,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    },
+    {
+      "index": 15,
+      "code": "unknown_citation",
+      "detail": "question_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    },
+    {
+      "index": 15,
+      "code": "unknown_citation",
+      "detail": "answer_citation_ids: 634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e"
+    }
+  ],
+  "persisted_candidate_count": 14
+}

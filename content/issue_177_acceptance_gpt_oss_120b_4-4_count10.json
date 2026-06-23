@@ -1,0 +1,850 @@
+{
+  "provider": "openrouter",
+  "model": "openai/gpt-oss-120b",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 10,
+  "batch_id": 18,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.4",
+  "topic_title": "4.4 SOME IMPORTANT CARBON COMPOUNDS - ETHANOL AND ETHANOIC ACID",
+  "chapter_map_node_id": "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2"
+    ],
+    "included_chapter_map_node_ids": [
+      "2b2ff5fd2b7fc8273e57e14b26f374827bf777856e20621ef905742832a064e2",
+      "47828774c1697ed4537abf2ebbcbe4e1292cd4d01f7be05ed6e31a1ba5525c5a",
+      "16843beccb844b58739c2834f698800fb669fe36832012cf30f9300e836ad961"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7971,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 14413,
+  "approx_input_tokens_4c": 3603,
+  "elapsed_ms": 128019,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "answer": "A",
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "When a small piece of sodium is dropped into absolute ethanol, a gas is evolved.",
+              "type": "paragraph"
+            },
+            {
+              "text": "Which gas is produced in this reaction?",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "Select the correct option:",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "A. Hydrogen",
+              "type": "paragraph"
+            },
+            {
+              "text": "B. Oxygen",
+              "type": "paragraph"
+            },
+            {
+              "text": "C. Carbon dioxide",
+              "type": "paragraph"
+            },
+            {
+              "text": "D. Nitrogen",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "raw_text": "When a small piece of sodium is dropped into absolute ethanol, a gas is evolved. Which gas is produced in this reaction?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Ethanol"
+        ]
+      },
+      {
+        "answer": "A",
+        "answer_citation_ids": [
+          "3de86b19d3bf3fcae5b877b203c19544bed2b19d194a35ba2c32934fc603db41"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Heating ethanol with excess concentrated sulphuric acid at 443 K leads to dehydration.",
+              "type": "paragraph"
+            },
+            {
+              "text": "What is the main organic product formed?",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "Select the correct option:",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "A. Ethene",
+              "type": "paragraph"
+            },
+            {
+              "text": "B. Propene",
+              "type": "paragraph"
+            },
+            {
+              "text": "C. Methane",
+              "type": "paragraph"
+            },
+            {
+              "text": "D. Ethanol (no change)",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "3de86b19d3bf3fcae5b877b203c19544bed2b19d194a35ba2c32934fc603db41"
+        ],
+        "raw_text": "Heating ethanol with excess concentrated sulphuric acid at 443 K leads to dehydration. What is the main organic product formed?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Ethanol"
+        ]
+      },
+      {
+        "answer": "A",
+        "answer_citation_ids": [
+          "51b39b52e8c32c315dfa388cbfea77b6fae1052646f9b6f9bd95a38ef8f04b75"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Ethanol reacts with ethanoic acid in the presence of a few drops of concentrated sulphuric acid.",
+              "type": "paragraph"
+            },
+            {
+              "text": "Which ester is formed as the main product?",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "Select the correct option:",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "",
+              "type": "paragraph"
+            },
+            {
+              "text": "A. Ethyl acetate",
+              "type": "paragraph"
+            },
+            {
+              "text": "B. Methyl acetate",
+              "type": "paragraph"
+            },
+            {
+              "text": "C. Propyl acetate",
+              "type": "paragraph"
+            },
+            {
+              "text": "D. Butyl acetate",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 1,
+        "qtype": "mcq",
+        "question_citation_ids": [
+          "51b39b52e8c32c315dfa388cbfea77b6fae1052646f9b6f9bd95a38ef8f04b75"
+        ],
+        "raw_text": "Ethanol reacts with ethanoic acid in the presence of a few drops of concentrated sulphuric acid. Which ester is formed as the main product?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Esterification"
+        ]
+      },
+      {
+        "answer": "Denatured alcohol is ethanol rendered unfit for drinking by adding poisonous substances such as methanol and coloured dyes.",
+        "answer_citation_ids": [
+          "f8e3fb444272b102ef78d861ad14ef9ca4be76d1d69f54887738f020976934f2"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Why is ethanol made unfit for drinking before it is supplied for industrial purposes?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "f8e3fb444272b102ef78d861ad14ef9ca4be76d1d69f54887738f020976934f2"
+        ],
+        "raw_text": "Why is ethanol made unfit for drinking before it is supplied for industrial purposes?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Denatured alcohol"
+        ]
+      },
+      {
+        "answer": "It is called glacial acetic acid because pure ethanoic acid freezes at 290 K (− 18 °C), forming a solid that looks like ice.",
+        "answer_citation_ids": [
+          "98cab1c761c45b4e427c838859d026fe8ed0f3f457547c490a4f2ec08915ea64"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Explain why ethanoic acid is also known as glacial acetic acid.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "98cab1c761c45b4e427c838859d026fe8ed0f3f457547c490a4f2ec08915ea64"
+        ],
+        "raw_text": "Explain why ethanoic acid is also known as glacial acetic acid.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Glacial acetic acid"
+        ]
+      },
+      {
+        "answer": "The gas is passed through freshly prepared lime‑water; if it turns milky, carbon dioxide is confirmed.",
+        "answer_citation_ids": [
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "In Activity 4.9, ethanoic acid reacts with sodium carbonate. Which test is used to identify the gas evolved?",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 2,
+        "qtype": "very_short_answer",
+        "question_citation_ids": [
+          "21a3241dc17fc009a9a81f1fd5de98d47dbbd1cdd4e3532a36cc5886271afed6"
+        ],
+        "raw_text": "In Activity 4.9, ethanoic acid reacts with sodium carbonate. Which test is used to identify the gas evolved?",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Carbon dioxide test"
+        ]
+      },
+      {
+        "answer": "2 Na + 2 CH₃CH₂OH → 2 CH₃CH₂ONa + H₂↑. Apart from hydrogen, sodium ethoxide (CH₃CH₂ONa) is formed.",
+        "answer_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Write the balanced chemical equation when ethanol reacts with sodium and name the product formed besides hydrogen.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "232337bd1c591f3a3a3b649e2e6d023098d24ea2d137d62a83f96481c465d116"
+        ],
+        "raw_text": "Write the balanced chemical equation when ethanol reacts with sodium and name the product formed besides hydrogen.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Reaction with sodium"
+        ]
+      },
+      {
+        "answer": "Using universal indicator, dilute acetic acid shows a pH of about 3 (yellow‑orange), whereas dilute HCl shows a pH of about 1 (red). Hence, HCl is a stronger acid. Litmus paper turns both acids red, but the colour change with universal indicator differentiates their strengths.",
+        "answer_citation_ids": [
+          "2f285557404e6d063b875f974ec4855dc71e1807b4d3cda93172847c337f06d2"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Compare the acidic strength of dilute ethanoic acid with dilute hydrochloric acid using litmus paper and universal indicator.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 3,
+        "qtype": "short_answer",
+        "question_citation_ids": [
+          "2f285557404e6d063b875f974ec4855dc71e1807b4d3cda93172847c337f06d2"
+        ],
+        "raw_text": "Compare the acidic strength of dilute ethanoic acid with dilute hydrochloric acid using litmus paper and universal indicator.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Acid strength comparison"
+        ]
+      },
+      {
+        "answer": "Esterification of ethanol and ethanoic acid is carried out by mixing 1 mL of absolute ethanol with 1 mL of glacial ethanoic acid and a few drops of concentrated H₂SO₄. The mixture is warmed in a water bath for about five minutes (Fig. 4.11). The acid acts as a catalyst and also removes water, driving the equilibrium toward ester formation. After cooling, the product, ethyl acetate, is separated, often by washing with water and drying over anhydrous CaCl₂. Ethyl acetate is an important industrial solvent and flavouring agent because of its pleasant odor and relatively low toxicity.",
+        "answer_citation_ids": [
+          "51b39b52e8c32c315dfa388cbfea77b6fae1052646f9b6f9bd95a38ef8f04b75",
+          "4ab3174d3c037f13f16bd3cbd44b4fe09b3d0826bd20168f47d9d98620520a7f"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Describe the laboratory method for preparing ethyl acetate from ethanol and ethanoic acid and mention one important use of the ester.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "51b39b52e8c32c315dfa388cbfea77b6fae1052646f9b6f9bd95a38ef8f04b75"
+        ],
+        "raw_text": "Describe the laboratory method for preparing ethyl acetate from ethanol and ethanoic acid and mention one important use of the ester.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Esterification"
+        ]
+      },
+      {
+        "answer": "Ethanol can be produced by fermenting sugarcane juice; the resulting alcohol is mixed with petrol (usually 5–10 % v/v). Advantages: it burns cleaner, producing only CO₂ and H₂O, reduces carbon monoxide and particulate emissions, and is a renewable resource, thus lowering dependence on fossil fuels. Disadvantages: it has a lower energy density than petrol, so fuel efficiency drops; it can absorb water from air, leading to phase separation; large‑scale production may compete with food supply and requires cultivation of crops, which has land‑use and water‑consumption implications. Moreover, the cost of ethanol‑blended petrol is generally higher than conventional petrol.",
+        "answer_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c",
+          "e9136835efbc63289fd4f6f4dc96e619a2b6bcc0faa0b5e6eecaf39c81973384"
+        ],
+        "chapter_slug": "carbon-and-its-compounds",
+        "cognitive_level": "Ap",
+        "content": {
+          "stem": [
+            {
+              "text": "Explain how ethanol is used as a bio‑fuel and discuss two advantages and two disadvantages of its use compared with conventional petrol.",
+              "type": "paragraph"
+            }
+          ]
+        },
+        "marks": 5,
+        "qtype": "long_answer",
+        "question_citation_ids": [
+          "acb4a4c47157eabc2d8a225e31ee131b00f151f4c6efc633ee429110484cbd1c"
+        ],
+        "raw_text": "Explain how ethanol is used as a bio‑fuel and discuss two advantages and two disadvantages of its use compared with conventional petrol.",
+        "source": {
+          "name": "question-generation",
+          "type": "ai_generated"
+        },
+        "topic_names": [
+          "Ethanol as fuel"
+        ]
+      }
+    ]
+  },
+  "raw_question_count": 10,
+  "valid_count": 7,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    },
+    {
+      "index": 1,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    },
+    {
+      "index": 2,
+      "code": "bad_mcq_options",
+      "detail": "content.options"
+    }
+  ],
+  "persisted_candidate_count": 7
+}

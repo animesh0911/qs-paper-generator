@@ -1,0 +1,846 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 34,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.3",
+  "topic_title": "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+  "chapter_map_node_id": "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131"
+    ],
+    "included_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+      "41d0334215e1625cf1ebe01cba630ac32041a607bc29e0a9ec51e2ac71e56091",
+      "51793358677d1704ca4284eadc447502951e7761799c1e37f21da694cef7fa91",
+      "93c240ac3922f2da865cac506987cb7e1e6a3b9367eb333d842a15209f3ffafe",
+      "9e7495d88888d8662c6ae34ae6f2b56a9bc29cbf5b5a3b7af54159278581d004"
+    ],
+    "included_chunk_count": 15,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7115,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 12609,
+  "approx_input_tokens_4c": 3152,
+  "elapsed_ms": 46840,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following is a saturated hydrocarbon?\nA) Ethene\nB) Ethyne\nC) Ethane\nD) Benzene",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is a saturated hydrocarbon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethene"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethyne"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ethane"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Benzene"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following is an unsaturated hydrocarbon?\nA) Methane\nB) Propane\nC) Butane\nD) Propene",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is an unsaturated hydrocarbon?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Methane"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Propane"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Butane"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Propene"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "D",
+        "question_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is the general formula for saturated hydrocarbons (alkanes)?\nA) CnH2n\nB) CnH2n+2\nC) CnH2n-2\nD) CnHn",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the general formula for saturated hydrocarbons (alkanes)?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n+2"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n-2"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnHn"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "What is the general formula for unsaturated hydrocarbons with one double bond (alkenes)?\nA) CnH2n\nB) CnH2n+2\nC) CnH2n-2\nD) CnHn",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the general formula for unsaturated hydrocarbons with one double bond (alkenes)?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n+2"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnH2n-2"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "CnHn"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "A",
+        "question_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following is a characteristic of a clean burning flame?\nA) Production of yellow soot\nB) Incomplete combustion\nC) Sufficient supply of oxygen\nD) Production of a sooty deposit",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following is a characteristic of a clean burning flame?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Production of yellow soot"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Incomplete combustion"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sufficient supply of oxygen"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Production of a sooty deposit"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "0638a0f31ebaa3ef454be2aace95a7ca384b76317650925ec3ad6a0b6dae1127",
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What are fossil fuels and why are they called so?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are fossil fuels and why are they called so?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "Fossil fuels are fuels formed from the remains of living organisms like plants and animals that died millions of years ago. They are called fossil fuels because they are derived from fossils, which are the preserved remains or traces of ancient life.",
+        "question_citation_ids": [
+          "818d003fa6e0b96d4b0c7be83c8ca0d55b0e109f6abb459733defdc6c9f52326",
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "answer_citation_ids": [
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is the difference between a luminous and a non-luminous flame?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the difference between a luminous and a non-luminous flame?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "A luminous flame is produced when gaseous substances burn with incomplete combustion, leading to glowing particles and a yellow, sooty flame. A non-luminous flame, often blue, is produced with complete combustion and sufficient oxygen supply, burning cleanly without soot.",
+        "question_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is combustion?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is combustion?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "Combustion is a chemical process in which a substance reacts rapidly with an oxidant, usually oxygen, to produce heat and light. For carbon compounds, it typically results in the formation of carbon dioxide and water.",
+        "question_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f"
+        ],
+        "answer_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What causes the bottom of cooking vessels to get blackened?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What causes the bottom of cooking vessels to get blackened?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "The bottom of cooking vessels gets blackened due to incomplete combustion of the fuel. This happens when the air holes of the stove are blocked, leading to insufficient oxygen supply for complete burning, and thus producing soot.",
+        "question_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is the role of a catalyst in an addition reaction?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the role of a catalyst in an addition reaction?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.3 Addition Reaction"
+        ],
+        "answer": "A catalyst is a substance that increases the rate of a chemical reaction without itself undergoing any permanent chemical change. In addition reactions, catalysts like palladium or nickel facilitate the addition of hydrogen to unsaturated hydrocarbons.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Explain why saturated hydrocarbons generally burn with a clean, blue flame, while unsaturated hydrocarbons produce a yellow, sooty flame.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why saturated hydrocarbons generally burn with a clean, blue flame, while unsaturated hydrocarbons produce a yellow, sooty flame."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "Saturated hydrocarbons, having only single bonds, undergo complete combustion when supplied with sufficient oxygen. This complete combustion produces carbon dioxide and water with minimal soot, resulting in a clean, blue flame. Unsaturated hydrocarbons, containing double or triple bonds, often undergo incomplete combustion even with adequate oxygen. This incomplete combustion leads to the formation of unburnt carbon particles (soot), which glow in the flame, producing a yellow and sooty flame.",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "What is an oxidation reaction in the context of carbon compounds? Give an example of oxidizing agents used for alcohols.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is an oxidation reaction in the context of carbon compounds? Give an example of oxidizing agents used for alcohols."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation"
+        ],
+        "answer": "In the context of carbon compounds, oxidation reactions involve the addition of oxygen or removal of hydrogen. Combustion is a common example where carbon compounds are oxidized. Another type of oxidation occurs when alcohols are converted to carboxylic acids. Alkaline potassium permanganate and acidified potassium dichromate are examples of oxidizing agents used for this purpose.",
+        "question_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "answer_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Describe the process of hydrogenation of vegetable oils and its significance.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the process of hydrogenation of vegetable oils and its significance."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.3 Addition Reaction"
+        ],
+        "answer": "Hydrogenation of vegetable oils is an addition reaction where hydrogen gas is added to unsaturated vegetable oils in the presence of a catalyst, typically nickel. This process converts the unsaturated carbon chains in the oils into saturated carbon chains, making the oils solid or semi-solid at room temperature. This is significant because animal fats, which are generally saturated, are considered harmful for health, while oils rich in unsaturated fatty acids are preferred for cooking.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Why are saturated hydrocarbons considered relatively unreactive?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why are saturated hydrocarbons considered relatively unreactive?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.4 Substitution Reaction"
+        ],
+        "answer": "Saturated hydrocarbons are considered relatively unreactive because their carbon atoms are linked by strong, stable single covalent bonds. These single bonds require significant energy to break, and they do not readily undergo addition reactions that are characteristic of unsaturated hydrocarbons with double or triple bonds. They are generally inert in the presence of most common reagents, but can participate in substitution reactions under specific conditions like the presence of sunlight.",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Describe the chemical property of combustion of carbon compounds. Explain how the nature of the flame produced depends on the type of hydrocarbon and the availability of air. Give examples of reactions involved.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the chemical property of combustion of carbon compounds. Explain how the nature of the flame produced depends on the type of hydrocarbon and the availability of air. Give examples of reactions involved."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "Combustion is a chemical process where carbon compounds react rapidly with oxygen, releasing heat and light. Carbon itself burns in oxygen to form carbon dioxide, releasing heat and light. Most carbon compounds also undergo combustion. The nature of the flame depends on two main factors:\n1. Type of hydrocarbon:\n   - Saturated hydrocarbons (like alkanes) generally burn with a clean, blue flame due to complete combustion, producing primarily CO2 and H2O. Example: CH4 + 2O2 → CO2 + 2H2O + heat and light.\n   - Unsaturated hydrocarbons (like alkenes and alkynes) tend to burn with a yellow, sooty flame because they often undergo incomplete combustion, producing soot (unburnt carbon) along with CO2 and H2O. The soot particles glow, giving the flame a yellow color. Example: C2H4 + O2 → CO2 + H2O + soot (unbalanced).\n2. Availability of air:\n   - A sufficient supply of oxygen (rich air mixture) leads to complete combustion, producing a clean blue flame even for hydrocarbons that might otherwise produce soot.\n   - A limited supply of oxygen (lean air mixture) results in incomplete combustion, producing a sooty, yellow flame. Example: If air supply is limited for methane, incomplete combustion occurs, forming carbon monoxide and water, along with soot: 2CH4 + 3O2 → 2CO + 4H2O + soot.\nThese reactions are oxidation reactions.",
+        "question_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the reactions of addition and substitution in carbon compounds. Provide suitable examples for each.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the reactions of addition and substitution in carbon compounds. Provide suitable examples for each."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.3 Addition Reaction",
+          "4.3.4 Substitution Reaction"
+        ],
+        "answer": "Two important types of reactions involving carbon compounds are addition and substitution reactions.\n\nAddition Reaction: This reaction typically occurs with unsaturated hydrocarbons (alkenes and alkynes) where an atom or group of atoms is added to one of the carbon atoms in a double or triple bond. The double or triple bond is converted into a single bond. A common example is the addition of hydrogen to unsaturated oils in the presence of a nickel catalyst to form saturated fats. \nExample: CnH2n (alkene) + H2 → CnH2n+2 (alkane) (in presence of Ni catalyst)\n\nSubstitution Reaction: This reaction involves the replacement of one atom or group of atoms by another atom or group of atoms. Saturated hydrocarbons, which are relatively unreactive, undergo substitution reactions. For example, in the presence of sunlight, chlorine can replace the hydrogen atoms in methane one by one.\nExample: CH4 (methane) + Cl2 → CH3Cl (chloromethane) + HCl (in presence of sunlight). Further substitution can occur to form dichloromethane (CH2Cl2), trichloromethane (CHCl3), and tetrachloromethane (CCl4).",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain the oxidation of alcohols to carboxylic acids. Discuss the oxidizing agents used and the significance of this reaction.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the oxidation of alcohols to carboxylic acids. Discuss the oxidizing agents used and the significance of this reaction."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.2 Oxidation"
+        ],
+        "answer": "Oxidation is a chemical reaction that involves the gain of oxygen or loss of hydrogen. In the case of alcohols, they can be oxidized to carboxylic acids. This transformation is a significant reaction in organic chemistry. \n\nProcess: When alcohols (like ethanol) are treated with strong oxidizing agents, they undergo oxidation. Typically, primary alcohols are first oxidized to aldehydes and then further oxidized to carboxylic acids. Secondary alcohols are oxidized to ketones.\n\nOxidizing Agents: Strong oxidizing agents capable of converting alcohols directly to carboxylic acids include alkaline potassium permanganate (KMnO4) or acidified potassium dichromate (K2Cr2O7). These agents supply oxygen for the reaction. Using these agents and heating the reaction mixture ensures that the oxidation proceeds to the carboxylic acid stage.\n\nSignificance: The conversion of alcohols to carboxylic acids is important for synthesizing various organic compounds. Carboxylic acids find wide applications in the production of esters (used in perfumes and flavorings), polymers, and pharmaceuticals. This reaction demonstrates a key chemical transformation of alcohols and highlights the role of specific oxidizing agents in organic synthesis.",
+        "question_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Discuss the formation of coal and petroleum. What are these substances and why are they called fossil fuels?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Discuss the formation of coal and petroleum. What are these substances and why are they called fossil fuels?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+          "4.3.1 Combustion"
+        ],
+        "answer": "Coal and petroleum are fossil fuels formed from the remains of dead organisms over millions of years through geological processes.\n\nFormation of Coal: Coal is formed from the remains of trees, ferns, and other plants that lived millions of years ago. When these plants died, they were buried under layers of earth and rock, possibly by geological events like earthquakes or volcanic eruptions. Under immense pressure and due to slow decay processes, these buried plant remains were transformed into coal.\n\nFormation of Petroleum: Petroleum (oil and natural gas) originated from the remains of millions of tiny marine plants and animals. When these organisms died, their bodies sank to the seabed and were covered by layers of silt. Bacteria acted upon these dead remains, converting them into oil and gas under high pressure and temperature. The silt was gradually compressed into rock, and the oil and gas seeped into the porous parts of this rock, getting trapped like water in a sponge.\n\nWhy Fossil Fuels?: Coal and petroleum are called fossil fuels because they are derived from the fossilized remains of ancient living organisms, representing stored solar energy captured by these organisms millions of years ago.",
+        "question_citation_ids": [
+          "818d003fa6e0b96d4b0c7be83c8ca0d55b0e109f6abb459733defdc6c9f52326",
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "answer_citation_ids": [
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 18,
+  "valid_count": 18,
+  "validation_errors": [],
+  "persisted_candidate_count": 18
+}

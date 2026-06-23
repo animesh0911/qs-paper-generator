@@ -18,6 +18,7 @@ import type {
   Chapter,
   GenerationBatch,
   GenerationBatchCreateRequest,
+  GeneratedQuestionCandidate,
   PaperDocument,
   PaperFormatSummary,
 } from '@/types';
@@ -173,6 +174,15 @@ export async function fetchGenerationBatch(
   batchId: number | string,
 ): Promise<GenerationBatch> {
   const res = await request(`/bank/generation-batches/${batchId}/`, {
+    method: 'GET',
+  });
+  return res.json();
+}
+
+export async function fetchGenerationCandidates(
+  batchId: number | string,
+): Promise<GeneratedQuestionCandidate[]> {
+  const res = await request(`/bank/generation-batches/${batchId}/candidates/`, {
     method: 'GET',
   });
   return res.json();

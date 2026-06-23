@@ -1,0 +1,152 @@
+{
+  "provider": "openrouter",
+  "model": "deepseek/deepseek-v4-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "batch_id": 5,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_title": "4.2 VERSATILE NATURE OF CARBON",
+  "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
+    "included_chapter_map_node_ids": [
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+      "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+      "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+      "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+      "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+      "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+    ],
+    "included_chunk_count": 40,
+    "skipped_chunk_count": 8,
+    "context_char_count": 15045,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 25088,
+  "approx_input_tokens_4c": 6272,
+  "elapsed_ms": 17830,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What is the property of carbon due to which it can form bonds with other atoms of carbon, giving rise to large molecules?",
+        "content": {
+          "text": "What is the property of carbon due to which it can form bonds with other atoms of carbon, giving rise to large molecules?",
+          "options": [
+            "A. Tetravalency",
+            "B. Catenation",
+            "C. Isomerism",
+            "D. Homologous series"
+          ]
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "B. Catenation",
+        "question_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "answer_citation_ids": [
+          "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "State the two characteristic features of carbon that give rise to a large number of compounds.",
+        "content": {
+          "text": "State the two characteristic features of carbon that give rise to a large number of compounds."
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "The two characteristic features of carbon are tetravalency and catenation.",
+        "question_citation_ids": [
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "answer_citation_ids": [
+          "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 2,
+        "cognitive_level": "Ap",
+        "raw_text": "Explain why carbon forms strong bonds with most other elements, referring to the size of its atom.",
+        "content": {
+          "text": "Explain why carbon forms strong bonds with most other elements, referring to the size of its atom."
+        },
+        "topic_names": [
+          "4.2 VERSATILE NATURE OF CARBON"
+        ],
+        "answer": "Carbon forms strong bonds because of its small size. Its small size enables the nucleus to hold on to the shared pairs of electrons strongly. In contrast, bonds formed by elements having bigger atoms are much weaker.",
+        "question_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "answer_citation_ids": [
+          "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 3,
+  "valid_count": 0,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "missing_stem",
+      "detail": "content.stem"
+    },
+    {
+      "index": 0,
+      "code": "mcq_answer_mismatch",
+      "detail": "answer"
+    },
+    {
+      "index": 1,
+      "code": "marks_qtype_mismatch",
+      "detail": "very_short_answer/1"
+    },
+    {
+      "index": 1,
+      "code": "missing_stem",
+      "detail": "content.stem"
+    },
+    {
+      "index": 2,
+      "code": "marks_qtype_mismatch",
+      "detail": "short_answer/2"
+    },
+    {
+      "index": 2,
+      "code": "missing_stem",
+      "detail": "content.stem"
+    }
+  ],
+  "persisted_candidate_count": 0
+}

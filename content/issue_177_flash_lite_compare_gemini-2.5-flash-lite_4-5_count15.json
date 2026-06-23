@@ -1,0 +1,98 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 15,
+  "batch_id": 46,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.5",
+  "topic_title": "4.5 SOAPS AND DETERGENTS",
+  "chapter_map_node_id": "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 7,
+    "context_char_count": 7210,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 13551,
+  "approx_input_tokens_4c": 3387,
+  "elapsed_ms": 2178,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which part of a soap molecule is a hydrophobic tail?\n(A) The ionic end.\n(B) The hydrocarbon chain.\n(C) The part that dissolves in water.\n(D) The carboxyl"
+      }
+    ]
+  },
+  "raw_question_count": 1,
+  "valid_count": 0,
+  "validation_errors": [
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "content"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "missing_field",
+      "detail": "source"
+    },
+    {
+      "index": 0,
+      "code": "bad_content",
+      "detail": "content"
+    },
+    {
+      "index": 0,
+      "code": "empty_answer",
+      "detail": "answer"
+    },
+    {
+      "index": 0,
+      "code": "bad_topic_names",
+      "detail": "topic_names"
+    },
+    {
+      "index": 0,
+      "code": "bad_source",
+      "detail": "source.type"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "question_citation_ids"
+    },
+    {
+      "index": 0,
+      "code": "missing_citation",
+      "detail": "answer_citation_ids"
+    }
+  ],
+  "persisted_candidate_count": 0
+}

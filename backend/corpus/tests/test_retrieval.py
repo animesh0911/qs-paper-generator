@@ -21,6 +21,7 @@ from corpus.models import (
     TextbookElement,
 )
 from corpus.retrieval import (
+    ChapterMapContextAssembler,
     PostgresTextbookRetriever,
     RetrievalChunkBuilder,
     TextbookRetrievalRequest,
@@ -279,3 +280,332 @@ def test_evaluation_rows_make_supported_hits_and_unsupported_misses_explicit(doc
         "unsupported_passed": 1,
         "unsupported_count": 1,
     }
+
+
+@pytest.mark.django_db
+def test_context_assembler_returns_selected_subtree_in_source_order(document):
+    """Selected-topic generation needs complete NCERT context, not search hits."""
+    RetrievalChunkBuilder(max_chars=120).rebuild(document)
+    topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
+
+    context = ChapterMapContextAssembler().retrieve(
+        TextbookRetrievalRequest(
+            chapter=document.chapter,
+            chapter_map_node_ids=(topic.stable_node_id,),
+        )
+    )
+
+    assert [result.chunk.chapter_map_node.title for result in context.results] == [
+        "4.2 Versatile Nature of Carbon",
+        "4.2 Versatile Nature of Carbon",
+        "4.2 Versatile Nature of Carbon",
+    ]
+    assert [
+        result.chunk.citation["source_element_ids"] for result in context.results
+    ] == [["element-5"], ["element-6", "element-7"], ["element-8", "element-9"]]
+    assert context.diagnostics == {
+        "mode": "chapter_map_subtree",
+        "chapter_slug": "carbon-and-its-compounds",
+        "requested_chapter_map_node_ids": [topic.stable_node_id],
+        "included_chapter_map_node_ids": [topic.stable_node_id],
+        "included_chunk_count": 3,
+        "skipped_chunk_count": 1,
+        "context_char_count": sum(len(result.chunk.text) for result in context.results),
+        "context_char_limit": 25000,
+        "cap_reached": False,
+        "chunk_limit_reached": False,
+    }
+
+
+@pytest.mark.django_db
+def test_context_assembler_includes_descendant_sections_and_filters_chunks(document):
+    """A major topic owns nested topic context but not exercises or weak media."""
+    RetrievalChunkBuilder(max_chars=120).rebuild(document)
+    topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
+    child_heading = TextbookElement.objects.create(
+        document=document,
+        stable_element_id="element-child-heading",
+        element_type="section_header",
+        source_order=12,
+        page_number=3,
+        bbox={},
+        text="4.2.1 Chains, Branches and Rings",
+    )
+    child = ChapterMapNode.objects.create(
+        document=document,
+        stable_node_id="child-topic",
+        node_type=ChapterMapNode.NodeType.SECTION,
+        title="4.2.1 Chains, Branches and Rings",
+        parent=topic,
+        source_element=child_heading,
+        source_start=12,
+        source_end=13,
+        page_start=3,
+        page_end=3,
+        element_count=2,
+        preview="Chains, branches and rings",
+    )
+    RetrievalChunk.objects.create(
+        document=document,
+        chapter=document.chapter,
+        chapter_map_node=child,
+        stable_chunk_id="child-prose",
+        text="4.2.1 Chains, Branches and Rings\nCarbon chains may be branched.",
+        source_element_ids=["element-child-heading", "element-child-prose"],
+        page_start=3,
+        page_end=3,
+        content_types=["section_header", "text"],
+        citation={
+            "chapter_map_node_id": child.stable_node_id,
+            "source_element_ids": ["element-child-heading", "element-child-prose"],
+            "pages": [3],
+        },
+    )
+    RetrievalChunk.objects.create(
+        document=document,
+        chapter=document.chapter,
+        chapter_map_node=topic,
+        stable_chunk_id="picture-only",
+        text="4.2 Versatile Nature of Carbon",
+        source_element_ids=["element-picture"],
+        page_start=3,
+        page_end=3,
+        content_types=["picture"],
+        citation={
+            "chapter_map_node_id": topic.stable_node_id,
+            "source_element_ids": ["element-picture"],
+            "pages": [3],
+        },
+    )
+    RetrievalChunk.objects.create(
+        document=document,
+        chapter=document.chapter,
+        chapter_map_node=topic,
+        stable_chunk_id="formula-only",
+        text="C2H6",
+        source_element_ids=["element-formula"],
+        page_start=3,
+        page_end=3,
+        content_types=["formula"],
+        citation={
+            "chapter_map_node_id": topic.stable_node_id,
+            "source_element_ids": ["element-formula"],
+            "pages": [3],
+        },
+    )
+
+    context = ChapterMapContextAssembler().retrieve(
+        TextbookRetrievalRequest(
+            chapter=document.chapter,
+            chapter_map_node_ids=(topic.stable_node_id,),
+        )
+    )
+
+    assert [result.chunk.stable_chunk_id for result in context.results] == [
+        RetrievalChunk.objects.get(source_element_ids=["element-5"]).stable_chunk_id,
+        RetrievalChunk.objects.get(
+            source_element_ids=["element-6", "element-7"]
+        ).stable_chunk_id,
+        RetrievalChunk.objects.get(
+            source_element_ids=["element-8", "element-9"]
+        ).stable_chunk_id,
+        "child-prose",
+    ]
+    assert "picture-only" not in [
+        result.chunk.stable_chunk_id for result in context.results
+    ]
+    assert "formula-only" not in [
+        result.chunk.stable_chunk_id for result in context.results
+    ]
+
+
+@pytest.mark.django_db
+def test_context_assembler_applies_optional_content_type_filters(document):
+    """Callers can narrow selected-topic context without freeform Topic strings."""
+    RetrievalChunkBuilder(max_chars=120).rebuild(document)
+    topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
+
+    context = ChapterMapContextAssembler().retrieve(
+        TextbookRetrievalRequest(
+            chapter=document.chapter,
+            chapter_map_node_ids=(topic.stable_node_id,),
+            content_types=("table",),
+        )
+    )
+
+    assert len(context.results) == 1
+    assert context.results[0].chunk.source_element_ids == ["element-8", "element-9"]
+    assert "table" in context.results[0].chunk.content_types
+
+
+@pytest.mark.django_db
+def test_context_assembler_uses_element_source_order_not_stable_hash(document):
+    """Textbook context must preserve narrative order inside one section."""
+    RetrievalChunkBuilder(max_chars=120).rebuild(document)
+    topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
+    TextbookElement.objects.create(
+        document=document,
+        stable_element_id="early-extra",
+        element_type="text",
+        source_order=12,
+        page_number=3,
+        bbox={},
+        text="Earlier extra context.",
+    )
+    TextbookElement.objects.create(
+        document=document,
+        stable_element_id="late-extra",
+        element_type="text",
+        source_order=13,
+        page_number=3,
+        bbox={},
+        text="Later extra context.",
+    )
+    RetrievalChunk.objects.create(
+        document=document,
+        chapter=document.chapter,
+        chapter_map_node=topic,
+        stable_chunk_id="aaa-late-hash-sort",
+        text="Later extra context.",
+        source_element_ids=["late-extra"],
+        page_start=3,
+        page_end=3,
+        content_types=["text"],
+        citation={
+            "chapter_map_node_id": topic.stable_node_id,
+            "source_element_ids": ["late-extra"],
+            "pages": [3],
+        },
+    )
+    RetrievalChunk.objects.create(
+        document=document,
+        chapter=document.chapter,
+        chapter_map_node=topic,
+        stable_chunk_id="zzz-early-hash-sort",
+        text="Earlier extra context.",
+        source_element_ids=["early-extra"],
+        page_start=3,
+        page_end=3,
+        content_types=["text"],
+        citation={
+            "chapter_map_node_id": topic.stable_node_id,
+            "source_element_ids": ["early-extra"],
+            "pages": [3],
+        },
+    )
+
+    context = ChapterMapContextAssembler().retrieve(
+        TextbookRetrievalRequest(
+            chapter=document.chapter,
+            chapter_map_node_ids=(topic.stable_node_id,),
+        )
+    )
+
+    assert [result.chunk.source_element_ids for result in context.results][-2:] == [
+        ["early-extra"],
+        ["late-extra"],
+    ]
+
+
+@pytest.mark.django_db
+def test_context_assembler_does_not_truncate_to_search_result_limit(document):
+    """Selected-topic context includes the full subtree unless the context cap fires."""
+    RetrievalChunkBuilder(max_chars=120).rebuild(document)
+    topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
+    for index in range(6):
+        element_id = f"extra-{index}"
+        TextbookElement.objects.create(
+            document=document,
+            stable_element_id=element_id,
+            element_type="text",
+            source_order=12 + index,
+            page_number=3,
+            bbox={},
+            text=f"Extra context {index}.",
+        )
+        RetrievalChunk.objects.create(
+            document=document,
+            chapter=document.chapter,
+            chapter_map_node=topic,
+            stable_chunk_id=f"extra-{index}",
+            text=f"Extra context {index}.",
+            source_element_ids=[element_id],
+            page_start=3,
+            page_end=3,
+            content_types=["text"],
+            citation={
+                "chapter_map_node_id": topic.stable_node_id,
+                "source_element_ids": [element_id],
+                "pages": [3],
+            },
+        )
+
+    context = ChapterMapContextAssembler().retrieve(
+        TextbookRetrievalRequest(
+            chapter=document.chapter,
+            chapter_map_node_ids=(topic.stable_node_id,),
+        )
+    )
+
+    assert len(context.results) == 9
+    assert context.diagnostics["cap_reached"] is False
+    assert context.diagnostics["chunk_limit_reached"] is False
+
+
+@pytest.mark.django_db
+def test_context_assembler_reports_defensive_cap_without_splitting(document):
+    """The context budget is a safety fuse, not multiple generation batches."""
+    RetrievalChunkBuilder(max_chars=120).rebuild(document)
+    topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
+
+    context = ChapterMapContextAssembler(context_char_limit=80).retrieve(
+        TextbookRetrievalRequest(
+            chapter=document.chapter,
+            chapter_map_node_ids=(topic.stable_node_id,),
+        )
+    )
+
+    assert len(context.results) == 1
+    assert context.diagnostics["cap_reached"] is True
+    assert context.diagnostics["context_char_count"] == len(
+        context.results[0].chunk.text
+    )
+    assert "chunks" not in context.diagnostics
+    assert "text" not in context.diagnostics
+
+
+@pytest.mark.django_db
+def test_context_assembler_rejects_nodes_outside_requested_chapter(document):
+    """Canonical ChapterMapNode filters must not cross Chapter boundaries."""
+    other_chapter = Chapter.objects.get(slug="life-processes")
+    other_document = TextbookDocument.objects.create(
+        chapter=other_chapter,
+        source_file_name="jesc106.pdf",
+        source_hash="c" * 64,
+        extractor_name="Docling",
+        extractor_version="2.102.1",
+        canonical_json_path="content/ncert/jesc106/jesc106.json",
+        canonical_json_hash="d" * 64,
+        page_count=1,
+    )
+    other_node = ChapterMapNode.objects.create(
+        document=other_document,
+        stable_node_id="other-node",
+        node_type=ChapterMapNode.NodeType.SECTION,
+        title="6.1 Life Processes",
+        source_start=0,
+        source_end=1,
+        page_start=1,
+        page_end=1,
+        element_count=2,
+    )
+
+    with pytest.raises(
+        ValueError, match="chapter_map_node_ids must belong to the requested Chapter"
+    ):
+        ChapterMapContextAssembler().retrieve(
+            TextbookRetrievalRequest(
+                chapter=document.chapter,
+                chapter_map_node_ids=(other_node.stable_node_id,),
+            )
+        )

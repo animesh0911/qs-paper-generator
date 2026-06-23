@@ -1,0 +1,898 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-3.5-flash",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 30,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.3",
+  "topic_title": "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS",
+  "chapter_map_node_id": "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131"
+    ],
+    "included_chapter_map_node_ids": [
+      "8e994dea9fa639953fc3c2912f71b0e606c522e1a09efdc6d988ffacb9774131",
+      "41d0334215e1625cf1ebe01cba630ac32041a607bc29e0a9ec51e2ac71e56091",
+      "51793358677d1704ca4284eadc447502951e7761799c1e37f21da694cef7fa91",
+      "93c240ac3922f2da865cac506987cb7e1e6a3b9367eb333d842a15209f3ffafe",
+      "9e7495d88888d8662c6ae34ae6f2b56a9bc29cbf5b5a3b7af54159278581d004"
+    ],
+    "included_chunk_count": 15,
+    "skipped_chunk_count": 4,
+    "context_char_count": 7115,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 12609,
+  "approx_input_tokens_4c": 3152,
+  "elapsed_ms": 89788,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "Which of the following substances will burn with a clean blue flame under normal conditions with a sufficient supply of oxygen?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following substances will burn with a clean blue flame under normal conditions with a sufficient supply of oxygen?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Naphthalene"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Camphor"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Methane"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Coal"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "R",
+        "raw_text": "In the presence of sunlight, chlorine reacts with saturated hydrocarbons in a very fast reaction. This chemical change is classified as which type of reaction?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "In the presence of sunlight, chlorine reacts with saturated hydrocarbons in a very fast reaction. This chemical change is classified as which type of reaction?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Addition reaction"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Substitution reaction"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Oxidation reaction"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Combustion reaction"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "A student notices that the bottom of a cooking vessel placed on a home gas stove is getting blackened. What is the most likely cause of this observation?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "A student notices that the bottom of a cooking vessel placed on a home gas stove is getting blackened. What is the most likely cause of this observation?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Complete combustion of the fuel is taking place."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The fuel contains a high percentage of sulphur and nitrogen pollutants."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The air holes of the stove are blocked, leading to incomplete combustion of the fuel."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The fuel being used is unsaturated in nature."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which catalyst is commonly used in the industrial hydrogenation of vegetable oils to convert them into saturated fats?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which catalyst is commonly used in the industrial hydrogenation of vegetable oils to convert them into saturated fats?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Iron"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Nickel"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Alkaline potassium permanganate"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Acidified potassium dichromate"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "An",
+        "raw_text": "When wood is ignited, it burns with a flame initially, but after some time, the charcoal left behind only glows red without producing any flame. What is the reason behind this difference?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "When wood is ignited, it burns with a flame initially, but after some time, the charcoal left behind only glows red without producing any flame. What is the reason behind this difference?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Charcoal contains non-combustible minerals that prevent flame formation."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "A flame is only produced when gaseous substances or vaporised volatile substances burn."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Charcoal is completely saturated and cannot undergo combustion reactions."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Charcoal does not react with the oxygen present in the air."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "Name two reagents that can act as oxidizing agents to convert alcohols directly into carboxylic acids.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Name two reagents that can act as oxidizing agents to convert alcohols directly into carboxylic acids."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "Alkaline potassium permanganate (alkaline KMnO4) or acidified potassium dichromate (acidified K2Cr2O7) can act as oxidizing agents for this conversion.",
+        "question_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "answer_citation_ids": [
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "R",
+        "raw_text": "What is defined as a catalyst in a chemical reaction?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is defined as a catalyst in a chemical reaction?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "A catalyst is defined as a substance that causes a reaction to occur or proceed at a different rate without the reaction itself being affected.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Mention two major environmental pollutants formed during the combustion of fossil fuels like coal and petroleum, and state why they are formed.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Mention two major environmental pollutants formed during the combustion of fossil fuels like coal and petroleum, and state why they are formed."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "The two major environmental pollutants are oxides of sulphur and oxides of nitrogen. They are formed because coal and petroleum contain some amount of sulphur and nitrogen in them, which on combustion react with oxygen.",
+        "question_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why are vegetable oils chosen for cooking over animal fats from a health perspective?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why are vegetable oils chosen for cooking over animal fats from a health perspective?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "Vegetable oils contain unsaturated fatty acids which are considered healthy, whereas animal fats contain saturated fatty acids which are considered harmful to health.",
+        "question_citation_ids": [
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "answer_citation_ids": [
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "An",
+        "raw_text": "Why do higher homologues of alkanes form a mixture of multiple chlorinated products during their reaction with chlorine in the presence of sunlight?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why do higher homologues of alkanes form a mixture of multiple chlorinated products during their reaction with chlorine in the presence of sunlight?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "Chlorine replaces hydrogen atoms one by one in a substitution reaction. Because higher homologues of alkanes have multiple hydrogen atoms located on different carbon environments, multiple different substitution combinations occur, resulting in a number of products.",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "R",
+        "raw_text": "State the typical nature of the flame and combustion products observed when the following are burnt in air:\n(a) Saturated hydrocarbons (in sufficient air)\n(b) Unsaturated carbon compounds\n(c) Coal or charcoal (after the volatile matter has escaped)",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "State the typical nature of the flame and combustion products observed when the following are burnt in air:"
+            },
+            {
+              "type": "paragraph",
+              "text": "(a) Saturated hydrocarbons (in sufficient air)"
+            },
+            {
+              "type": "paragraph",
+              "text": "(b) Unsaturated carbon compounds"
+            },
+            {
+              "type": "paragraph",
+              "text": "(c) Coal or charcoal (after the volatile matter has escaped)"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "(a) Saturated hydrocarbons burn with a clean blue flame, yielding carbon dioxide, water, heat, and light.\n(b) Unsaturated carbon compounds burn with a yellow flame with lots of black smoke (sooty flame).\n(c) Coal or charcoal glows red and gives out heat without producing a flame, as no volatile gases remain to burn.",
+        "question_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Explain why a candle burns with a yellow, luminous flame. What causes this characteristic color of the flame?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why a candle burns with a yellow, luminous flame. What causes this characteristic color of the flame?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "A candle burns with a yellow luminous flame because of incomplete combustion of the wax. This incomplete combustion results in the formation of unburnt carbon particles (soot). When these tiny carbon atoms are heated inside the flame, they start to glow, which attributes the characteristic yellow color to the candle flame.",
+        "question_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "answer_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "During an experiment, a student warmed 3 mL of ethanol in a test tube and added a 5% solution of alkaline potassium permanganate drop by drop.\n(a) Why does the pink color of the potassium permanganate initially disappear when added?\n(b) Why does the color persist when an excess of the permanganate solution is added?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "During an experiment, a student warmed 3 mL of ethanol in a test tube and added a 5% solution of alkaline potassium permanganate drop by drop."
+            },
+            {
+              "type": "paragraph",
+              "text": "(a) Why does the pink color of the potassium permanganate initially disappear when added?"
+            },
+            {
+              "type": "paragraph",
+              "text": "(b) Why does the color persist when an excess of the permanganate solution is added?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "(a) Initially, the added alkaline potassium permanganate is completely consumed in reacting with and oxidizing ethanol into ethanoic acid. Therefore, its pink color disappears.\n(b) Once all the ethanol has been completely oxidized, any further addition of alkaline potassium permanganate will have no ethanol left to react with. Thus, the excess unreacted permanganate remains in the solution, causing its pink color to persist.",
+        "question_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "Give reasons for the following observations:\n(a) Burning of charcoal in an 'angithi' sometimes just glows red without a flame.\n(b) Limiting the supply of air to a gas stove at home yields a sooty, yellow flame instead of a clean blue one.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Give reasons for the following observations:"
+            },
+            {
+              "type": "paragraph",
+              "text": "(a) Burning of charcoal in an 'angithi' sometimes just glows red without a flame."
+            },
+            {
+              "type": "paragraph",
+              "text": "(b) Limiting the supply of air to a gas stove at home yields a sooty, yellow flame instead of a clean blue one."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "(a) A flame is produced only when gaseous or vaporised volatile substances burn. Charcoal lacks such volatile components (as they have already escaped), so it merely glows red. \n(b) Limiting the supply of air results in the incomplete combustion of the saturated hydrocarbon fuel. This produces unburnt carbon particles (soot) that glow yellow and deposit on cooking vessels.",
+        "question_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "answer_citation_ids": [
+          "e6f7c7e93184b5f5f9a115e10eccb711869926a611280c2e56d35dc13119f799",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Saturated and unsaturated hydrocarbons react differently with reagents. Contrast their behavior under the following circumstances:\n(a) In the presence of a catalyst like nickel or palladium with hydrogen.\n(b) In the presence of chlorine gas in sunlight.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Saturated and unsaturated hydrocarbons react differently with reagents. Contrast their behavior under the following circumstances:"
+            },
+            {
+              "type": "paragraph",
+              "text": "(a) In the presence of a catalyst like nickel or palladium with hydrogen."
+            },
+            {
+              "type": "paragraph",
+              "text": "(b) In the presence of chlorine gas in sunlight."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "(a) Under a nickel or palladium catalyst with hydrogen, unsaturated hydrocarbons undergo an addition reaction to form saturated hydrocarbons. Saturated hydrocarbons do not undergo addition reactions. \n(b) In sunlight, saturated hydrocarbons undergo a very fast substitution reaction where chlorine replaces hydrogen atoms one by one. Unsaturated hydrocarbons generally add chlorine across their multiple carbon-carbon bonds without undergoing substitution.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "R",
+        "raw_text": "Describe the origin and formation of coal and petroleum from biomass as a result of biological and geological processes.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the origin and formation of coal and petroleum from biomass as a result of biological and geological processes."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "1. Origin of Coal: Coal is the remains of trees, ferns, and other plants that lived millions of years ago. These plants were crushed into the earth (possibly because of earthquakes or volcanic eruptions) and pressed down under layers of earth and rock, where they slowly decayed into coal under geological pressures.\n2. Origin of Oil and Gas: Petroleum is formed from the remains of millions of tiny plants and animals that lived in the sea. \n3. Sinking to the Ocean Floor: On dying, their bodies sank to the sea bed and were covered with silt.\n4. Bacterial and Pressure Action: Anaerobic bacteria attacked these remains, turning them into oil and gas under the high pressures to which they were subjected. \n5. Trap in Sponge-Like Rocks: Meanwhile, the silt was compressed into rock, and the oil and gas seeped into the porous parts of the rock, getting trapped inside like water in a sponge.",
+        "question_citation_ids": [
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "answer_citation_ids": [
+          "e3354ebd21730b05e8be2dcb27db0caf40b6cf84980b1fe1150dde85c5a26ae1"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Explain the process of combustion in carbon and its compounds. Describe the products formed and the reaction conditions that dictate the appearance of the flame and the release of pollutants.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the process of combustion in carbon and its compounds. Describe the products formed and the reaction conditions that dictate the appearance of the flame and the release of pollutants."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "1. Combustion of Carbon and its Compounds: Carbon (in all allotropic forms) and its compounds burn in the presence of oxygen to release carbon dioxide, heat, and light. Methane and ethanol also yield water along with CO2, heat, and light.\n2. Nature of Flame in Saturated and Unsaturated Compounds: Saturated hydrocarbons generally undergo complete combustion and give a clean, blue flame. Unsaturated carbon compounds undergo incomplete combustion and yield a smoky yellow flame with a black carbon soot deposit.\n3. Influence of Air Supply: Even saturated hydrocarbons can undergo incomplete combustion, yielding a yellow sooty flame, if the supply of air is limited or if the burner's air holes are blocked.\n4. Energy Wastage: This incomplete combustion results in fuel wastage, which is visible when the bottoms of cooking vessels get blackened.\n5. Pollutant Release: Fossil fuels like coal and petroleum contain small amounts of nitrogen and sulphur. Upon combustion, they form oxides of sulphur and nitrogen, which are major environmental pollutants.",
+        "question_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "34307e2d3bf335fa2ba588a84f57d019fb94daf8ea73efe10ff0ef4bc9ad392f",
+          "6ebd429777e5773174ef5da29c34bd12d9affd29bcf0b8dcda2caf54b46c2ae2",
+          "8964bfa523bf1e0aed8648701d981367ef9d993f50b2f83caee0334faffdffb4",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "What is meant by complete oxidation of a carbon compound versus oxidation using specific oxidising agents? Explain this with reference to the reactions of ethanol, naming the reagents, reaction conditions, and products formed.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is meant by complete oxidation of a carbon compound versus oxidation using specific oxidising agents? Explain this with reference to the reactions of ethanol, naming the reagents, reaction conditions, and products formed."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "1. Complete Oxidation (Combustion): During combustion, carbon compounds undergo complete oxidation. For instance, burning ethanol in oxygen completely oxidizes all of its carbon and hydrogen to carbon dioxide and water, releasing heat and light.\n2. Specific Chemical Oxidation: This refers to controlled reactions where carbon compounds (like alcohols) are converted into other specific classes (like carboxylic acids) instead of being fully broken down into CO2 and H2O.\n3. Specific Reagents: Alkaline potassium permanganate (alkaline KMnO4) or acidified potassium dichromate (acidified K2Cr2O7) are used because they are capable of adding oxygen to other substances, making them oxidising agents.\n4. Reaction Conditions for Ethanol: Ethanol is converted into ethanoic acid by adding alkaline KMnO4 or acidified K2Cr2O7 while warming the ethanol gently.\n5. Chemical Reaction: In this specific oxidation, the starting material (ethanol, CH3CH2OH) gains oxygen and is converted to ethanoic acid (CH3COOH).",
+        "question_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "answer_citation_ids": [
+          "d1cc948d0927196e655eb09c988b8387458693e651e6a05e4b1eccdd72ec7721",
+          "2cc10a07d289a023f945d1390e2fdf84cf204bbf48f1e560224f77b985750209",
+          "3c56db3de5c8c7adee1217620f87940f0e0b05dbf59e6f351f1687a7424b66e9"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "U",
+        "raw_text": "Unsaturated carbon compounds are converted into saturated compounds through hydrogenation. Detail this reaction by answering the following:\n(a) What is this reaction called, and which catalysts are utilized?\n(b) What are catalysts?\n(c) How is this reaction applied in the food industry, and what are the dietary implications of saturated versus unsaturated fats?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Unsaturated carbon compounds are converted into saturated compounds through hydrogenation. Detail this reaction by answering the following:"
+            },
+            {
+              "type": "paragraph",
+              "text": "(a) What is this reaction called, and which catalysts are utilized?"
+            },
+            {
+              "type": "paragraph",
+              "text": "(b) What are catalysts?"
+            },
+            {
+              "type": "paragraph",
+              "text": "(c) How is this reaction applied in the food industry, and what are the dietary implications of saturated versus unsaturated fats?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "(a) This chemical process is called an addition reaction. Catalysts such as nickel (Ni) or palladium (Pd) are typically utilized.\n(b) Catalysts are substances that cause a reaction to occur or proceed at a different rate without the reaction itself being affected.\n(c) Industrial Food Application: This reaction is widely used in the hydrogenation of vegetable oils (which are long unsaturated carbon chains) to convert them into saturated fats (resembling animal fats).\n(d) Dietary Implications: Saturated fatty acids, which are commonly present in animal fats, are considered harmful to health and can increase risk factors. In contrast, unsaturated fatty acids found in vegetable oils are considered healthier and are recommended for cooking. Therefore, vegetable cooking oils containing unsaturated fatty acids should be selected.",
+        "question_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "answer_citation_ids": [
+          "093c2bed61f0d5e78bdaa02baae60f284515f21f884d1169027aa2ec6af602b6",
+          "53206e0a6be340d1d4dfc1c6f5ae243adc057c6115dfb54b1aeea502ddb1ad13"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Alkanes are generally considered inert and fairly unreactive. However, they undergo a rapid reaction with chlorine under specific conditions.\n(a) Under what condition does this reaction occur?\n(b) Write the chemical equation for the first step of this reaction with methane.\n(c) Explain why this reaction is called a substitution reaction.\n(d) Explain how this reaction behaves differently for methane compared to higher homologues of alkanes.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Alkanes are generally considered inert and fairly unreactive. However, they undergo a rapid reaction with chlorine under specific conditions."
+            },
+            {
+              "type": "paragraph",
+              "text": "(a) Under what condition does this reaction occur?"
+            },
+            {
+              "type": "paragraph",
+              "text": "(b) Write the chemical equation for the first step of this reaction with methane."
+            },
+            {
+              "type": "paragraph",
+              "text": "(c) Explain why this reaction is called a substitution reaction."
+            },
+            {
+              "type": "paragraph",
+              "text": "(d) Explain how this reaction behaves differently for methane compared to higher homologues of alkanes."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.3 CHEMICAL PROPERTIES OF CARBON COMPOUNDS"
+        ],
+        "answer": "(a) The reaction between alkanes and chlorine occurs in the presence of sunlight.\n(b) First step chemical equation: CH4 + Cl2 yielding CH3Cl + HCl (in the presence of sunlight).\n(c) Why it is called a substitution reaction: It is called a substitution reaction because a chlorine atom takes the place of (substitutes) a hydrogen atom in the hydrocarbon molecule.\n(d) Behavior with higher homologues: In methane, substitution proceeds step-by-step in a relatively straightforward manner. However, for higher homologues of alkanes, there are multiple hydrogen atoms in different carbon environments. Consequently, chlorine can replace hydrogen atoms at several different positions, yielding a complex mixture of multiple isomeric chlorination products.",
+        "question_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "answer_citation_ids": [
+          "c4787e4cf7a317e813acc64ad82eb3c02dd1ac735f34d4a2088f1602db48dfa2"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 20,
+  "valid_count": 20,
+  "validation_errors": [],
+  "persisted_candidate_count": 20
+}

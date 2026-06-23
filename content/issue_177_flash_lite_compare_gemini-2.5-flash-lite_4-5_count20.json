@@ -1,0 +1,829 @@
+{
+  "provider": "openrouter",
+  "model": "google/gemini-2.5-flash-lite",
+  "api_calls": 1,
+  "max_retries": 0,
+  "requested_count": 20,
+  "batch_id": 36,
+  "chapter_slug": "carbon-and-its-compounds",
+  "topic_code": "4.5",
+  "topic_title": "4.5 SOAPS AND DETERGENTS",
+  "chapter_map_node_id": "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0",
+  "context_diagnostics": {
+    "mode": "chapter_map_subtree",
+    "chapter_slug": "carbon-and-its-compounds",
+    "requested_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chapter_map_node_ids": [
+      "9e621dea5c7a1a31179b24be16bb7915be677497952afef157bdba64517061a0"
+    ],
+    "included_chunk_count": 19,
+    "skipped_chunk_count": 7,
+    "context_char_count": 7210,
+    "context_char_limit": 25000,
+    "cap_reached": false,
+    "chunk_limit_reached": false
+  },
+  "prompt_chars": 13551,
+  "approx_input_tokens_4c": 3387,
+  "elapsed_ms": 32164,
+  "error": null,
+  "raw_payload": {
+    "questions": [
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "Which of the following describes the property of a soap molecule that interacts with oil?\nA. Hydrophilic end\nB. Hydrophobic end\nC. Ionic end\nD. None of the above",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Which of the following describes the property of a soap molecule that interacts with oil?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hydrophilic end"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hydrophobic end"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Ionic end"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "None of the above"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82"
+        ],
+        "answer_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What is the term for the clusters of soap molecules formed in water, where the hydrophobic tails are in the interior and the ionic ends are on the surface?\nA. Emulsion\nB. Micelle\nC. Colloid\nD. Precipitate",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the term for the clusters of soap molecules formed in water, where the hydrophobic tails are in the interior and the ionic ends are on the surface?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Emulsion"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Micelle"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Colloid"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Precipitate"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "863b1eb7e21e7b8228f0227c97bf4dc8835abc28126718f7ea094d8d54793e78",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "answer_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What is the primary reason why soap is less effective in hard water?\nA. Hard water contains more oil.\nB. Soap forms an insoluble precipitate with calcium and magnesium ions.\nC. Detergents are more soluble in hard water.\nD. The ionic end of the soap molecule repels hard water ions.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the primary reason why soap is less effective in hard water?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Hard water contains more oil."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Soap forms an insoluble precipitate with calcium and magnesium ions."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Detergents are more soluble in hard water."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The ionic end of the soap molecule repels hard water ions."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "B",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "What type of compounds are detergents generally, as mentioned in the context of hard water cleaning?\nA. Sodium salts of long-chain carboxylic acids\nB. Potassium salts of long-chain carboxylic acids\nC. Sodium salts of sulphonic acids or ammonium salts with halide ions\nD. Salts of ethanoic acid",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What type of compounds are detergents generally, as mentioned in the context of hard water cleaning?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sodium salts of long-chain carboxylic acids"
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Potassium salts of long-chain carboxylic acids"
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Sodium salts of sulphonic acids or ammonium salts with halide ions"
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "Salts of ethanoic acid"
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "mcq",
+        "marks": 1,
+        "cognitive_level": "U",
+        "raw_text": "In Activity 4.10, why is soap solution added to one of the test tubes containing oil and water?\nA. To observe the reaction of oil with water.\nB. To see if soap can dissolve oil.\nC. To demonstrate the cleansing action of soap by forming an emulsion.\nD. To compare the density of soap and oil.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "In Activity 4.10, why is soap solution added to one of the test tubes containing oil and water?"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To observe the reaction of oil with water."
+                }
+              ]
+            },
+            {
+              "label": "B",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To see if soap can dissolve oil."
+                }
+              ]
+            },
+            {
+              "label": "C",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To demonstrate the cleansing action of soap by forming an emulsion."
+                }
+              ]
+            },
+            {
+              "label": "D",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "To compare the density of soap and oil."
+                }
+              ]
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "C",
+        "question_citation_ids": [
+          "4a23e091078b226dc0bff27de547304c99d7f0c5709607d8129d3542eac7e46d",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "answer_citation_ids": [
+          "4a23e091078b226dc0bff27de547304c99d7f0c5709607d8129d3542eac7e46d",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What are the two types of ends found in soap molecules, and what are their respective interactions with water and oil?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are the two types of ends found in soap molecules, and what are their respective interactions with water and oil?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soap molecules have two ends: a hydrophilic end that interacts with water and a hydrophobic end that interacts with oil.",
+        "question_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82"
+        ],
+        "answer_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Explain why soap helps in cleaning oily dirt.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain why soap helps in cleaning oily dirt."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soap molecules form micelles, where the hydrophobic tails dissolve in the oily dirt and the hydrophilic heads interact with water, allowing the dirt to be emulsified and washed away.",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is the difference in the outcome when soap solution is added to distilled water versus hard water, as observed in Activity 4.11?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the difference in the outcome when soap solution is added to distilled water versus hard water, as observed in Activity 4.11?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "In distilled water, soap produces good lather. In hard water, soap produces less lather and a white curdy precipitate (scum) is formed.",
+        "question_citation_ids": [
+          "f55887877ff570745dbee0122b504c6a2a412ac9d62a4a92d7bf69c9374477b0",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "f55887877ff570745dbee0122b504c6a2a412ac9d62a4a92d7bf69c9374477b0",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "What is meant by the term 'micelle' in the context of soaps?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is meant by the term 'micelle' in the context of soaps?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "A micelle is a cluster of soap molecules in water where the hydrophobic tails are oriented towards the interior of the cluster (away from water) and the ionic ends are on the surface (interacting with water).",
+        "question_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "answer_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "very_short_answer",
+        "marks": 2,
+        "cognitive_level": "U",
+        "raw_text": "Why do detergents remain effective in hard water, unlike soaps?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Why do detergents remain effective in hard water, unlike soaps?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Detergents, unlike soaps, do not form insoluble precipitates with the calcium and magnesium ions present in hard water because their charged ends (sulphonic acid or ammonium salts) do not react with these ions.",
+        "question_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "Describe the structure of a soap molecule and explain how it helps in emulsifying oily dirt.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe the structure of a soap molecule and explain how it helps in emulsifying oily dirt."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "A soap molecule has two ends: a long hydrocarbon chain which is hydrophobic (water-repelling) and an ionic group (-COONa) which is hydrophilic (water-attracting). When soap is mixed with oily dirt and water, the hydrophobic ends dissolve in the oil, while the hydrophilic ends remain in the water. This arrangement forms micelles, where the oil gets trapped inside the micelle. The micelle, being soluble in water, allows the oily dirt to be lifted away from the surface and washed off.",
+        "question_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "answer_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "An",
+        "raw_text": "Compare the cleaning action of soaps in soft water and hard water. What is the reason for the difference?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Compare the cleaning action of soaps in soft water and hard water. What is the reason for the difference?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "In soft water, soaps effectively form lather and clean efficiently because there are no significant amounts of dissolved ions. In hard water, soaps react with calcium and magnesium ions to form an insoluble precipitate called scum. This scum reduces the cleansing efficiency of the soap and may stick to fabrics. The reaction with these ions is the main reason for the difference in performance.",
+        "question_citation_ids": [
+          "f55887877ff570745dbee0122b504c6a2a412ac9d62a4a92d7bf69c9374477b0",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "f55887877ff570745dbee0122b504c6a2a412ac9d62a4a92d7bf69c9374477b0",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "What are micelles and how do they help in washing clothes?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What are micelles and how do they help in washing clothes?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "A micelle is an aggregation of soap molecules in water. The hydrophobic hydrocarbon tails cluster together in the interior, away from water, while the hydrophilic ionic heads face outwards, towards the water. When washing clothes, micelles surround the oily dirt particles, trapping the dirt in their hydrophobic core. The outer hydrophilic surface of the micelle allows the dirt-laden micelles to be suspended in water and washed away.",
+        "question_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "464c21c001766bc1c58e00f190dadda445741611f6bdb6f11331f4f234454db3"
+        ],
+        "answer_citation_ids": [
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "464c21c001766bc1c58e00f190dadda445741611f6bdb6f11331f4f234454db3"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "U",
+        "raw_text": "What is the basic difference between soaps and detergents in terms of their chemical nature and effectiveness in hard water?",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "What is the basic difference between soaps and detergents in terms of their chemical nature and effectiveness in hard water?"
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soaps are typically sodium or potassium salts of long-chain carboxylic acids. They are less effective in hard water because they react with the calcium and magnesium ions in hard water to form insoluble precipitates (scum). Detergents, on the other hand, are usually sodium salts of sulphonic acids or ammonium salts with halide ions. Their charged ends do not form insoluble precipitates with the ions in hard water, making them effective cleansing agents even in hard water.",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "short_answer",
+        "marks": 3,
+        "cognitive_level": "Ap",
+        "raw_text": "Explain the role of hydrophilic and hydrophobic parts in the cleaning action of soap, referring to micelle formation.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain the role of hydrophilic and hydrophobic parts in the cleaning action of soap, referring to micelle formation."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "A soap molecule has a hydrophilic (water-loving) ionic head and a hydrophobic (water-repelling) hydrocarbon tail. In water, soap molecules form micelles. The hydrophobic tails face inward, surrounding the oily dirt particles, while the hydrophilic heads face outward towards the water. This mechanism allows the oily dirt to be enclosed within the micelle and suspended in water, facilitating its removal during washing.",
+        "question_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "answer_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Describe Activity 4.10 related to the cleansing action of soap. Explain the observations and the scientific principle behind it, including the formation of micelles.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe Activity 4.10 related to the cleansing action of soap. Explain the observations and the scientific principle behind it, including the formation of micelles."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Activity 4.10 involves taking two test tubes, A and B, each with 10 mL of water and a drop of oil. Soap solution is added to test tube B. Both test tubes are shaken vigorously. In test tube A (without soap), the oil and water layers separate out quickly after shaking. In test tube B (with soap), upon shaking, the oil breaks into small droplets dispersed in water, forming an emulsion. After leaving undisturbed for some time, the oil layer may separate out more slowly in test tube B compared to A. The scientific principle behind this is micelle formation. Soap molecules have a hydrophobic tail that attaches to the oil droplets and a hydrophilic head that dissolves in water. These soap molecules arrange themselves around the oil droplet, forming a micelle. The outer hydrophilic heads interact with water, keeping the micelle suspended and allowing the oil (dirt) to be washed away. This emulsification process is crucial for the cleaning action of soap.",
+        "question_citation_ids": [
+          "4a23e091078b226dc0bff27de547304c99d7f0c5709607d8129d3542eac7e46d",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "863b1eb7e21e7b8228f0227c97bf4dc8835abc28126718f7ea094d8d54793e78"
+        ],
+        "answer_citation_ids": [
+          "4a23e091078b226dc0bff27de547304c99d7f0c5709607d8129d3542eac7e46d",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "863b1eb7e21e7b8228f0227c97bf4dc8835abc28126718f7ea094d8d54793e78"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "Explain how soaps and detergents clean in water. Detail the process for both, including the role of their molecular structure and how they handle oily dirt. Discuss any differences in their effectiveness, particularly in relation to hard water.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Explain how soaps and detergents clean in water. Detail the process for both, including the role of their molecular structure and how they handle oily dirt. Discuss any differences in their effectiveness, particularly in relation to hard water."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Soaps and detergents are cleansing agents that work on the principle of emulsification. Their molecules have a dual nature: a hydrophilic (water-attracting) ionic head and a hydrophobic (oil-attracting) hydrocarbon tail.\n\n**Soap:** Soap molecules, when dissolved in water, arrange themselves around oily dirt particles to form micelles. The hydrophobic tails embed themselves in the oil, while the hydrophilic heads remain in contact with water. This traps the oily dirt within the micelle, forming an emulsion that can be suspended in water and washed away. However, soaps are less effective in hard water. Hard water contains dissolved calcium and magnesium ions, which react with soap molecules to form an insoluble precipitate called scum. This scum reduces the lathering ability of the soap and its cleaning efficiency.\n\n**Detergent:** Detergents are chemically different from soaps; they are typically sodium salts of sulphonic acids or ammonium salts with halide ions. Like soaps, they possess a hydrophilic head and a hydrophobic tail. Their advantage lies in their effectiveness in hard water. The ionic ends of detergents do not react with calcium and magnesium ions to form precipitates. Therefore, detergents can effectively form micelles and clean oily dirt even in hard water, making them generally more efficient than soaps in such conditions.",
+        "question_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "answer_citation_ids": [
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "Ap",
+        "raw_text": "Describe Activity 4.12 concerning the comparison between soap and detergent. Explain what you observe and the reason behind these observations, especially regarding lather formation and precipitate in hard water.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "Describe Activity 4.12 concerning the comparison between soap and detergent. Explain what you observe and the reason behind these observations, especially regarding lather formation and precipitate in hard water."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "Activity 4.12 involves taking two test tubes with hard water. To one, soap solution is added, and to the other, detergent solution. Both are shaken vigorously for the same period. The observation is that the test tube with soap solution produces less foam and may form a white curdy precipitate (scum). The test tube with detergent solution, however, produces a good amount of foam and does not form a significant precipitate. The reason for this difference lies in the chemical composition of soaps and detergents and their reaction with hard water. Hard water contains calcium and magnesium ions. Soaps, being sodium or potassium salts of long-chain carboxylic acids, react with these ions to form insoluble scum, thus reducing lathering and cleaning power. Detergents, typically sodium salts of sulphonic acids or ammonium salts, have charged ends that do not precipitate with these ions. Therefore, they retain their cleansing ability and produce abundant lather even in hard water.",
+        "question_citation_ids": [
+          "f55887877ff570745dbee0122b504c6a2a412ac9d62a4a92d7bf69c9374477b0",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "answer_citation_ids": [
+          "f55887877ff570745dbee0122b504c6a2a412ac9d62a4a92d7bf69c9374477b0",
+          "330871a51bfa6d29a860029360a38a734c4e5ab2d83b0c800354452770467851"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      },
+      {
+        "chapter_slug": "carbon-and-its-compounds",
+        "qtype": "long_answer",
+        "marks": 5,
+        "cognitive_level": "An",
+        "raw_text": "How does the molecular structure of soap enable it to work as a cleansing agent? Discuss the formation of micelles and their role in removing dirt, referencing the hydrophilic and hydrophobic parts of the soap molecule.",
+        "content": {
+          "stem": [
+            {
+              "type": "paragraph",
+              "text": "How does the molecular structure of soap enable it to work as a cleansing agent? Discuss the formation of micelles and their role in removing dirt, referencing the hydrophilic and hydrophobic parts of the soap molecule."
+            }
+          ]
+        },
+        "topic_names": [
+          "4.5 SOAPS AND DETERGENTS"
+        ],
+        "answer": "A soap molecule consists of two distinct parts: a long hydrocarbon chain, which is hydrophobic (repels water) and lipophilic (dissolves in oil/grease), and an ionic carboxylate group (-COO⁻Na⁺), which is hydrophilic (attracts water). This dual nature is key to its cleaning action.\n\nWhen soap is added to water containing oily dirt, the hydrophobic tails of the soap molecules orient themselves towards the oily dirt particles, dissolving in them. Simultaneously, the hydrophilic heads remain in the surrounding water. This arrangement causes the soap molecules to form spherical structures called micelles, with the hydrophobic tails clustered inwards around the dirt particle and the hydrophilic heads facing outwards. These micelles effectively trap the oily dirt within their core. Because the outer surface of the micelle is hydrophilic, it can be suspended in water and easily washed away, taking the trapped dirt along with it. Thus, the formation of micelles by soap molecules enables the emulsification and removal of oily grime from surfaces.",
+        "question_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "answer_citation_ids": [
+          "63538bb8e99efb2ac6364ab5c054816dc2a3072a8a6319e6c1c957237c4b2b82",
+          "bdad1ed00c7143de21c931fdef9aa2341dd910d9799e4d6654c189f2d1dd3480",
+          "9d214497f2a12b083096d095db386e34027be5f860ae9d0eb14ae1d81728b7ca",
+          "87225b242f53e8b419f32089551f24bd3ae8a4da37afc38f1d29422a60e47fdf"
+        ],
+        "source": {
+          "type": "ai_generated",
+          "name": "question-generation"
+        }
+      }
+    ]
+  },
+  "raw_question_count": 19,
+  "valid_count": 19,
+  "validation_errors": [],
+  "persisted_candidate_count": 19
+}

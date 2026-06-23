@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import type { GenerationBatch } from '@/types';
+import type { GeneratedQuestionCandidate, GenerationBatch } from '@/types';
 import {
   BulkQuestionGenerationSetup,
   GenerationProgressWorkspace,
@@ -94,6 +94,26 @@ describe('GenerationProgressWorkspace', () => {
     updated_at: '2026-06-21T00:00:00Z',
   };
 
+  const candidates: GeneratedQuestionCandidate[] = [
+    {
+      id: 1,
+      status: 'ready_for_review',
+      payload: {
+        chapter_slug: 'life-processes',
+        qtype: 'mcq',
+        marks: 1,
+        raw_text: 'Which process releases energy from glucose?',
+        answer: 'A. Respiration',
+        topic_names: ['Respiration'],
+        source: { citation: 'NCERT p. 84' },
+      },
+      question_id: null,
+      accepted_at: null,
+      created_at: '2026-06-21T00:00:00Z',
+      updated_at: '2026-06-21T00:00:00Z',
+    },
+  ];
+
   function progressProps(overrides = {}) {
     return {
       batch: baseBatch,
@@ -101,8 +121,12 @@ describe('GenerationProgressWorkspace', () => {
       error: '',
       lastCheckedAt: '2026-06-21T00:00:03Z',
       pollIntervalMs: 3000,
+      candidates: [],
+      candidatesLoading: false,
+      candidatesError: '',
       onRunInBackground: vi.fn(),
       onTryAgain: vi.fn(),
+      onRetryCandidates: vi.fn(),
       onBackToPaperSetup: vi.fn(),
       ...overrides,
     };
@@ -119,20 +143,57 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).not.toContain('%');
   });
 
-  it('shows a disabled review entry point when ready', () => {
+  it('renders ready-for-review candidates with visible answers and counts', () => {
     const html = renderToStaticMarkup(
       <GenerationProgressWorkspace
         {...progressProps({
-          batch: { ...baseBatch, status: 'ready_for_review', candidate_count: 3 },
+          batch: { ...baseBatch, status: 'ready_for_review', candidate_count: 1 },
+          candidates,
         })}
       />,
     );
 
-    expect(html).toContain('Ready for review');
-    expect(html).toContain('Review generated Questions');
-    expect(html).toContain('Review workspace is not connected in this release yet.');
-    expect(html).toContain('disabled=""');
+    expect(html).toContain('Review generated Q&amp;A');
+    expect(html).toContain('1</span> accepted');
+    expect(html).toContain('0</span> rejected');
+    expect(html).toContain('Which process releases energy from glucose?');
+    expect(html).toContain('A. Respiration');
+    expect(html).toContain('Respiration');
+    expect(html).not.toContain('Grounding / citation context');
+    expect(html).not.toContain('NCERT p. 84');
+    expect(html).toContain('Reject');
     expect(html).not.toContain('Run in background');
+  });
+
+  it('shows candidate loading, empty, and error states', () => {
+    const loadingHtml = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'ready_for_review', candidate_count: 1 },
+          candidatesLoading: true,
+        })}
+      />,
+    );
+    const errorHtml = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'ready_for_review', candidate_count: 1 },
+          candidatesError: 'Request failed (500)',
+        })}
+      />,
+    );
+    const emptyHtml = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'ready_for_review', candidate_count: 1 },
+        })}
+      />,
+    );
+
+    expect(loadingHtml).toContain('Loading generated candidates…');
+    expect(errorHtml).toContain('Candidates could not be loaded.');
+    expect(errorHtml).toContain('Try loading candidates again');
+    expect(emptyHtml).toContain('no generated candidates were returned');
   });
 
   it('shows a recoverable load error when no batch is available', () => {
