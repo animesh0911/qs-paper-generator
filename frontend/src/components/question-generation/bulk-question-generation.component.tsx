@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type {
   Chapter,
   ChapterTopicNode,
@@ -13,13 +12,7 @@ import {
   generationStageLabel,
   shouldShowNoValidQuestionsMessage,
 } from '@/lib/question-generation';
-import {
-  candidateAnswerText,
-  candidateQuestionText,
-  candidateReviewCounts,
-  candidateTopicLabels,
-  toggleRejectedCandidate,
-} from './candidate-review';
+import { CandidateReviewPanel } from './candidate-review-panel.component';
 
 const ACTIVE_GENERATION_STATUSES: GenerationBatch['status'][] = [
   'queued',
@@ -317,17 +310,6 @@ function formatStatusTime(value: string): string {
   }).format(new Date(value));
 }
 
-function candidateTypeLabel(candidate: GeneratedQuestionCandidate): string {
-  const parts = [
-    candidate.payload.qtype,
-    typeof candidate.payload.marks === 'number'
-      ? `${candidate.payload.marks} mark${candidate.payload.marks === 1 ? '' : 's'}`
-      : '',
-    candidate.payload.chapter_slug,
-  ].filter((part): part is string => typeof part === 'string' && Boolean(part));
-  return parts.join(' · ');
-}
-
 export function GenerationProgressWorkspace({
   batch,
   loading,
@@ -346,30 +328,10 @@ export function GenerationProgressWorkspace({
   onRetryCandidates,
   onBackToPaperSetup,
 }: GenerationProgressWorkspaceProps) {
-  const [rejectedCandidateIds, setRejectedCandidateIds] = useState<Set<number>>(
-    () => new Set(initialRejectedCandidateIds),
-  );
   const noValidQuestions = batch
     ? shouldShowNoValidQuestionsMessage(batch)
     : false;
   const active = batch ? isActiveGenerationStatus(batch.status) : false;
-  const reviewCounts = candidateReviewCounts(candidates, rejectedCandidateIds);
-
-  function toggleRejected(candidateId: number) {
-    setRejectedCandidateIds((current) =>
-      toggleRejectedCandidate(current, candidateId),
-    );
-  }
-
-  function acceptedCandidateIds() {
-    return candidates
-      .filter((candidate) => !rejectedCandidateIds.has(candidate.id))
-      .map((candidate) => candidate.id);
-  }
-
-  function importAcceptedCandidates() {
-    onAcceptCandidates(acceptedCandidateIds());
-  }
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -456,182 +418,16 @@ export function GenerationProgressWorkspace({
               )}
 
               {batch.status === 'ready_for_review' && (
-                <div className="border-t pt-4 space-y-4">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <h2 className="font-medium">Review generated Q&amp;A</h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {candidates.length} candidate
-                        {candidates.length === 1 ? '' : 's'} passed validation
-                        and {candidates.length === 1 ? 'is' : 'are'} shown for
-                        teacher review. Answers are visible by default. All
-                        candidates are accepted locally until you reject them;
-                        the final import sends only accepted candidates to the
-                        Question bank.
-                      </p>
-                    </div>
-                    <div className="rounded-md border px-3 py-2 text-sm">
-                      <span className="font-medium">
-                        {reviewCounts.accepted}
-                      </span>{' '}
-                      accepted ·{' '}
-                      <span className="font-medium">
-                        {reviewCounts.rejected}
-                      </span>{' '}
-                      rejected
-                    </div>
-                  </div>
-
-                  {candidatesLoading && (
-                    <p className="text-sm">Loading generated candidates…</p>
-                  )}
-
-                  {!candidatesLoading && candidatesError && (
-                    <div role="alert" className="space-y-2">
-                      <div>
-                        <p className="text-sm font-medium">
-                          Candidates could not be loaded.
-                        </p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {candidatesError}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={onRetryCandidates}
-                      >
-                        Try loading candidates again
-                      </Button>
-                    </div>
-                  )}
-
-                  {!candidatesLoading &&
-                    !candidatesError &&
-                    candidates.length === 0 && (
-                      <p className="text-sm text-muted-foreground">
-                        This batch is ready, but no generated candidates were
-                        returned.
-                      </p>
-                    )}
-
-                  {!candidatesLoading &&
-                    !candidatesError &&
-                    candidates.length > 0 && (
-                      <ul
-                        className="max-h-[64vh] overflow-y-auto rounded-md border"
-                        aria-label="Generated Q&A candidates"
-                      >
-                        {candidates.map((candidate) => {
-                          const rejected = rejectedCandidateIds.has(
-                            candidate.id,
-                          );
-                          const topics = candidateTopicLabels(candidate);
-                          return (
-                            <li
-                              key={candidate.id}
-                              className={`space-y-3 border-b p-4 last:border-b-0 ${
-                                rejected ? 'bg-secondary/70' : 'bg-background'
-                              }`}
-                            >
-                              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                                <div className="space-y-1">
-                                  <p className="font-medium">
-                                    {candidateQuestionText(candidate)}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {candidateTypeLabel(candidate) ||
-                                      'Generated candidate'}
-                                  </p>
-                                </div>
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant={rejected ? 'outline' : 'ghost'}
-                                  onClick={() => toggleRejected(candidate.id)}
-                                >
-                                  {rejected ? 'Undo reject' : 'Reject'}
-                                </Button>
-                              </div>
-
-                              <div className="rounded-md border bg-secondary/50 p-3">
-                                <p className="text-xs font-medium text-muted-foreground">
-                                  Answer
-                                </p>
-                                <p className="mt-1 text-sm">
-                                  {candidateAnswerText(candidate)}
-                                </p>
-                              </div>
-
-                              {topics.length > 0 && (
-                                <p className="text-sm text-muted-foreground">
-                                  Topics: {topics.join(', ')}
-                                </p>
-                              )}
-
-                              {rejected && (
-                                <p
-                                  className="text-sm font-medium"
-                                  role="status"
-                                >
-                                  Rejected locally. Use Undo to include this
-                                  candidate again.
-                                </p>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-
-                  {acceptError && (
-                    <div
-                      className="rounded-md border border-destructive/40 bg-destructive/5 p-3"
-                      role="alert"
-                    >
-                      <p className="text-sm font-medium">Import failed.</p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {acceptError}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="sticky bottom-0 -mx-6 border-t bg-background/95 px-6 py-4 shadow-lg backdrop-blur">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-sm">
-                        <span className="font-medium">
-                          {reviewCounts.accepted}
-                        </span>{' '}
-                        accepted ·{' '}
-                        <span className="font-medium">
-                          {reviewCounts.rejected}
-                        </span>{' '}
-                        rejected
-                      </p>
-                      <Button
-                        type="button"
-                        onClick={importAcceptedCandidates}
-                        disabled={
-                          accepting ||
-                          candidatesLoading ||
-                          Boolean(candidatesError) ||
-                          candidates.length === 0 ||
-                          reviewCounts.accepted === 0
-                        }
-                      >
-                        {accepting
-                          ? 'Importing accepted Q&A…'
-                          : 'Import accepted Q&A'}
-                      </Button>
-                    </div>
-                    {reviewCounts.accepted === 0 && candidates.length > 0 && (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        Restore at least one candidate to import into the
-                        Question bank.
-                      </p>
-                    )}
-                  </div>
-                </div>
+                <CandidateReviewPanel
+                  candidates={candidates}
+                  candidatesLoading={candidatesLoading}
+                  candidatesError={candidatesError}
+                  accepting={accepting}
+                  acceptError={acceptError}
+                  initialRejectedCandidateIds={initialRejectedCandidateIds}
+                  onAcceptCandidates={onAcceptCandidates}
+                  onRetryCandidates={onRetryCandidates}
+                />
               )}
 
               {active && (

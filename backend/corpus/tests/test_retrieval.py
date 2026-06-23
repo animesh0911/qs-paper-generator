@@ -318,6 +318,36 @@ def test_context_assembler_returns_selected_subtree_in_source_order(document):
 
 
 @pytest.mark.django_db
+def test_grounding_context_renders_generation_manifest(document):
+    """Question generation receives citation manifests through the corpus interface."""
+    RetrievalChunkBuilder(max_chars=120).rebuild(document)
+    topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
+
+    context = ChapterMapContextAssembler().retrieve(
+        TextbookRetrievalRequest(
+            chapter=document.chapter,
+            chapter_map_node_ids=(topic.stable_node_id,),
+        )
+    )
+
+    manifest = context.to_generation_manifest()
+
+    assert manifest["chapter_slug"] == "carbon-and-its-compounds"
+    assert manifest["requested_chapter_map_node_ids"] == [topic.stable_node_id]
+    assert manifest["included_chapter_map_node_ids"] == [topic.stable_node_id]
+    assert manifest["excerpts"][0] == {
+        "citation_id": context.results[0].chunk.stable_chunk_id,
+        "chapter_map_node_id": topic.stable_node_id,
+        "pages": [2],
+        "source_element_ids": ["element-5"],
+        "content_types": ["text"],
+        "text": context.results[0].chunk.text,
+    }
+    assert "formula-only" in manifest["unsupported_content_policy"]
+    assert manifest["diagnostics"] == context.diagnostics
+
+
+@pytest.mark.django_db
 def test_context_assembler_includes_descendant_sections_and_filters_chunks(document):
     """A major topic owns nested topic context but not exercises or weak media."""
     RetrievalChunkBuilder(max_chars=120).rebuild(document)
