@@ -71,8 +71,32 @@ export type GenerationBatchStatus =
 
 export type GenerationDifficultyLabel = 'Easy' | 'Standard' | 'Challenging';
 
+export interface ChapterTopicNode {
+  id: string;
+  type: string;
+  title: string;
+  parent_id: string | null;
+  source_element_id: string | null;
+  source_range: { start: number; end: number };
+  page_range: { start: number; end: number };
+  element_count: number;
+  preview: string;
+}
+
+export interface ChapterTopicsResponse {
+  chapter: Chapter;
+  document: {
+    id: number;
+    chapter: Chapter;
+    source_file_name: string;
+    page_count: number;
+  } | null;
+  topics: ChapterTopicNode[];
+}
+
 export interface GenerationBatchCreateRequest {
   chapter_slugs: string[];
+  chapter_map_node_ids?: string[];
   topic_names?: string[];
   difficulty_preset: string;
 }
@@ -81,6 +105,7 @@ export interface GenerationBatch {
   id: number;
   status: GenerationBatchStatus;
   chapter_slugs: string[];
+  chapter_map_node_ids: string[];
   topic_names: string[];
   difficulty_preset: string;
   requested_count: number;
@@ -118,6 +143,7 @@ export interface GeneratedQuestionCandidate {
   grounding_manifest?: unknown;
   question_id: number | null;
   accepted_at: string | null;
+  rejected_at?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -10,6 +10,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockPaperDocumentV1 } from '@/mocks';
 import {
+  acceptGenerationCandidates,
   approvePaper,
   assemblePaper,
   clearToken,
@@ -104,6 +105,7 @@ describe('generation batches', () => {
     });
     await fetchGenerationBatch(144);
     await fetchGenerationCandidates(144);
+    await acceptGenerationCandidates(144, [1, 3]);
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
@@ -126,6 +128,14 @@ describe('generation batches', () => {
       3,
       '/api/bank/generation-batches/144/candidates/',
       expect.objectContaining({ method: 'GET' }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      4,
+      '/api/bank/generation-batches/144/accept/',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ accepted_candidate_ids: [1, 3] }),
+      }),
     );
   });
 });

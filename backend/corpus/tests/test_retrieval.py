@@ -184,7 +184,7 @@ def test_lexical_retriever_ranks_cited_chunks_and_applies_topic_and_type_filters
     topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
     request = TextbookRetrievalRequest(
         chapter=document.chapter,
-        chapter_map_node=topic,
+        chapter_map_node_ids=(topic.stable_node_id,),
         content_types=("table", "activity"),
         query_text="compound formula",
         limit=3,

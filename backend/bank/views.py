@@ -12,6 +12,8 @@
 * ``GET  /api/bank/generation-batches/{batch_id}/`` — poll generation status.
 * ``GET  /api/bank/generation-batches/{batch_id}/candidates/`` — list valid
   generated candidates for teacher review.
+* ``POST /api/bank/generation-batches/{batch_id}/accept/`` — import selected
+  generated candidates and reject the rest.
 
 The HTTP path is the *live* ingestion front door (teachers uploading their own
 PDFs at runtime); the committed-JSON CLI path (``extract_paper`` →
@@ -44,6 +46,7 @@ from .permissions import IsTeacher
 from .serializers import (
     ChapterSerializer,
     GeneratedQuestionCandidateSerializer,
+    GenerationBatchAcceptSerializer,
     GenerationBatchCreateSerializer,
     GenerationBatchSerializer,
     IngestionJobSerializer,
@@ -181,7 +184,11 @@ def generation_batch_candidates(request, batch_id):
 @api_view(["POST"])
 @permission_classes([IsTeacher])
 def generation_batch_accept(request, batch_id):
-    """Accept all ready candidates in a batch and insert them into the bank."""
+    """Import selected ready candidates and reject the rest of the batch."""
+    serializer = GenerationBatchAcceptSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    accepted_candidate_ids = set(serializer.validated_data["accepted_candidate_ids"])
+
     with transaction.atomic():
         batch = _get_owned_generation_batch(request, batch_id, lock=True)
         if batch is None:
@@ -203,14 +210,27 @@ def generation_batch_accept(request, batch_id):
                 {"detail": "Generation batch has no candidates to accept."}, status=409
             )
 
+        ready_candidate_ids = {candidate.pk for candidate in candidates}
+        unknown_ids = accepted_candidate_ids - ready_candidate_ids
+        if unknown_ids:
+            return Response(
+                {"detail": "Selection includes candidates outside this review batch."},
+                status=400,
+            )
+
         now = timezone.now()
         for candidate in candidates:
-            candidate.question = _question_from_candidate(candidate, batch)
-            candidate.status = GeneratedQuestionCandidateStatus.ACCEPTED
-            candidate.accepted_at = now
-            candidate.save(
-                update_fields=["question", "status", "accepted_at", "updated_at"]
-            )
+            if candidate.pk in accepted_candidate_ids:
+                candidate.question = _question_from_candidate(candidate, batch)
+                candidate.status = GeneratedQuestionCandidateStatus.ACCEPTED
+                candidate.accepted_at = now
+                candidate.save(
+                    update_fields=["question", "status", "accepted_at", "updated_at"]
+                )
+            else:
+                candidate.status = GeneratedQuestionCandidateStatus.REJECTED
+                candidate.rejected_at = now
+                candidate.save(update_fields=["status", "rejected_at", "updated_at"])
 
         batch.status = GenerationBatchStatus.ACCEPTED
         batch.accepted_at = now

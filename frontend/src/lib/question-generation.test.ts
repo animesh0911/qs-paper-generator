@@ -7,27 +7,34 @@ import {
 } from './question-generation';
 
 describe('buildGenerationBatchPayload', () => {
-  it('requires at least one canonical Chapter and maps teacher difficulty labels to backend presets', () => {
+  it('requires one canonical Chapter and selected NCERT topic nodes', () => {
     expect(() =>
       buildGenerationBatchPayload({
-        chapterSlugs: [],
-        topicNamesByChapter: {},
+        chapterSlug: '',
+        chapterMapNodeIds: [],
         difficulty: 'Standard',
       }),
-    ).toThrow('Select at least one Chapter.');
+    ).toThrow('Select one Chapter.');
 
+    expect(() =>
+      buildGenerationBatchPayload({
+        chapterSlug: 'life-processes',
+        chapterMapNodeIds: [],
+        difficulty: 'Standard',
+      }),
+    ).toThrow('Select at least one NCERT topic.');
+  });
+
+  it('maps teacher difficulty labels and selected topic nodes to the backend payload', () => {
     expect(
       buildGenerationBatchPayload({
-        chapterSlugs: ['life-processes'],
-        topicNamesByChapter: {
-          'life-processes': 'Nutrition, Respiration\nTransport',
-          electricity: 'Ohm Law',
-        },
+        chapterSlug: 'life-processes',
+        chapterMapNodeIds: ['life-processes:5.1', 'life-processes:activity-5.1'],
         difficulty: 'Challenging',
       }),
     ).toEqual({
       chapter_slugs: ['life-processes'],
-      topic_names: ['Nutrition', 'Respiration', 'Transport'],
+      chapter_map_node_ids: ['life-processes:5.1', 'life-processes:activity-5.1'],
       difficulty_preset: 'hard',
     });
   });
