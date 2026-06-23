@@ -100,6 +100,8 @@ def _apply_retrieval_scope(chunks, request: TextbookRetrievalRequest):
     if request.content_types:
         chunks = chunks.filter(_content_type_filter(request.content_types))
     return chunks
+
+
 class ChapterMapContextAssembler:
     """Assemble selected ChapterMapNode subtree context without search."""
 

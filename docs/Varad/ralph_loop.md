@@ -13,9 +13,9 @@ Use this loop for each `V` issue.
 4. Rectify the findings. You can also reject findings.
 10. Re-read the GitHub issue for obvious scope misses.
 16. Push the branch.
-17. Close the GitHub issue only after the pushed branch contains the completed,
-    verified work.
-18. Use building-mental-map skill to update the vault at
+
+18. You are only allowed to close the issue after the changes are succesfully merged to main. Take pull from main , rebase the changes. push and merge to main.
+19. Use building-mental-map skill to update the vault at
     `/Users/varad/Obsidian Vault/AI Research/`
 
 
