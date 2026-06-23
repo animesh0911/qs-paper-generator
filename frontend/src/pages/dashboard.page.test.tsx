@@ -12,8 +12,13 @@ vi.mock('@/hooks/useAuth.hook', () => ({
 
 const coverageForm = {
   chapters: [
-    { id: 1, slug: 'life-processes', name: 'Life Processes', order: 5 },
-    { id: 2, slug: 'electricity', name: 'Electricity', order: 12 },
+    {
+      id: 4,
+      slug: 'carbon-and-its-compounds',
+      name: 'Carbon and its Compounds',
+      order: 4,
+    },
+    { id: 5, slug: 'life-processes', name: 'Life Processes', order: 5 },
   ],
   chaptersLoading: false,
   chaptersError: '',
@@ -46,9 +51,15 @@ describe('Dashboard', () => {
     expect(html.indexOf('Generate paper')).toBeLessThan(
       html.indexOf('Generate AI Q&amp;A'),
     );
-    expect(html).toContain('Secondary workflow');
+    expect(html).toContain('Pick Chapter 4, then choose topics');
     expect(html).toContain('NCERT Chapter');
-    expect(html).toContain('The MVP supports one Chapter per run');
+    expect(html).toContain('Select Chapter 4 to show topics.');
+    const qnaPanelHtml = html.slice(html.indexOf('Generate AI Q&amp;A'));
+    expect(qnaPanelHtml).toContain('Chapter 4: Carbon and its Compounds');
+    expect(qnaPanelHtml).not.toContain('5. Life Processes');
+    expect(html).not.toContain(
+      'Selected NCERT topics define the generation scope',
+    );
     expect(html).not.toMatch(/batch size|prompt|instructions|topic hints/i);
   });
 });

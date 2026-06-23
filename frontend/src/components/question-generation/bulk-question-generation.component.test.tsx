@@ -11,15 +11,19 @@ import {
 } from './bulk-question-generation.component';
 
 const chapters = [
-  { id: 1, slug: 'life-processes', name: 'Life Processes', order: 5 },
-  { id: 2, slug: 'electricity', name: 'Electricity', order: 12 },
+  {
+    id: 4,
+    slug: 'carbon-and-its-compounds',
+    name: 'Carbon and its Compounds',
+    order: 4,
+  },
 ];
 
 const topics: ChapterTopicNode[] = [
   {
     id: 'life-processes:5.1',
     type: 'section',
-    title: '5.1 Life Processes',
+    title: '5.1 LIFE PROCESSES',
     parent_id: null,
     source_element_id: 'element-1',
     source_range: { start: 1, end: 8 },
@@ -29,8 +33,8 @@ const topics: ChapterTopicNode[] = [
   },
   {
     id: 'life-processes:activity-5.1',
-    type: 'activity',
-    title: 'Activity 5.1',
+    type: 'section',
+    title: '5.2 Nutrition',
     parent_id: 'life-processes:5.1',
     source_element_id: 'element-4',
     source_range: { start: 4, end: 6 },
@@ -69,17 +73,19 @@ describe('BulkQuestionGenerationSetup', () => {
     );
 
     expect(html).toContain('Generate AI Q&amp;A');
-    expect(html).toContain('Selected NCERT topics define the generation scope');
     expect(html).toContain('NCERT Chapter');
-    expect(html).toContain('Topic scope');
+    expect(html).toContain('Topics');
     expect(html).toContain('5.1 Life Processes');
-    expect(html).toContain('Section · pp. 81–83');
-    expect(html).toContain(
-      'Generated Q&amp;A stays separate from the Question bank',
-    );
+    expect(html).toContain('pp. 81–83');
     expect(html).toContain('Easy');
     expect(html).toContain('Standard');
     expect(html).toContain('Challenging');
+    expect(html).not.toContain(
+      'Selected NCERT topics define the generation scope',
+    );
+    expect(html).not.toContain(
+      'Generated Q&amp;A stays separate from the Question bank',
+    );
     expect(html).not.toMatch(
       /batch size|provider|model|fallback|cost|marks distribution|prompt|instructions|topic hints/i,
     );
@@ -92,18 +98,22 @@ describe('BulkQuestionGenerationSetup', () => {
       />,
     );
 
-    expect(html).toContain(
-      'Select at least one NCERT topic to enable generation.',
-    );
+    expect(html).toContain('Select at least one topic.');
     expect(html).toContain('disabled=""');
   });
 
-  it('explains that the MVP is one Chapter per generation run', () => {
+  it('waits for a Chapter selection before showing topics', () => {
     const html = renderToStaticMarkup(
-      <BulkQuestionGenerationSetup {...setupProps()} />,
+      <BulkQuestionGenerationSetup
+        {...setupProps({
+          selectedChapterSlug: '',
+          selectedTopicIds: new Set(),
+        })}
+      />,
     );
 
-    expect(html).toContain('The MVP supports one Chapter per run');
+    expect(html).toContain('Select Chapter 4 to show topics.');
+    expect(html).not.toContain('5.1 Life Processes');
     expect(html).toContain('type="radio"');
   });
 
@@ -131,6 +141,23 @@ describe('BulkQuestionGenerationSetup', () => {
     expect(loadingHtml).toContain('Loading Chapters…');
     expect(chapterErrorHtml).toContain('Chapters could not be loaded.');
     expect(topicsErrorHtml).toContain('Topics could not be loaded.');
+  });
+
+  it('shows a friendly active-batch message when Q&A is already generating', () => {
+    const html = renderToStaticMarkup(
+      <BulkQuestionGenerationSetup
+        {...setupProps({
+          activeBatchId: 1,
+          error: 'Questions are already being generated.',
+          onOpenActiveBatch: vi.fn(),
+        })}
+      />,
+    );
+
+    expect(html).toContain('Q&amp;A generation is already running.');
+    expect(html).toContain('Batch #1 is preparing questions now.');
+    expect(html).toContain('View progress');
+    expect(html).not.toContain('Teacher already has active generation batch');
   });
 });
 
@@ -193,18 +220,27 @@ describe('GenerationProgressWorkspace', () => {
     };
   }
 
-  it('shows polling stages, backend-requested count, and validation expectations without percentages', () => {
+  it('shows a lean teacher-facing progress state without backend details', () => {
     const html = renderToStaticMarkup(
       <GenerationProgressWorkspace {...progressProps()} />,
     );
 
-    expect(html).toContain('Generating Questions');
-    expect(html).toContain('Backend requested 10 candidates');
+    expect(html).toContain('Drafting Q&amp;A');
     expect(html).toContain(
-      'Validation may reduce how many candidates reach review',
+      'Questions are being drafted from the selected topics.',
     );
-    expect(html).toContain('Checking every 3 seconds');
-    expect(html).toContain('Run in background');
+    expect(html).toContain('Preparing');
+    expect(html).toContain('Drafting');
+    expect(html).toContain('Review');
+    expect(html).toContain('Q&amp;A generation is in progress');
+    expect(html).toContain(
+      'This will update automatically when review is ready.',
+    );
+    expect(html).toContain('Back to setup');
+    expect(html).not.toContain('Backend requested');
+    expect(html).not.toContain('Validation may reduce');
+    expect(html).not.toContain('Checking every');
+    expect(html).not.toContain('Last checked');
     expect(html).not.toContain('%');
   });
 
@@ -223,7 +259,8 @@ describe('GenerationProgressWorkspace', () => {
     );
 
     expect(html).toContain('Review generated Q&amp;A');
-    expect(html).toContain('Backend requested 10 candidates');
+    expect(html).toContain('Ready to review');
+    expect(html).not.toContain('Q&amp;A generation is in progress');
     expect(html).toContain(
       '1 candidate passed validation and is shown for teacher review',
     );

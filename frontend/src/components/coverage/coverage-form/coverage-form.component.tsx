@@ -10,6 +10,7 @@
  * @module CoverageFormView
  */
 import type { ReactNode } from 'react';
+import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { type CoverageForm, DIFFICULTIES } from '@/hooks/useCoverageForm.hook';
@@ -41,14 +42,17 @@ export function CoverageFormView({
   } = form;
 
   return (
-    <div className="space-y-4">
-      <div>
-        <label htmlFor="paper-format" className="text-sm font-medium mb-2 block">
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <label
+          htmlFor="paper-format"
+          className="block text-[0.8125rem] font-medium leading-5"
+        >
           Format
         </label>
         <select
           id="paper-format"
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="flex h-11 w-full rounded-lg border border-white/70 bg-white/75 px-3 py-2 text-sm text-foreground transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           value={selectedFormatId}
           onChange={(event) => setSelectedFormatId(event.target.value)}
           disabled={formats.length === 0}
@@ -65,63 +69,109 @@ export function CoverageFormView({
         </select>
       </div>
 
-      <div>
-        <p className="text-sm font-medium mb-2">Difficulty</p>
-        <div className="flex gap-2">
+      <fieldset className="space-y-2">
+        <legend className="text-[0.8125rem] font-medium leading-5">
+          Difficulty
+        </legend>
+        <div
+          className="inline-flex flex-wrap gap-1 rounded-lg border border-white/70 bg-white/55 p-1"
+          role="group"
+          aria-label="Paper difficulty"
+        >
           {DIFFICULTIES.map((d) => (
-            <Button
+            <button
               key={d}
               type="button"
-              size="sm"
-              variant={difficulty === d ? 'default' : 'outline'}
+              className={
+                difficulty === d
+                  ? 'rounded-md bg-primary px-3 py-1.5 text-[0.8125rem] font-medium leading-5 text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                  : 'rounded-md px-3 py-1.5 text-[0.8125rem] font-medium leading-5 text-muted-foreground transition-colors hover:bg-white/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+              }
+              aria-pressed={difficulty === d}
               onClick={() => setDifficulty(d)}
             >
               {d}
-            </Button>
+            </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
-      <div>
-        <p className="text-sm font-medium mb-2">
+      <section className="space-y-3" aria-labelledby="paper-chapters-heading">
+        <p
+          id="paper-chapters-heading"
+          className="text-[0.8125rem] font-medium leading-5"
+        >
           Chapters{' '}
           <span className="text-muted-foreground font-normal">
             (leave empty to use all)
           </span>
         </p>
-        <ul className="space-y-1">
+        <ul className="grid gap-2 sm:grid-cols-2">
           {chapters.map((ch) => {
             const selected = selectedSlugs.has(ch.slug);
+            const chapterInputId = `paper-chapter-${ch.slug}`;
             return (
-              <li key={ch.slug} className="flex items-center gap-3 text-sm">
-                <label className="flex items-center gap-2 flex-1">
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() => toggleChapter(ch.slug)}
-                  />
-                  <span>
-                    {ch.order}. {ch.name}
-                  </span>
-                </label>
-                {selected && (
-                  <Input
-                    type="number"
-                    min={0}
-                    step="0.1"
-                    placeholder="weight"
-                    className="w-24 h-8"
-                    value={weights[ch.slug] ?? ''}
-                    onChange={(e) => setWeight(ch.slug, e.target.value)}
-                  />
-                )}
+              <li key={ch.slug}>
+                <div
+                  className={
+                    selected
+                      ? 'h-full rounded-lg border border-primary bg-white/80 px-3 py-3 text-sm leading-5 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring'
+                      : 'h-full rounded-lg border border-white/70 bg-white/55 px-3 py-3 text-sm leading-5 transition-colors hover:bg-white/85 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring'
+                  }
+                >
+                  <label
+                    htmlFor={chapterInputId}
+                    className="flex cursor-pointer items-start gap-3"
+                  >
+                    <input
+                      id={chapterInputId}
+                      type="checkbox"
+                      className="sr-only"
+                      checked={selected}
+                      onChange={() => toggleChapter(ch.slug)}
+                    />
+                    <span
+                      className={
+                        selected
+                          ? 'mt-0.5 flex size-5 items-center justify-center rounded-md bg-primary text-primary-foreground'
+                          : 'mt-0.5 flex size-5 items-center justify-center rounded-md border bg-white text-transparent'
+                      }
+                      aria-hidden="true"
+                    >
+                      <Check className="size-3.5" />
+                    </span>
+                    <span className="block min-w-0 flex-1 font-medium">
+                      {ch.order}. {ch.name}
+                    </span>
+                  </label>
+                  {selected && (
+                    <div className="mt-3 pl-8">
+                      <label
+                        htmlFor={`${chapterInputId}-weight`}
+                        className="mb-1 block text-xs font-medium text-muted-foreground"
+                      >
+                        Weight
+                      </label>
+                      <Input
+                        id={`${chapterInputId}-weight`}
+                        type="number"
+                        min={0}
+                        step="0.1"
+                        placeholder="weight"
+                        className="h-9 w-28 bg-white/80"
+                        value={weights[ch.slug] ?? ''}
+                        onChange={(e) => setWeight(ch.slug, e.target.value)}
+                      />
+                    </div>
+                  )}
+                </div>
               </li>
             );
           })}
         </ul>
-      </div>
+      </section>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-2 border-t border-white/70 pt-4 sm:flex-row sm:items-center">
         <Button onClick={onGenerate} disabled={busy || !selectedFormatId}>
           {busy ? 'Generating…' : 'Generate paper'}
         </Button>

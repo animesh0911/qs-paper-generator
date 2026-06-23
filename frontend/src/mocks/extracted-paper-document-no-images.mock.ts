@@ -5,7 +5,7 @@
  * editor mock so exact-count tests and default editor behavior remain stable.
  *
  * Patterns:
- * - The raw JSON is imported from the Varad docs scratch artifact.
+ * - The raw JSON is vendored beside this module so Docker/Vite can resolve it.
  * - Runtime validation happens at the editor boundary via `assertPaperDocument`.
  *
  * Where it fits:
@@ -14,7 +14,7 @@
  *
  * @module extractedPaperDocumentNoImagesMock
  */
-import extractedPaperDocumentNoImagesJson from '../../../docs/Varad/extracted_paper_document_no_images.json';
+import extractedPaperDocumentNoImagesJson from './extracted-paper-document-no-images.json';
 import type { PaperDocument } from '@/types';
 
 export const extractedPaperDocumentNoImages =

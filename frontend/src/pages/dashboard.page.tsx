@@ -8,8 +8,9 @@
  *
  * @module DashboardPage
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronDown, ChevronUp, ListChecks, Sparkles } from 'lucide-react';
 import {
   assemblePaper,
   createGenerationBatch,
@@ -25,6 +26,14 @@ import { BulkQuestionGenerationSetup } from '@/components/question-generation';
 import { buildGenerationBatchPayload } from '@/lib/question-generation';
 import type { ChapterTopicNode, GenerationDifficultyLabel } from '@/types';
 
+const MVP_GENERATION_CHAPTER_SLUG = 'carbon-and-its-compounds';
+
+function activeGenerationBatchIdFromMessage(message: string): number | null {
+  const match = message.match(/active generation batch #(\d+)/i);
+  if (!match) return null;
+  return Number(match[1]);
+}
+
 export default function Dashboard() {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -34,13 +43,28 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [generationBusy, setGenerationBusy] = useState(false);
   const [generationError, setGenerationError] = useState('');
+  const [activeGenerationBatchId, setActiveGenerationBatchId] = useState<
+    number | null
+  >(null);
   const [generationChapterSlug, setGenerationChapterSlug] = useState('');
-  const [generationTopics, setGenerationTopics] = useState<ChapterTopicNode[]>([]);
+  const [generationTopics, setGenerationTopics] = useState<ChapterTopicNode[]>(
+    [],
+  );
   const [generationTopicsLoading, setGenerationTopicsLoading] = useState(false);
   const [generationTopicsError, setGenerationTopicsError] = useState('');
-  const [selectedTopicIds, setSelectedTopicIds] = useState<Set<string>>(new Set());
+  const [selectedTopicIds, setSelectedTopicIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [generationPanelOpen, setGenerationPanelOpen] = useState(false);
   const [generationDifficulty, setGenerationDifficulty] =
     useState<GenerationDifficultyLabel>('Standard');
+  const generationChapters = useMemo(
+    () =>
+      form.chapters.filter(
+        (chapter) => chapter.slug === MVP_GENERATION_CHAPTER_SLUG,
+      ),
+    [form.chapters],
+  );
 
   useEffect(() => {
     if (!generationChapterSlug) {
@@ -89,6 +113,7 @@ export default function Dashboard() {
     setGenerationChapterSlug(slug);
     setSelectedTopicIds(new Set());
     setGenerationError('');
+    setActiveGenerationBatchId(null);
   }
 
   function toggleGenerationTopic(nodeId: string) {
@@ -107,6 +132,7 @@ export default function Dashboard() {
   async function startQuestionBankGeneration() {
     setGenerationBusy(true);
     setGenerationError('');
+    setActiveGenerationBatchId(null);
     try {
       const payload = buildGenerationBatchPayload({
         chapterSlug: generationChapterSlug,
@@ -116,7 +142,14 @@ export default function Dashboard() {
       const batch = await createGenerationBatch(payload);
       navigate(`/generation-batches/${batch.id}`);
     } catch (err) {
-      setGenerationError((err as Error).message);
+      const message = (err as Error).message;
+      const activeBatchId = activeGenerationBatchIdFromMessage(message);
+      if (activeBatchId) {
+        setActiveGenerationBatchId(activeBatchId);
+        setGenerationError('Questions are already being generated.');
+      } else {
+        setGenerationError(message);
+      }
     } finally {
       setGenerationBusy(false);
     }
@@ -124,55 +157,120 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-secondary">
-      <header className="flex items-center justify-between border-b bg-background px-6 py-3">
-        <h1 className="font-semibold">Question Paper Generator</h1>
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b bg-background/95 px-6 py-3 backdrop-blur">
+        <div>
+          <p className="text-xs font-medium text-muted-foreground">
+            CBSE Class 10 Science
+          </p>
+          <h1 className="font-semibold">Question Paper Generator</h1>
+        </div>
         <Button variant="ghost" size="sm" onClick={logout}>
           Sign out
         </Button>
       </header>
 
-      <main className="mx-auto max-w-3xl p-6 space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Generate paper</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Select chapters and optionally weight them. Difficulty profile
-              sets the Remember / Understand / Apply / Analyse mix.
-            </p>
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-10">
+        <Card className="overflow-hidden rounded-lg border-white/70 bg-white/80 shadow-none backdrop-blur-2xl">
+          <CardHeader className="border-b border-white/70 bg-white/60 px-5 py-5 sm:px-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-1.5">
+                <CardTitle className="text-xl leading-7">
+                  Generate paper
+                </CardTitle>
+                <p className="max-w-2xl text-[0.9375rem] leading-6 text-muted-foreground">
+                  Select chapters and optionally weight them. Difficulty profile
+                  sets the Remember / Understand / Apply / Analyse mix.
+                </p>
+              </div>
+              <span className="inline-flex w-fit items-center gap-1 rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
+                <ListChecks className="size-3.5" aria-hidden="true" />
+                Review workspace
+              </span>
+            </div>
           </CardHeader>
-          <CardContent>
-            <CoverageFormView form={form} busy={busy} onGenerate={generate} />
+          <CardContent className="space-y-7 bg-white/45 px-5 py-6 sm:px-6">
+            <section aria-labelledby="paper-generation-heading">
+              <h2 id="paper-generation-heading" className="sr-only">
+                Paper generation setup
+              </h2>
+              <CoverageFormView form={form} busy={busy} onGenerate={generate} />
+            </section>
             {error && <p className="text-sm text-destructive mt-2">{error}</p>}
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Generate AI Q&amp;A</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Secondary workflow for creating review-only Question-and-answer
-              candidates from grounded NCERT topic metadata.
-            </p>
-          </CardHeader>
-          <CardContent>
-            <BulkQuestionGenerationSetup
-              chapters={form.chapters}
-              chaptersLoading={form.chaptersLoading}
-              chaptersError={form.chaptersError}
-              selectedChapterSlug={generationChapterSlug}
-              topics={generationTopics}
-              topicsLoading={generationTopicsLoading}
-              topicsError={generationTopicsError}
-              selectedTopicIds={selectedTopicIds}
-              difficulty={generationDifficulty}
-              busy={generationBusy}
-              error={generationError}
-              onSelectChapter={selectGenerationChapter}
-              onToggleTopic={toggleGenerationTopic}
-              onClearTopics={clearGenerationTopics}
-              onDifficultyChange={setGenerationDifficulty}
-              onStart={startQuestionBankGeneration}
-            />
+            <section
+              className="border-t border-white/70 pt-6"
+              aria-labelledby="generation-section-heading"
+            >
+              <button
+                type="button"
+                className="flex w-full items-start justify-between gap-4 rounded-lg border border-white/70 bg-white/70 px-4 py-3.5 text-left transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-expanded={generationPanelOpen}
+                aria-controls="generation-panel"
+                onClick={() => setGenerationPanelOpen((open) => !open)}
+              >
+                <span className="flex min-w-0 items-start gap-3">
+                  <span className="mt-0.5 flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                    <Sparkles className="size-4" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 space-y-1">
+                    <span
+                      id="generation-section-heading"
+                      className="block text-sm font-semibold"
+                    >
+                      Generate AI Q&amp;A
+                    </span>
+                    <span className="block text-[0.8125rem] leading-5 text-muted-foreground sm:text-sm">
+                      {selectedTopicIds.size > 0
+                        ? `${selectedTopicIds.size} topic${selectedTopicIds.size === 1 ? '' : 's'} selected`
+                        : 'Pick Chapter 4, then choose topics'}
+                    </span>
+                  </span>
+                </span>
+                <span className="mt-2 flex items-center gap-3">
+                  <span className="hidden items-center gap-1 rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground sm:inline-flex">
+                    <ListChecks className="size-3.5" aria-hidden="true" />
+                    Topic scoped
+                  </span>
+                  {generationPanelOpen ? (
+                    <ChevronUp className="size-4" aria-hidden="true" />
+                  ) : (
+                    <ChevronDown className="size-4" aria-hidden="true" />
+                  )}
+                </span>
+              </button>
+
+              <div
+                id="generation-panel"
+                className={generationPanelOpen ? 'pt-4' : 'hidden'}
+              >
+                <BulkQuestionGenerationSetup
+                  chapters={generationChapters}
+                  chaptersLoading={form.chaptersLoading}
+                  chaptersError={form.chaptersError}
+                  selectedChapterSlug={generationChapterSlug}
+                  topics={generationTopics}
+                  topicsLoading={generationTopicsLoading}
+                  topicsError={generationTopicsError}
+                  selectedTopicIds={selectedTopicIds}
+                  difficulty={generationDifficulty}
+                  busy={generationBusy}
+                  error={generationError}
+                  activeBatchId={activeGenerationBatchId}
+                  onSelectChapter={selectGenerationChapter}
+                  onToggleTopic={toggleGenerationTopic}
+                  onClearTopics={clearGenerationTopics}
+                  onDifficultyChange={setGenerationDifficulty}
+                  onStart={startQuestionBankGeneration}
+                  onOpenActiveBatch={() => {
+                    if (activeGenerationBatchId) {
+                      navigate(
+                        `/generation-batches/${activeGenerationBatchId}`,
+                      );
+                    }
+                  }}
+                />
+              </div>
+            </section>
           </CardContent>
         </Card>
       </main>

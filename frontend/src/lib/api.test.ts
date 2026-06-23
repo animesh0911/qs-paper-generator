@@ -174,6 +174,32 @@ describe('login', () => {
 
     expect(getToken()).toBeNull();
   });
+
+  it('does not attach a stale token to login requests', async () => {
+    storage.set('qpg_token', 'stale-token');
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            token: 'fresh-token',
+            user: { email: 'teacher@example.com' },
+          }),
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await login('teacher@example.com', 'teacher123');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/auth/login',
+      expect.objectContaining({
+        headers: expect.not.objectContaining({
+          Authorization: expect.any(String),
+        }),
+      }),
+    );
+    expect(getToken()).toBe('fresh-token');
+  });
 });
 
 describe('paper persistence', () => {
@@ -195,7 +221,9 @@ describe('paper persistence', () => {
   it('rejects an invalid persisted paper instead of opening a broken editor', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response(JSON.stringify({ paper: { id: 'paper_1' } }))),
+      vi.fn(
+        async () => new Response(JSON.stringify({ paper: { id: 'paper_1' } })),
+      ),
     );
 
     await expect(fetchPaperDocument('paper_1')).rejects.toThrow(

@@ -44,8 +44,8 @@ def chapter_topics(request, chapter_slug):
 
     topics = (
         document.chapter_map_nodes.select_related("parent", "source_element")
-        .exclude(node_type=ChapterMapNode.NodeType.DOCUMENT)
-        .order_by("source_start", "node_type", "stable_node_id")
+        .filter(node_type=ChapterMapNode.NodeType.SECTION)
+        .order_by("source_start", "stable_node_id")
     )
     return Response(
         {

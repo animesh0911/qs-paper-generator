@@ -2,14 +2,14 @@ import type {
   Chapter,
   ChapterTopicNode,
   GenerationBatch,
+  GenerationBatchStatus,
   GeneratedQuestionCandidate,
   GenerationDifficultyLabel,
 } from '@/types';
+import { Check, Layers, LoaderCircle, MousePointer2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   GENERATION_DIFFICULTIES,
-  generationStageDescription,
-  generationStageLabel,
   shouldShowNoValidQuestionsMessage,
 } from '@/lib/question-generation';
 import { CandidateReviewPanel } from './candidate-review-panel.component';
@@ -32,11 +32,13 @@ export interface BulkQuestionGenerationSetupProps {
   difficulty: GenerationDifficultyLabel;
   busy: boolean;
   error: string;
+  activeBatchId?: number | null;
   onSelectChapter: (slug: string) => void;
   onToggleTopic: (nodeId: string) => void;
   onClearTopics: () => void;
   onDifficultyChange: (difficulty: GenerationDifficultyLabel) => void;
   onStart: () => void;
+  onOpenActiveBatch?: () => void;
 }
 
 function formatPageRange(topic: ChapterTopicNode): string {
@@ -46,8 +48,34 @@ function formatPageRange(topic: ChapterTopicNode): string {
   return `pp. ${topic.page_range.start}–${topic.page_range.end}`;
 }
 
-function nodeTypeLabel(type: string): string {
-  return type.charAt(0).toUpperCase() + type.slice(1);
+function formatTopicTitle(title: string): string {
+  const match = title.match(/^(\d+(?:\.\d+)*\s+)(.*)$/);
+  if (!match) return title;
+
+  const [, numberPrefix, body] = match;
+  if (body !== body.toUpperCase()) return title;
+
+  const smallWords = new Set([
+    'and',
+    'be',
+    'for',
+    'in',
+    'its',
+    'of',
+    'the',
+    'to',
+  ]);
+  const words = body.toLowerCase().split(' ');
+  const formatted = words
+    .map((word, index) => {
+      if (word === '-') return word;
+      const followsDash = index > 0 && words[index - 1] === '-';
+      if (index > 0 && !followsDash && smallWords.has(word)) return word;
+      return word.replace(/^[a-z]/, (letter) => letter.toUpperCase());
+    })
+    .join(' ');
+
+  return `${numberPrefix}${formatted}`;
 }
 
 export function BulkQuestionGenerationSetup({
@@ -62,11 +90,13 @@ export function BulkQuestionGenerationSetup({
   difficulty,
   busy,
   error,
+  activeBatchId = null,
   onSelectChapter,
   onToggleTopic,
   onClearTopics,
   onDifficultyChange,
   onStart,
+  onOpenActiveBatch,
 }: BulkQuestionGenerationSetupProps) {
   const selectedTopicCount = selectedTopicIds.size;
   const selectedChapter = chapters.find(
@@ -76,35 +106,30 @@ export function BulkQuestionGenerationSetup({
     Boolean(selectedChapterSlug) && selectedTopicCount > 0 && !busy;
 
   return (
-    <div className="space-y-5">
-      <div className="space-y-2">
-        <p className="text-sm font-medium">Generate AI Q&amp;A</p>
-        <p className="max-w-prose text-sm text-muted-foreground">
-          Selected NCERT topics define the generation scope. Choose one Chapter,
-          then select the grounded NCERT topic nodes that should drive
-          generation. Generated Q&amp;A stays separate from the Question bank
-          until a teacher reviews and accepts it.
-        </p>
-      </div>
-
+    <div className="space-y-5 rounded-lg border border-white/70 bg-white/55 p-4">
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">Difficulty</legend>
+        <legend className="text-[0.8125rem] font-medium leading-5">
+          Difficulty
+        </legend>
         <div
-          className="flex flex-wrap gap-2"
+          className="inline-flex flex-wrap gap-1 rounded-lg border border-white/70 bg-white/55 p-1"
           role="group"
           aria-label="Difficulty"
         >
           {GENERATION_DIFFICULTIES.map((label) => (
-            <Button
+            <button
               key={label}
               type="button"
-              size="sm"
-              variant={difficulty === label ? 'default' : 'outline'}
+              className={
+                difficulty === label
+                  ? 'rounded-md bg-primary px-3 py-1.5 text-[0.8125rem] font-medium leading-5 text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                  : 'rounded-md px-3 py-1.5 text-[0.8125rem] font-medium leading-5 text-muted-foreground transition-colors hover:bg-white/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+              }
               aria-pressed={difficulty === label}
               onClick={() => onDifficultyChange(label)}
             >
               {label}
-            </Button>
+            </button>
           ))}
         </div>
       </fieldset>
@@ -114,12 +139,11 @@ export function BulkQuestionGenerationSetup({
         aria-labelledby="generation-chapter-heading"
       >
         <div className="space-y-1">
-          <p id="generation-chapter-heading" className="text-sm font-medium">
+          <p
+            id="generation-chapter-heading"
+            className="text-[0.8125rem] font-medium leading-5"
+          >
             NCERT Chapter
-          </p>
-          <p className="text-sm text-muted-foreground">
-            The MVP supports one Chapter per run, so selecting another Chapter
-            clears the current topic scope.
           </p>
         </div>
 
@@ -148,44 +172,65 @@ export function BulkQuestionGenerationSetup({
             role="radiogroup"
             aria-label="NCERT Chapter"
           >
-            {chapters.map((chapter) => (
-              <label
-                key={chapter.slug}
-                className="flex items-start gap-2 rounded-md border bg-background px-3 py-2 text-sm"
-              >
-                <input
-                  type="radio"
-                  name="generation-chapter"
-                  checked={selectedChapterSlug === chapter.slug}
-                  onChange={() => onSelectChapter(chapter.slug)}
-                />
-                <span>
-                  <span className="block font-medium">
-                    {chapter.order}. {chapter.name}
+            {chapters.map((chapter) => {
+              const chapterInputId = `generation-chapter-${chapter.slug}`;
+              const selected = selectedChapterSlug === chapter.slug;
+              return (
+                <label
+                  key={chapter.slug}
+                  htmlFor={chapterInputId}
+                  className={
+                    selected
+                      ? 'flex cursor-pointer items-start gap-3 rounded-lg border border-primary bg-white/90 px-3 py-3 text-sm leading-5 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring'
+                      : 'flex cursor-pointer items-start gap-3 rounded-lg border border-white/70 bg-white/65 px-3 py-3 text-sm leading-5 transition-colors hover:bg-white/90 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring'
+                  }
+                >
+                  <input
+                    id={chapterInputId}
+                    type="radio"
+                    name="generation-chapter"
+                    className="sr-only"
+                    checked={selected}
+                    onChange={() => onSelectChapter(chapter.slug)}
+                  />
+                  <span
+                    className={
+                      selected
+                        ? 'mt-0.5 flex size-5 items-center justify-center rounded-md bg-primary text-primary-foreground'
+                        : 'mt-0.5 flex size-5 items-center justify-center rounded-md border bg-white text-transparent'
+                    }
+                    aria-hidden="true"
+                  >
+                    <Check className="size-3.5" />
                   </span>
-                  <span className="block text-muted-foreground">
-                    Open this Chapter's NCERT topics
+                  <span className="min-w-0">
+                    <span className="block font-medium">
+                      Chapter {chapter.order}: {chapter.name}
+                    </span>
                   </span>
-                </span>
-              </label>
-            ))}
+                </label>
+              );
+            })}
           </div>
         )}
       </section>
 
       {selectedChapterSlug && (
         <section
-          className="space-y-3 border-t pt-4"
+          className="space-y-3 border-t border-white/70 pt-4"
           aria-labelledby="generation-topics-heading"
         >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
-              <p id="generation-topics-heading" className="text-sm font-medium">
-                Topic scope{selectedChapter ? ` — ${selectedChapter.name}` : ''}
+              <p
+                id="generation-topics-heading"
+                className="text-[0.8125rem] font-medium leading-5"
+              >
+                Topics{selectedChapter ? ` — ${selectedChapter.name}` : ''}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm leading-5 text-muted-foreground">
                 {selectedTopicCount === 0
-                  ? 'Select at least one NCERT topic to enable generation.'
+                  ? 'Select at least one topic.'
                   : `${selectedTopicCount} topic${selectedTopicCount === 1 ? '' : 's'} selected for generation.`}
               </p>
             </div>
@@ -196,11 +241,21 @@ export function BulkQuestionGenerationSetup({
               onClick={onClearTopics}
               disabled={selectedTopicCount === 0}
             >
+              <X className="mr-1.5 size-3.5" aria-hidden="true" />
               Clear topics
             </Button>
           </div>
 
-          {topicsLoading && <p className="text-sm">Loading NCERT topics…</p>}
+          {topicsLoading && (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-16 animate-pulse rounded-lg border border-white/70 bg-white/55"
+                />
+              ))}
+            </div>
+          )}
 
           {!topicsLoading && topicsError && (
             <div role="alert">
@@ -218,32 +273,49 @@ export function BulkQuestionGenerationSetup({
           )}
 
           {!topicsLoading && !topicsError && topics.length > 0 && (
-            <ul className="divide-y rounded-md border">
+            <ul className="grid max-h-80 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
               {topics.map((topic) => {
                 const topicInputId = `topic-${topic.id}`;
+                const selected = selectedTopicIds.has(topic.id);
                 return (
-                  <li key={topic.id} className="p-3">
+                  <li key={topic.id}>
                     <label
                       htmlFor={topicInputId}
-                      className="flex items-start gap-3 text-sm"
+                      className={
+                        selected
+                          ? 'flex h-full cursor-pointer items-start gap-3 rounded-lg border border-primary bg-white/90 px-3 py-3 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring'
+                          : 'flex h-full cursor-pointer items-start gap-3 rounded-lg border border-white/70 bg-white/65 px-3 py-3 text-sm transition-colors hover:bg-white/90 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring'
+                      }
                     >
                       <input
                         id={topicInputId}
                         type="checkbox"
-                        className="mt-1"
+                        className="sr-only"
                         checked={selectedTopicIds.has(topic.id)}
                         onChange={() => onToggleTopic(topic.id)}
                       />
+                      <span
+                        className={
+                          selected
+                            ? 'mt-0.5 flex size-5 items-center justify-center rounded-md bg-primary text-primary-foreground'
+                            : 'mt-0.5 flex size-5 items-center justify-center rounded-md border bg-white text-transparent'
+                        }
+                        aria-hidden="true"
+                      >
+                        <Check className="size-3.5" />
+                      </span>
                       <span className="min-w-0 space-y-1">
                         <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                          <span className="font-medium">{topic.title}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {nodeTypeLabel(topic.type)} ·{' '}
+                          <span className="font-medium leading-snug">
+                            {formatTopicTitle(topic.title)}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-sm bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                            <Layers className="size-3" aria-hidden="true" />
                             {formatPageRange(topic)}
                           </span>
                         </span>
                         {topic.preview && (
-                          <span className="block text-muted-foreground">
+                          <span className="line-clamp-2 block text-xs leading-5 text-muted-foreground">
                             {topic.preview}
                           </span>
                         )}
@@ -257,20 +329,42 @@ export function BulkQuestionGenerationSetup({
         </section>
       )}
 
-      {error && (
-        <div className="border-t pt-3" role="alert">
-          <p className="text-sm font-medium">Generation could not start.</p>
-          <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+      {!selectedChapterSlug && (
+        <div className="flex items-center gap-2 rounded-lg border border-white/70 bg-white/50 px-3 py-2 text-sm leading-5 text-muted-foreground">
+          <MousePointer2 className="size-4 flex-none" aria-hidden="true" />
+          Select Chapter 4 to show topics.
         </div>
       )}
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      {error && (
+        <div className="space-y-3 border-t border-white/70 pt-4" role="alert">
+          <div>
+            <p className="text-sm font-medium">
+              {activeBatchId
+                ? 'Q&A generation is already running.'
+                : 'Generation could not start.'}
+            </p>
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">
+              {activeBatchId
+                ? `Batch #${activeBatchId} is preparing questions now.`
+                : error}
+            </p>
+          </div>
+          {activeBatchId && onOpenActiveBatch && (
+            <Button type="button" size="sm" onClick={onOpenActiveBatch}>
+              View progress
+            </Button>
+          )}
+        </div>
+      )}
+
+      <div className="flex flex-col gap-2 border-t border-white/70 pt-4 sm:flex-row sm:items-center">
         <Button type="button" onClick={onStart} disabled={!canStart}>
           {busy ? 'Starting generation…' : 'Generate AI Q&A'}
         </Button>
         {!canStart && !busy && (
-          <p className="text-sm text-muted-foreground">
-            Select one Chapter and at least one topic to queue generation.
+          <p className="text-sm leading-5 text-muted-foreground">
+            Select Chapter 4 and at least one topic.
           </p>
         )}
       </div>
@@ -301,21 +395,93 @@ function isActiveGenerationStatus(status: GenerationBatch['status']): boolean {
   return ACTIVE_GENERATION_STATUSES.includes(status);
 }
 
-function formatStatusTime(value: string): string {
-  if (!value) return 'Not checked yet';
-  return new Intl.DateTimeFormat(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date(value));
+function progressStageLabel(status: GenerationBatchStatus): string {
+  switch (status) {
+    case 'queued':
+      return 'Preparing';
+    case 'generating_questions':
+      return 'Drafting Q&A';
+    case 'validating':
+      return 'Checking';
+    case 'ready_for_review':
+      return 'Ready to review';
+    case 'accepted':
+      return 'Imported';
+    case 'expired':
+      return 'Closed';
+    case 'failed':
+      return 'Needs retry';
+  }
+}
+
+function progressStageDescription(status: GenerationBatchStatus): string {
+  switch (status) {
+    case 'queued':
+      return 'Your request is in line. This usually takes a moment.';
+    case 'generating_questions':
+      return 'Questions are being drafted from the selected topics.';
+    case 'validating':
+      return 'The draft is being checked before review.';
+    case 'ready_for_review':
+      return 'Review the candidates below and import the ones you want.';
+    case 'accepted':
+      return 'Accepted Q&A has been added to the Question bank.';
+    case 'expired':
+      return 'This request is no longer active.';
+    case 'failed':
+      return 'No usable Q&A was created.';
+  }
+}
+
+function progressStep(status: GenerationBatchStatus): number {
+  switch (status) {
+    case 'queued':
+      return 0;
+    case 'generating_questions':
+    case 'validating':
+      return 1;
+    case 'ready_for_review':
+    case 'accepted':
+      return 2;
+    case 'expired':
+    case 'failed':
+      return 0;
+  }
+}
+
+function ActiveGenerationIndicator() {
+  return (
+    <div
+      className="mt-4 flex items-center gap-3 rounded-lg border border-white/70 bg-white/60 px-3 py-2"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="relative flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+        <span
+          className="absolute inline-flex size-8 animate-ping rounded-md bg-primary/25 motion-reduce:hidden"
+          aria-hidden="true"
+        />
+        <LoaderCircle
+          className="relative size-4 animate-spin motion-reduce:animate-none"
+          aria-hidden="true"
+        />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-medium leading-5">
+          Q&amp;A generation is in progress
+        </span>
+        <span className="block text-xs leading-5 text-muted-foreground">
+          This will update automatically when review is ready.
+        </span>
+      </span>
+    </div>
+  );
 }
 
 export function GenerationProgressWorkspace({
   batch,
   loading,
   error,
-  lastCheckedAt,
-  pollIntervalMs,
   candidates,
   candidatesLoading,
   candidatesError,
@@ -332,24 +498,30 @@ export function GenerationProgressWorkspace({
     ? shouldShowNoValidQuestionsMessage(batch)
     : false;
   const active = batch ? isActiveGenerationStatus(batch.status) : false;
+  const step = batch ? progressStep(batch.status) : 0;
 
   return (
     <div className="min-h-screen bg-secondary">
-      <main className="mx-auto max-w-3xl p-6">
-        <div className="rounded-lg border bg-background p-6 space-y-5">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">
-              Question generation status
-            </p>
-            <h1 className="text-2xl font-semibold">Question bank generation</h1>
-            <p className="max-w-prose text-sm text-muted-foreground">
-              Generated candidates stay separate from the Question bank until a
-              teacher reviews and accepts them.
-            </p>
+      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-10">
+        <div className="space-y-6 rounded-lg border border-white/70 bg-white/80 p-5 shadow-none backdrop-blur-2xl sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1.5">
+              <h1 className="text-xl font-semibold leading-7">
+                Question bank generation
+              </h1>
+              <p className="max-w-prose text-[0.9375rem] leading-6 text-muted-foreground">
+                We’ll prepare the Q&amp;A and bring it here for review.
+              </p>
+            </div>
+            {batch && (
+              <span className="inline-flex w-fit rounded-md bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                {progressStageLabel(batch.status)}
+              </span>
+            )}
           </div>
 
           {loading && !batch && (
-            <p className="text-sm">Loading generation status…</p>
+            <p className="text-sm leading-5">Loading generation status…</p>
           )}
 
           {error && !batch && (
@@ -376,36 +548,51 @@ export function GenerationProgressWorkspace({
           )}
 
           {batch && !noValidQuestions && (
-            <div className="space-y-4">
-              <div className="border-t pt-4 space-y-2">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Current stage
-                    </p>
-                    <p className="text-lg font-medium">
-                      {generationStageLabel(batch.status)}
-                    </p>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Last checked{' '}
-                    {formatStatusTime(lastCheckedAt || batch.updated_at)}
+            <div className="space-y-5">
+              <div className="space-y-4 border-t border-white/70 pt-5">
+                <div className="rounded-lg border border-white/70 bg-white/55 p-4">
+                  <p className="text-[0.8125rem] font-medium leading-5 text-muted-foreground">
+                    Status
                   </p>
+                  <p className="mt-1 text-2xl font-semibold leading-8">
+                    {progressStageLabel(batch.status)}
+                  </p>
+                  <p className="mt-2 text-sm leading-5 text-muted-foreground">
+                    {progressStageDescription(batch.status)}
+                  </p>
+                  {active && <ActiveGenerationIndicator />}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {generationStageDescription(batch.status)}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Backend requested {batch.requested_count} candidate
-                  {batch.requested_count === 1 ? '' : 's'}. Validation may
-                  reduce how many candidates reach review.
-                </p>
-                {active && (
-                  <p className="text-sm text-muted-foreground">
-                    Checking every {Math.round(pollIntervalMs / 1000)} seconds.
-                    You can safely run this in the background.
-                  </p>
-                )}
+
+                <ol
+                  className="grid gap-2 sm:grid-cols-3"
+                  aria-label="Generation progress"
+                >
+                  {['Preparing', 'Drafting', 'Review'].map((label, index) => {
+                    const complete = index <= step;
+                    return (
+                      <li
+                        key={label}
+                        className={
+                          complete
+                            ? 'rounded-lg border border-primary bg-white/85 px-3 py-2 text-sm font-medium leading-5'
+                            : 'rounded-lg border border-white/70 bg-white/45 px-3 py-2 text-sm font-medium leading-5 text-muted-foreground'
+                        }
+                      >
+                        <span
+                          className={
+                            complete
+                              ? 'mr-2 inline-flex size-5 items-center justify-center rounded-md bg-primary text-xs text-primary-foreground'
+                              : 'mr-2 inline-flex size-5 items-center justify-center rounded-md border bg-white text-xs'
+                          }
+                          aria-hidden="true"
+                        >
+                          {index + 1}
+                        </span>
+                        {label}
+                      </li>
+                    );
+                  })}
+                </ol>
               </div>
 
               {error && (
@@ -431,13 +618,18 @@ export function GenerationProgressWorkspace({
               )}
 
               {active && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onRunInBackground}
-                >
-                  Run in background
-                </Button>
+                <div className="flex flex-col gap-2 border-t border-white/70 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm leading-5 text-muted-foreground">
+                    You can leave this page and come back later.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onRunInBackground}
+                  >
+                    Back to setup
+                  </Button>
+                </div>
               )}
 
               {batch.status === 'accepted' && (
