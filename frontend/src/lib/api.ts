@@ -46,7 +46,7 @@ async function request(
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
-  const token = tokenOverride ?? getToken();
+  const token = tokenOverride === undefined ? getToken() : tokenOverride;
   if (token) headers['Authorization'] = `Token ${token}`;
 
   const res = await fetch(`/api${path}`, { ...options, headers });
@@ -64,10 +64,14 @@ async function request(
 }
 
 async function authResult(path: string, email: string, password: string) {
-  const res = await request(path, {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  });
+  const res = await request(
+    path,
+    {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    },
+    null,
+  );
   const data = await res.json();
   setToken(data.token);
   return data;

@@ -228,7 +228,7 @@ def test_ambiguous_landmark_identifier_does_not_create_reference(document):
 def test_chapter_topics_api_returns_latest_selectable_nodes_by_chapter(
     document, api_client
 ):
-    """Generation setup can load grounded NCERT topic metadata from a Chapter."""
+    """Generation setup loads only teacher-selectable NCERT topic sections."""
     ChapterMapBuilder().rebuild(document)
 
     response = api_client.get(
@@ -241,7 +241,9 @@ def test_chapter_topics_api_returns_latest_selectable_nodes_by_chapter(
     topics = response.data["topics"]
     assert topics
     assert {"id", "title", "type", "page_range", "preview"} <= set(topics[0])
-    assert all(topic["type"] != "document" for topic in topics)
+    assert {topic["type"] for topic in topics} == {"section"}
+    assert all(not topic["title"].lower().startswith("activity") for topic in topics)
+    assert all(topic["title"] not in {"Questions", "Exercises"} for topic in topics)
     assert any(topic["title"] == "4.2.1 Saturated Compounds" for topic in topics)
 
     anonymous = APIClient().get(
