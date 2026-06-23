@@ -225,6 +225,31 @@ def test_ambiguous_landmark_identifier_does_not_create_reference(document):
 
 
 @pytest.mark.django_db
+def test_chapter_topics_api_returns_latest_selectable_nodes_by_chapter(
+    document, api_client
+):
+    """Generation setup can load grounded NCERT topic metadata from a Chapter."""
+    ChapterMapBuilder().rebuild(document)
+
+    response = api_client.get(
+        "/api/corpus/chapters/carbon-and-its-compounds/topics/"
+    )
+
+    assert response.status_code == 200
+    assert response.data["chapter"]["slug"] == "carbon-and-its-compounds"
+    assert response.data["document"]["id"] == document.pk
+    topics = response.data["topics"]
+    assert topics
+    assert {"id", "title", "type", "page_range", "preview"} <= set(topics[0])
+    assert all(topic["type"] != "document" for topic in topics)
+    assert any(topic["title"] == "4.2.1 Saturated Compounds" for topic in topics)
+
+    anonymous = APIClient().get(
+        "/api/corpus/chapters/carbon-and-its-compounds/topics/"
+    )
+    assert anonymous.status_code in (401, 403)
+
+@pytest.mark.django_db
 def test_chapter_map_api_returns_document_specific_semantic_graph(document, api_client):
     """Clients select one extraction explicitly and receive no layout state."""
     ChapterMapBuilder().rebuild(document)
