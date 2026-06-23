@@ -8,6 +8,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from bank.models import Chapter
+
 from .models import ChapterMapNode, TextbookDocument, TextbookElement
 from .serializers import (
     ChapterMapEdgeSerializer,
@@ -16,6 +18,47 @@ from .serializers import (
     TextbookElementSourceSerializer,
 )
 
+
+@api_view(["GET"])
+def chapter_topics(request, chapter_slug):
+    """Return selectable NCERT topic nodes for the latest Chapter extraction."""
+    chapter = get_object_or_404(Chapter, slug=chapter_slug)
+    document = (
+        TextbookDocument.objects.filter(chapter=chapter)
+        .order_by("-created_at", "-pk")
+        .first()
+    )
+    if document is None:
+        return Response(
+            {
+                "chapter": {
+                    "id": chapter.pk,
+                    "slug": chapter.slug,
+                    "name": chapter.name,
+                    "order": chapter.order,
+                },
+                "document": None,
+                "topics": [],
+            }
+        )
+
+    topics = (
+        document.chapter_map_nodes.select_related("parent", "source_element")
+        .exclude(node_type=ChapterMapNode.NodeType.DOCUMENT)
+        .order_by("source_start", "node_type", "stable_node_id")
+    )
+    return Response(
+        {
+            "chapter": {
+                "id": chapter.pk,
+                "slug": chapter.slug,
+                "name": chapter.name,
+                "order": chapter.order,
+            },
+            "document": TextbookDocumentMapSerializer(document).data,
+            "topics": ChapterMapNodeSerializer(topics, many=True).data,
+        }
+    )
 
 @api_view(["GET"])
 def chapter_map(request, document_id):

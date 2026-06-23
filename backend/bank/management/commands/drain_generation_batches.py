@@ -179,6 +179,7 @@ def _request_from_batch(
     )
     return QuestionGenerationRequest(
         chapter_slugs=chapter_slugs,
+        chapter_map_node_ids=tuple(batch.chapter_map_node_ids),
         topic_names=tuple(batch.topic_names),
         difficulty_targets=DIFFICULTY_TARGETS_BY_PRESET.get(batch.difficulty_preset),
         grounding_manifest=grounding_manifest,

@@ -16,6 +16,7 @@
 import type {
   AssembleRequest,
   Chapter,
+  ChapterTopicsResponse,
   GenerationBatch,
   GenerationBatchCreateRequest,
   GeneratedQuestionCandidate,
@@ -137,6 +138,13 @@ export async function fetchMetadata(): Promise<Metadata> {
 
 export async function fetchChapters(): Promise<Chapter[]> {
   const res = await request('/bank/chapters/');
+  return res.json();
+}
+
+export async function fetchChapterTopics(
+  chapterSlug: string,
+): Promise<ChapterTopicsResponse> {
+  const res = await request(`/corpus/chapters/${chapterSlug}/topics/`);
   return res.json();
 }
 

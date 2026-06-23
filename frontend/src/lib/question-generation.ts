@@ -17,32 +17,25 @@ const BACKEND_DIFFICULTY_BY_LABEL: Record<GenerationDifficultyLabel, string> = {
   Challenging: 'hard',
 };
 
-export function splitTopicNames(raw: string): string[] {
-  return raw
-    .split(/[\n,]/)
-    .map((topic) => topic.trim())
-    .filter(Boolean);
-}
-
 export function buildGenerationBatchPayload({
-  chapterSlugs,
-  topicNamesByChapter,
+  chapterSlug,
+  chapterMapNodeIds,
   difficulty,
 }: {
-  chapterSlugs: string[];
-  topicNamesByChapter: Record<string, string>;
+  chapterSlug: string;
+  chapterMapNodeIds: string[];
   difficulty: GenerationDifficultyLabel;
 }): GenerationBatchCreateRequest {
-  if (chapterSlugs.length === 0) {
-    throw new Error('Select at least one Chapter.');
+  if (!chapterSlug) {
+    throw new Error('Select one Chapter.');
+  }
+  if (chapterMapNodeIds.length === 0) {
+    throw new Error('Select at least one NCERT topic.');
   }
 
-  const selected = new Set(chapterSlugs);
   return {
-    chapter_slugs: chapterSlugs,
-    topic_names: chapterSlugs.flatMap((slug) =>
-      selected.has(slug) ? splitTopicNames(topicNamesByChapter[slug] ?? '') : [],
-    ),
+    chapter_slugs: [chapterSlug],
+    chapter_map_node_ids: chapterMapNodeIds,
     difficulty_preset: BACKEND_DIFFICULTY_BY_LABEL[difficulty],
   };
 }
@@ -71,7 +64,7 @@ export function generationStageDescription(status: GenerationBatchStatus): strin
     case 'queued':
       return 'The request is waiting for the generation worker.';
     case 'generating_questions':
-      return 'The worker is drafting candidates from the selected Chapter scope and Topic hints.';
+      return 'The worker is drafting candidates from the selected NCERT topic scope.';
     case 'validating':
       return 'Candidates are being checked before they can be reviewed.';
     case 'ready_for_review':

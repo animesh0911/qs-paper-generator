@@ -8,9 +8,13 @@
  *
  * @module DashboardPage
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { assemblePaper, createGenerationBatch } from '@/lib/api';
+import {
+  assemblePaper,
+  createGenerationBatch,
+  fetchChapterTopics,
+} from '@/lib/api';
 import { generatedPaperEditorPath } from '@/lib/editor-routes';
 import { useAuth } from '@/hooks/useAuth.hook';
 import { useCoverageForm } from '@/hooks/useCoverageForm.hook';
@@ -19,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CoverageFormView } from '@/components/coverage';
 import { BulkQuestionGenerationSetup } from '@/components/question-generation';
 import { buildGenerationBatchPayload } from '@/lib/question-generation';
-import type { GenerationDifficultyLabel } from '@/types';
+import type { ChapterTopicNode, GenerationDifficultyLabel } from '@/types';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -30,14 +34,43 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [generationBusy, setGenerationBusy] = useState(false);
   const [generationError, setGenerationError] = useState('');
-  const [generationSelectedSlugs, setGenerationSelectedSlugs] = useState<Set<string>>(
-    new Set(),
-  );
-  const [topicNamesByChapter, setTopicNamesByChapter] = useState<Record<string, string>>(
-    {},
-  );
+  const [generationChapterSlug, setGenerationChapterSlug] = useState('');
+  const [generationTopics, setGenerationTopics] = useState<ChapterTopicNode[]>([]);
+  const [generationTopicsLoading, setGenerationTopicsLoading] = useState(false);
+  const [generationTopicsError, setGenerationTopicsError] = useState('');
+  const [selectedTopicIds, setSelectedTopicIds] = useState<Set<string>>(new Set());
   const [generationDifficulty, setGenerationDifficulty] =
     useState<GenerationDifficultyLabel>('Standard');
+
+  useEffect(() => {
+    if (!generationChapterSlug) {
+      setGenerationTopics([]);
+      setGenerationTopicsError('');
+      setGenerationTopicsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setGenerationTopicsLoading(true);
+    setGenerationTopicsError('');
+    fetchChapterTopics(generationChapterSlug)
+      .then((response) => {
+        if (cancelled) return;
+        setGenerationTopics(response.topics);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setGenerationTopics([]);
+        setGenerationTopicsError((err as Error).message);
+      })
+      .finally(() => {
+        if (!cancelled) setGenerationTopicsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [generationChapterSlug]);
 
   async function generate() {
     setBusy(true);
@@ -52,21 +85,23 @@ export default function Dashboard() {
     }
   }
 
-  function toggleGenerationChapter(slug: string) {
-    setGenerationSelectedSlugs((prev) => {
+  function selectGenerationChapter(slug: string) {
+    setGenerationChapterSlug(slug);
+    setSelectedTopicIds(new Set());
+    setGenerationError('');
+  }
+
+  function toggleGenerationTopic(nodeId: string) {
+    setSelectedTopicIds((prev) => {
       const next = new Set(prev);
-      if (next.has(slug)) next.delete(slug);
-      else next.add(slug);
+      if (next.has(nodeId)) next.delete(nodeId);
+      else next.add(nodeId);
       return next;
     });
   }
 
-  function selectAllGenerationChapters() {
-    setGenerationSelectedSlugs(new Set(form.chapters.map((chapter) => chapter.slug)));
-  }
-
-  function clearGenerationChapters() {
-    setGenerationSelectedSlugs(new Set());
+  function clearGenerationTopics() {
+    setSelectedTopicIds(new Set());
   }
 
   async function startQuestionBankGeneration() {
@@ -74,8 +109,8 @@ export default function Dashboard() {
     setGenerationError('');
     try {
       const payload = buildGenerationBatchPayload({
-        chapterSlugs: Array.from(generationSelectedSlugs),
-        topicNamesByChapter,
+        chapterSlug: generationChapterSlug,
+        chapterMapNodeIds: Array.from(selectedTopicIds),
         difficulty: generationDifficulty,
       });
       const batch = await createGenerationBatch(payload);
@@ -99,7 +134,7 @@ export default function Dashboard() {
       <main className="mx-auto max-w-3xl p-6 space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Coverage</CardTitle>
+            <CardTitle>Generate paper</CardTitle>
             <p className="text-sm text-muted-foreground">
               Select chapters and optionally weight them. Difficulty profile
               sets the Remember / Understand / Apply / Analyse mix.
@@ -113,10 +148,10 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Question bank</CardTitle>
+            <CardTitle>Generate AI Q&amp;A</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Generate Question-and-answer candidates for later review without
-              changing this paper setup.
+              Secondary workflow for creating review-only Question-and-answer
+              candidates from grounded NCERT topic metadata.
             </p>
           </CardHeader>
           <CardContent>
@@ -124,17 +159,17 @@ export default function Dashboard() {
               chapters={form.chapters}
               chaptersLoading={form.chaptersLoading}
               chaptersError={form.chaptersError}
-              selectedSlugs={generationSelectedSlugs}
-              topicNamesByChapter={topicNamesByChapter}
+              selectedChapterSlug={generationChapterSlug}
+              topics={generationTopics}
+              topicsLoading={generationTopicsLoading}
+              topicsError={generationTopicsError}
+              selectedTopicIds={selectedTopicIds}
               difficulty={generationDifficulty}
               busy={generationBusy}
               error={generationError}
-              onToggleChapter={toggleGenerationChapter}
-              onSelectAllChapters={selectAllGenerationChapters}
-              onClearChapters={clearGenerationChapters}
-              onTopicNamesChange={(slug, value) =>
-                setTopicNamesByChapter((prev) => ({ ...prev, [slug]: value }))
-              }
+              onSelectChapter={selectGenerationChapter}
+              onToggleTopic={toggleGenerationTopic}
+              onClearTopics={clearGenerationTopics}
               onDifficultyChange={setGenerationDifficulty}
               onStart={startQuestionBankGeneration}
             />

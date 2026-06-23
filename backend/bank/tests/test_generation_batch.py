@@ -170,6 +170,24 @@ def test_create_batch_persists_teacher_scope_and_request(api_client, user):
     assert Question.objects.count() == 0
 
 
+def test_create_batch_rejects_topic_nodes_from_more_than_one_chapter(api_client):
+    """The MVP allows exactly one Chapter when topic node ids are present."""
+    node = _create_grounded_topic()
+
+    resp = api_client.post(
+        "/api/bank/generation-batches/",
+        {
+            "chapter_slugs": ["life-processes", "electricity"],
+            "chapter_map_node_ids": [node.stable_node_id],
+            "difficulty_preset": "balanced",
+        },
+        format="json",
+    )
+
+    assert resp.status_code == 400
+    assert "exactly one chapter_slug" in str(resp.data)
+
+
 def test_create_batch_enforces_one_active_batch_per_teacher(api_client):
     """A teacher cannot start another review-pending generation batch."""
     first = _create_batch(api_client)

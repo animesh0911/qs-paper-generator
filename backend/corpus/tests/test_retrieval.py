@@ -184,7 +184,7 @@ def test_lexical_retriever_ranks_cited_chunks_and_applies_topic_and_type_filters
     topic = ChapterMapNode.objects.get(title="4.2 Versatile Nature of Carbon")
     request = TextbookRetrievalRequest(
         chapter=document.chapter,
-        chapter_map_node=topic,
+        chapter_map_node_ids=(topic.stable_node_id,),
         content_types=("table", "activity"),
         query_text="compound formula",
         limit=3,
@@ -193,6 +193,7 @@ def test_lexical_retriever_ranks_cited_chunks_and_applies_topic_and_type_filters
     context = PostgresTextbookRetriever().retrieve(request)
 
     assert len(context.results) == 1
+    assert context.diagnostics == {}
     result = context.results[0]
     assert result.rank > 0
     assert result.chunk.chapter_map_node == topic
@@ -213,6 +214,18 @@ def test_lexical_retriever_returns_no_context_for_unsupported_query(document):
     )
 
     assert context.results == ()
+    assert context.diagnostics == {}
+
+
+@pytest.mark.django_db
+def test_search_retriever_still_rejects_default_blank_query(document):
+    """Making query text optional for query-free seams must not weaken search."""
+    RetrievalChunkBuilder().rebuild(document)
+
+    with pytest.raises(ValueError, match="query_text must not be blank"):
+        PostgresTextbookRetriever().retrieve(
+            TextbookRetrievalRequest(chapter=document.chapter)
+        )
 
 
 @pytest.mark.django_db
