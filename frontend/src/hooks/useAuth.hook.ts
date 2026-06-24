@@ -10,11 +10,17 @@
  *
  * @module useAuth.hook
  */
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { clearToken, getToken } from '@/lib/api';
+import { clearToken, getToken, onTokenChange } from '@/lib/api';
 
 export function useAuth() {
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!getToken());
+
+  useEffect(() => {
+    return onTokenChange(() => setIsAuthenticated(!!getToken()));
+  }, []);
 
   function logout() {
     clearToken();
@@ -22,7 +28,7 @@ export function useAuth() {
   }
 
   return {
-    isAuthenticated: !!getToken(),
+    isAuthenticated,
     logout,
   };
 }

@@ -26,15 +26,32 @@ import type {
 import { paperDocumentSchema } from '@/types/paper-document.schema';
 
 const TOKEN_KEY = 'qpg_token';
+const AUTH_TOKEN_CHANGED_EVENT = 'qpg:auth-token-changed';
+
+function notifyTokenChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(AUTH_TOKEN_CHANGED_EVENT));
+  }
+}
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 export function setToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token);
+  notifyTokenChanged();
 }
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
+  notifyTokenChanged();
+}
+export function onTokenChange(listener: () => void): () => void {
+  window.addEventListener(AUTH_TOKEN_CHANGED_EVENT, listener);
+  window.addEventListener('storage', listener);
+  return () => {
+    window.removeEventListener(AUTH_TOKEN_CHANGED_EVENT, listener);
+    window.removeEventListener('storage', listener);
+  };
 }
 
 async function request(
@@ -57,6 +74,13 @@ async function request(
       detail = data.detail || Object.values(data).flat().join(' ') || detail;
     } catch {
       /* ignore non-JSON error bodies */
+    }
+    if (
+      tokenOverride === undefined &&
+      token &&
+      (res.status === 401 || res.status === 403)
+    ) {
+      clearToken();
     }
     throw new Error(detail);
   }
