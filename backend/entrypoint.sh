@@ -14,6 +14,7 @@ if [ "${RUN_MIGRATIONS:-0}" = "1" ]; then
   # volume in dev and (b) mask "missing migration" errors in prod.
   python manage.py migrate --noinput
   python manage.py seed_questions
+  python manage.py seed_textbook_corpus
 fi
 
 exec "$@"

@@ -76,6 +76,48 @@ describe('paper formats', () => {
       }),
     );
   });
+
+  it('clears a stale token when the backend rejects an authenticated request', async () => {
+    storage.set('qpg_token', 'stale-token');
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ detail: 'Invalid token.' }), {
+          status: 401,
+        }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(fetchPaperFormats()).rejects.toThrow('Invalid token.');
+
+    expect(getToken()).toBeNull();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/formats',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Token stale-token',
+        }),
+      }),
+    );
+  });
+
+  it('does not clear the stored session for one-off token override failures', async () => {
+    storage.set('qpg_token', 'current-session-token');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ detail: 'Invalid token.' }), {
+            status: 401,
+          }),
+      ),
+    );
+
+    await expect(fetchPaperDocument('paper_1', 'print-token')).rejects.toThrow(
+      'Invalid token.',
+    );
+
+    expect(getToken()).toBe('current-session-token');
+  });
 });
 
 describe('generation batches', () => {

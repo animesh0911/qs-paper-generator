@@ -214,3 +214,21 @@ def test_import_command_is_idempotent_and_records_provenance():
         )
         == first_chunk_pks
     )
+
+
+@pytest.mark.django_db
+def test_seed_textbook_corpus_populates_generation_topics(api_client):
+    """Local startup seed must make the Chapter 4 topic picker usable."""
+    call_command("seed_textbook_corpus")
+
+    response = api_client.get(
+        "/api/corpus/chapters/carbon-and-its-compounds/topics/"
+    )
+
+    assert response.status_code == 200
+    assert response.data["document"] is not None
+    assert len(response.data["topics"]) > 0
+    assert any(
+        topic["title"].startswith("4.2.1 ")
+        for topic in response.data["topics"]
+    )
