@@ -171,6 +171,7 @@ class GenerationBatchSerializer(serializers.ModelSerializer):
             "ready_at",
             "accepted_at",
             "expired_at",
+            "discarded_at",
             "created_at",
             "updated_at",
         ]

@@ -175,6 +175,7 @@ describe('GenerationProgressWorkspace', () => {
     ready_at: null,
     accepted_at: null,
     expired_at: null,
+    discarded_at: null,
     created_at: '2026-06-21T00:00:00Z',
     updated_at: '2026-06-21T00:00:00Z',
   };
@@ -335,6 +336,36 @@ describe('GenerationProgressWorkspace', () => {
     );
     expect(html).toContain('Rejected candidates were not imported');
     expect(html).toContain('Back to paper setup');
+  });
+
+  it('offers "Discard & generate another" on a review-ready batch', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: {
+            ...baseBatch,
+            status: 'ready_for_review',
+            candidate_count: 2,
+          },
+          onGenerateAnother: vi.fn(),
+        })}
+      />,
+    );
+
+    expect(html).toContain('Discard &amp; generate another');
+  });
+
+  it('labels the regenerate action plainly on a settled (accepted) batch', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'accepted' },
+          onGenerateAnother: vi.fn(),
+        })}
+      />,
+    );
+
+    expect(html).toContain('Generate another batch');
   });
 
   it('shows candidate loading, empty, and error states', () => {

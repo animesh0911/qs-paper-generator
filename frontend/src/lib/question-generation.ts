@@ -17,6 +17,18 @@ const BACKEND_DIFFICULTY_BY_LABEL: Record<GenerationDifficultyLabel, string> = {
   Challenging: 'hard',
 };
 
+const LABEL_BY_BACKEND_DIFFICULTY: Record<string, GenerationDifficultyLabel> = {
+  easy: 'Easy',
+  balanced: 'Standard',
+  hard: 'Challenging',
+};
+
+export function difficultyLabelFromPreset(
+  preset: string,
+): GenerationDifficultyLabel {
+  return LABEL_BY_BACKEND_DIFFICULTY[preset] ?? 'Standard';
+}
+
 export function buildGenerationBatchPayload({
   chapterSlug,
   chapterMapNodeIds,
@@ -54,12 +66,16 @@ export function generationStageLabel(status: GenerationBatchStatus): string {
       return 'Accepted';
     case 'expired':
       return 'Expired';
+    case 'discarded':
+      return 'Discarded';
     case 'failed':
       return 'Failed';
   }
 }
 
-export function generationStageDescription(status: GenerationBatchStatus): string {
+export function generationStageDescription(
+  status: GenerationBatchStatus,
+): string {
   switch (status) {
     case 'queued':
       return 'The request is waiting for the generation worker.';
@@ -73,6 +89,8 @@ export function generationStageDescription(status: GenerationBatchStatus): strin
       return 'Reviewed candidates have been accepted into the Question bank.';
     case 'expired':
       return 'This generation job expired before review was completed.';
+    case 'discarded':
+      return 'You discarded this batch before importing any candidates.';
     case 'failed':
       return 'The job finished without usable candidates.';
   }

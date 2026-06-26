@@ -157,9 +157,9 @@ def test_prompt_scales_default_question_type_distribution_to_requested_count():
         QuestionGenerationRequest(chapter_slugs=("carbon-and-its-compounds",), count=3)
     )
 
-    distribution_line = prompt.split("Requested counts by QuestionType: ", 1)[
-        1
-    ].split("\n", 1)[0]
+    distribution_line = prompt.split("Requested counts by QuestionType: ", 1)[1].split(
+        "\n", 1
+    )[0]
 
     assert "Total candidates: exactly 3" in prompt
     assert distribution_line == (
@@ -298,11 +298,7 @@ def test_citation_support_review_handles_numeric_and_unicode_tokens():
     """Citation review must not drop formulas, numerals, or non-English text."""
     candidate = _question(
         raw_text="कार्बन की संयोजकता कितनी है?",
-        content={
-            "stem": [
-                {"type": "paragraph", "text": "कार्बन की संयोजकता कितनी है?"}
-            ]
-        },
+        content={"stem": [{"type": "paragraph", "text": "कार्बन की संयोजकता कितनी है?"}]},
         answer="4",
     )
     manifest = {
