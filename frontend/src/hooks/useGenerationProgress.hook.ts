@@ -2,11 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import type { GeneratedQuestionCandidate, GenerationBatch } from '@/types';
 import {
   acceptGenerationCandidates,
+  discardGenerationBatch,
   fetchGenerationBatch,
   fetchGenerationCandidates,
 } from '@/lib/api';
 
-const TERMINAL_STATUSES = new Set(['ready_for_review', 'accepted', 'failed', 'expired']);
+const TERMINAL_STATUSES = new Set([
+  'ready_for_review',
+  'accepted',
+  'failed',
+  'expired',
+  'discarded',
+]);
 
 export interface GenerationProgressState {
   batch: GenerationBatch | null;
@@ -18,9 +25,12 @@ export interface GenerationProgressState {
   candidatesError: string;
   accepting: boolean;
   acceptError: string;
+  discarding: boolean;
+  discardError: string;
   tryAgain: () => void;
   retryCandidates: () => void;
   acceptCandidates: (acceptedCandidateIds: number[]) => Promise<void>;
+  generateAnother: () => Promise<GenerationBatch | null>;
 }
 
 export function useGenerationProgress(
@@ -32,12 +42,16 @@ export function useGenerationProgress(
   const [error, setError] = useState('');
   const [lastCheckedAt, setLastCheckedAt] = useState('');
   const [retryTick, setRetryTick] = useState(0);
-  const [candidates, setCandidates] = useState<GeneratedQuestionCandidate[]>([]);
+  const [candidates, setCandidates] = useState<GeneratedQuestionCandidate[]>(
+    [],
+  );
   const [candidatesLoading, setCandidatesLoading] = useState(false);
   const [candidatesError, setCandidatesError] = useState('');
   const [candidatesRetryTick, setCandidatesRetryTick] = useState(0);
   const [accepting, setAccepting] = useState(false);
   const [acceptError, setAcceptError] = useState('');
+  const [discarding, setDiscarding] = useState(false);
+  const [discardError, setDiscardError] = useState('');
   const hasLoadedBatch = useRef(false);
 
   useEffect(() => {
@@ -134,6 +148,24 @@ export function useGenerationProgress(
     }
   }
 
+  async function generateAnother(): Promise<GenerationBatch | null> {
+    // A review-ready batch is still "active" and blocks a new one, so discard
+    // it first; settled batches (accepted/failed/expired/discarded) already
+    // free their queue slot and only need the return to setup.
+    if (!batchId || discarding) return batch;
+    if (batch?.status !== 'ready_for_review') return batch;
+    setDiscarding(true);
+    setDiscardError('');
+    try {
+      return await discardGenerationBatch(batchId);
+    } catch (err) {
+      setDiscardError((err as Error).message);
+      return null;
+    } finally {
+      setDiscarding(false);
+    }
+  }
+
   return {
     batch,
     loading,
@@ -144,8 +176,11 @@ export function useGenerationProgress(
     candidatesError,
     accepting,
     acceptError,
+    discarding,
+    discardError,
     tryAgain,
     retryCandidates,
     acceptCandidates,
+    generateAnother,
   };
 }

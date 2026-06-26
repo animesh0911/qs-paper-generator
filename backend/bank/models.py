@@ -312,6 +312,7 @@ class GenerationBatchStatus(models.TextChoices):
     ACCEPTED = "accepted", "Accepted"
     FAILED = "failed", "Failed"
     EXPIRED = "expired", "Expired"
+    DISCARDED = "discarded", "Discarded"
 
 
 ACTIVE_GENERATION_BATCH_STATUSES = (
@@ -320,6 +321,20 @@ ACTIVE_GENERATION_BATCH_STATUSES = (
     GenerationBatchStatus.VALIDATING,
     GenerationBatchStatus.READY_FOR_REVIEW,
 )
+
+# Statuses a teacher may discard from. In-flight statuses
+# (generating/validating) are excluded so a discard never races the drain
+# worker mid-run.
+DISCARDABLE_GENERATION_BATCH_STATUSES = (
+    GenerationBatchStatus.QUEUED,
+    GenerationBatchStatus.READY_FOR_REVIEW,
+    GenerationBatchStatus.FAILED,
+    GenerationBatchStatus.EXPIRED,
+)
+
+# Upper bound on a teacher's simultaneously non-terminal batches. Bounds paid
+# model-call runaway from the FIFO queue (Rule 13).
+MAX_ACTIVE_GENERATION_BATCHES_PER_TEACHER = 5
 
 GENERATION_BATCH_REVIEW_TTL = timedelta(days=30)
 
@@ -360,9 +375,13 @@ class GenerationBatch(models.Model):
         db_index=True,
     )
     error = models.TextField(blank=True)
+    # Pointer to the LangGraph checkpointer thread that owns this batch's
+    # in-flight execution state (ADR-0006), mirroring ``IngestionJob``.
+    thread_id = models.CharField(max_length=64, blank=True, default="")
     ready_at = models.DateTimeField(null=True, blank=True)
     accepted_at = models.DateTimeField(null=True, blank=True)
     expired_at = models.DateTimeField(null=True, blank=True)
+    discarded_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -427,6 +446,7 @@ class GeneratedQuestionCandidateStatus(models.TextChoices):
     ACCEPTED = "accepted", "Accepted"
     REJECTED = "rejected", "Rejected"
     EXPIRED = "expired", "Expired"
+    DISCARDED = "discarded", "Discarded"
 
 
 class GeneratedQuestionCandidate(models.Model):

@@ -389,6 +389,9 @@ export interface GenerationProgressWorkspaceProps {
   onAcceptCandidates: (acceptedCandidateIds: number[]) => void;
   onRetryCandidates: () => void;
   onBackToPaperSetup: () => void;
+  discarding?: boolean;
+  discardError?: string;
+  onGenerateAnother?: () => void;
 }
 
 function isActiveGenerationStatus(status: GenerationBatch['status']): boolean {
@@ -409,6 +412,8 @@ function progressStageLabel(status: GenerationBatchStatus): string {
       return 'Imported';
     case 'expired':
       return 'Closed';
+    case 'discarded':
+      return 'Discarded';
     case 'failed':
       return 'Needs retry';
   }
@@ -428,6 +433,8 @@ function progressStageDescription(status: GenerationBatchStatus): string {
       return 'Accepted Q&A has been added to the Question bank.';
     case 'expired':
       return 'This request is no longer active.';
+    case 'discarded':
+      return 'You discarded this batch. Start a new one any time.';
     case 'failed':
       return 'No usable Q&A was created.';
   }
@@ -444,6 +451,7 @@ function progressStep(status: GenerationBatchStatus): number {
     case 'accepted':
       return 2;
     case 'expired':
+    case 'discarded':
     case 'failed':
       return 0;
   }
@@ -493,12 +501,27 @@ export function GenerationProgressWorkspace({
   onAcceptCandidates,
   onRetryCandidates,
   onBackToPaperSetup,
+  discarding = false,
+  discardError = '',
+  onGenerateAnother,
 }: GenerationProgressWorkspaceProps) {
   const noValidQuestions = batch
     ? shouldShowNoValidQuestionsMessage(batch)
     : false;
   const active = batch ? isActiveGenerationStatus(batch.status) : false;
   const step = batch ? progressStep(batch.status) : 0;
+  // On a still-active review batch this discards first; on a settled batch it
+  // just returns to the (pre-filled) setup. Either way it frees a queue slot,
+  // so the teacher never needs the browser back button to generate again.
+  const canGenerateAnother =
+    Boolean(onGenerateAnother) &&
+    Boolean(batch) &&
+    batch?.status !== 'queued' &&
+    !active;
+  const generateAnotherLabel =
+    batch?.status === 'ready_for_review'
+      ? 'Discard & generate another'
+      : 'Generate another batch';
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -595,6 +618,24 @@ export function GenerationProgressWorkspace({
                 </ol>
               </div>
 
+              {canGenerateAnother && (
+                <div className="flex flex-col gap-2 border-t border-white/70 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onGenerateAnother}
+                    disabled={discarding}
+                  >
+                    {discarding ? 'Closing this batch…' : generateAnotherLabel}
+                  </Button>
+                  {discardError && (
+                    <p className="text-sm text-muted-foreground" role="alert">
+                      {discardError}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {error && (
                 <div className="border-t pt-3" role="status">
                   <p className="text-sm font-medium">
@@ -675,7 +716,18 @@ export function GenerationProgressWorkspace({
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button type="button" onClick={onTryAgain}>
+                {onGenerateAnother && (
+                  <Button
+                    type="button"
+                    onClick={onGenerateAnother}
+                    disabled={discarding}
+                  >
+                    {discarding
+                      ? 'Closing this batch…'
+                      : 'Generate another batch'}
+                  </Button>
+                )}
+                <Button type="button" variant="outline" onClick={onTryAgain}>
                   Try again
                 </Button>
                 <Button
