@@ -188,14 +188,68 @@ def test_create_batch_rejects_topic_nodes_from_more_than_one_chapter(api_client)
     assert "exactly one chapter_slug" in str(resp.data)
 
 
-def test_create_batch_enforces_one_active_batch_per_teacher(api_client):
-    """A teacher cannot start another review-pending generation batch."""
+def test_create_batch_allows_multiple_queued_batches_fifo(api_client):
+    """Teachers may queue several batches at once; they line up FIFO."""
     first = _create_batch(api_client)
     second = _create_batch(api_client)
 
     assert first.status_code == 202
-    assert second.status_code == 409
-    assert "active" in second.data["detail"]
+    assert second.status_code == 202
+
+    listed = api_client.get("/api/bank/generation-batches/")
+    assert listed.status_code == 200
+    ids = [row["id"] for row in listed.data]
+    assert ids == [first.data["id"], second.data["id"]]
+
+
+def test_create_batch_enforces_queue_cap(api_client, user):
+    """The per-teacher non-terminal cap bounds paid model-call runaway."""
+    from bank.models import MAX_ACTIVE_GENERATION_BATCHES_PER_TEACHER
+
+    for _ in range(MAX_ACTIVE_GENERATION_BATCHES_PER_TEACHER):
+        assert _create_batch(api_client).status_code == 202
+
+    overflow = _create_batch(api_client)
+    assert overflow.status_code == 409
+    assert "full" in overflow.data["detail"]
+
+
+def test_discard_ready_batch_frees_a_queue_slot(api_client, user):
+    """Discarding a ready batch marks its candidates discarded and clears it."""
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.READY_FOR_REVIEW,
+        ready_at=timezone.now(),
+    )
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
+    candidate = batch.candidates.create(payload=_payload())
+
+    resp = api_client.post(f"/api/bank/generation-batches/{batch.pk}/discard/")
+
+    assert resp.status_code == 200
+    assert resp.data["status"] == GenerationBatchStatus.DISCARDED
+    batch.refresh_from_db()
+    candidate.refresh_from_db()
+    assert batch.status == GenerationBatchStatus.DISCARDED
+    assert candidate.status == GeneratedQuestionCandidateStatus.DISCARDED
+    assert Question.objects.count() == 0
+
+
+def test_discard_rejects_in_flight_batch(api_client, user):
+    """A batch the worker may be running cannot be discarded mid-run."""
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.GENERATING_QUESTIONS,
+    )
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
+
+    resp = api_client.post(f"/api/bank/generation-batches/{batch.pk}/discard/")
+
+    assert resp.status_code == 409
+    batch.refresh_from_db()
+    assert batch.status == GenerationBatchStatus.GENERATING_QUESTIONS
 
 
 def test_create_batch_rejects_unknown_difficulty_preset(api_client):

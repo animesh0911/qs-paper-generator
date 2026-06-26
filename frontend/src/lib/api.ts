@@ -215,6 +215,20 @@ export async function fetchGenerationBatch(
   return res.json();
 }
 
+export async function fetchGenerationBatches(): Promise<GenerationBatch[]> {
+  const res = await request('/bank/generation-batches/', { method: 'GET' });
+  return res.json();
+}
+
+export async function discardGenerationBatch(
+  batchId: number | string,
+): Promise<GenerationBatch> {
+  const res = await request(`/bank/generation-batches/${batchId}/discard/`, {
+    method: 'POST',
+  });
+  return res.json();
+}
+
 export async function fetchGenerationCandidates(
   batchId: number | string,
 ): Promise<GeneratedQuestionCandidate[]> {
