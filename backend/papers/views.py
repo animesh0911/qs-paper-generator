@@ -29,6 +29,7 @@ from .answer_document import (
 )
 from .assets import strip_resolved_asset_urls, with_resolved_asset_urls
 from .builder import PaperBuilder
+from .document_contract import PaperDocumentContractError
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
 from .serializers import AssembleRequestSerializer, PaperSerializer
@@ -58,7 +59,19 @@ class AssemblePaperView(APIView):
         params = dict(req.validated_data)
         if not params.get("title"):
             params.pop("title", None)
-        result = PaperBuilder().assemble(request.user, **params)
+        try:
+            result = PaperBuilder().assemble(request.user, **params)
+        except PaperDocumentContractError as exc:
+            # The builder produced a document the editor would reject. Caught
+            # and logged in the builder; return a clean 500 instead of a raw
+            # traceback or a browser-only "Unable to open paper".
+            return Response(
+                {
+                    "error": "Generated paper failed contract validation.",
+                    "detail": exc.errors,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
         return Response(result.document, status=status.HTTP_201_CREATED)
 
 

@@ -7,12 +7,14 @@ maps the result to PaperDocumentV1, and returns both as an AssemblyResult.
 Callers (view, tests) pick `.paper` or `.document` as needed.
 """
 
+import logging
 from dataclasses import dataclass
 
 from django.db import transaction
 
 from .answer_document import build_answer_document
 from .document import PaperDocumentBuilder
+from .document_contract import PaperDocumentContractError, validate_paper_document
 from .models import Paper, PaperFormat, PaperQuestion
 from .picker import DEFAULT_DIFFICULTY, FilledTemplate, PaperOptions, QuestionPicker
 from .template import TemplateBuilder
@@ -55,12 +57,30 @@ class PaperBuilder:
         result = QuestionPicker().select(opts)
         paper = self._persist(user, title, result)
         document = PaperDocumentBuilder().build(paper, result, opts, paper_format)
+        self._guard_contract(paper, document)
         paper.document = document
         # The answer document is keyed by slot id, so it is built from the
         # finished document (which owns slot ids), not from the raw template.
         paper.answer_document = build_answer_document(paper)
         paper.save(update_fields=["document", "answer_document"])
         return AssemblyResult(paper=paper, document=document)
+
+    @staticmethod
+    def _guard_contract(paper: Paper, document: dict) -> None:
+        """Fail loudly if the built document violates the v1 contract.
+
+        The builder is meant to emit a contract-valid PaperDocument; if it does
+        not, that is a server bug we want surfaced (logged + raised) here rather
+        than shipped to the editor as the opaque "Unable to open paper".
+        """
+        errors = validate_paper_document(document)
+        if errors:
+            logging.getLogger(__name__).error(
+                "PaperDocument contract violation for paper %s: %s",
+                paper.pk,
+                errors,
+            )
+            raise PaperDocumentContractError(errors)
 
     @transaction.atomic
     def _persist(self, user, title: str, result: FilledTemplate) -> Paper:
