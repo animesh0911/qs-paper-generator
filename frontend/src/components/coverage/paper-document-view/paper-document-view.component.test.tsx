@@ -41,7 +41,7 @@ describe('PaperDocumentView', () => {
     slot.overrides = {
       modified: true,
       regions: {
-        'choice:1:A': [
+        'choice:1:0:A': [
           {
             type: 'paragraph',
             text: 'Edited second choice group option.',
