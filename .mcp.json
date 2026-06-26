@@ -5,12 +5,8 @@
       "args": ["-y", "@playwright/mcp@latest"]
     },
     "codex-agy-bridge": {
-      "command": "/opt/homebrew/bin/uv",
-      "args": ["--directory", "/Users/varad/V/repo/codex-agy-bridge", "run", "codex-agy-bridge"],
-      "env": {
-        "AGY_BRIDGE_STATE_DIR": "/Users/varad/.local/state/codex-agy-bridge",
-        "AGY_CMD": "/Users/varad/.local/bin/agy"
-      }
+      "command": "uvx",
+      "args": ["codex-agy-bridge@latest"]
     }
   }
 }
