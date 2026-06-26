@@ -332,7 +332,7 @@ class PaperDocumentBuilder:
         text-only stem, with diagram items synthesised from the bank flags.
         """
         if q.content:
-            return q.content
+            return self._normalise_choice_groups(q.content)
 
         # Which regions to synthesise comes from the QuestionShape spec, so the
         # fallback can't drift from the qtype's real structure (see CONTEXT.md).
@@ -349,6 +349,40 @@ class PaperDocumentBuilder:
 
         self._apply_diagram_fallback(q, content)
         return content
+
+    @staticmethod
+    def _normalise_choice_groups(content: dict) -> dict:
+        """Fill contract-required ChoiceGroup fields some ingested rows omit.
+
+        The contract (§9) requires every ``choices`` group to carry a
+        ``displayStyle`` ("or" | "choose_any") and a ``chooseCount``, but some
+        ingested questions store an internal-OR group with only ``options`` +
+        ``chooseCount``. Passing those through verbatim yields a PaperDocument
+        the editor's schema rejects, which surfaced as "Unable to open paper"
+        for chapters whose case-based questions came from such rows. A group
+        with N options where the teacher answers some is an "or" choice, so we
+        default the missing ``displayStyle`` to "or" (and ``chooseCount`` to 1)
+        without mutating the stored row.
+        """
+        groups = content.get("choices")
+        if not isinstance(groups, list):
+            return content
+        normalised = []
+        changed = False
+        for group in groups:
+            if isinstance(group, dict) and (
+                "displayStyle" not in group or "chooseCount" not in group
+            ):
+                group = {
+                    "displayStyle": group.get("displayStyle", "or"),
+                    "chooseCount": group.get("chooseCount", 1),
+                    **group,
+                }
+                changed = True
+            normalised.append(group)
+        if not changed:
+            return content
+        return {**content, "choices": normalised}
 
     def _apply_diagram_fallback(self, q: Question, content: dict) -> None:
         """Append a diagram item to the stem for rows without structured content.

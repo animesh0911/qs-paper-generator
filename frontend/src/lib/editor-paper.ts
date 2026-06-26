@@ -616,11 +616,16 @@ function pushInternalChoiceRegions(
   overrides: SlotOverrides | undefined,
 ) {
   choices?.forEach((choiceGroup, groupIndex) => {
-    choiceGroup.options.forEach((option) => {
+    choiceGroup.options.forEach((option, optionIndex) => {
       blocks.push(
         regionBlock(
           'internalChoiceBlock',
-          `choice:${groupIndex}:${option.label}`,
+          // Include the option index: a choice group may legitimately repeat an
+          // option label (ingested case-based questions sometimes label two
+          // options the same, e.g. both "c"), and the region key must stay
+          // unique so React keys don't collide and per-option edits aren't
+          // applied to the wrong option.
+          `choice:${groupIndex}:${optionIndex}:${option.label}`,
           option.content,
           overrides,
           `${option.label}. `,

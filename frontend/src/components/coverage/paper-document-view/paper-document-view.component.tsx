@@ -484,11 +484,14 @@ function PrintChoiceGroup({
   return (
     <div className="paper-choice-group">
       {choice.options.map((option, index) => (
-        <div key={option.label}>
+        // Key by index: option labels can repeat within a group, so the label
+        // alone is not unique. Must match the region-key scheme in
+        // editor-paper.ts so edit overrides resolve to the same option.
+        <div key={`${index}:${option.label}`}>
           {index > 0 && <strong>OR</strong>}
           <PaperContentItems
             items={
-              overrides[`choice:${groupIndex}:${option.label}`] ??
+              overrides[`choice:${groupIndex}:${index}:${option.label}`] ??
               option.content
             }
           />

@@ -388,6 +388,35 @@ def test_internal_choice_structured_content_passthrough():
     assert result == structured
 
 
+def test_choice_group_missing_display_style_defaults_to_or():
+    """Ingested OR groups lacking displayStyle/chooseCount are made contract-valid.
+
+    Some ingested case-based/internal-choice rows store a choice group with only
+    ``options`` (no ``displayStyle``). Passed through verbatim that yields a
+    PaperDocument the editor schema rejects ("Unable to open paper"). The builder
+    fills the missing contract fields, defaulting displayStyle to "or".
+    """
+    content = {
+        "choices": [
+            {
+                "chooseCount": 1,
+                "options": [
+                    {"label": "i", "content": [{"type": "paragraph", "text": "A"}]},
+                    {"label": "ii", "content": [{"type": "paragraph", "text": "B"}]},
+                ],
+            }
+        ]
+    }
+    q = _question(qtype="case_based", content=content)
+    result = PaperDocumentBuilder()._build_content(q)
+    group = result["choices"][0]
+    assert group["displayStyle"] == "or"
+    assert group["chooseCount"] == 1
+    assert group["options"] == content["choices"][0]["options"]
+    # The stored row is not mutated.
+    assert "displayStyle" not in content["choices"][0]
+
+
 def test_internal_choice_fallback_has_only_stem():
     """internal_choice without structured content falls back to stem only."""
     q = _question(qtype="internal_choice", content={}, text="Answer any one.")
