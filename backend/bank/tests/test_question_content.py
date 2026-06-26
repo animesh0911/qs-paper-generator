@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-from bank.question_content import (
-    normalise_question_content,
-    validate_question_content,
-)
+from bank.question_content import normalise_question_content
 
 
 def _group(**overrides):
@@ -50,23 +47,5 @@ def test_normalise_ignores_content_without_choices():
     assert normalise_question_content(content) is content
 
 
-def test_validate_accepts_normalised_choice_group():
-    assert validate_question_content({"choices": [_group()]}) == []
-
-
-def test_validate_flags_bad_display_style_and_types():
-    content = {
-        "choices": [
-            {"displayStyle": "maybe", "chooseCount": "1", "options": {}},
-        ]
-    }
-
-    errors = validate_question_content(content)
-
-    assert any("displayStyle must be one of" in e for e in errors)
-    assert any("chooseCount must be an integer" in e for e in errors)
-    assert any("options must be a list" in e for e in errors)
-
-
-def test_validate_flags_non_dict_content():
-    assert validate_question_content("nope") == ["content must be an object"]
+def test_normalise_ignores_non_dict_content():
+    assert normalise_question_content("nope") == "nope"

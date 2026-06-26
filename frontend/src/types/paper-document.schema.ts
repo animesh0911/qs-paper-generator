@@ -11,6 +11,14 @@
  * verify that the actual JSON returned by the server matches them.
  * Commit b6384db shipped a backend shape change with no frontend update
  * and no test failed — Zod parsing closes that gap.
+ *
+ * Single source of truth: this schema is also the source for the *backend's*
+ * shape validation. `paper-document.schema.export.test.ts` generates
+ * `backend/papers/paper_document_v1.schema.json` from it (run
+ * `npm run schema:export` after intentional changes) and guards against drift,
+ * so the Python guard in `papers/document_contract.py` can never diverge from
+ * this definition. The `.superRefine` below is the one part that can't be
+ * expressed in JSON Schema; the backend mirrors it in Python.
  */
 import { z } from 'zod';
 

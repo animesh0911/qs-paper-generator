@@ -1,28 +1,28 @@
 """Server-side PaperDocumentV1 contract guard.
 
 ``PaperBuilder.assemble`` runs this over the document it is about to return so a
-contract violation is caught here — with a precise, logged message — instead of
+contract violation is caught here — with precise, logged messages — instead of
 silently shipping to the browser and surfacing as the opaque editor error
-"Unable to open paper". It deliberately checks only the invariants the editor's
-Zod schema enforces strictly and that the builder does not guarantee by
-construction: required top-level keys, per-question ``content`` shape (via the
-shared ``bank.question_content`` validator), and slot→question referential
-integrity. It is a safety net against our own regressions, not a full mirror of
-the frontend schema.
+"Unable to open paper".
+
+Single source of truth: the document *shape* is validated against
+``paper_document_v1.schema.json``, a JSON Schema generated from the frontend Zod
+schema (``paper-document.schema.ts``) — the one definition both sides derive
+from, kept in sync by a drift-guard test on the frontend. JSON Schema cannot
+express cross-references, so the Zod ``.superRefine`` (slot ↔ question
+referential integrity and slot/question compatibility) is mirrored here as a
+Python check.
 """
 
 from __future__ import annotations
 
-from bank.question_content import validate_question_content
+import json
+from functools import lru_cache
+from pathlib import Path
 
-_REQUIRED_TOP_LEVEL_KEYS = (
-    "schemaVersion",
-    "request",
-    "template",
-    "format",
-    "paper",
-    "questions",
-)
+from jsonschema import Draft202012Validator
+
+_SCHEMA_PATH = Path(__file__).with_name("paper_document_v1.schema.json")
 
 
 class PaperDocumentContractError(Exception):
@@ -33,50 +33,69 @@ class PaperDocumentContractError(Exception):
         super().__init__("; ".join(errors))
 
 
+@lru_cache(maxsize=1)
+def _validator() -> Draft202012Validator:
+    schema = json.loads(_SCHEMA_PATH.read_text())
+    return Draft202012Validator(schema)
+
+
 def validate_paper_document(document: dict) -> list[str]:
     """Return contract-violation messages for ``document`` (empty == valid)."""
-    errors: list[str] = []
-
-    missing = [k for k in _REQUIRED_TOP_LEVEL_KEYS if k not in document]
-    if missing:
-        errors.append(f"document missing required keys: {missing}")
-
-    questions = document.get("questions")
-    if not isinstance(questions, list):
-        errors.append("document.questions must be a list")
-        return errors  # nothing more can be checked without the question list
-
-    question_ids: set[str] = set()
-    for index, question in enumerate(questions):
-        if not isinstance(question, dict):
-            errors.append(f"questions[{index}] must be an object")
-            continue
-        qid = question.get("id")
-        if isinstance(qid, str):
-            question_ids.add(qid)
-        errors.extend(
-            validate_question_content(
-                question.get("content"), where=f"questions[{index}].content"
-            )
+    errors = [
+        f"{_json_path(error.absolute_path)}: {error.message}"
+        for error in sorted(
+            _validator().iter_errors(document), key=lambda e: list(e.absolute_path)
         )
-
-    errors.extend(_validate_slot_references(document, question_ids))
+    ]
+    # Cross-reference checks JSON Schema can't express (mirrors Zod superRefine).
+    errors.extend(_validate_references(document))
     return errors
 
 
-def _validate_slot_references(document: dict, question_ids: set[str]) -> list[str]:
-    """Every slot's selected/alternate question id must resolve to a question."""
+def _json_path(path) -> str:
+    parts = "".join(
+        f"[{part}]" if isinstance(part, int) else f".{part}" for part in path
+    )
+    return f"document{parts}" if parts else "document"
+
+
+def _validate_references(document: dict) -> list[str]:
+    """Mirror the Zod superRefine: every slot's selected/alternate id must
+    resolve to a question, and a referenced question must match the slot's
+    marks/type and the paper's language."""
+    paper = document.get("paper")
+    questions = document.get("questions")
+    if not isinstance(paper, dict) or not isinstance(questions, list):
+        return []  # shape errors already reported by the JSON Schema pass.
+
+    questions_by_id = {
+        q["id"]: q for q in questions if isinstance(q, dict) and "id" in q
+    }
+    language = paper.get("language")
+
     errors: list[str] = []
-    sections = (document.get("paper") or {}).get("sections") or []
-    for section in sections:
+    for section in paper.get("sections") or []:
         for slot in section.get("slots") or []:
-            selected = slot.get("selectedQuestionId")
             slot_id = slot.get("id", "?")
-            if selected is not None and selected not in question_ids:
-                errors.append(
-                    f"slot {slot_id} selects unknown question id {selected!r}"
-                )
-            for alt in slot.get("alternateQuestionIds") or []:
-                if alt not in question_ids:
-                    errors.append(f"slot {slot_id} lists unknown alternate id {alt!r}")
+            selected = slot.get("selectedQuestionId")
+            referenced = [
+                qid
+                for qid in [selected, *(slot.get("alternateQuestionIds") or [])]
+                if qid is not None
+            ]
+            for qid in referenced:
+                if qid not in questions_by_id:
+                    label = "selects" if qid == selected else "lists alternate"
+                    errors.append(f"slot {slot_id} {label} unknown question {qid!r}")
+                    continue
+                q = questions_by_id[qid]
+                if (
+                    q.get("defaultMarks") != slot.get("marks")
+                    or q.get("type") != slot.get("type")
+                    or q.get("language") != language
+                ):
+                    errors.append(
+                        f"slot {slot_id} references incompatible question {qid!r} "
+                        "(marks/type/language mismatch)"
+                    )
     return errors

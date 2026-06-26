@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "schema:export": "UPDATE_SCHEMA=1 vitest run src/types/paper-document.schema.export.test.ts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
