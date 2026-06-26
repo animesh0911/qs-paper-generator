@@ -9,7 +9,7 @@
  * @module DashboardPage
  */
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronUp, ListChecks, Sparkles } from 'lucide-react';
 import {
   assemblePaper,
@@ -28,16 +28,17 @@ import type { ChapterTopicNode, GenerationDifficultyLabel } from '@/types';
 
 const MVP_GENERATION_CHAPTER_SLUG = 'carbon-and-its-compounds';
 
-function activeGenerationBatchIdFromMessage(message: string): number | null {
-  const match = message.match(/active generation batch #(\d+)/i);
-  if (!match) return null;
-  return Number(match[1]);
+interface GenerationPrefill {
+  chapterSlug: string;
+  topicIds: string[];
+  difficulty: GenerationDifficultyLabel;
 }
 
 export default function Dashboard() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const form = useCoverageForm();
+  const location = useLocation();
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -96,6 +97,22 @@ export default function Dashboard() {
     };
   }, [generationChapterSlug]);
 
+  // Pre-fill the generation setup when arriving from "Generate another batch"
+  // on the progress page, so the teacher can tweak and regenerate in place.
+  useEffect(() => {
+    const prefill = (
+      location.state as { generationPrefill?: GenerationPrefill }
+    )?.generationPrefill;
+    if (!prefill) return;
+    setGenerationChapterSlug(prefill.chapterSlug);
+    setSelectedTopicIds(new Set(prefill.topicIds));
+    setGenerationDifficulty(prefill.difficulty);
+    setGenerationPanelOpen(true);
+    // Clear the navigation state so a refresh doesn't re-apply the prefill.
+    navigate('.', { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
+
   async function generate() {
     setBusy(true);
     setError('');
@@ -142,14 +159,9 @@ export default function Dashboard() {
       const batch = await createGenerationBatch(payload);
       navigate(`/generation-batches/${batch.id}`);
     } catch (err) {
-      const message = (err as Error).message;
-      const activeBatchId = activeGenerationBatchIdFromMessage(message);
-      if (activeBatchId) {
-        setActiveGenerationBatchId(activeBatchId);
-        setGenerationError('Questions are already being generated.');
-      } else {
-        setGenerationError(message);
-      }
+      // Batches now queue freely; a 409 here means the per-teacher queue cap is
+      // reached, so surface the message rather than blocking on one active batch.
+      setGenerationError((err as Error).message);
     } finally {
       setGenerationBusy(false);
     }

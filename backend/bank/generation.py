@@ -64,7 +64,9 @@ QUESTION_GENERATION_RESPONSE_SCHEMA: dict[str, Any] = {
                     "chapter_slug": {"type": "string"},
                     "qtype": {
                         "type": "string",
-                        "enum": sorted(str(qtype) for qtype in SUPPORTED_GENERATED_QTYPES),
+                        "enum": sorted(
+                            str(qtype) for qtype in SUPPORTED_GENERATED_QTYPES
+                        ),
                     },
                     "marks": {"type": "integer"},
                     "cognitive_level": {
@@ -80,7 +82,10 @@ QUESTION_GENERATION_RESPONSE_SCHEMA: dict[str, Any] = {
                                 "items": {
                                     "type": "object",
                                     "properties": {
-                                        "type": {"type": "string", "enum": ["paragraph"]},
+                                        "type": {
+                                            "type": "string",
+                                            "enum": ["paragraph"],
+                                        },
                                         "text": {"type": "string"},
                                     },
                                     "required": ["type", "text"],
@@ -206,8 +211,9 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
         "medium": 50,
         "hard": 20,
     }
-    distribution = request.question_type_distribution or _default_distribution_for_count(
-        request.count
+    distribution = (
+        request.question_type_distribution
+        or _default_distribution_for_count(request.count)
     )
     grounding_lines = _grounding_prompt_lines(request.grounding_manifest)
     return "\n".join(

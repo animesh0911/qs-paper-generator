@@ -26,11 +26,12 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from .generation_batches import (
-    ActiveGenerationBatchError,
     GenerationBatchBadSelection,
     GenerationBatchConflict,
     accept_generation_batch_selection,
+    discard_generation_batch,
     get_owned_generation_batch,
+    list_generation_batches,
     queue_generation_batch,
 )
 from .models import Chapter, CognitiveLevel, IngestionJob, QuestionType, Section
@@ -109,18 +110,36 @@ def ingest_status(request, job_id):
     return Response(IngestionJobSerializer(job).data)
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @permission_classes([IsTeacher])
-def generation_batch_create(request):
-    """Queue a teacher's bulk AI Question-generation request."""
+def generation_batches(request):
+    """List the teacher's batch queue (GET) or enqueue a new batch (POST)."""
+    if request.method == "GET":
+        batches = list_generation_batches(request.user)
+        return Response(GenerationBatchSerializer(batches, many=True).data)
+
     serializer = GenerationBatchCreateSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     try:
         batch = queue_generation_batch(request.user, serializer.validated_data)
-    except ActiveGenerationBatchError as exc:
+    except GenerationBatchConflict as exc:
         return Response({"detail": exc.detail}, status=409)
 
     return Response(GenerationBatchSerializer(batch).data, status=202)
+
+
+@api_view(["POST"])
+@permission_classes([IsTeacher])
+def generation_batch_discard(request, batch_id):
+    """Discard an owned batch so the teacher can start a fresh one."""
+    try:
+        batch = discard_generation_batch(request.user, batch_id)
+    except GenerationBatchConflict as exc:
+        return Response({"detail": exc.detail}, status=409)
+
+    if batch is None:
+        return Response({"detail": "Not found."}, status=404)
+    return Response(GenerationBatchSerializer(batch).data)
 
 
 @api_view(["GET"])

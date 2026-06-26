@@ -9,26 +9,29 @@ persistence, and GeneratedQuestionCandidate import into the Question bank.
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from datetime import timedelta
+from uuid import uuid4
 
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
 from corpus.retrieval import ChapterMapContextAssembler, TextbookRetrievalRequest
+from workflows.checkpointer import get_checkpointer
 
 from .generation import (
     DIFFICULTY_TARGETS_BY_PRESET,
     LangChainQuestionGenerator,
     QuestionGenerationRequest,
-    validate_generated_questions,
 )
 from .models import (
     ACTIVE_GENERATION_BATCH_STATUSES,
+    DISCARDABLE_GENERATION_BATCH_STATUSES,
+    MAX_ACTIVE_GENERATION_BATCHES_PER_TEACHER,
     AnswerSource,
     Chapter,
-    GeneratedQuestionCandidate,
     GeneratedQuestionCandidateStatus,
     GenerationBatch,
     GenerationBatchStatus,
@@ -91,16 +94,23 @@ def drainable_filter(now) -> Q:
 
 
 def queue_generation_batch(user, data: dict) -> GenerationBatch:
-    """Create one teacher-owned queued GenerationBatch, enforcing active-batch rules."""
+    """Enqueue one teacher-owned GenerationBatch into the FIFO queue.
+
+    Multiple batches may queue at once; the sequential drain worker processes
+    them one at a time in ``created_at`` order. A per-teacher cap on
+    simultaneously non-terminal batches bounds paid model-call runaway (Rule 13).
+    """
     GenerationBatch.expire_ready_batches()
     with transaction.atomic():
         locked_user = type(user).objects.select_for_update().get(pk=user.pk)
-        active = GenerationBatch.objects.filter(
+        active_count = GenerationBatch.objects.filter(
             created_by=locked_user,
             status__in=ACTIVE_GENERATION_BATCH_STATUSES,
-        ).first()
-        if active:
-            raise ActiveGenerationBatchError(active)
+        ).count()
+        if active_count >= MAX_ACTIVE_GENERATION_BATCHES_PER_TEACHER:
+            raise GenerationBatchConflict(
+                "Generation queue is full; review or discard a batch first."
+            )
 
         chapters_for_request = list(
             Chapter.objects.filter(slug__in=data["chapter_slugs"]).order_by("order")
@@ -148,44 +158,30 @@ def claim_generation_batch(batch_id: int) -> tuple[GenerationBatch | None, bool]
 def process_generation_batch(
     batch: GenerationBatch,
     *,
-    reclaimed: bool,
+    reclaimed: bool = False,
     generator_factory: Callable[[], object] = build_generator,
     context_assembler_factory: Callable[[], object] = build_context_assembler,
+    checkpointer_cm: Callable[[], AbstractContextManager] = get_checkpointer,
 ) -> ProcessedGenerationBatch:
-    """Generate and persist valid candidates, or mark the batch failed."""
-    if reclaimed:
-        batch.status = GenerationBatchStatus.FAILED
-        batch.error = "Reclaimed after an interrupted drain run; not retried."
-        batch.save(update_fields=["status", "error", "updated_at"])
-        raise GenerationBatchConflict(batch.error)
+    """Drive the batch's LangGraph thread to completion and persist candidates.
+
+    The checkpoint — not the ledger — is the truth about how far the thread
+    got: a batch reclaimed after an interrupted run *resumes* from its last
+    checkpoint (the post-``generate`` snapshot) instead of re-billing the model,
+    so ``reclaimed`` no longer fails the batch. Terminal generator/validation
+    errors flip the batch to ``FAILED``.
+    """
+    del reclaimed  # Resume is checkpoint-driven; no special-casing needed.
+    if not batch.thread_id:
+        batch.thread_id = uuid4().hex
+        batch.save(update_fields=["thread_id", "updated_at"])
 
     try:
-        request = request_from_batch(batch)
-        grounding_manifest = grounding_manifest_from_batch(
+        final = _run_generation_graph(
             batch,
-            context_assembler=(
-                context_assembler_factory() if batch.chapter_map_node_ids else None
-            ),
-        )
-        if grounding_manifest:
-            request = request_from_batch(batch, grounding_manifest)
-        generated = generator_factory().generate(request)
-        batch.status = GenerationBatchStatus.VALIDATING
-        batch.save(update_fields=["status", "updated_at"])
-
-        result = validate_generated_questions({"questions": generated}, request)
-        if not result.valid_questions:
-            raise ValueError("No valid generated candidates.")
-
-        GeneratedQuestionCandidate.objects.bulk_create(
-            [
-                GeneratedQuestionCandidate(
-                    batch=batch,
-                    payload=payload,
-                    grounding_manifest=grounding_manifest or {},
-                )
-                for payload in result.valid_questions
-            ]
+            generator_factory=generator_factory,
+            context_assembler_factory=context_assembler_factory,
+            checkpointer_cm=checkpointer_cm,
         )
     except Exception as exc:
         batch.status = GenerationBatchStatus.FAILED
@@ -199,8 +195,42 @@ def process_generation_batch(
     batch.save(update_fields=["status", "error", "ready_at", "updated_at"])
     return ProcessedGenerationBatch(
         batch=batch,
-        candidate_count=len(result.valid_questions),
+        candidate_count=final["valid_count"],
     )
+
+
+def _run_generation_graph(
+    batch: GenerationBatch,
+    *,
+    generator_factory: Callable[[], object],
+    context_assembler_factory: Callable[[], object],
+    checkpointer_cm: Callable[[], AbstractContextManager],
+) -> dict:
+    """Run the batch's thread fresh, resume it, or read back a finished thread.
+
+    No checkpoint means a fresh invoke with the initial state; pending tasks
+    mean a resume (``input=None`` continues from the last checkpoint); a
+    finished thread (a crash landed between the graph completing and the ledger
+    update) only needs its values read back — re-invoking would re-bill the
+    model. ``durability="sync"`` makes the post-``generate`` checkpoint a
+    synchronous write, so a kill can never lose a paid call.
+    """
+    # Imported here to break the import cycle with ``workflows.generation``,
+    # which imports this module's request/grounding helpers.
+    from workflows.generation import build_generation_graph
+
+    with checkpointer_cm() as checkpointer:
+        graph = build_generation_graph(
+            checkpointer,
+            generator_factory=generator_factory,
+            context_assembler_factory=context_assembler_factory,
+        )
+        config = {"configurable": {"thread_id": batch.thread_id}}
+        snapshot = graph.get_state(config)
+        if snapshot.values and not snapshot.next:
+            return snapshot.values
+        state = None if snapshot.values else {"batch_id": batch.pk}
+        return graph.invoke(state, config, durability="sync")
 
 
 def request_from_batch(
@@ -294,6 +324,46 @@ def accept_generation_batch_selection(
         batch.error = ""
         batch.save(update_fields=["status", "accepted_at", "error", "updated_at"])
         return batch
+
+
+def discard_generation_batch(user, batch_id) -> GenerationBatch | None:
+    """Discard a teacher-owned batch so a fresh one can take its place.
+
+    Allowed from queued/ready/failed/expired only — discarding while the drain
+    worker is mid-run would race it, so in-flight batches are rejected. Ready
+    candidates are marked discarded; no Question rows are created.
+    """
+    with transaction.atomic():
+        batch = get_owned_generation_batch(user, batch_id, lock=True)
+        if batch is None:
+            return None
+        batch.expire_if_stale()
+        if batch.status not in DISCARDABLE_GENERATION_BATCH_STATUSES:
+            raise GenerationBatchConflict(
+                "Generation batch cannot be discarded while it is in progress."
+            )
+
+        now = timezone.now()
+        batch.candidates.filter(
+            status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW
+        ).update(
+            status=GeneratedQuestionCandidateStatus.DISCARDED,
+            updated_at=now,
+        )
+        batch.status = GenerationBatchStatus.DISCARDED
+        batch.discarded_at = now
+        batch.error = ""
+        batch.save(update_fields=["status", "discarded_at", "error", "updated_at"])
+        return batch
+
+
+def list_generation_batches(user, *, limit: int = 20):
+    """Return a teacher's batches, FIFO-ordered, for the queue view."""
+    return list(
+        GenerationBatch.objects.filter(created_by=user, school=user.school)
+        .prefetch_related("chapters")
+        .order_by("created_at")[:limit]
+    )
 
 
 def question_from_candidate(candidate, batch):

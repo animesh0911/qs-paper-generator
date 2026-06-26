@@ -67,7 +67,8 @@ export type GenerationBatchStatus =
   | 'ready_for_review'
   | 'accepted'
   | 'failed'
-  | 'expired';
+  | 'expired'
+  | 'discarded';
 
 export type GenerationDifficultyLabel = 'Easy' | 'Standard' | 'Challenging';
 
@@ -114,6 +115,7 @@ export interface GenerationBatch {
   ready_at: string | null;
   accepted_at: string | null;
   expired_at: string | null;
+  discarded_at: string | null;
   created_at: string;
   updated_at: string;
 }

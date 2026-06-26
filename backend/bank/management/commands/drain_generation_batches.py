@@ -74,7 +74,12 @@ class Command(BaseCommand):
                 self._process(batch, reclaimed=reclaimed)
 
     def _process(self, batch: GenerationBatch, *, reclaimed: bool) -> None:
-        """Generate and persist valid candidates, recording terminal failures."""
+        """Run/resume the batch's graph thread, recording terminal failures.
+
+        A reclaimed batch is no longer failed outright: its graph thread resumes
+        from the last checkpoint (the post-``generate`` snapshot), so an
+        interrupted drain costs no second model call.
+        """
         try:
             result = process_generation_batch(
                 batch,
@@ -83,12 +88,7 @@ class Command(BaseCommand):
                 context_assembler_factory=build_context_assembler,
             )
         except GenerationBatchConflict as exc:
-            if reclaimed:
-                self.stderr.write(
-                    f"Generation batch #{batch.pk} failed (interrupted run)."
-                )
-            else:
-                self.stderr.write(f"Generation batch #{batch.pk} failed: {exc.detail}")
+            self.stderr.write(f"Generation batch #{batch.pk} failed: {exc.detail}")
             return
 
         self.stdout.write(

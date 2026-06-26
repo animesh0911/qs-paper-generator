@@ -59,3 +59,17 @@ graph interrupts, its state persists under `thread_id`, the ledger row flips to
   (one `.setup()` call / migration). No new datastore — consistent with #105.
 - Reading job status stays a plain ledger query; the API and frontend poll path
   are untouched in shape.
+
+## Update (#143 bulk generation)
+
+Bulk generation now follows the same split as extraction: `GenerationBatch` is
+the ledger (with a `thread_id`), and `workflows.generation` is a checkpointed
+`StateGraph` (`assemble → generate → validate_and_persist`) driven by
+`drain_generation_batches`. The single paid `generate` call is checkpointed, so
+a reclaimed/interrupted batch **resumes** from that snapshot instead of being
+failed and re-billed. Like extraction it runs to completion in one pass —
+teacher review stays a separate HTTP endpoint (`accept`/`discard`), **not** yet a
+graph interrupt; the HITL-interrupt option in this ADR remains available for a
+later slice. Queueing changed at the ledger layer only: a teacher may hold
+several non-terminal batches (a FIFO queue, bounded by a per-teacher cap) and
+`discard` a queued/ready/failed/expired batch to free a slot.
