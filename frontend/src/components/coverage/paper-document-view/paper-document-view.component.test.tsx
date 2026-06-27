@@ -155,6 +155,36 @@ describe('PaperDocumentView', () => {
     expect(html).toContain('<td>2.4</td>');
   });
 
+  it('typesets latex content items with KaTeX instead of leaking raw source', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const slot = document.paper.sections[0].slots[0];
+    const question = document.questions.find(
+      (candidate) => candidate.id === slot.selectedQuestionId,
+    );
+
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    question.content.stem = [
+      {
+        type: 'equation',
+        latex:
+          '\\text{C}_6\\text{H}_{12}\\text{O}_{6(\\text{aq})} + 6\\text{O}_{2(\\text{g})} \\rightarrow 6\\text{CO}_{2(\\text{g})} + 6\\text{H}_2\\text{O}_{(\\text{l})}',
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    // KaTeX wraps output in its own markup with a typeset HTML layer; the raw
+    // source only survives inside the hidden MathML annotation, never as the
+    // visible paragraph text it used to be dumped into.
+    expect(html).toContain('class="katex"');
+    expect(html).toContain('class="katex-html"');
+    expect(html).not.toContain('<p>\\text{C}');
+  });
+
   it('keeps table content inside option and subquestion grid body cells', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const slot = document.paper.sections[0].slots[0];

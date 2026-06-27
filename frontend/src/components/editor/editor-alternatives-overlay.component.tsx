@@ -13,6 +13,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { AlertTriangle, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { MathContent } from '@/components/math/math-content.component';
 import type {
   EditorQuestionAlternativeView,
   EditorQuestionContainerBlock,
@@ -380,7 +381,7 @@ function QuestionPreview({
               </span>
             )}
             <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">
-              {region.text}
+              <MathContent items={region.content} />
             </span>
             {region.displaySuffix && (
               <span className="flex-none select-none text-xs text-muted-foreground">
