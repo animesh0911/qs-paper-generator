@@ -11,7 +11,7 @@ export default function GenerationProgressPage() {
   const progress = useGenerationProgress(batchId, POLL_MS);
 
   function backToPaperSetup() {
-    navigate('/');
+    navigate('/ai-qa');
   }
 
   async function generateAnother() {
@@ -20,7 +20,7 @@ export default function GenerationProgressPage() {
     const batch = progress.batch;
     // Pre-fill setup with this batch's selections so the teacher can tweak and
     // regenerate without re-picking the chapter/topics/difficulty.
-    navigate('/', {
+    navigate('/ai-qa', {
       state: batch
         ? {
             generationPrefill: {
