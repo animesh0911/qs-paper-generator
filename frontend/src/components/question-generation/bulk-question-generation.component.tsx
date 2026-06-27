@@ -20,6 +20,24 @@ const ACTIVE_GENERATION_STATUSES: GenerationBatch['status'][] = [
   'validating',
 ];
 
+// Placeholder chapters shown (disabled) so teachers can see that AI Q&A
+// generation will expand to the rest of the NCERT Class 10 Science syllabus.
+// These are not yet wired to any content and cannot be selected.
+const UPCOMING_CHAPTERS: { order: number; name: string }[] = [
+  { order: 1, name: 'Chemical Reactions and Equations' },
+  { order: 2, name: 'Acids, Bases and Salts' },
+  { order: 3, name: 'Metals and Non-metals' },
+  { order: 5, name: 'Life Processes' },
+  { order: 6, name: 'Control and Coordination' },
+  { order: 7, name: 'How do Organisms Reproduce?' },
+  { order: 8, name: 'Heredity' },
+  { order: 9, name: 'Light – Reflection and Refraction' },
+  { order: 10, name: 'The Human Eye and the Colourful World' },
+  { order: 11, name: 'Electricity' },
+  { order: 12, name: 'Magnetic Effects of Electric Current' },
+  { order: 13, name: 'Our Environment' },
+];
+
 export interface BulkQuestionGenerationSetupProps {
   chapters: Chapter[];
   chaptersLoading: boolean;
@@ -211,6 +229,30 @@ export function BulkQuestionGenerationSetup({
                 </label>
               );
             })}
+
+            {UPCOMING_CHAPTERS.map((chapter) => (
+              <div
+                key={`upcoming-${chapter.order}`}
+                aria-disabled="true"
+                title="Coming soon"
+                className="flex cursor-not-allowed items-start gap-3 rounded-lg border border-dashed border-white/70 bg-white/30 px-3 py-3 text-sm leading-5 opacity-60"
+              >
+                <span
+                  className="mt-0.5 flex size-5 items-center justify-center rounded-md border bg-white/50 text-transparent"
+                  aria-hidden="true"
+                >
+                  <Check className="size-3.5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-medium text-muted-foreground">
+                    Chapter {chapter.order}: {chapter.name}
+                  </span>
+                  <span className="mt-0.5 inline-flex items-center rounded-sm bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                    Coming soon
+                  </span>
+                </span>
+              </div>
+            ))}
           </div>
         )}
       </section>
