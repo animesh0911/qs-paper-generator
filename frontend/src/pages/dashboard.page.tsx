@@ -190,8 +190,8 @@ export default function Dashboard() {
                   Generate paper
                 </CardTitle>
                 <p className="max-w-2xl text-[0.9375rem] leading-6 text-muted-foreground">
-                  Select chapters and optionally weight them. Difficulty profile
-                  sets the Remember / Understand / Apply / Analyse mix.
+                  Select chapters — they are distributed equally. Difficulty
+                  profile sets the Remember / Understand / Apply / Analyse mix.
                 </p>
               </div>
               <span className="inline-flex w-fit items-center gap-1 rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
