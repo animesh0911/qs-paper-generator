@@ -3,6 +3,7 @@ import type { GeneratedQuestionCandidate } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   candidateAnswerText,
+  candidateOptionTexts,
   candidateQuestionText,
   candidateReviewCounts,
   candidateTopicLabels,
@@ -109,6 +110,7 @@ export function CandidateReviewPanel({
           {candidates.map((candidate) => {
             const rejected = rejectedCandidateIds.has(candidate.id);
             const topics = candidateTopicLabels(candidate);
+            const options = candidateOptionTexts(candidate);
             return (
               <li
                 key={candidate.id}
@@ -132,6 +134,22 @@ export function CandidateReviewPanel({
                     {rejected ? 'Undo reject' : 'Reject'}
                   </Button>
                 </div>
+
+                {options.length > 0 && (
+                  <ol className="grid gap-2 text-sm sm:grid-cols-2">
+                    {options.map((option, index) => (
+                      <li
+                        key={`${option.label || index}-${option.text}`}
+                        className="flex gap-2 rounded-md border bg-white/70 px-3 py-2"
+                      >
+                        {option.label && (
+                          <span className="font-medium">{option.label}.</span>
+                        )}
+                        <span>{option.text}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
 
                 <div className="rounded-md border bg-secondary/50 p-3">
                   <p className="text-xs font-medium text-muted-foreground">Answer</p>

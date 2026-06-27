@@ -189,6 +189,14 @@ describe('GenerationProgressWorkspace', () => {
         qtype: 'mcq',
         marks: 1,
         raw_text: 'Which process releases energy from glucose?',
+        content: {
+          options: [
+            { label: 'A', content: [{ text: 'Respiration' }] },
+            { label: 'B', content: [{ text: 'Photosynthesis' }] },
+            { label: 'C', content: [{ text: 'Transpiration' }] },
+            { label: 'D', content: [{ text: 'Osmosis' }] },
+          ],
+        },
         answer: 'A. Respiration',
         topic_names: ['Respiration'],
         source: { citation: 'NCERT p. 84' },
@@ -268,6 +276,10 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain('1</span> accepted');
     expect(html).toContain('0</span> rejected');
     expect(html).toContain('Which process releases energy from glucose?');
+    expect(html).toContain('A.');
+    expect(html).toContain('Respiration');
+    expect(html).toContain('B.');
+    expect(html).toContain('Photosynthesis');
     expect(html).toContain('A. Respiration');
     expect(html).toContain('Respiration');
     expect(html).not.toContain('Grounding / citation context');

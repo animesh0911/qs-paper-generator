@@ -224,4 +224,75 @@ describe('PaperDocumentView', () => {
     expect(html).toContain('<td>Metal</td>');
     expect(html).toContain('<td>I (A)</td>');
   });
+
+  it('keeps non-image option content visible in compact preview', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const slot = document.paper.sections[0].slots[0];
+    const question = document.questions.find(
+      (candidate) => candidate.id === slot.selectedQuestionId,
+    );
+
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    question.content.options = [
+      {
+        label: 'A',
+        content: [
+          { type: 'paragraph', text: 'First option sentence.' },
+          { type: 'paragraph', text: 'Second option sentence.' },
+          { type: 'equation', latex: 'H_2O' },
+          { type: 'table', rows: [['Metal', 'Reaction']] },
+          {
+            type: 'image_placeholder',
+            assetId: 'diagram-1',
+            caption: 'Hidden image caption.',
+          },
+        ],
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="preview" />,
+    );
+
+    expect(html).toContain('First option sentence.');
+    expect(html).toContain('Second option sentence.');
+    expect(html).toContain('H_2O');
+    expect(html).toContain('Metal Reaction');
+    expect(html).not.toContain('Hidden image caption.');
+  });
+
+  it('prefers structured stem content in compact preview', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const slot = document.paper.sections[0].slots[0];
+    const question = document.questions.find(
+      (candidate) => candidate.id === slot.selectedQuestionId,
+    );
+
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    question.rawText = 'Stale raw question text.';
+    question.content.stem = [
+      { type: 'paragraph', text: 'Structured stem text.' },
+      { type: 'equation', latex: 'V = IR' },
+      { type: 'table', rows: [['I', 'V']] },
+      {
+        type: 'image_placeholder',
+        assetId: 'diagram-1',
+        caption: 'Hidden stem image caption.',
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="preview" />,
+    );
+
+    expect(html).toContain('Structured stem text.');
+    expect(html).toContain('V = IR');
+    expect(html).toContain('I V');
+    expect(html).not.toContain('Stale raw question text.');
+    expect(html).not.toContain('Hidden stem image caption.');
+  });
 });

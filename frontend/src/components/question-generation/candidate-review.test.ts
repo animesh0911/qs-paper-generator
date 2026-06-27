@@ -3,6 +3,7 @@ import type { GeneratedQuestionCandidate } from '@/types';
 import {
   candidateAnswerText,
   candidateGroundingText,
+  candidateOptionTexts,
   candidateQuestionText,
   candidateReviewCounts,
   candidateTopicLabels,
@@ -55,5 +56,72 @@ describe('candidate review helpers', () => {
     expect(candidateAnswerText(candidate)).toBe('A. Respiration');
     expect(candidateTopicLabels(candidate)).toEqual(['Respiration', 'Life processes']);
     expect(candidateGroundingText(candidate)).toBe('NCERT p. 84');
+  });
+
+  it('extracts MCQ option text from structured generated content', () => {
+    expect(
+      candidateOptionTexts({
+        ...candidate,
+        payload: {
+          ...candidate.payload,
+          content: {
+            options: [
+              {
+                label: 'A',
+                content: [{ text: 'Respiration' }],
+              },
+              {
+                label: 'B',
+                content: [{ text: 'Photosynthesis' }],
+              },
+            ],
+          },
+        },
+      }),
+    ).toEqual([
+      { label: 'A', text: 'Respiration' },
+      { label: 'B', text: 'Photosynthesis' },
+    ]);
+  });
+
+  it('keeps non-image option content visible when it is not plain paragraph text', () => {
+    expect(
+      candidateOptionTexts({
+        ...candidate,
+        payload: {
+          ...candidate.payload,
+          content: {
+            options: [
+              {
+                label: 'A',
+                content: [
+                  { type: 'equation', latex: '2H_2 + O_2 \\rightarrow 2H_2O' },
+                  {
+                    type: 'image_placeholder',
+                    assetId: 'diagram-1',
+                    caption: 'Do not render this image caption here.',
+                  },
+                ],
+              },
+              {
+                label: 'B',
+                content: [
+                  {
+                    type: 'table',
+                    rows: [
+                      ['Metal', 'Reaction'],
+                      ['Zn', 'H2'],
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      }),
+    ).toEqual([
+      { label: 'A', text: '2H_2 + O_2 \\rightarrow 2H_2O' },
+      { label: 'B', text: 'Metal Reaction Zn H2' },
+    ]);
   });
 });
