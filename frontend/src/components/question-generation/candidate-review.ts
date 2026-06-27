@@ -1,4 +1,5 @@
 import type { GeneratedQuestionCandidate } from '@/types';
+import { contentItemsToPlainText } from '@/lib/content-items';
 
 export function toggleRejectedCandidate(
   rejectedIds: Set<number>,
@@ -23,16 +24,31 @@ export function candidateQuestionText(candidate: GeneratedQuestionCandidate): st
   if (typeof payload.raw_text === 'string' && payload.raw_text.trim()) {
     return payload.raw_text.trim();
   }
-  const stem = payload.content?.stem;
-  if (Array.isArray(stem)) {
-    const text = stem
-      .map((item) => (typeof item?.text === 'string' ? item.text : ''))
-      .filter(Boolean)
-      .join(' ')
-      .trim();
-    if (text) return text;
-  }
+  const text = contentItemsToPlainText(payload.content?.stem);
+  if (text) return text;
   return 'Untitled generated Question';
+}
+
+export function candidateOptionTexts(
+  candidate: GeneratedQuestionCandidate,
+): { label: string; text: string }[] {
+  const options = candidate.payload.content?.options;
+  if (!Array.isArray(options)) return [];
+  return options
+    .map((option) => {
+      if (!option || typeof option !== 'object') return null;
+      const label =
+        'label' in option && typeof option.label === 'string'
+          ? option.label.trim()
+          : '';
+      const text =
+        'text' in option && typeof option.text === 'string'
+          ? option.text.trim()
+          : contentItemsToPlainText('content' in option ? option.content : undefined);
+      if (!label && !text) return null;
+      return { label, text };
+    })
+    .filter((option): option is { label: string; text: string } => option !== null);
 }
 
 export function candidateAnswerText(candidate: GeneratedQuestionCandidate): string {

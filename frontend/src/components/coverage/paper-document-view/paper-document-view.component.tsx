@@ -16,6 +16,7 @@
  */
 import { useMemo } from 'react';
 import { MathExpression } from '@/components/math/math-expression.component';
+import { contentItemsToPlainText } from '@/lib/content-items';
 import { getPaperFormatRendererResult } from '@/lib/paper-format-renderers';
 import type {
   ChoiceGroup,
@@ -162,7 +163,7 @@ export function PaperDocumentView({
                   </span>{' '}
                   {question ? (
                     <>
-                      {question.rawText}{' '}
+                      {compactQuestionText(question)}{' '}
                       <span
                         className={
                           printMode ? 'paper-marks' : 'text-muted-foreground'
@@ -181,7 +182,7 @@ export function PaperDocumentView({
                           >
                             {question.content.options.map((option) => (
                               <li key={option.label}>
-                                ({option.label}) {option.content[0]?.text}
+                                ({option.label}) {compactOptionContentText(option)}
                               </li>
                             ))}
                           </ul>
@@ -560,6 +561,14 @@ function contentItemToText(item: ContentItem) {
     return item.caption ? `[Diagram: ${item.caption}]` : '[Diagram]';
   }
   return item.caption ?? '';
+}
+
+function compactOptionContentText(option: ChoiceOption) {
+  return contentItemsToPlainText(option.content);
+}
+
+function compactQuestionText(question: DocQuestion) {
+  return contentItemsToPlainText(question.content.stem) || question.rawText;
 }
 
 function chromeBlock(

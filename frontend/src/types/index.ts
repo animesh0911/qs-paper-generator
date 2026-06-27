@@ -126,7 +126,12 @@ export interface GeneratedQuestionPayload {
   cognitive_level?: string;
   raw_text?: string;
   content?: {
-    stem?: { text?: string }[];
+    stem?: GeneratedQuestionContentItem[];
+    options?: {
+      label?: string;
+      text?: string;
+      content?: GeneratedQuestionContentItem[];
+    }[];
     [key: string]: unknown;
   };
   topic_names?: string[];
@@ -134,6 +139,16 @@ export interface GeneratedQuestionPayload {
   source?: Record<string, unknown>;
   grounding_manifest?: unknown;
   grounding_context?: unknown;
+  [key: string]: unknown;
+}
+
+export interface GeneratedQuestionContentItem {
+  type?: string;
+  text?: string;
+  latex?: string;
+  caption?: string;
+  rows?: string[][];
+  assetId?: string;
   [key: string]: unknown;
 }
 
