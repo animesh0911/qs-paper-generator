@@ -36,6 +36,11 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    // The backend's Playwright PDF renderer reaches the dev server by its
+    // Docker service name ("frontend"). Vite blocks unknown Host headers by
+    // default, so without this the print route returns 403 and the PDF falls
+    // back to the plain ReportLab renderer after a long timeout.
+    allowedHosts: ['frontend'],
     proxy: {
       '/api': { target: apiTarget, changeOrigin: true },
     },
