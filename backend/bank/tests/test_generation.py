@@ -12,8 +12,27 @@ from bank.generation import (
     LangChainQuestionGenerator,
     QuestionGenerationRequest,
     build_question_generation_prompt,
+    node_question_targets,
+    select_balanced_questions,
     validate_generated_questions,
 )
+
+
+def _two_topic_manifest() -> dict:
+    return {
+        "excerpts": [
+            {
+                "citation_id": "chunk-nutrition",
+                "chapter_map_node_id": "node-nutrition",
+                "text": "Nutrition supplies energy.",
+            },
+            {
+                "citation_id": "chunk-respiration",
+                "chapter_map_node_id": "node-respiration",
+                "text": "Respiration releases energy from glucose.",
+            },
+        ],
+    }
 
 
 def _request() -> QuestionGenerationRequest:
@@ -315,6 +334,104 @@ def test_citation_support_review_handles_numeric_and_unicode_tokens():
     assert "कार्बन" in _tokens("कार्बन की संयोजकता")
     assert "संयोजकता" in _tokens("कार्बन की संयोजकता")
     assert review.supported
+
+
+def test_node_question_targets_splits_evenly_with_remainder_to_earliest():
+    """The total is split as evenly as possible; the remainder lands earliest."""
+    targets = node_question_targets(("node-a", "node-b", "node-c"), 8)
+
+    assert targets == {"node-a": 3, "node-b": 3, "node-c": 2}
+    assert sum(targets.values()) == 8
+
+
+def test_node_question_targets_is_empty_without_topic_nodes():
+    """The chapter-only path keeps its old behaviour: no per-node allocation."""
+    assert node_question_targets((), 10) == {}
+
+
+def test_select_balanced_questions_trims_overage_to_per_node_target():
+    """A node that over-delivers is trimmed back to its even target."""
+    targets = {"node-nutrition": 1, "node-respiration": 1}
+    nutrition = [
+        _question(question_citation_ids=["chunk-nutrition"], raw_text=f"N{i}")
+        for i in range(3)
+    ]
+    respiration = [
+        _question(question_citation_ids=["chunk-respiration"], raw_text="R0")
+    ]
+
+    selected = select_balanced_questions(
+        [*nutrition, *respiration], targets, _two_topic_manifest()
+    )
+
+    raw_texts = [question["raw_text"] for question in selected]
+    assert raw_texts == ["N0", "R0"]
+
+
+def test_select_balanced_questions_backfills_shortfall_from_surplus():
+    """A node that under-delivers is backfilled from another node's surplus."""
+    targets = {"node-nutrition": 1, "node-respiration": 1}
+    nutrition = [
+        _question(question_citation_ids=["chunk-nutrition"], raw_text=f"N{i}")
+        for i in range(2)
+    ]
+
+    selected = select_balanced_questions(nutrition, targets, _two_topic_manifest())
+
+    assert len(selected) == 2
+    assert {question["raw_text"] for question in selected} == {"N0", "N1"}
+
+
+def test_prompt_breaks_down_targets_per_topic_node_with_headroom():
+    """Topic selection yields an explicit per-node breakdown plus review spare."""
+    request = QuestionGenerationRequest(
+        chapter_slugs=("life-processes",),
+        chapter_map_node_ids=("node-nutrition", "node-respiration"),
+        grounding_manifest=_two_topic_manifest(),
+        count=4,
+    )
+
+    prompt = build_question_generation_prompt(request)
+
+    assert "Per-topic question targets" in prompt
+    assert "topic node node-nutrition: generate 3 candidates (final target 2)" in prompt
+    assert (
+        "topic node node-respiration: generate 3 candidates (final target 2)" in prompt
+    )
+    # Overshoot total drives the headline count (3 + 3), not the final 4.
+    assert "Total candidates: exactly 6" in prompt
+
+
+def test_generator_returns_evenly_distributed_candidates(monkeypatch):
+    """End to end: the generator trims model output to the even per-node target."""
+    request = QuestionGenerationRequest(
+        chapter_slugs=("life-processes",),
+        chapter_map_node_ids=("node-nutrition", "node-respiration"),
+        grounding_manifest=_two_topic_manifest(),
+        count=2,
+    )
+    model_output = {
+        "questions": [
+            _question(question_citation_ids=["chunk-nutrition"], raw_text="N0"),
+            _question(question_citation_ids=["chunk-nutrition"], raw_text="N1"),
+            _question(question_citation_ids=["chunk-respiration"], raw_text="R0"),
+        ]
+    }
+
+    class _StructuredModel:
+        def invoke(self, prompt):
+            return model_output
+
+    class _Model:
+        def with_structured_output(self, schema):
+            return _StructuredModel()
+
+    result = LangChainQuestionGenerator(make_model=lambda purpose: _Model()).generate(
+        request
+    )
+
+    raw_texts = sorted(question["raw_text"] for question in result)
+    assert raw_texts == ["N0", "R0"]
 
 
 def test_question_generation_route_resolves_from_env(monkeypatch):

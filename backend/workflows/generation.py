@@ -46,7 +46,11 @@ from typing import TypedDict
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, StateGraph
 
-from bank.generation import validate_generated_questions
+from bank.generation import (
+    node_question_targets,
+    select_balanced_questions,
+    validate_generated_questions,
+)
 from bank.models import GeneratedQuestionCandidate, GenerationBatch
 
 
@@ -93,6 +97,16 @@ def build_generation_graph(
         result = validate_generated_questions({"questions": state["payloads"]}, request)
         if not result.valid_questions:
             raise ValueError("No valid generated candidates.")
+        # The persistence boundary owns the even per-topic-node distribution: it
+        # re-runs the deterministic trim so persisted candidates are balanced by
+        # construction, regardless of how ``payloads`` reached this node. This is
+        # idempotent over an already-balanced generator output (a no-op trim).
+        targets = node_question_targets(
+            tuple(batch.chapter_map_node_ids), batch.requested_count
+        )
+        candidates = select_balanced_questions(
+            result.valid_questions, targets, state.get("grounding_manifest") or None
+        )
         # Idempotent: a resumed run that already persisted skips re-creating.
         if not batch.candidates.exists():
             GeneratedQuestionCandidate.objects.bulk_create(
@@ -102,10 +116,10 @@ def build_generation_graph(
                         payload=payload,
                         grounding_manifest=state.get("grounding_manifest") or {},
                     )
-                    for payload in result.valid_questions
+                    for payload in candidates
                 ]
             )
-        return {"valid_count": len(result.valid_questions)}
+        return {"valid_count": len(candidates)}
 
     graph = StateGraph(GenerationState)
     graph.add_node("assemble", assemble)
