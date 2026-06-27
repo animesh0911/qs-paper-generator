@@ -15,10 +15,8 @@ export interface CoverageForm {
   selectedFormatId: string;
   chapterNameBySlug: Record<string, string>;
   selectedSlugs: Set<string>;
-  weights: Record<string, string>;
   difficulty: Difficulty;
   toggleChapter: (slug: string) => void;
-  setWeight: (slug: string, value: string) => void;
   setDifficulty: (d: Difficulty) => void;
   setSelectedFormatId: (formatId: string) => void;
   toAssemblePayload: () => AssembleRequest;
@@ -28,31 +26,23 @@ export function buildCoverageAssemblePayload({
   selectedFormatId,
   difficulty,
   selectedSlugs,
-  weights,
 }: {
   selectedFormatId: string;
   difficulty: Difficulty;
   selectedSlugs: Set<string>;
-  weights: Record<string, string>;
 }): AssembleRequest {
   return {
     ...(selectedFormatId ? { format_id: selectedFormatId } : {}),
     difficulty,
     chapter_slugs: Array.from(selectedSlugs),
-    weights: Object.fromEntries(
-      Array.from(selectedSlugs).flatMap((slug) => {
-        const raw = weights[slug];
-        const value = raw === undefined || raw === '' ? 1 : Number(raw);
-        return Number.isFinite(value) ? [[slug, value]] : [];
-      }),
-    ),
   };
 }
 
 /**
- * Owns the Slice 3 coverage form: chapter selection, per-chapter weights, and
- * the difficulty profile. Builds the payload sent to /papers/assemble so the
- * dashboard page never has to construct it inline.
+ * Owns the Slice 3 coverage form: chapter selection and the difficulty profile.
+ * Selected chapters are distributed equally by the backend. Builds the payload
+ * sent to /papers/assemble so the dashboard page never has to construct it
+ * inline.
  */
 export function useCoverageForm(): CoverageForm {
   const saved = readSavedCoverageForm();
@@ -60,11 +50,12 @@ export function useCoverageForm(): CoverageForm {
   const [chaptersLoading, setChaptersLoading] = useState(true);
   const [chaptersError, setChaptersError] = useState('');
   const [formats, setFormats] = useState<PaperFormatSummary[]>([]);
-  const [selectedFormatId, setSelectedFormatId] = useState(saved.selectedFormatId);
+  const [selectedFormatId, setSelectedFormatId] = useState(
+    saved.selectedFormatId,
+  );
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(
     new Set(saved.selectedSlugs),
   );
-  const [weights, setWeights] = useState<Record<string, string>>(saved.weights);
   const [difficulty, setDifficulty] = useState<Difficulty>(saved.difficulty);
 
   useEffect(() => {
@@ -81,7 +72,9 @@ export function useCoverageForm(): CoverageForm {
     fetchPaperFormats()
       .then((nextFormats) => {
         setFormats(nextFormats);
-        setSelectedFormatId((current) => current || nextFormats[0]?.format_id || '');
+        setSelectedFormatId(
+          (current) => current || nextFormats[0]?.format_id || '',
+        );
       })
       .catch(() => setFormats([]));
   }, []);
@@ -92,11 +85,10 @@ export function useCoverageForm(): CoverageForm {
       JSON.stringify({
         selectedFormatId,
         selectedSlugs: Array.from(selectedSlugs),
-        weights,
         difficulty,
       }),
     );
-  }, [selectedFormatId, selectedSlugs, weights, difficulty]);
+  }, [selectedFormatId, selectedSlugs, difficulty]);
 
   function toggleChapter(slug: string) {
     setSelectedSlugs((prev) => {
@@ -107,16 +99,11 @@ export function useCoverageForm(): CoverageForm {
     });
   }
 
-  function setWeight(slug: string, value: string) {
-    setWeights((prev) => ({ ...prev, [slug]: value }));
-  }
-
   function toAssemblePayload(): AssembleRequest {
     return buildCoverageAssemblePayload({
       selectedFormatId,
       difficulty,
       selectedSlugs,
-      weights,
     });
   }
 
@@ -133,10 +120,8 @@ export function useCoverageForm(): CoverageForm {
     selectedFormatId,
     chapterNameBySlug,
     selectedSlugs,
-    weights,
     difficulty,
     toggleChapter,
-    setWeight,
     setDifficulty,
     setSelectedFormatId,
     toAssemblePayload,
@@ -146,7 +131,6 @@ export function useCoverageForm(): CoverageForm {
 function readSavedCoverageForm(): {
   selectedFormatId: string;
   selectedSlugs: string[];
-  weights: Record<string, string>;
   difficulty: Difficulty;
 } {
   if (typeof sessionStorage === 'undefined') {
@@ -158,12 +142,14 @@ function readSavedCoverageForm(): {
     ) as Partial<ReturnType<typeof emptySavedCoverageForm>>;
     return {
       selectedFormatId:
-        typeof parsed.selectedFormatId === 'string' ? parsed.selectedFormatId : '',
+        typeof parsed.selectedFormatId === 'string'
+          ? parsed.selectedFormatId
+          : '',
       selectedSlugs: Array.isArray(parsed.selectedSlugs)
-        ? parsed.selectedSlugs.filter((slug): slug is string => typeof slug === 'string')
+        ? parsed.selectedSlugs.filter(
+            (slug): slug is string => typeof slug === 'string',
+          )
         : [],
-      weights:
-        parsed.weights && typeof parsed.weights === 'object' ? parsed.weights : {},
       difficulty: DIFFICULTIES.includes(parsed.difficulty as Difficulty)
         ? (parsed.difficulty as Difficulty)
         : 'standard',
@@ -177,7 +163,6 @@ function emptySavedCoverageForm() {
   return {
     selectedFormatId: '',
     selectedSlugs: [] as string[],
-    weights: {} as Record<string, string>,
     difficulty: 'standard' as Difficulty,
   };
 }
