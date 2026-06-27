@@ -1,0 +1,199 @@
+/**
+ * AI Q&A — bulk-generate AI questions for a chapter's topics into the bank.
+ *
+ * Pure orchestration: loads the (MVP-scoped) chapter list and the selected
+ * chapter's topics, then queues a generation batch and routes to its progress
+ * page. Pre-fills from `location.state.generationPrefill` when arriving via
+ * "Generate another batch" on the progress page.
+ *
+ * @module AiQaPage
+ */
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  createGenerationBatch,
+  fetchChapters,
+  fetchChapterTopics,
+} from '@/lib/api';
+import { buildGenerationBatchPayload } from '@/lib/question-generation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AppHeader } from '@/components/app-nav';
+import { BulkQuestionGenerationSetup } from '@/components/question-generation';
+import type {
+  Chapter,
+  ChapterTopicNode,
+  GenerationDifficultyLabel,
+} from '@/types';
+
+const MVP_GENERATION_CHAPTER_SLUG = 'carbon-and-its-compounds';
+
+interface GenerationPrefill {
+  chapterSlug: string;
+  topicIds: string[];
+  difficulty: GenerationDifficultyLabel;
+}
+
+export default function AiQaPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [chaptersLoading, setChaptersLoading] = useState(true);
+  const [chaptersError, setChaptersError] = useState('');
+  const [chapterSlug, setChapterSlug] = useState('');
+  const [topics, setTopics] = useState<ChapterTopicNode[]>([]);
+  const [topicsLoading, setTopicsLoading] = useState(false);
+  const [topicsError, setTopicsError] = useState('');
+  const [selectedTopicIds, setSelectedTopicIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [difficulty, setDifficulty] =
+    useState<GenerationDifficultyLabel>('Standard');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchChapters()
+      .then((all) => {
+        if (cancelled) return;
+        // MVP: AI generation is wired to Chapter 4 only; the rest of the
+        // syllabus is shown as upcoming (disabled) inside the setup component.
+        setChapters(all.filter((c) => c.slug === MVP_GENERATION_CHAPTER_SLUG));
+        setChaptersError('');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setChapters([]);
+        setChaptersError((err as Error).message);
+      })
+      .finally(() => {
+        if (!cancelled) setChaptersLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!chapterSlug) {
+      setTopics([]);
+      setTopicsError('');
+      setTopicsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setTopicsLoading(true);
+    setTopicsError('');
+    fetchChapterTopics(chapterSlug)
+      .then((response) => {
+        if (cancelled) return;
+        setTopics(response.topics);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setTopics([]);
+        setTopicsError((err as Error).message);
+      })
+      .finally(() => {
+        if (!cancelled) setTopicsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [chapterSlug]);
+
+  // Pre-fill from "Generate another batch" so the teacher can tweak and re-run.
+  useEffect(() => {
+    const prefill = (
+      location.state as { generationPrefill?: GenerationPrefill }
+    )?.generationPrefill;
+    if (!prefill) return;
+    setChapterSlug(prefill.chapterSlug);
+    setSelectedTopicIds(new Set(prefill.topicIds));
+    setDifficulty(prefill.difficulty);
+    navigate('.', { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
+
+  function selectChapter(slug: string) {
+    setChapterSlug(slug);
+    setSelectedTopicIds(new Set());
+    setError('');
+  }
+
+  function toggleTopic(nodeId: string) {
+    setSelectedTopicIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) next.delete(nodeId);
+      else next.add(nodeId);
+      return next;
+    });
+  }
+
+  async function start() {
+    setBusy(true);
+    setError('');
+    try {
+      const payload = buildGenerationBatchPayload({
+        chapterSlug,
+        chapterMapNodeIds: Array.from(selectedTopicIds),
+        difficulty,
+      });
+      const batch = await createGenerationBatch(payload);
+      navigate(`/generation-batches/${batch.id}`);
+    } catch (err) {
+      // A 409 here means the per-teacher queue cap is reached; surface it.
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-secondary">
+      <AppHeader />
+
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-10">
+        <Card className="overflow-hidden rounded-lg border-white/70 bg-white/80 shadow-none backdrop-blur-2xl">
+          <CardHeader className="border-b border-white/70 bg-white/60 px-5 py-5 sm:px-6">
+            <div className="space-y-1.5">
+              <CardTitle className="text-xl leading-7">
+                Generate AI Q&amp;A
+              </CardTitle>
+              <p className="max-w-2xl text-[0.9375rem] leading-6 text-muted-foreground">
+                Pick a chapter and its topics, then generate grounded questions
+                for your bank. You’ll review every candidate before any are
+                added.
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="bg-white/45 px-5 py-6 sm:px-6">
+            <BulkQuestionGenerationSetup
+              chapters={chapters}
+              chaptersLoading={chaptersLoading}
+              chaptersError={chaptersError}
+              selectedChapterSlug={chapterSlug}
+              topics={topics}
+              topicsLoading={topicsLoading}
+              topicsError={topicsError}
+              selectedTopicIds={selectedTopicIds}
+              difficulty={difficulty}
+              busy={busy}
+              error={error}
+              activeBatchId={null}
+              onSelectChapter={selectChapter}
+              onToggleTopic={toggleTopic}
+              onClearTopics={() => setSelectedTopicIds(new Set())}
+              onDifficultyChange={setDifficulty}
+              onStart={start}
+              onOpenActiveBatch={() => {}}
+            />
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}

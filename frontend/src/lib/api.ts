@@ -20,8 +20,10 @@ import type {
   GenerationBatch,
   GenerationBatchCreateRequest,
   GeneratedQuestionCandidate,
+  IngestionJob,
   PaperDocument,
   PaperFormatSummary,
+  SourceType,
 } from '@/types';
 import { paperDocumentSchema } from '@/types/paper-document.schema';
 
@@ -59,8 +61,12 @@ async function request(
   options: RequestInit = {},
   tokenOverride?: string | null,
 ): Promise<Response> {
+  // FormData bodies must set their own multipart boundary, so we never force a
+  // JSON Content-Type on them (the PDF upload relies on this).
+  const isFormData =
+    typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers as Record<string, string>),
   };
   const token = tokenOverride === undefined ? getToken() : tokenOverride;
@@ -194,6 +200,29 @@ export async function downloadPaperPdf(paper: PaperDocument) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+/**
+ * Upload a teacher's PDF for out-of-request extraction. Returns 202 + the
+ * queued `IngestionJob` to poll; the Gemini extraction runs later via cron.
+ */
+export async function uploadIngestionPdf(
+  pdf: File,
+  sourceType: SourceType,
+): Promise<IngestionJob> {
+  const body = new FormData();
+  body.append('pdf', pdf);
+  body.append('source_type', sourceType);
+  const res = await request('/bank/ingest/', { method: 'POST', body });
+  return res.json();
+}
+
+/** Poll one ingestion job's status (scoped to the teacher's school). */
+export async function fetchIngestionJob(
+  jobId: number | string,
+): Promise<IngestionJob> {
+  const res = await request(`/bank/ingest/${jobId}/`, { method: 'GET' });
+  return res.json();
 }
 
 export async function createGenerationBatch(

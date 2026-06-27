@@ -10,7 +10,13 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth.hook';
-import { DashboardPage, LoginPage, PrintPaperPage } from '@/pages';
+import {
+  AiQaPage,
+  DashboardPage,
+  LoginPage,
+  PrintPaperPage,
+  UploadPapersPage,
+} from '@/pages';
 
 const EditorPage = lazy(() => import('@/pages/editor.page'));
 const GenerationProgressPage = lazy(
@@ -57,6 +63,22 @@ export default function App() {
         }
       />
       <Route path="/editor/:paperId/print" element={<PrintPaperPage />} />
+      <Route
+        path="/upload"
+        element={
+          <RequireAuth>
+            <UploadPapersPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ai-qa"
+        element={
+          <RequireAuth>
+            <AiQaPage />
+          </RequireAuth>
+        }
+      />
       <Route
         path="/generation-batches/:batchId"
         element={

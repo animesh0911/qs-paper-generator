@@ -148,3 +148,34 @@ export interface GeneratedQuestionCandidate {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * Provenance of an uploaded PDF, stored on every extracted question. Mirrors
+ * the backend `bank.models.SourceType` choices.
+ */
+export type SourceType =
+  | 'previous_year_paper'
+  | 'sample_paper'
+  | 'question_bank';
+
+/**
+ * Lifecycle of an out-of-request PDF ingestion. `pending`/`running` are polled;
+ * `done`/`failed` are terminal. Mirrors `bank.models.IngestionJobStatus`.
+ */
+export type IngestionJobStatus = 'pending' | 'running' | 'done' | 'failed';
+
+/**
+ * The job-status shape the frontend polls after uploading a PDF. The stored PDF
+ * itself is never exposed. Mirrors `bank.serializers.IngestionJobSerializer`.
+ */
+export interface IngestionJob {
+  id: number;
+  status: IngestionJobStatus;
+  source_type: SourceType;
+  source_file_name: string;
+  created_count: number;
+  skipped_count: number;
+  error: string;
+  created_at: string;
+  updated_at: string;
+}
