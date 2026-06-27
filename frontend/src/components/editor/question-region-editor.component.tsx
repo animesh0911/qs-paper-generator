@@ -14,6 +14,7 @@
 import { useEffect, useRef } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
+import { MathContent } from '@/components/math/math-content.component';
 import { blockNoteBlocksToContentItems } from '@/lib/editor-paper';
 import { shouldCommitQuestionRegionDraft } from '@/lib/question-region-commit';
 import type { EditorQuestionRegionBlock } from '@/lib/editor-paper';
@@ -31,7 +32,7 @@ export function QuestionRegionEditor({
   if (!editable) {
     return (
       <div className="qpg-question-blocknote qpg-question-region-text">
-        {region.text}
+        <MathContent items={region.content} />
       </div>
     );
   }
