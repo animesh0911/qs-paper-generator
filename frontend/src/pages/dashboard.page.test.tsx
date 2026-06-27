@@ -1,10 +1,12 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Dashboard from './dashboard.page';
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ state: null }),
+  NavLink: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
 
 vi.mock('@/hooks/useAuth.hook', () => ({
@@ -39,26 +41,24 @@ vi.mock('@/hooks/useCoverageForm.hook', () => ({
   useCoverageForm: () => coverageForm,
 }));
 
-describe('Dashboard', () => {
+describe('Dashboard (Generate paper page)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('keeps Generate paper primary and exposes Generate AI Q&A as the secondary topic-scoped workflow', () => {
+  it('renders the paper-assembly workflow with workflow navigation', () => {
     const html = renderToStaticMarkup(<Dashboard />);
 
-    expect(html.indexOf('Generate paper')).toBeLessThan(
-      html.indexOf('Generate AI Q&amp;A'),
-    );
-    expect(html).toContain('Pick Chapter 4, then choose topics');
-    expect(html).toContain('NCERT Chapter');
-    expect(html).toContain('Select Chapter 4 to show topics.');
-    const qnaPanelHtml = html.slice(html.indexOf('Generate AI Q&amp;A'));
-    expect(qnaPanelHtml).toContain('Chapter 4: Carbon and its Compounds');
-    expect(qnaPanelHtml).not.toContain('5. Life Processes');
-    expect(html).not.toContain(
-      'Selected NCERT topics define the generation scope',
-    );
-    expect(html).not.toMatch(/batch size|prompt|instructions|topic hints/i);
+    expect(html).toContain('Generate paper');
+    // The three workflows are reachable from the shared header nav.
+    expect(html).toContain('Upload papers');
+    expect(html).toContain('AI Q&amp;A');
+  });
+
+  it('no longer embeds the AI Q&A generation panel (it has its own page)', () => {
+    const html = renderToStaticMarkup(<Dashboard />);
+
+    expect(html).not.toContain('Pick Chapter 4, then choose topics');
+    expect(html).not.toContain('Select Chapter 4 to show topics.');
   });
 });
