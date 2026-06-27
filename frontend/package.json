@@ -26,6 +26,7 @@
     "@mantine/hooks": "^9.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "katex": "^0.16.47",
     "lucide-react": "^1.17.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.x",
+    "@types/katex": "^0.16.8",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",

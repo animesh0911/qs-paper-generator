@@ -15,6 +15,7 @@
  * @module PaperDocumentView
  */
 import { useMemo } from 'react';
+import { MathExpression } from '@/components/math/math-expression.component';
 import { getPaperFormatRendererResult } from '@/lib/paper-format-renderers';
 import type {
   ChoiceGroup,
@@ -536,6 +537,16 @@ function PaperContentItem({ item }: { item: ContentItem }) {
           ))}
         </tbody>
       </table>
+    );
+  }
+
+  // Math lives in a dedicated `latex` field — typeset it rather than dumping
+  // the raw source. `text` takes precedence so labelled prose stays plain.
+  if (!item.text && item.latex) {
+    return (
+      <p>
+        <MathExpression latex={item.latex} />
+      </p>
     );
   }
 
