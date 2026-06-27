@@ -54,13 +54,19 @@ def _render_browser_pdf(print_url: str) -> bytes:
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
-        page = browser.new_page()
-        page.goto(print_url, wait_until="networkidle")
-        page.wait_for_selector("[data-print-ready='true']")
-        page.emulate_media(media="print")
-        pdf = page.pdf(format="A4", print_background=True)
-        browser.close()
-        return pdf
+        try:
+            page = browser.new_page()
+            # Wait on the explicit readiness marker the print route sets once its
+            # document has loaded — not on "networkidle". networkidle never
+            # settles while a persistent connection stays open (the dev server's
+            # HMR websocket, font/CDN keep-alives), so it would block for the
+            # full default timeout on every render before the marker is checked.
+            page.goto(print_url, wait_until="domcontentloaded")
+            page.wait_for_selector("[data-print-ready='true']", timeout=15000)
+            page.emulate_media(media="print")
+            return page.pdf(format="A4", print_background=True)
+        finally:
+            browser.close()
 
 
 def _render_reportlab_pdf(document: dict) -> bytes:
