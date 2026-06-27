@@ -69,6 +69,33 @@ def _batch():
     return batch
 
 
+class _FakeGroundingContext:
+    """Minimal stand-in for corpus GroundingContext used by ``assemble``."""
+
+    results = ("chunk-nutrition", "chunk-respiration")
+
+    def to_generation_manifest(self):
+        return {
+            "excerpts": [
+                {
+                    "citation_id": "chunk-nutrition",
+                    "chapter_map_node_id": "node-nutrition",
+                    "text": "Nutrition supplies energy.",
+                },
+                {
+                    "citation_id": "chunk-respiration",
+                    "chapter_map_node_id": "node-respiration",
+                    "text": "Respiration releases energy from glucose.",
+                },
+            ],
+        }
+
+
+class _FakeAssembler:
+    def retrieve(self, request):
+        return _FakeGroundingContext()
+
+
 def _cfg(thread_id):
     return {"configurable": {"thread_id": thread_id}}
 
@@ -111,3 +138,39 @@ def test_resume_after_persist_crash_does_not_rebill_the_model(monkeypatch):
     assert generator.calls == 1  # the paid call was never repeated
     assert final["valid_count"] == 1
     assert GeneratedQuestionCandidate.objects.filter(batch=batch).count() == 1
+
+
+def test_persist_trims_unbalanced_payloads_to_even_node_distribution():
+    """The persistence boundary enforces the even per-node split on its own:
+    an unbalanced generator output is trimmed to the requested total before
+    any candidates are written."""
+    batch = GenerationBatch.objects.create(requested_count=2)
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
+    batch.chapter_map_node_ids = ["node-nutrition", "node-respiration"]
+    batch.save(update_fields=["chapter_map_node_ids"])
+
+    # All three valid candidates cite only the nutrition node; targets are 1 per
+    # node (total 2), so persist keeps one for nutrition and backfills one more.
+    payloads = [
+        _valid_payload()
+        | {
+            "raw_text": f"Nutrition question {index}",
+            "question_citation_ids": ["chunk-nutrition"],
+            "answer_citation_ids": ["chunk-nutrition"],
+        }
+        for index in range(3)
+    ]
+    generator = CountingGenerator(payloads)
+
+    with get_checkpointer() as checkpointer:
+        graph = build_generation_graph(
+            checkpointer,
+            generator_factory=lambda: generator,
+            context_assembler_factory=_FakeAssembler,
+        )
+        final = graph.invoke(
+            {"batch_id": batch.pk}, _cfg(uuid.uuid4().hex), durability="sync"
+        )
+
+    assert final["valid_count"] == 2
+    assert GeneratedQuestionCandidate.objects.filter(batch=batch).count() == 2
