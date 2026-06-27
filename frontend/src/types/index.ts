@@ -51,7 +51,6 @@ export interface AssembleRequest {
   title?: string;
   format_id?: string;
   chapter_slugs?: string[];
-  weights?: Record<string, number>;
   difficulty?: 'easy' | 'standard' | 'hard';
 }
 

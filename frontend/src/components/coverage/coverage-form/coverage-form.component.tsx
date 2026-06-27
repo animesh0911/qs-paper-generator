@@ -1,6 +1,7 @@
 /**
- * Renders the Slice 3 coverage form: difficulty buttons, chapter checklist
- * with per-chapter weight inputs, and the Generate button.
+ * Renders the Slice 3 coverage form: difficulty buttons, chapter checklist,
+ * and the Generate button. Selected chapters are distributed equally by the
+ * backend.
  *
  * Owns no state — the parent owns `useCoverageForm` and threads its API
  * through `props.form`. The `trailing` slot lets the parent add a
@@ -12,7 +13,6 @@
 import type { ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { type CoverageForm, DIFFICULTIES } from '@/hooks/useCoverageForm.hook';
 
 export interface CoverageFormProps {
@@ -33,10 +33,8 @@ export function CoverageFormView({
     formats,
     selectedFormatId,
     selectedSlugs,
-    weights,
     difficulty,
     toggleChapter,
-    setWeight,
     setDifficulty,
     setSelectedFormatId,
   } = form;
@@ -144,26 +142,6 @@ export function CoverageFormView({
                       {ch.order}. {ch.name}
                     </span>
                   </label>
-                  {selected && (
-                    <div className="mt-3 pl-8">
-                      <label
-                        htmlFor={`${chapterInputId}-weight`}
-                        className="mb-1 block text-xs font-medium text-muted-foreground"
-                      >
-                        Weight
-                      </label>
-                      <Input
-                        id={`${chapterInputId}-weight`}
-                        type="number"
-                        min={0}
-                        step="0.1"
-                        placeholder="weight"
-                        className="h-9 w-28 bg-white/80"
-                        value={weights[ch.slug] ?? ''}
-                        onChange={(e) => setWeight(ch.slug, e.target.value)}
-                      />
-                    </div>
-                  )}
                 </div>
               </li>
             );
