@@ -200,6 +200,8 @@ def test_prompt_keeps_workflow_fields_out_of_model_payload():
     assert "QuestionType/marks distribution" not in prompt
     assert "mcq/1" in prompt
     assert "long_answer/5" in prompt
+    assert "Do not generate numerical" not in prompt
+    assert "formula-only" not in prompt
 
 
 def test_grounded_prompt_supplies_excerpts_and_requires_citations():

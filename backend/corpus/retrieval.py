@@ -39,7 +39,7 @@ _CHEMICAL_TERM = re.compile(r"^(?:pH|(?:[A-Z][a-z]?\d*)+)$")
 GROUNDING_UNSUPPORTED_CONTENT_POLICY = (
     "Excluded by default: existing NCERT question/exercise chunks, "
     "picture-only chunks without captions, formula-only chunks, "
-    "numerical/formula-only generation, and diagram-image generation."
+    "and diagram-image generation."
 )
 
 

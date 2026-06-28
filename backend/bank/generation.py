@@ -404,9 +404,8 @@ def _grounding_prompt_lines(grounding_manifest: dict[str, Any] | None) -> list[s
         "returning no candidate for that unsupported idea.",
         "For every candidate, include non-empty question_citation_ids and "
         "answer_citation_ids chosen from the supplied citation_id values.",
-        "Do not generate numerical, formula-only, or diagram-image questions. "
-        "Caption-aware text questions are allowed only when supported by "
-        "caption/prose context below.",
+        "Do not generate diagram-image questions. Caption-aware text questions "
+        "are allowed only when supported by caption/prose context below.",
         "Unsupported content policy: "
         f"{grounding_manifest.get('unsupported_content_policy', '')}",
     ]
