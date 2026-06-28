@@ -37,7 +37,6 @@ import '@blocknote/mantine/style.css';
 import { resolveEditorFixture } from '@/mocks';
 import {
   approvePaper,
-  downloadPaperPdf,
   fetchEditorDraft,
   persistDraft,
 } from '@/lib/api';
@@ -47,6 +46,7 @@ import {
 } from '@/lib/paper-format-renderers';
 import { assertPaperDocument } from '@/lib/paper-document';
 import { editorSlotClipboardText } from '@/lib/editor-paper';
+import { openPersistedPrintDocument } from '@/lib/editor-print';
 import { useEditorWorkspace } from '@/hooks/useEditorWorkspace.hook';
 import {
   AssistantChat,
@@ -306,7 +306,9 @@ function EditorPageWorkspace({
         await persistDraft(documentSnapshot);
         setLastSavedDocument(documentSnapshot);
         setActionState('saved');
-        if (action === 'download') await downloadPaperPdf(documentSnapshot);
+        if (action === 'download') {
+          openPersistedPrintDocument(documentSnapshot);
+        }
       }
     } catch (reason) {
       setActionError((reason as Error).message);

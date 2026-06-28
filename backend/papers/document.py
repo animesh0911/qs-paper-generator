@@ -13,6 +13,13 @@ from bank.models import Question
 from bank.question_content import normalise_question_content
 from bank.question_shape import fallback_regions
 
+from .format_defaults import (
+    CBSE_COMPACT_CHROME_BLOCKS,
+    CBSE_COMPACT_FORMAT_ID,
+    CBSE_COMPACT_INSTRUCTION_BLOCKS,
+    merge_missing_text_blocks,
+    render_text_blocks,
+)
 from .models import Paper, PaperFormat
 from .picker import FilledTemplate, PaperOptions
 from .template import Slot
@@ -74,7 +81,7 @@ class PaperDocumentBuilder:
             "request": self._build_request(paper, inp, preset.exam_type),
             "template": self._build_template(paper, preset),
             "format": self._build_format(paper_format),
-            "paper": self._build_paper(paper, result, questions_by_pk),
+            "paper": self._build_paper(paper, result, questions_by_pk, paper_format),
             "questions": [self._build_question(q) for q in questions_by_pk.values()],
         }
 
@@ -155,6 +162,7 @@ class PaperDocumentBuilder:
         paper: Paper,
         result: FilledTemplate,
         questions_by_pk: dict[int, Question],
+        paper_format: PaperFormat | None = None,
     ) -> dict:
         duration = result.template.preset.duration_minutes
         paper_doc: dict = {
@@ -165,32 +173,12 @@ class PaperDocumentBuilder:
             "durationMinutes": duration,
             "language": "en",
             # Chrome = visible paper text keyed by CBSE role (contract §5).
-            "chromeBlocks": [
-                {"id": "subject_label", "role": "subject_label", "text": paper.title},
-                {
-                    "id": "paper_meta_left",
-                    "role": "paper_meta_left",
-                    "text": f"Time allowed: {duration // 60} hours",
-                },
-                {
-                    "id": "paper_meta_right",
-                    "role": "paper_meta_right",
-                    "text": f"Maximum Marks: {paper.total_marks}",
-                },
-                {"id": "roll_number", "role": "roll_number", "text": "Roll No."},
-            ],
-            "instructionBlocks": [
-                {
-                    "id": "general_instructions_heading",
-                    "role": "general_instructions_heading",
-                    "text": "General Instructions:",
-                },
-                {
-                    "id": "general_instruction_1",
-                    "role": "general_instruction",
-                    "text": "All questions are compulsory.",
-                },
-            ],
+            "chromeBlocks": self._build_chrome_blocks(
+                paper, duration, result.template.question_count, paper_format
+            ),
+            "instructionBlocks": self._build_instruction_blocks(
+                paper, result, paper_format
+            ),
             "sections": self._build_sections(result, questions_by_pk),
         }
         branding = self._build_branding(paper)
@@ -200,6 +188,47 @@ class PaperDocumentBuilder:
             # no branding so no empty placeholder object ships.
             paper_doc["branding"] = branding
         return paper_doc
+
+    def _build_chrome_blocks(
+        self,
+        paper: Paper,
+        duration_minutes: int,
+        question_count: int,
+        paper_format: PaperFormat | None = None,
+    ) -> list[dict]:
+        """Visible paper chrome for the selected format family."""
+        if paper_format is not None and paper_format.chrome_blocks:
+            return paper_format.render_chrome_blocks(
+                total_marks=paper.total_marks,
+                duration_minutes=duration_minutes,
+                question_count=question_count,
+            )
+        return render_text_blocks(
+            CBSE_COMPACT_CHROME_BLOCKS,
+            total_marks=paper.total_marks,
+            duration_minutes=duration_minutes,
+            question_count=question_count,
+        )
+
+    def _build_instruction_blocks(
+        self,
+        paper: Paper,
+        result: FilledTemplate,
+        paper_format: PaperFormat | None = None,
+    ) -> list[dict]:
+        question_count = result.template.question_count
+        if paper_format is not None and paper_format.instruction_blocks:
+            return paper_format.render_instruction_blocks(
+                total_marks=paper.total_marks,
+                duration_minutes=result.template.preset.duration_minutes,
+                question_count=question_count,
+            )
+        return render_text_blocks(
+            CBSE_COMPACT_INSTRUCTION_BLOCKS,
+            total_marks=paper.total_marks,
+            duration_minutes=result.template.preset.duration_minutes,
+            question_count=question_count,
+        )
 
     def _build_branding(self, paper: Paper) -> dict | None:
         """School identity (name/logo/exam header) from ``School.settings``.
@@ -404,3 +433,93 @@ class PaperDocumentBuilder:
         if q.source_original_qnum:
             source["originalQuestionNumber"] = q.source_original_qnum
         return source
+
+
+def reconcile_document_format_defaults(
+    document: dict | None,
+) -> tuple[dict | None, bool]:
+    """Add missing backend-owned format chrome to older saved documents.
+
+    Existing blocks are preserved so teacher edits are never overwritten; only
+    missing default blocks for the document's ``format.id`` are appended.
+    """
+    if not isinstance(document, dict):
+        return document, False
+    paper = document.get("paper")
+    if not isinstance(paper, dict):
+        return document, False
+
+    format_id = (document.get("format") or {}).get("id")
+    total_marks = int(paper.get("totalMarks") or 0)
+    duration_minutes = int(paper.get("durationMinutes") or 0)
+    question_count = _document_question_count(document)
+
+    paper_format = PaperFormat.objects.filter(
+        format_id=format_id, is_active=True
+    ).first()
+    if paper_format is not None:
+        chrome_defaults = paper_format.render_chrome_blocks(
+            total_marks=total_marks,
+            duration_minutes=duration_minutes,
+            question_count=question_count,
+        )
+        instruction_defaults = paper_format.render_instruction_blocks(
+            total_marks=total_marks,
+            duration_minutes=duration_minutes,
+            question_count=question_count,
+        )
+    elif format_id == CBSE_COMPACT_FORMAT_ID:
+        chrome_defaults = render_text_blocks(
+            CBSE_COMPACT_CHROME_BLOCKS,
+            total_marks=total_marks,
+            duration_minutes=duration_minutes,
+            question_count=question_count,
+        )
+        instruction_defaults = render_text_blocks(
+            CBSE_COMPACT_INSTRUCTION_BLOCKS,
+            total_marks=total_marks,
+            duration_minutes=duration_minutes,
+            question_count=question_count,
+        )
+    else:
+        return document, False
+
+    next_chrome = merge_missing_text_blocks(
+        paper.get("chromeBlocks"), chrome_defaults
+    )
+    next_instructions = merge_missing_text_blocks(
+        paper.get("instructionBlocks"), instruction_defaults
+    )
+    changed = (
+        next_chrome != paper.get("chromeBlocks")
+        or next_instructions != paper.get("instructionBlocks")
+    )
+    if not changed:
+        return document, False
+
+    next_document = {
+        **document,
+        "paper": {
+            **paper,
+            "chromeBlocks": next_chrome,
+            "instructionBlocks": next_instructions,
+        },
+    }
+    return next_document, True
+
+
+def _document_question_count(document: dict) -> int:
+    count = 0
+    seen_or_groups: set[tuple[str, int]] = set()
+    for section in document.get("paper", {}).get("sections", []):
+        section_id = section.get("id", "")
+        for slot in section.get("slots", []):
+            or_group = slot.get("orGroup")
+            if or_group is None:
+                count += 1
+                continue
+            key = (section_id, int(or_group))
+            if key not in seen_or_groups:
+                seen_or_groups.add(key)
+                count += 1
+    return count

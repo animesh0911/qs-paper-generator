@@ -85,9 +85,6 @@ class CoverageReport:
         )
 
 
-_N_ALTERNATES = 3
-
-
 @dataclass
 class FilledTemplate:
     template: PaperTemplate
@@ -236,13 +233,16 @@ class QuestionPicker:
         alternate_ids: list[list[int]] = [[] for _ in range(len(opts.template.slots))]
         for key, slot_indices in bucket_slot_indices.items():
             candidates = pool.get(key, [])
-            # Offer the freshest swap candidates first, mirroring the pick order.
+            # Offer every unused compatible candidate so the editor can expose
+            # the full selected-chapter bank for MVP review. Freshest rows stay
+            # first, mirroring the pick order; selected main-paper questions are
+            # deliberately excluded from alternatives.
             alt_pool = sorted(
                 (qid for qid, _, _ in candidates if qid not in used),
                 key=lambda qid: (usage.get(qid, 0), qid),
             )
             for slot_idx in slot_indices:
-                alternate_ids[slot_idx] = alt_pool[:_N_ALTERNATES]
+                alternate_ids[slot_idx] = list(alt_pool)
 
         return FilledTemplate(
             template=opts.template,

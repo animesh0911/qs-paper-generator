@@ -119,6 +119,25 @@ describe('paper formats', () => {
 
     expect(getToken()).toBe('current-session-token');
   });
+
+  it('uses the active browser session when the print route has no token query', async () => {
+    storage.set('qpg_token', 'current-session-token');
+    const fetchMock = vi.fn(
+      async () => new Response(JSON.stringify(mockPaperDocumentV1)),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await fetchPaperDocument('paper_mock_cbse_science_001', null);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/mock_cbse_science_001/',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Token current-session-token',
+        }),
+      }),
+    );
+  });
 });
 
 describe('generation batches', () => {

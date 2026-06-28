@@ -136,7 +136,11 @@ export async function fetchPaperDocument(
   token?: string | null,
 ): Promise<PaperDocument> {
   const id = paperId.replace(/^paper_/, '');
-  const res = await request(`/papers/${id}/`, { method: 'GET' }, token);
+  const res = await request(
+    `/papers/${id}/`,
+    { method: 'GET' },
+    token ?? undefined,
+  );
   const parsed = paperDocumentSchema.safeParse(await res.json());
   if (!parsed.success) {
     throw new Error(
