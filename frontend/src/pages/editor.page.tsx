@@ -38,7 +38,7 @@ import { resolveEditorFixture } from '@/mocks';
 import {
   approvePaper,
   downloadPaperPdf,
-  fetchPaperDocument,
+  fetchEditorDraft,
   persistDraft,
 } from '@/lib/api';
 import {
@@ -51,6 +51,7 @@ import { useEditorWorkspace } from '@/hooks/useEditorWorkspace.hook';
 import {
   AssistantChat,
   EditorAlternativesOverlay,
+  EditorAnswerOverlay,
   EditorInspector,
   EditorOutlineRail,
   PaperChromeEditor,
@@ -61,7 +62,7 @@ import {
 } from '@/components/editor';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { PaperDocument } from '@/types';
+import type { PaperAnswerDocument, PaperDocument } from '@/types';
 
 function toRoman(value: number) {
   const numerals = [
@@ -91,15 +92,20 @@ export default function EditorPage() {
 
 function PersistedEditorPage({ paperId }: { paperId: string }) {
   const [document, setDocument] = useState<PaperDocument | null>(null);
+  const [answerDocument, setAnswerDocument] =
+    useState<PaperAnswerDocument | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
     let active = true;
     setDocument(null);
+    setAnswerDocument(null);
     setError('');
-    fetchPaperDocument(paperId)
-      .then((nextDocument) => {
-        if (active) setDocument(nextDocument);
+    fetchEditorDraft(paperId)
+      .then((draft) => {
+        if (!active) return;
+        setDocument(draft.document);
+        setAnswerDocument(draft.answer_document);
       })
       .catch((reason) => {
         if (active) setError((reason as Error).message);
@@ -112,12 +118,16 @@ function PersistedEditorPage({ paperId }: { paperId: string }) {
   if (error) {
     return <EditorDocumentStatus state="error" message={error} />;
   }
-  if (!document) {
+  if (!document || !answerDocument) {
     return <EditorDocumentStatus state="loading" />;
   }
 
   return (
-    <ResolvedEditorPage document={document} documentKey={document.paper.id} />
+    <ResolvedEditorPage
+      document={document}
+      answerDocument={answerDocument}
+      documentKey={document.paper.id}
+    />
   );
 }
 
@@ -141,9 +151,11 @@ function DemoEditorPage() {
 
 function ResolvedEditorPage({
   document,
+  answerDocument,
   documentKey,
 }: {
   document: PaperDocument;
+  answerDocument?: PaperAnswerDocument;
   documentKey: string;
 }) {
   const rendererResult = useMemo(
@@ -158,6 +170,7 @@ function ResolvedEditorPage({
   return (
     <EditorPageWorkspace
       document={document}
+      answerDocument={answerDocument}
       renderer={rendererResult.renderer}
       selectedFixtureId={documentKey}
       persisted={!documentKey.startsWith('fixture:')}
@@ -205,11 +218,13 @@ function UnsupportedPaperFormatNotice({
 
 function EditorPageWorkspace({
   document,
+  answerDocument,
   renderer,
   selectedFixtureId,
   persisted,
 }: {
   document: PaperDocument;
+  answerDocument?: PaperAnswerDocument;
   renderer: PaperFormatRenderer;
   selectedFixtureId: string;
   persisted: boolean;
@@ -265,9 +280,17 @@ function EditorPageWorkspace({
     'idle' | 'saving' | 'saved' | 'approving' | 'approved' | 'error'
   >('idle');
   const [actionError, setActionError] = useState('');
+  const [answerOverlayOpen, setAnswerOverlayOpen] = useState(false);
   const dirty =
     JSON.stringify(paperState.document) !== JSON.stringify(lastSavedDocument);
   const warnings = view.validationSummary.warnings;
+  const selectedAnswerEntry = selectedSlot
+    ? answerDocument?.answersBySlotId[selectedSlot.slotId]
+    : undefined;
+  const currentSelectedAnswerEntry =
+    selectedAnswerEntry?.questionId === selectedSlot?.questionBlockTree.questionId
+      ? selectedAnswerEntry
+      : undefined;
 
   async function runAction(action: 'save' | 'approve' | 'download') {
     if (!persisted) return;
@@ -880,6 +903,10 @@ function EditorPageWorkspace({
                                   lockEnabled={slot.editCapabilities.lock}
                                   swapEnabled={slot.editCapabilities.swap}
                                   onInfo={() => handleShowInfo(slot.slotId)}
+                                  onAnswer={() => {
+                                    handleSelectSlot(slot.slotId);
+                                    setAnswerOverlayOpen(true);
+                                  }}
                                   onAlternatives={(intent) =>
                                     handleShowAlternatives(slot.slotId, intent)
                                   }
@@ -930,6 +957,16 @@ function EditorPageWorkspace({
             onUseAlternative={(questionId) =>
               handleUseAlternative(selectedSlot.slotId, questionId)
             }
+          />
+        </div>
+      )}
+
+      {answerOverlayOpen && selectedSlot && (
+        <div className="editor-answer-overlay">
+          <EditorAnswerOverlay
+            selectedSlot={selectedSlot}
+            answerEntry={currentSelectedAnswerEntry}
+            onClose={() => setAnswerOverlayOpen(false)}
           />
         </div>
       )}

@@ -15,6 +15,7 @@ import {
   assemblePaper,
   clearToken,
   createGenerationBatch,
+  fetchEditorDraft,
   fetchGenerationBatch,
   fetchGenerationCandidates,
   fetchPaperFormats,
@@ -256,6 +257,42 @@ describe('paper persistence', () => {
     expect(document.paper.id).toBe('paper_mock_cbse_science_001');
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/papers/mock_cbse_science_001/',
+      expect.objectContaining({ method: 'GET' }),
+    );
+  });
+
+  it('loads the editor draft document and paper-local answers together', async () => {
+    const answerDocument = {
+      schemaVersion: 'paper_answer_document.v1',
+      paperId: 'paper_mock_cbse_science_001',
+      answersBySlotId: {
+        slot_A_01: {
+          slotId: 'slot_A_01',
+          questionId: 'q_1',
+          content: [{ type: 'paragraph', text: 'Model answer' }],
+          source: 'generated',
+          modified: false,
+        },
+      },
+    };
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            document: mockPaperDocumentV1,
+            answer_document: answerDocument,
+            status: 'draft',
+          }),
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const draft = await fetchEditorDraft('paper_mock_cbse_science_001');
+
+    expect(draft.document.paper.id).toBe('paper_mock_cbse_science_001');
+    expect(draft.answer_document).toEqual(answerDocument);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/mock_cbse_science_001/editor-draft/',
       expect.objectContaining({ method: 'GET' }),
     );
   });

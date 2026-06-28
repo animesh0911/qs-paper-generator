@@ -8,6 +8,8 @@
  *
  * @module types
  */
+import type { ContentItem, PaperDocument } from './paper-document.schema';
+
 export type {
   ChoiceGroup,
   ChoiceOption,
@@ -57,6 +59,28 @@ export interface AssembleRequest {
 export interface PaperFormatSummary {
   format_id: string;
   name: string;
+}
+
+export type PaperAnswerSource = 'source' | 'generated';
+
+export interface PaperAnswerEntry {
+  slotId: string;
+  questionId: string;
+  content: ContentItem[];
+  source: PaperAnswerSource;
+  modified: boolean;
+}
+
+export interface PaperAnswerDocument {
+  schemaVersion: 'paper_answer_document.v1';
+  paperId: string;
+  answersBySlotId: Record<string, PaperAnswerEntry>;
+}
+
+export interface EditorDraftResponse {
+  document: PaperDocument;
+  answer_document: PaperAnswerDocument;
+  status: string;
 }
 
 export type GenerationBatchStatus =
