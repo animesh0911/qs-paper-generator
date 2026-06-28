@@ -35,3 +35,11 @@ export function openMockPrintDocument(
   saveDocument(printDocument);
   openWindow(`/editor/${printDocument.paper.id}/print?mock=1`, '_blank');
 }
+
+export function openPersistedPrintDocument(
+  paper: PaperDocument,
+  openWindow: (url: string, target: string) => Window | null | void =
+    window.open.bind(window),
+) {
+  openWindow(`/editor/${paper.paper.id}/print`, '_blank');
+}

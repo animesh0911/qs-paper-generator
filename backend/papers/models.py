@@ -17,6 +17,8 @@ from django.db import models, transaction
 from accounts.models import School
 from bank.models import Question
 
+from .format_defaults import render_text_blocks
+
 
 class PaperStatus(models.TextChoices):
     DRAFT = "draft", "Draft"
@@ -140,6 +142,8 @@ class PaperFormat(models.Model):
     preset_name = models.CharField(max_length=50)
     page = models.JSONField()
     layout = models.JSONField()
+    chrome_blocks = models.JSONField(default=list, blank=True)
+    instruction_blocks = models.JSONField(default=list, blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -151,6 +155,34 @@ class PaperFormat(models.Model):
     @property
     def format_data(self) -> dict:
         return {"id": self.format_id, "page": self.page, "layout": self.layout}
+
+    def render_chrome_blocks(
+        self,
+        *,
+        total_marks: int,
+        duration_minutes: int,
+        question_count: int,
+    ) -> list[dict]:
+        return render_text_blocks(
+            list(self.chrome_blocks or []),
+            total_marks=total_marks,
+            duration_minutes=duration_minutes,
+            question_count=question_count,
+        )
+
+    def render_instruction_blocks(
+        self,
+        *,
+        total_marks: int,
+        duration_minutes: int,
+        question_count: int,
+    ) -> list[dict]:
+        return render_text_blocks(
+            list(self.instruction_blocks or []),
+            total_marks=total_marks,
+            duration_minutes=duration_minutes,
+            question_count=question_count,
+        )
 
 
 class PaperQuestion(models.Model):

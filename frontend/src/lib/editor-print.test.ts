@@ -13,7 +13,7 @@ import {
   normalizePaperDocument,
   setSlotRegionOverride,
 } from './paper-document';
-import { openMockPrintDocument } from './editor-print';
+import { openMockPrintDocument, openPersistedPrintDocument } from './editor-print';
 
 describe('editor print handoff', () => {
   it('opens the mock print route in a new tab so the editor stays mounted', () => {
@@ -54,5 +54,17 @@ describe('editor print handoff', () => {
         stem: [{ type: 'paragraph', text: 'Edited question for print.' }],
       },
     });
+  });
+
+  it('opens persisted downloads through the print-preview route', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const openWindow = vi.fn();
+
+    openPersistedPrintDocument(document, openWindow);
+
+    expect(openWindow).toHaveBeenCalledWith(
+      `/editor/${document.paper.id}/print`,
+      '_blank',
+    );
   });
 });

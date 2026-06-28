@@ -29,6 +29,7 @@ from .answer_document import (
 )
 from .assets import strip_resolved_asset_urls, with_resolved_asset_urls
 from .builder import PaperBuilder
+from .document import reconcile_document_format_defaults
 from .document_contract import PaperDocumentContractError
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
@@ -81,7 +82,7 @@ class PaperDetailView(APIView):
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
         if paper.document is not None:
-            return Response(paper.document)
+            return Response(_document_with_format_defaults(paper))
         return Response(PaperSerializer(paper).data)
 
     def patch(self, request, pk):
@@ -126,6 +127,7 @@ class PaperEditorDraftView(APIView):
 
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        _document_with_format_defaults(paper)
         answer_document = self._reconciled_answer_document(paper)
 
         # Enrich the response copies with backend-issued asset URLs the editor
@@ -227,7 +229,7 @@ class PaperPdfView(APIView):
 
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
-        document = paper.document or {}
+        document = _document_with_format_defaults(paper) or {}
         print_url = _paper_print_url(request.user, paper.pk)
         if paper.status == PaperStatus.APPROVED:
             cache_key = f"paper-pdf:{paper.pk}"
@@ -275,6 +277,14 @@ class PaperAnswerKeyPdfView(APIView):
             f'inline; filename="paper-{paper.pk}-answer-key.pdf"'
         )
         return response
+
+
+def _document_with_format_defaults(paper: Paper) -> dict | None:
+    document, changed = reconcile_document_format_defaults(paper.document)
+    if changed:
+        paper.document = document
+        paper.save(update_fields=["document"])
+    return document
 
 
 def _paper_print_url(user, paper_pk: int) -> str | None:

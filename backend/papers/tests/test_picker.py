@@ -266,6 +266,31 @@ def test_pure_allocator_reports_unfilled_with_empty_pool():
     assert len(result.unfilled) == 3
 
 
+def test_pure_allocator_exposes_every_remaining_candidate_as_an_alternative():
+    """All compatible bank rows should reach the editor for MVP review.
+
+    If a teacher selects only one chapter, every persisted matching question for
+    that chapter should either be placed in the main paper or be visible as a
+    swap alternative. Capping alternatives hides valid bank rows from the editor.
+    """
+    bucket = (Section.A, QuestionType.MCQ, 1)
+    pool: QuestionPool = {
+        bucket: [(qid, "carbon-and-its-compounds", "R") for qid in range(1, 11)]
+    }
+    opts = PaperOptions(
+        template=_spec(2),
+        chapter_slugs=["carbon-and-its-compounds"],
+        difficulty="standard",
+    )
+
+    result = QuestionPicker._select_from_pool(opts, pool)
+
+    selected = {qid for qid in result.question_ids if qid is not None}
+    alternatives = {qid for alts in result.alternate_ids for qid in alts}
+    assert selected | alternatives == set(range(1, 11))
+    assert alternatives.isdisjoint(selected)
+
+
 @pytest.mark.django_db
 def test_assemble_rejects_unknown_difficulty(api_client, seeded_bank):
     resp = api_client.post(

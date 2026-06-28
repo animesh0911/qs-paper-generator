@@ -485,6 +485,96 @@ def test_assemble_with_format_id_uses_stored_format_object(api_client, seeded_ba
 
 
 @pytest.mark.django_db
+def test_assemble_with_cbse_format_includes_cbse_chrome(api_client, seeded_bank):
+    """Live papers should carry the full editable CBSE visible format text."""
+    from papers.models import PaperFormat
+
+    fmt = PaperFormat.objects.get(
+        format_id="cbse_science_class_10_board_compact_2026_v1"
+    )
+    assert fmt.chrome_blocks
+    assert fmt.instruction_blocks
+
+    resp = api_client.post(
+        "/api/papers/assemble",
+        {"format_id": "cbse_science_class_10_board_compact_2026_v1"},
+        format="json",
+    )
+
+    assert resp.status_code == status.HTTP_201_CREATED
+    chrome_roles = {
+        block["role"] for block in resp.data["paper"]["chromeBlocks"]
+    }
+    assert {
+        "series",
+        "set",
+        "paper_code",
+        "subject_label",
+        "roll_number",
+        "paper_meta_left",
+        "paper_meta_right",
+        "footer_left",
+        "footer_right",
+    }.issubset(chrome_roles)
+    instruction_roles = {
+        block["role"] for block in resp.data["paper"]["instructionBlocks"]
+    }
+    assert "note" in instruction_roles
+    assert "general_instruction" in instruction_roles
+
+
+@pytest.mark.django_db
+def test_editor_draft_backfills_missing_cbse_chrome(api_client, seeded_bank):
+    """Older saved docs regain missing format-owned chrome on load."""
+    from papers.models import Paper
+
+    assembled = api_client.post(
+        "/api/papers/assemble",
+        {"format_id": "cbse_science_class_10_board_compact_2026_v1"},
+        format="json",
+    )
+    paper_id = int(assembled.data["paper"]["id"].removeprefix("paper_"))
+    paper = Paper.objects.get(pk=paper_id)
+    old_document = dict(paper.document)
+    old_document["paper"] = {
+        **old_document["paper"],
+        "chromeBlocks": [
+            {
+                "id": "subject_label",
+                "role": "subject_label",
+                "text": "Science",
+            }
+        ],
+        "instructionBlocks": [],
+    }
+    paper.document = old_document
+    paper.save(update_fields=["document"])
+
+    resp = api_client.get(f"/api/papers/{paper_id}/editor-draft/")
+
+    assert resp.status_code == status.HTTP_200_OK
+    chrome_roles = {
+        block["role"] for block in resp.data["document"]["paper"]["chromeBlocks"]
+    }
+    assert "series" in chrome_roles
+    assert "paper_code" in chrome_roles
+    assert "footer_right" in chrome_roles
+    # Existing saved text is preserved rather than overwritten.
+    subject = next(
+        block
+        for block in resp.data["document"]["paper"]["chromeBlocks"]
+        if block["role"] == "subject_label"
+    )
+    assert subject["text"] == "Science"
+
+    paper.refresh_from_db()
+    persisted_roles = {
+        block["role"] for block in paper.document["paper"]["chromeBlocks"]
+    }
+    assert "series" in persisted_roles
+
+
+@pytest.mark.django_db
 def test_assemble_rejects_unsupported_format_id(api_client, seeded_bank):
     """Unknown format_id returns 400 with a clear error."""
     resp = api_client.post(
