@@ -10,7 +10,14 @@
  *
  * @module QuestionActionRail
  */
-import { Info, Lock, MessageSquareText, Shuffle, Unlock } from 'lucide-react';
+import {
+  BookOpenCheck,
+  Info,
+  Lock,
+  MessageSquareText,
+  Shuffle,
+  Unlock,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AlternativesIntent } from './editor-types';
 
@@ -19,6 +26,7 @@ export function QuestionActionRail({
   lockEnabled = true,
   swapEnabled = true,
   onInfo,
+  onAnswer,
   onAlternatives,
   onToggleLock,
   onAsk,
@@ -27,6 +35,7 @@ export function QuestionActionRail({
   lockEnabled?: boolean;
   swapEnabled?: boolean;
   onInfo: () => void;
+  onAnswer: () => void;
   onAlternatives: (intent: AlternativesIntent) => void;
   onToggleLock: () => void;
   onAsk: () => void;
@@ -52,6 +61,18 @@ export function QuestionActionRail({
       >
         <Info className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
         Info
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="justify-start px-2 text-xs"
+        title="Show answer"
+        aria-label="Show answer"
+        onClick={onAnswer}
+      >
+        <BookOpenCheck className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+        Answer
       </Button>
       <Button
         type="button"

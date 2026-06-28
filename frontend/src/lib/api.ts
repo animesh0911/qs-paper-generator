@@ -17,6 +17,7 @@ import type {
   AssembleRequest,
   Chapter,
   ChapterTopicsResponse,
+  EditorDraftResponse,
   GenerationBatch,
   GenerationBatchCreateRequest,
   GeneratedQuestionCandidate,
@@ -143,6 +144,40 @@ export async function fetchPaperDocument(
     );
   }
   return parsed.data as PaperDocument;
+}
+
+export async function fetchEditorDraft(
+  paperId: string,
+): Promise<EditorDraftResponse> {
+  const id = paperId.replace(/^paper_/, '');
+  const res = await request(`/papers/${id}/editor-draft/`, { method: 'GET' });
+  const data = await res.json();
+  const parsed = paperDocumentSchema.safeParse(data.document);
+  if (!parsed.success) {
+    throw new Error(
+      `Backend returned an unexpected PaperDocument shape: ${parsed.error.message}`,
+    );
+  }
+  if (!isPaperAnswerDocument(data.answer_document)) {
+    throw new Error('Backend returned an unexpected answer document shape.');
+  }
+  return {
+    document: parsed.data as PaperDocument,
+    answer_document: data.answer_document,
+    status: typeof data.status === 'string' ? data.status : '',
+  };
+}
+
+function isPaperAnswerDocument(value: unknown): value is EditorDraftResponse['answer_document'] {
+  return (
+    Boolean(value) &&
+    typeof value === 'object' &&
+    (value as { schemaVersion?: unknown }).schemaVersion ===
+      'paper_answer_document.v1' &&
+    typeof (value as { paperId?: unknown }).paperId === 'string' &&
+    Boolean((value as { answersBySlotId?: unknown }).answersBySlotId) &&
+    typeof (value as { answersBySlotId?: unknown }).answersBySlotId === 'object'
+  );
 }
 
 export async function persistDraft(paper: PaperDocument): Promise<void> {

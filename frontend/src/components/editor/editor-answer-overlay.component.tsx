@@ -1,0 +1,244 @@
+/**
+ * Full-screen answer viewer for a selected Paper Slot.
+ *
+ * Mirrors the alternatives overlay shell so answer review has enough space for
+ * longer marking points while the paper remains visually behind it. This slice
+ * is deliberately view-only: answer editing is deferred.
+ *
+ * @module EditorAnswerOverlay
+ */
+import { useEffect, useRef, type KeyboardEvent } from 'react';
+import { AlertTriangle, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MathContent } from '@/components/math/math-content.component';
+import type { EditorPaperSlotView } from '@/lib/editor-paper';
+import type { ContentItem, PaperAnswerEntry } from '@/types';
+
+export function EditorAnswerOverlay({
+  selectedSlot,
+  answerEntry,
+  onClose,
+}: {
+  selectedSlot: EditorPaperSlotView;
+  answerEntry?: PaperAnswerEntry;
+  onClose: () => void;
+}) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const generatedUnverified = answerEntry?.source === 'generated';
+  const answerContent = Array.isArray(answerEntry?.content)
+    ? answerEntry.content
+    : [];
+  const hasAnswer = answerContent.length > 0;
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      onClose();
+      return;
+    }
+
+    if (event.key !== 'Tab' || !dialogRef.current) return;
+
+    const focusableElements = Array.from(
+      dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), summary, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => !element.hasAttribute('disabled'));
+
+    if (focusableElements.length === 0) return;
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
+  return (
+    <div
+      data-editor-chrome
+      className="fixed inset-0 z-40 bg-foreground/45 p-4 max-sm:p-0"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="answer-title"
+      ref={dialogRef}
+      onKeyDown={handleKeyDown}
+    >
+      <div className="mx-auto flex h-full max-w-5xl flex-col overflow-hidden rounded-lg border bg-background shadow-[0_12px_28px_rgba(15,23,42,0.18)] max-sm:rounded-none">
+        <header className="flex flex-wrap items-start justify-between gap-3 border-b px-5 py-4">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">
+              Question {selectedSlot.displayNumber} answer
+            </p>
+            <h2 id="answer-title" className="mt-1 text-lg font-semibold">
+              Show answer
+            </h2>
+          </div>
+          <Button
+            ref={closeButtonRef}
+            type="button"
+            variant="ghost"
+            size="sm"
+            aria-label="Close answer"
+            onClick={onClose}
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </header>
+
+        <div className="grid min-h-0 flex-1 grid-cols-[18rem_minmax(0,1fr)] max-lg:grid-cols-1">
+          <aside className="space-y-4 border-r bg-secondary/70 p-4 max-lg:border-b max-lg:border-r-0">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">
+                Question preview
+              </p>
+              <QuestionPreview
+                selectedSlot={selectedSlot}
+                className="mt-1 text-sm font-medium leading-6"
+              />
+            </div>
+            <div className="flex flex-wrap gap-1.5 text-xs">
+              <MetadataChip>{selectedSlot.marksLabel}</MetadataChip>
+              <MetadataChip>
+                {selectedSlot.questionType.replace(/_/g, ' ')}
+              </MetadataChip>
+            </div>
+          </aside>
+
+          <main className="min-h-0 overflow-auto p-5">
+            <div className="mx-auto max-w-3xl space-y-4">
+              {generatedUnverified && (
+                <div
+                  className="rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-950"
+                  role="status"
+                >
+                  <div className="flex gap-2">
+                    <AlertTriangle
+                      className="mt-0.5 h-4 w-4 flex-none"
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <p className="text-sm font-medium">
+                        AI-generated answer — verify before use
+                      </p>
+                      <p className="mt-1 text-sm leading-6">
+                        This answer was generated by AI and has not been
+                        independently verified. Treat it as a review aid, not a
+                        final authority.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <section className="rounded-lg border bg-background p-4">
+                <h3 className="text-sm font-medium">Answer</h3>
+                {hasAnswer ? (
+                  <AnswerContent items={answerContent} />
+                ) : (
+                  <p className="mt-3 rounded-md bg-secondary/70 p-3 text-sm text-muted-foreground">
+                    No answer on file.
+                  </p>
+                )}
+              </section>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuestionPreview({
+  selectedSlot,
+  className,
+}: {
+  selectedSlot: EditorPaperSlotView;
+  className?: string;
+}) {
+  if (selectedSlot.questionBlockTree.children.length === 0) {
+    return <p className={className}>No question text available.</p>;
+  }
+
+  return (
+    <details className={className} open>
+      <summary className="cursor-pointer select-none text-xs font-medium text-muted-foreground">
+        Current question
+      </summary>
+      <div className="mt-2 space-y-1.5">
+        {selectedSlot.questionBlockTree.children.map((region) => (
+          <div
+            key={region.regionKey}
+            className="flex min-w-0 items-start gap-1.5"
+          >
+            {region.displayPrefix && (
+              <span className="flex-none select-none font-semibold">
+                {region.displayPrefix}
+              </span>
+            )}
+            <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">
+              <MathContent items={region.content} />
+            </span>
+            {region.displaySuffix && (
+              <span className="flex-none select-none text-xs text-muted-foreground">
+                {region.displaySuffix}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </details>
+  );
+}
+
+function AnswerContent({ items }: { items: ContentItem[] }) {
+  return (
+    <div className="mt-3 space-y-3 text-sm leading-6">
+      {items.map((item, index) => {
+        if (item.type === 'table' && item.rows) {
+          return (
+            <div key={index} className="overflow-x-auto">
+              <table className="min-w-full border-collapse text-left text-sm">
+                <tbody>
+                  {item.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, cellIndex) => (
+                        <td key={cellIndex} className="border px-2 py-1">
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
+        return (
+          <p key={index} className="whitespace-pre-wrap break-words">
+            <MathContent items={[item]} />
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function MetadataChip({ children }: { children: string | number }) {
+  return (
+    <span className="rounded border bg-secondary px-1.5 py-0.5 text-muted-foreground">
+      {children}
+    </span>
+  );
+}

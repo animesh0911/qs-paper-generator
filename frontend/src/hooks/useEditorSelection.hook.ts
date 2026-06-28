@@ -33,7 +33,7 @@ export function useEditorSelection() {
       if (!(target instanceof Element)) return;
       if (
         target.closest(
-          '[data-question-slot], .qpg-question-action-rail, .editor-inspector, .editor-alternatives-overlay, .editor-chat-footer, .editor-left-rail, header',
+          '[data-question-slot], .qpg-question-action-rail, .editor-inspector, .editor-alternatives-overlay, .editor-answer-overlay, .editor-chat-footer, .editor-left-rail, header',
         )
       ) {
         return;
