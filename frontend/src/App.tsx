@@ -14,6 +14,7 @@ import {
   AiQaPage,
   DashboardPage,
   LoginPage,
+  PrintAnswerKeyPage,
   PrintPaperPage,
   UploadPapersPage,
 } from '@/pages';
@@ -63,6 +64,10 @@ export default function App() {
         }
       />
       <Route path="/editor/:paperId/print" element={<PrintPaperPage />} />
+      <Route
+        path="/editor/:paperId/answer-key/print"
+        element={<PrintAnswerKeyPage />}
+      />
       <Route
         path="/upload"
         element={
