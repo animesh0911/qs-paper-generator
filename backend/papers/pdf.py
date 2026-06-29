@@ -7,9 +7,10 @@ The primary path prints the React print route through Chromium so the
 downloaded PDF follows the same renderer as the editor. The ReportLab path is
 kept as a fallback for tests and environments without Playwright installed.
 
-``render_answer_key_pdf`` produces the separate marking-scheme PDF. It is
-always ReportLab-rendered (an internal document, not the editor surface) and
-joins the canonical document's slot order with the answers passed in.
+``render_answer_key_pdf`` produces the separate marking-scheme PDF. Its primary
+path prints the React answer-key route through Chromium, with ReportLab kept as
+the fallback, joining the canonical document's slot order with the answers
+passed in.
 
 School branding (``paper.branding``: schoolName/examHeader/logoUrl) is emitted
 into the contract by ``papers.document`` and rendered as a header here. The
@@ -170,7 +171,9 @@ def _render_reportlab_pdf(document: dict) -> bytes:
     return pdf
 
 
-def render_answer_key_pdf(document: dict, answers_by_slot: dict[str, str]) -> bytes:
+def render_answer_key_pdf(
+    document: dict, answers_by_slot: dict[str, str], print_url: str | None = None
+) -> bytes:
     """Render the marking-scheme PDF for a paper.
 
     ``answers_by_slot`` maps the contract **slot id** to printable answer text —
@@ -179,8 +182,18 @@ def render_answer_key_pdf(document: dict, answers_by_slot: dict[str, str]) -> by
     slot id means a swapped question prints its current answer in current order.
     Walks the canonical slot order so the key numbering matches the question
     paper exactly. A filled slot with no printable answer renders
-    ``Answer not available``.
+    ``Answer not available``. When ``print_url`` is configured, the frontend
+    answer-key print route is the primary renderer; ReportLab remains the
+    fallback for tests and environments without a browser.
     """
+    if print_url:
+        try:
+            return _render_browser_pdf(print_url)
+        except Exception:
+            logger.warning(
+                "Browser answer-key PDF renderer failed; falling back.", exc_info=True
+            )
+
     paper = document["paper"]
     title = paper["title"]
 

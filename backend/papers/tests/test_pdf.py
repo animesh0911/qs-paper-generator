@@ -115,6 +115,42 @@ def test_paper_pdf_renders_without_branding():
     assert render_paper_pdf(document)[:4] == b"%PDF"
 
 
+def test_answer_key_pdf_uses_browser_route_when_print_url_is_supplied(monkeypatch):
+    """Frontend print route is the primary answer-key PDF renderer when configured."""
+    calls = []
+
+    def fake_browser_pdf(print_url):
+        calls.append(print_url)
+        return b"%PDF browser answer key"
+
+    monkeypatch.setattr("papers.pdf._render_browser_pdf", fake_browser_pdf)
+
+    pdf = render_answer_key_pdf(
+        _doc(), {"slot_A_01": "H2O"}, print_url="http://frontend/answer-key"
+    )
+
+    assert pdf == b"%PDF browser answer key"
+    assert calls == ["http://frontend/answer-key"]
+
+
+def test_answer_key_pdf_falls_back_to_reportlab_when_browser_fails(monkeypatch):
+    """A browser failure must not block answer-key PDF download."""
+
+    def fail_browser_pdf(print_url):
+        raise RuntimeError("chromium unavailable")
+
+    monkeypatch.setattr("papers.pdf._render_browser_pdf", fail_browser_pdf)
+
+    text = _pdf_text(
+        render_answer_key_pdf(
+            _doc(), {"slot_A_01": "H2O fallback answer"}, print_url="http://bad"
+        )
+    )
+
+    assert "Answer Key" in text
+    assert "H2O fallback answer" in text
+
+
 def test_answer_key_pdf_contains_answers_in_slot_order():
     """The marking scheme is worthless if the supplied answer text is absent.
 
