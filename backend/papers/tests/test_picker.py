@@ -209,7 +209,7 @@ def test_pure_allocator_honours_chapter_weights_with_hand_built_pool():
     in-memory pool. If a future refactor makes _select_from_pool reach into
     the ORM, this test fails immediately without any fixture cost.
     """
-    bucket = (Section.A, QuestionType.MCQ, 1)
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
     pool: QuestionPool = {
         bucket: [
             (i, "electricity" if i < 50 else "life-processes", "R")
@@ -273,7 +273,7 @@ def test_pure_allocator_exposes_every_remaining_candidate_as_an_alternative():
     that chapter should either be placed in the main paper or be visible as a
     swap alternative. Capping alternatives hides valid bank rows from the editor.
     """
-    bucket = (Section.A, QuestionType.MCQ, 1)
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
     pool: QuestionPool = {
         bucket: [(qid, "carbon-and-its-compounds", "R") for qid in range(1, 11)]
     }
@@ -315,7 +315,7 @@ def test_pure_allocator_prefers_fresher_question_when_quotas_tie():
     not break the tie, the picker would keep handing out the same low-id
     questions paper after paper.
     """
-    bucket = (Section.A, QuestionType.MCQ, 1)
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
     pool: QuestionPool = {bucket: [(1, "electricity", "R"), (2, "electricity", "R")]}
     opts = PaperOptions(template=_spec(1), chapter_slugs=["electricity"])
 
@@ -334,7 +334,7 @@ def test_freshness_never_leaves_a_fillable_slot_empty():
     repeat must never turn a fillable slot into an unfilled one against a
     finite bank.
     """
-    bucket = (Section.A, QuestionType.MCQ, 1)
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
     pool: QuestionPool = {bucket: [(1, "electricity", "R")]}
     opts = PaperOptions(template=_spec(1), chapter_slugs=["electricity"])
 

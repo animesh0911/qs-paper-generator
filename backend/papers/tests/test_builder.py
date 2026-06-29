@@ -25,9 +25,11 @@ def test_assemble_creates_paper_matching_board_spec(user, seeded_bank):
     assert paper.created_by == user
     assert paper.total_marks == spec.total_marks
 
-    expected_section_counts = Counter(s.section for s in spec.slots)
-    actual_section_counts = Counter(item.section for item in paper.items.all())
-    assert actual_section_counts == expected_section_counts
+    document_section_counts = Counter(
+        slot.section for slot in spec.slots if slot.section in {"A", "B", "C"}
+    )
+    assert document_section_counts == {"A": 18, "B": 15, "C": 12}
+    assert spec.question_count == 39
 
 
 @pytest.mark.django_db
@@ -67,6 +69,51 @@ def test_assemble_endpoint_returns_document(api_client, seeded_bank):
     assert resp.data["paper"]["totalMarks"] > 0
     assert len(resp.data["questions"]) > 0
     assert len(resp.data["paper"]["sections"]) > 0
+
+
+@pytest.mark.django_db
+def test_board_document_uses_three_subject_sections(api_client, seeded_bank):
+    """Board paper is 39 questions across Biology/Chemistry/Physics sections."""
+
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+
+    assert resp.status_code == status.HTTP_201_CREATED
+    sections = resp.data["paper"]["sections"]
+    assert [(s["id"], s["subtitle"], s["marks"]) for s in sections] == [
+        ("A", "Biology", 30),
+        ("B", "Chemistry", 25),
+        ("C", "Physics", 25),
+    ]
+    # Internal-choice alternatives are represented as paired slots for editing,
+    # but they share one displayed question number. The paper must read as 39
+    # questions, not 45 numbered questions.
+    assert sum(len(s["slots"]) for s in sections) == 45
+    displayed_numbers = [
+        slot["number"] for section in sections for slot in section["slots"]
+    ]
+    assert len(set(displayed_numbers)) == 39
+    assert displayed_numbers[-1] == "39"
+
+
+@pytest.mark.django_db
+def test_board_subject_sections_only_pull_matching_chapter_strand(api_client, seeded_bank):
+    """CBSE subject sections constrain retrieval by Chapter.subject_area."""
+
+    resp = api_client.post("/api/papers/assemble", {}, format="json")
+
+    question_by_id = {q["id"]: q for q in resp.data["questions"]}
+    expected_subject_by_section = {
+        "A": "Biology",
+        "B": "Chemistry",
+        "C": "Physics",
+    }
+    for section in resp.data["paper"]["sections"]:
+        expected = expected_subject_by_section[section["id"]]
+        for slot in section["slots"]:
+            qid = slot["selectedQuestionId"]
+            if qid is None:
+                continue
+            assert question_by_id[qid]["metadata"]["subjectArea"] == expected
 
 
 @pytest.mark.django_db
@@ -446,10 +493,20 @@ def test_formats_endpoint_lists_active_formats(api_client):
     """GET /api/papers/formats returns at least the seeded CBSE board format."""
     resp = api_client.get("/api/papers/formats")
     assert resp.status_code == status.HTTP_200_OK
-    ids = [f["format_id"] for f in resp.data]
-    assert "cbse_science_class_10_board_compact_2026_v1" in ids
-    names = [f["name"] for f in resp.data]
-    assert "CBSE End Term Exam" in names
+    formats = {f["format_id"]: f for f in resp.data}
+    board = formats["cbse_science_class_10_board_compact_2026_v1"]
+    assert board["name"] == "CBSE End Term Exam"
+    assert board["preset_name"] == "board"
+    assert board["total_marks"] == 80
+    assert board["section_count"] == 3
+    assert board["question_count"] == 39
+    assert board["marks_by_question_type"] == {
+        "mcq": 20,
+        "very_short_answer": 12,
+        "short_answer": 21,
+        "long_answer": 15,
+        "case_based": 12,
+    }
 
 
 @pytest.mark.django_db

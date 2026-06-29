@@ -34,6 +34,18 @@ class ChapterSerializer(serializers.ModelSerializer):
         fields = ["id", "slug", "name", "order"]
 
 
+class ChapterTaxonomySerializer(serializers.ModelSerializer):
+    """Full chapter taxonomy used by paper setup.
+
+    Kept separate from ``ChapterSerializer`` so corpus/question nested chapter
+    contracts do not change when the setup UI needs grouping metadata.
+    """
+
+    class Meta:
+        model = Chapter
+        fields = ["id", "slug", "name", "order", "subject_area"]
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     """Default question shape exposed to clients. Omits ``answer`` by design."""
 

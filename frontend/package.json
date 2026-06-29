@@ -36,6 +36,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.x",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/katex": "^0.16.8",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.2",
@@ -49,6 +51,7 @@
     "eslint-plugin-react-hooks": "^5.x",
     "eslint-plugin-react-refresh": "^0.4.x",
     "globals": "^16.x",
+    "jsdom": "^29.1.1",
     "lint-staged": "^15.x",
     "postcss": "^8.4.49",
     "prettier": "^3.x",

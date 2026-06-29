@@ -228,14 +228,21 @@ def test_slot_ids_are_unique(document):
 
 
 @pytest.mark.django_db
-def test_slot_numbers_are_sequential(document):
-    """Slot display numbers run 1, 2, 3, … across all sections (contract §7)."""
-    numbers = [
-        int(slot["number"])
-        for section in document["paper"]["sections"]
-        for slot in section["slots"]
-    ]
-    assert numbers == list(range(1, len(numbers) + 1))
+def test_slot_numbers_are_sequential_visible_questions(document):
+    """Displayed question numbers run 1..N; OR alternatives share one number."""
+
+    slots = [slot for section in document["paper"]["sections"] for slot in section["slots"]]
+    numbers = [int(slot["number"]) for slot in slots]
+    unique_numbers = sorted(set(numbers))
+    assert unique_numbers == list(range(1, max(unique_numbers) + 1))
+    assert len(unique_numbers) == 39
+
+    for number in unique_numbers:
+        same_number_slots = [slot for slot in slots if int(slot["number"]) == number]
+        if len(same_number_slots) > 1:
+            groups = {slot.get("orGroup") for slot in same_number_slots}
+            assert len(groups) == 1
+            assert None not in groups
 
 
 # --- questions ---

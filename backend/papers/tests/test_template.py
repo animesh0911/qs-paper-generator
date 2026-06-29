@@ -4,12 +4,10 @@ from collections import Counter
 
 import pytest
 
-from bank.models import QuestionType, Section
+from bank.models import QuestionType, Section, SubjectArea
 from papers.template import PRESET_NAMES, PaperTemplate, Preset, Slot, TemplateBuilder
 
-# ---------------------------------------------------------------------------
 # Board preset — acceptance criteria
-# ---------------------------------------------------------------------------
 
 
 def test_board_spec_total_marks():
@@ -20,54 +18,73 @@ def test_board_spec_question_count():
     assert TemplateBuilder().build("board").question_count == 39
 
 
-def test_board_spec_section_a_20_mcq_1m():
+def test_board_spec_uses_three_subject_sections():
     spec = TemplateBuilder().build("board")
-    a = [s for s in spec.slots if s.section == Section.A]
-    assert len(a) == 20
-    assert all(
-        s.marks == 1 and s.qtype == QuestionType.MCQ and s.or_group is None for s in a
-    )
+    section_marks = {}
+    for section in [Section.A, Section.B, Section.C]:
+        seen_groups = set()
+        total = 0
+        for slot in [s for s in spec.slots if s.section == section]:
+            if slot.or_group is None:
+                total += slot.marks
+            elif slot.or_group not in seen_groups:
+                seen_groups.add(slot.or_group)
+                total += slot.marks
+        section_marks[section] = total
+
+    assert section_marks == {Section.A: 30, Section.B: 25, Section.C: 25}
+    assert {s.section for s in spec.slots} == {Section.A, Section.B, Section.C}
+    assert {s.subject_area for s in spec.slots if s.section == Section.A} == {
+        SubjectArea.BIOLOGY
+    }
+    assert {s.subject_area for s in spec.slots if s.section == Section.B} == {
+        SubjectArea.CHEMISTRY
+    }
+    assert {s.subject_area for s in spec.slots if s.section == Section.C} == {
+        SubjectArea.PHYSICS
+    }
 
 
-def test_board_spec_section_b_6_vsa_2m():
+def test_board_spec_preserves_question_type_totals_for_candidate_lookup():
     spec = TemplateBuilder().build("board")
-    b = [s for s in spec.slots if s.section == Section.B]
-    assert len(b) == 6
-    assert all(
-        s.marks == 2 and s.qtype == QuestionType.VSA and s.or_group is None for s in b
-    )
+    by_type = Counter()
+    seen_groups = set()
+    for slot in spec.slots:
+        if slot.or_group is None:
+            by_type[slot.qtype] += slot.marks
+        elif slot.or_group not in seen_groups:
+            seen_groups.add(slot.or_group)
+            by_type[slot.qtype] += slot.marks
+
+    assert by_type == {
+        QuestionType.MCQ: 20,
+        QuestionType.VSA: 12,
+        QuestionType.SA: 21,
+        QuestionType.LA: 15,
+        QuestionType.CASE: 12,
+    }
 
 
-def test_board_spec_section_c_7_sa_3m():
+def test_board_spec_maps_visible_sections_to_bank_question_type_sections():
     spec = TemplateBuilder().build("board")
-    c = [s for s in spec.slots if s.section == Section.C]
-    assert len(c) == 7
-    assert all(
-        s.marks == 3 and s.qtype == QuestionType.SA and s.or_group is None for s in c
-    )
+    assert {s.bank_section for s in spec.slots if s.qtype == QuestionType.MCQ} == {
+        Section.A
+    }
+    assert {s.bank_section for s in spec.slots if s.qtype == QuestionType.VSA} == {
+        Section.B
+    }
+    assert {s.bank_section for s in spec.slots if s.qtype == QuestionType.SA} == {
+        Section.C
+    }
+    assert {s.bank_section for s in spec.slots if s.qtype == QuestionType.LA} == {
+        Section.D
+    }
+    assert {s.bank_section for s in spec.slots if s.qtype == QuestionType.CASE} == {
+        Section.E
+    }
 
 
-def test_board_spec_section_d_3_la_5m_with_or():
-    spec = TemplateBuilder().build("board")
-    d = [s for s in spec.slots if s.section == Section.D]
-    assert len(d) == 6
-    groups = {s.or_group for s in d}
-    assert None not in groups
-    assert len(groups) == 3
-
-
-def test_board_spec_section_e_3_case_4m_with_or():
-    spec = TemplateBuilder().build("board")
-    e = [s for s in spec.slots if s.section == Section.E]
-    assert len(e) == 6
-    groups = {s.or_group for s in e}
-    assert None not in groups
-    assert len(groups) == 3
-
-
-# ---------------------------------------------------------------------------
 # Additional presets
-# ---------------------------------------------------------------------------
 
 
 def test_half_yearly_total_marks():
@@ -90,9 +107,7 @@ def test_unit_test_question_count():
     assert TemplateBuilder().build("unit_test").question_count == 10
 
 
-# ---------------------------------------------------------------------------
 # OR-group invariants across all presets
-# ---------------------------------------------------------------------------
 
 
 def test_all_presets_or_groups_have_exactly_two_slots():
@@ -103,24 +118,22 @@ def test_all_presets_or_groups_have_exactly_two_slots():
             assert n == 2, f"Preset {name!r} or_group={grp} has {n} slots, want 2"
 
 
-def test_d_and_e_groups_do_not_overlap():
+def test_board_la_and_case_groups_do_not_overlap():
     spec = TemplateBuilder().build("board")
-    d_groups = {
+    la_groups = {
         s.or_group
         for s in spec.slots
-        if s.section == Section.D and s.or_group is not None
+        if s.qtype == QuestionType.LA and s.or_group is not None
     }
-    e_groups = {
+    case_groups = {
         s.or_group
         for s in spec.slots
-        if s.section == Section.E and s.or_group is not None
+        if s.qtype == QuestionType.CASE and s.or_group is not None
     }
-    assert d_groups.isdisjoint(e_groups)
+    assert la_groups.isdisjoint(case_groups)
 
 
-# ---------------------------------------------------------------------------
 # Unknown preset
-# ---------------------------------------------------------------------------
 
 
 def test_unknown_preset_raises_value_error():
@@ -128,9 +141,7 @@ def test_unknown_preset_raises_value_error():
         TemplateBuilder().build("nonexistent")
 
 
-# ---------------------------------------------------------------------------
 # PaperTemplate.total_marks / question_count logic
-# ---------------------------------------------------------------------------
 
 
 def test_paper_template_counts_or_marks_once():

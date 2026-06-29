@@ -37,7 +37,7 @@ from .generation_batches import (
 from .models import Chapter, CognitiveLevel, IngestionJob, QuestionType, Section
 from .permissions import IsTeacher
 from .serializers import (
-    ChapterSerializer,
+    ChapterTaxonomySerializer,
     GeneratedQuestionCandidateSerializer,
     GenerationBatchAcceptSerializer,
     GenerationBatchCreateSerializer,
@@ -65,7 +65,7 @@ def metadata(request):
 
 @api_view(["GET"])
 def chapters(request):
-    return Response(ChapterSerializer(Chapter.objects.all(), many=True).data)
+    return Response(ChapterTaxonomySerializer(Chapter.objects.all(), many=True).data)
 
 
 @api_view(["POST"])

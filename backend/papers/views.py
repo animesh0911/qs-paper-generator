@@ -34,9 +34,25 @@ from .document_contract import PaperDocumentContractError
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
 from .serializers import AssembleRequestSerializer, PaperSerializer
+from .template import TemplateBuilder
 
 _PDF_CACHE_TTL = 60 * 60 * 24  # 1 day
 _SCHEMA_VERSION = "paper_document.v1"
+
+
+def _marks_by_question_type(template) -> dict[str, int]:
+    """Total marks by question type, counting OR groups once."""
+
+    seen_or_groups: set[int] = set()
+    marks_by_type: dict[str, int] = {}
+    for slot in template.slots:
+        if slot.or_group is not None:
+            if slot.or_group in seen_or_groups:
+                continue
+            seen_or_groups.add(slot.or_group)
+        qtype = slot.qtype.value if hasattr(slot.qtype, "value") else str(slot.qtype)
+        marks_by_type[qtype] = marks_by_type.get(qtype, 0) + slot.marks
+    return marks_by_type
 
 
 class PaperFormatsView(APIView):
@@ -45,9 +61,21 @@ class PaperFormatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        formats = list(
-            PaperFormat.objects.filter(is_active=True).values("format_id", "name")
-        )
+        formats = []
+        template_builder = TemplateBuilder()
+        for paper_format in PaperFormat.objects.filter(is_active=True):
+            template = template_builder.build(paper_format.preset_name)
+            formats.append(
+                {
+                    "format_id": paper_format.format_id,
+                    "name": paper_format.name,
+                    "preset_name": paper_format.preset_name,
+                    "total_marks": template.total_marks,
+                    "section_count": len({slot.section for slot in template.slots}),
+                    "question_count": template.question_count,
+                    "marks_by_question_type": _marks_by_question_type(template),
+                }
+            )
         return Response(formats)
 
 

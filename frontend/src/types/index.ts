@@ -42,11 +42,14 @@ export type {
   Refusal,
 } from './ai-proposal.schema';
 
+export type SubjectArea = 'Chemistry' | 'Biology' | 'Physics' | (string & {});
+
 export interface Chapter {
   id: number;
   slug: string;
   name: string;
   order: number;
+  subject_area?: SubjectArea;
 }
 
 export interface AssembleRequest {
@@ -59,6 +62,11 @@ export interface AssembleRequest {
 export interface PaperFormatSummary {
   format_id: string;
   name: string;
+  preset_name?: string;
+  total_marks?: number;
+  section_count?: number;
+  question_count?: number;
+  marks_by_question_type?: Record<string, number>;
 }
 
 export type PaperAnswerSource = 'source' | 'generated';
