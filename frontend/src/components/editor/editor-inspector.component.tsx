@@ -10,7 +10,7 @@
  *
  * @module EditorInspector
  */
-import { Maximize2, RotateCcw } from 'lucide-react';
+import { FileText, Maximize2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { EditorPaperSlotView } from '@/lib/editor-paper';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ export function EditorInspector({
   onInspectorModeChange,
   onShowAllAlternatives,
   onOpenAlternatives,
+  onOpenQuestionInfo,
   onRestoreSelectedSlot,
   highlighted,
 }: {
@@ -35,6 +36,7 @@ export function EditorInspector({
   onInspectorModeChange: (mode: InspectorMode) => void;
   onShowAllAlternatives: () => void;
   onOpenAlternatives: () => void;
+  onOpenQuestionInfo: () => void;
   onRestoreSelectedSlot: () => void;
   highlighted: boolean;
 }) {
@@ -82,6 +84,7 @@ export function EditorInspector({
           <QuestionInfoPanel
             selectedSlot={selectedSlot}
             selectedQuestion={selectedQuestion}
+            onOpenQuestionInfo={onOpenQuestionInfo}
             onRestoreSelectedSlot={onRestoreSelectedSlot}
           />
         ) : (
@@ -105,21 +108,38 @@ export function EditorInspector({
 function QuestionInfoPanel({
   selectedSlot,
   selectedQuestion,
+  onOpenQuestionInfo,
   onRestoreSelectedSlot,
 }: {
   selectedSlot: EditorPaperSlotView;
   selectedQuestion: DocQuestion;
+  onOpenQuestionInfo: () => void;
   onRestoreSelectedSlot: () => void;
 }) {
+  const sourceSummary = sourceDetails(selectedQuestion.source).join(' · ');
+  const relevance = formatRelevance(selectedQuestion.metadata.cbseRelevance);
+
   return (
     <div className="mt-4 space-y-4 text-sm">
-      <div>
+      <div className="rounded-md border bg-secondary/45 p-3">
         <p className="text-xs text-muted-foreground">
           Question {selectedSlot.displayNumber}
         </p>
-        <p className="mt-1 font-medium">{selectedQuestion.rawText}</p>
+        <p className="mt-1 line-clamp-4 font-medium leading-6">
+          {selectedQuestion.rawText}
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-3 w-full"
+          onClick={onOpenQuestionInfo}
+        >
+          <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
+          Open details
+        </Button>
       </div>
-      <dl className="space-y-3">
+      <dl className="grid grid-cols-2 gap-3">
         <div>
           <dt className="text-xs text-muted-foreground">Marks</dt>
           <dd>{selectedSlot.marksLabel}</dd>
@@ -130,46 +150,28 @@ function QuestionInfoPanel({
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Chapter</dt>
-          <dd>
+          <dd className="line-clamp-2">
             {selectedQuestion.metadata.chapterNames.join(', ') || 'Not tagged'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Topics</dt>
-          <dd>
-            {selectedQuestion.metadata.topicNames?.join(', ') || 'Not tagged'}
           </dd>
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Difficulty</dt>
           <dd>{selectedQuestion.metadata.difficulty}</dd>
         </div>
-        {formatRelevance(selectedQuestion.metadata.cbseRelevance) && (
+        {relevance && (
           <div>
-            <dt className="text-xs text-muted-foreground">CBSE relevance</dt>
-            <dd>{formatRelevance(selectedQuestion.metadata.cbseRelevance)}</dd>
+            <dt className="text-xs text-muted-foreground">Relevance</dt>
+            <dd>{relevance}</dd>
           </div>
         )}
-        <div>
+        <div className="col-span-2">
           <dt className="text-xs text-muted-foreground">Source</dt>
-          <dd>{selectedQuestion.source.name}</dd>
-          {sourceDetails(selectedQuestion.source).length > 0 && (
-            <dd className="text-xs text-muted-foreground">
-              {sourceDetails(selectedQuestion.source).join(' · ')}
+          <dd className="line-clamp-2">{selectedQuestion.source.name}</dd>
+          {sourceSummary && (
+            <dd className="line-clamp-2 text-xs text-muted-foreground">
+              {sourceSummary}
             </dd>
           )}
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Lock state</dt>
-          <dd>{selectedSlot.locked ? 'Locked' : 'Unlocked'}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Modified state</dt>
-          <dd>
-            {selectedSlot.modifiedFromSource
-              ? 'Modified from source'
-              : 'Original source text'}
-          </dd>
         </div>
       </dl>
       <Button

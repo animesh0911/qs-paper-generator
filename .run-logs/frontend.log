@@ -1,0 +1,52 @@
+
+> qpg-frontend@0.1.0 dev
+> vite --host 0.0.0.0
+
+
+  VITE v6.4.3  ready in 161 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.0.0.2:5173/
+1:41:47 AM [vite] (client) hmr update /src/pages/editor.page.tsx, /src/index.css
+1:57:15 AM [vite] (client) page reload src/lib/editor-print.ts
+1:57:24 AM [vite] (client) hmr update /src/pages/editor.page.tsx, /src/index.css
+1:57:50 AM [vite] (client) page reload src/lib/editor-print.test.ts
+2:05:13 AM [vite] (client) page reload src/lib/api.test.ts
+2:05:23 AM [vite] (client) hmr update /src/index.css, /src/App.tsx, /src/components/app-nav/app-header.component.tsx, /src/pages/dashboard.page.tsx, /src/pages/login.page.tsx, /src/pages/print-paper.page.tsx, /src/pages/ai-qa.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx, /src/pages/upload-papers.page.tsx, /src/pages/editor.page.tsx
+2:05:37 AM [vite] (client) hmr update /src/index.css, /src/App.tsx, /src/components/app-nav/app-header.component.tsx, /src/pages/dashboard.page.tsx, /src/pages/login.page.tsx, /src/pages/print-paper.page.tsx, /src/pages/ai-qa.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx, /src/pages/upload-papers.page.tsx, /src/pages/editor.page.tsx
+2:12:32 PM [vite] (client) page reload src/types/index.ts
+2:13:25 PM [vite] (client) hmr update /src/index.css, /src/pages/dashboard.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx
+2:14:25 PM [vite] (client) hmr update /src/components/coverage/coverage-form/coverage-form.component.tsx, /src/index.css
+2:14:37 PM [vite] (client) hmr update /src/pages/dashboard.page.tsx, /src/index.css
+2:15:04 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+2:15:18 PM [vite] (client) page reload src/hooks/useCoverageForm.hook.test.ts
+2:15:35 PM [vite] (client) page reload src/pages/dashboard.page.test.tsx
+2:59:00 PM [vite] (client) page reload src/types/index.ts
+2:59:41 PM [vite] (client) hmr update /src/index.css, /src/pages/dashboard.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx
+3:00:07 PM [vite] (client) hmr update /src/index.css, /src/pages/dashboard.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx
+3:00:15 PM [vite] (client) hmr update /src/index.css, /src/pages/dashboard.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx
+3:00:31 PM [vite] (client) hmr update /src/components/coverage/coverage-form/coverage-form.component.tsx, /src/index.css
+3:01:12 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:01:32 PM [vite] (client) page reload src/hooks/useCoverageForm.hook.test.ts
+3:01:42 PM [vite] (client) page reload src/pages/dashboard.page.test.tsx
+3:04:02 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:04:13 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:31:53 PM [vite] (client) hmr update /src/index.css, /src/pages/dashboard.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx
+3:32:27 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:32:34 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:32:40 PM [vite] (client) page reload src/hooks/useCoverageForm.hook.test.ts
+3:32:44 PM [vite] (client) page reload src/hooks/useCoverageForm.hook.test.ts
+3:32:47 PM [vite] (client) page reload src/pages/dashboard.page.test.tsx
+3:32:59 PM [vite] (client) page reload src/pages/dashboard.page.test.tsx
+3:42:52 PM [vite] (client) hmr update /src/index.css, /src/pages/dashboard.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx
+3:43:00 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:43:15 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:43:20 PM [vite] (client) page reload src/pages/dashboard.page.test.tsx
+3:43:42 PM [vite] (client) page reload src/pages/dashboard.page.test.tsx
+3:43:48 PM [vite] (client) page reload src/components/coverage/coverage-form/coverage-form.component.test.tsx
+3:43:48 PM [vite] (client) hmr update /src/index.css, /src/pages/dashboard.page.tsx, /src/components/coverage/coverage-form/coverage-form.component.tsx
+3:43:48 PM [vite] (client) page reload src/pages/dashboard.page.test.tsx
+11:49:01 PM [vite] (client) hmr update /src/index.css, /src/components/coverage/paper-document-view/paper-document-view.component.tsx, /src/pages/editor.page.tsx, /src/components/editor/paper-chrome-editor.component.tsx, /src/components/editor/question-region-editor.component.tsx
+11:49:01 PM [vite] (client) hmr update /src/index.css, /src/components/coverage/paper-document-view/paper-document-view.component.tsx, /src/pages/editor.page.tsx, /src/components/editor/paper-chrome-editor.component.tsx, /src/components/editor/question-region-editor.component.tsx
+11:49:12 PM [vite] (client) page reload src/lib/editor-paper.test.ts
+11:49:12 PM [vite] (client) page reload src/lib/editor-paper.test.ts

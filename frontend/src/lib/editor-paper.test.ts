@@ -513,6 +513,26 @@ describe('editor paper view model', () => {
     );
   });
 
+  it('disambiguates unfilled internal-choice slots in validation warnings', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const [firstSlot, secondSlot] = document.paper.sections[0].slots;
+    firstSlot.number = '16';
+    secondSlot.number = '16';
+    firstSlot.orGroup = 12;
+    secondSlot.orGroup = 12;
+    firstSlot.selectedQuestionId = null;
+    secondSlot.selectedQuestionId = null;
+
+    const view = buildEditorPaperView(document);
+
+    expect(view.validationSummary.warnings).toEqual(
+      expect.arrayContaining([
+        'Slot 16 (choice 1 of 2) has no selected question.',
+        'Slot 16 (choice 2 of 2) has no selected question.',
+      ]),
+    );
+  });
+
   it('renders recomputed display numbers after slot reorder', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const state = normalizePaperDocument(document);

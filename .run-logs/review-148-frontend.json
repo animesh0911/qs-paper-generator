@@ -1,0 +1,103 @@
+{
+  "schema": "agy.review.v1",
+  "verdict": "rejected",
+  "findings": [
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "line": 47,
+      "type": "bug",
+      "priority": "high",
+      "description": "The setup panel allows the user to edit the 'Total marks' input field, and the frontend dynamically scales the paper structure summary locally. However, totalMarks is not included in the payload sent to the backend assembly endpoint (toAssemblePayload), and the backend does not accept custom marks. Consequently, the assembled paper always falls back to the preset's default marks (e.g. 80 for board), ignoring the user's setup input entirely.",
+      "fix": "Disable or make the 'Total marks' field read-only, and automatically update it to match the active PaperFormat's default template preset marks."
+    },
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "line": 177,
+      "type": "code-quality",
+      "priority": "low",
+      "description": "Inside useCoverageForm, the toggleChapterGroup helper references the chapterGroups variable (initialized on line 203) before it is declared. Although closures prevent runtime errors during event handlers, this is bad practice and leads to potential reference bugs if used during render.",
+      "fix": "Reorder the hook declarations to define chapterGroups before any functions referencing it."
+    },
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "line": 83,
+      "type": "maintainability",
+      "priority": "medium",
+      "description": "The template layout metrics (MCQ, VSA, SA, LA count and marks) are duplicated and hardcoded in the frontend helper buildPaperStructureSummary. If the backend template structures change or new formats are introduced, the frontend live summary will either be incorrect or default blindly to 'board'.",
+      "fix": "Expose the structural layout parameters of presets from the backend API (e.g., in /api/paper-formats) and parse them dynamically on the frontend."
+    },
+    {
+      "file": "frontend/src/components/coverage/coverage-form/coverage-form.component.tsx",
+      "line": 135,
+      "type": "ux",
+      "priority": "medium",
+      "description": "'Select all Chapters' and 'Clear' buttons are active and clickable while chapters are loading or when there is an error loading chapters. Clicking them while loading alters the selection state in an unexpected way.",
+      "fix": "Disable both buttons when chaptersLoading is true or chaptersError is present: disabled={chaptersLoading || !!chaptersError}."
+    },
+    {
+      "file": "frontend/src/types/index.ts",
+      "line": 45,
+      "type": "type-safety",
+      "priority": "low",
+      "description": "SubjectArea is typed as 'Chemistry' | 'Biology' | 'Physics' | string. When a union contains specific string literals and the generic string type, TypeScript simplifies it to string, losing IDE autocompletion for the literals.",
+      "fix": "Redefine the union as 'Chemistry' | 'Biology' | 'Physics' | (string & {}) to preserve autocomplete."
+    },
+    {
+      "file": "frontend/src/components/coverage/coverage-form/coverage-form.component.test.tsx",
+      "line": 81,
+      "type": "testing-gap",
+      "priority": "medium",
+      "description": "Component tests use renderToStaticMarkup from react-dom/server instead of standard React testing utilities. This only verifies the initial static HTML output and completely bypasses testing user interactions (like clicking check boxes, select options, and buttons) or ensuring that event handers like toggleChapter or selectAllChapters are correctly wired and function.",
+      "fix": "Migrate tests to @testing-library/react and use fireEvent or @testing-library/user-event to simulate clicks and assert state changes."
+    },
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.test.ts",
+      "line": 1,
+      "type": "testing-gap",
+      "priority": "medium",
+      "description": "The hook tests only assert request payload building, basic grouping, and a static board summary check. There are no unit tests for interactive functions (toggleChapter, selectAllChapters, toggleChapterGroup, etc.) or for checking scaling math under different marks in buildPaperStructureSummary.",
+      "fix": "Add test cases for all functions returned by useCoverageForm and verify various totalMarks inputs (including scale limits and edge cases)."
+    },
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "line": 126,
+      "type": "robustness",
+      "priority": "low",
+      "description": "State totalMarks can be set to any number, including 0 or negative values. If a user inputs these, scaleSummary will calculate 1 for all question counts/marks, but the invalid/negative total marks will be stored in sessionStorage and persist, showing incorrect values in the structure summary panel.",
+      "fix": "Enforce bounds checking in the state setter, ensuring totalMarks >= 1."
+    },
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "line": 124,
+      "type": "robustness",
+      "priority": "low",
+      "description": "The hook loads selectedSlugs from sessionStorage on mount. However, if any restored chapter slug is no longer valid or present in the newly fetched chapters, it is never filtered out, allowing invalid/stale chapter slugs to be sent to the backend.",
+      "fix": "Filter selectedSlugs against the loaded list of chapters inside the fetch useEffect callback."
+    },
+    {
+      "file": "frontend/src/components/coverage/coverage-form/coverage-form.component.tsx",
+      "line": 240,
+      "type": "accessibility",
+      "priority": "medium",
+      "description": "The difficulty selector uses multiple <button type=\"button\"> elements with aria-pressed. Semantically, a single-select control should use role=\"radiogroup\" and role=\"radio\" (with aria-checked), or a standard <select> element, so screen readers correctly announce the group context and current value.",
+      "fix": "Refactor the button group to use role=\"radiogroup\" with proper radio elements or styled labels wrapped around hidden radio inputs."
+    }
+  ],
+  "blockers": [],
+  "files_inspected": [
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.tsx",
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.test.tsx",
+    "frontend/src/hooks/useCoverageForm.hook.ts",
+    "frontend/src/hooks/useCoverageForm.hook.test.ts",
+    "frontend/src/pages/dashboard.page.tsx",
+    "frontend/src/pages/dashboard.page.test.tsx",
+    "frontend/src/types/index.ts"
+  ],
+  "commands_run": [
+    "git status",
+    "git diff HEAD -- frontend/",
+    "npm test",
+    "npm run lint",
+    "npm run type-check"
+  ]
+}

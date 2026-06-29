@@ -20,6 +20,7 @@ import type { Block, PartialBlock } from '@blocknote/core';
 import type {
   ChoiceOption,
   ContentItem,
+  DocSlot,
   DocQuestion,
   EditableTextBlock,
   PaperDocument,
@@ -200,9 +201,13 @@ export function buildEditorPaperView(
           section.instructions,
         )
       : undefined;
+    const slotNumberCounts = countSlotNumbers(section.slots);
+    const seenSlotNumbers = new Map<string, number>();
     const slots = section.slots.map((slot) => {
       totalSlots += 1;
       if (slot.locked) lockedSlots += 1;
+      const slotNumberSeen = (seenSlotNumbers.get(slot.number) ?? 0) + 1;
+      seenSlotNumbers.set(slot.number, slotNumberSeen);
 
       const question = slot.selectedQuestionId
         ? questionsById.get(slot.selectedQuestionId)
@@ -211,7 +216,9 @@ export function buildEditorPaperView(
       if (question) {
         filledSlots += 1;
       } else {
-        warnings.push(`Slot ${slot.number} has no selected question.`);
+        warnings.push(
+          `${slotWarningLabel(slot, slotNumberSeen, slotNumberCounts.get(slot.number) ?? 1)} has no selected question.`,
+        );
       }
 
       const slotOverrides = options.slotEditsById?.[slot.id] ?? slot.overrides;
@@ -336,6 +343,24 @@ export function buildEditorPaperView(
       warnings,
     },
   };
+}
+
+function countSlotNumbers(slots: DocSlot[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const slot of slots) {
+    counts.set(slot.number, (counts.get(slot.number) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function slotWarningLabel(
+  slot: DocSlot,
+  occurrence: number,
+  totalOccurrences: number,
+): string {
+  if (totalOccurrences <= 1) return `Slot ${slot.number}`;
+  const labelKind = slot.orGroup === undefined ? 'copy' : 'choice';
+  return `Slot ${slot.number} (${labelKind} ${occurrence} of ${totalOccurrences})`;
 }
 
 function markTotalWarnings(document: PaperDocument) {

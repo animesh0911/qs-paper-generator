@@ -1,0 +1,75 @@
+{
+  "schema": "agy.review.v1",
+  "verdict": "accepted",
+  "findings": [
+    {
+      "id": "148.1",
+      "title": "Read-only backend-derived total marks and structure metadata verified",
+      "description": "The component and hook correctly use backend-derived PaperFormat total_marks, section_count, question_count, and marks_by_question_type. The total marks input field is marked readOnly and displays the backend-derived value. Predefined layouts are correctly scaled relative to default total marks if backend values are missing. No regressions were found.",
+      "severity": "info",
+      "status": "resolved"
+    },
+    {
+      "id": "148.2",
+      "title": "Context-specific chapter serializer avoids API regressions",
+      "description": "ChapterTaxonomySerializer is introduced and used specifically for the GET /api/bank/chapters/ endpoint to provide subject_area grouping info to the setup UI. Nested Chapter serialization (in QuestionSerializer and PaperSerializer) continues to use the original ChapterSerializer, preserving existing API contracts and avoiding schema regressions.",
+      "severity": "info",
+      "status": "resolved"
+    },
+    {
+      "id": "148.3",
+      "title": "NCERT fallback grouping is correct",
+      "description": "Chapter grouping fallbacks correctly match the DB seeded mapping (Chemistry: 1-4, Biology: 5-8 & 13, Physics: 9-12, Science: others) in inferSubjectArea. Ordering is also preserved. Tested successfully in useCoverageForm.hook.test.ts.",
+      "severity": "info",
+      "status": "resolved"
+    },
+    {
+      "id": "148.4",
+      "title": "Disabled loading/error controls are correct",
+      "description": "The bulk chapter selection controls (Select All / Clear) are disabled when chapters are loading or when an error is present. The Generate paper button is correctly disabled when there is no selected format, when generation is busy, or when no chapter is selected. A warning is shown when no chapters are selected.",
+      "severity": "info",
+      "status": "resolved"
+    },
+    {
+      "id": "148.5",
+      "title": "Interaction test additions and dependencies",
+      "description": "Testing dependencies (@testing-library/react, @testing-library/user-event, and jsdom) are successfully added to package.json. The coverage-form component test suite is successfully migrated to the jsdom environment and tests real DOM interactions (clicks) using userEvent. All tests are passing.",
+      "severity": "info",
+      "status": "resolved"
+    }
+  ],
+  "blockers": [],
+  "files_inspected": [
+    "backend/bank/serializers.py",
+    "backend/bank/views.py",
+    "backend/papers/views.py",
+    "backend/papers/tests/test_builder.py",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.tsx",
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.test.tsx",
+    "frontend/src/hooks/useCoverageForm.hook.ts",
+    "frontend/src/hooks/useCoverageForm.hook.test.ts",
+    "frontend/src/pages/dashboard.page.tsx",
+    "frontend/src/pages/dashboard.page.test.tsx",
+    "frontend/src/types/index.ts"
+  ],
+  "commands_run": [
+    "git status",
+    "git diff",
+    "git diff backend/bank/serializers.py",
+    "git diff backend/bank/views.py",
+    "git diff backend/papers/views.py",
+    "git diff backend/papers/tests/test_builder.py",
+    "git diff frontend/package.json",
+    "git diff frontend/src/components/coverage/coverage-form/coverage-form.component.tsx",
+    "git diff frontend/src/hooks/useCoverageForm.hook.ts",
+    "git diff frontend/src/hooks/useCoverageForm.hook.test.ts",
+    "git diff frontend/src/components/coverage/coverage-form/coverage-form.component.test.tsx",
+    "git diff frontend/src/pages/dashboard.page.tsx",
+    "git diff frontend/src/pages/dashboard.page.test.tsx",
+    "git diff frontend/src/types/index.ts",
+    "npm test",
+    "POSTGRES_HOST=localhost DJANGO_DEBUG=1 uv run pytest"
+  ]
+}
