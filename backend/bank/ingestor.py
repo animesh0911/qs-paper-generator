@@ -68,7 +68,16 @@ QTYPE_DEFAULT_MARKS: dict[str, int] = {
     "short_answer": 3,
     "long_answer": 5,
     "case_based": 4,
+    # Legacy extractor output only. Internal choice is paper structure, not a
+    # CBSE-visible question type; ingestion splits it into normal questions.
     "internal_choice": 3,
+}
+QTYPE_BY_MARKS: dict[int, str] = {
+    1: "mcq",
+    2: "very_short_answer",
+    3: "short_answer",
+    4: "case_based",
+    5: "long_answer",
 }
 
 
@@ -230,7 +239,6 @@ _QUESTION_SCHEMA = {
                             "short_answer",
                             "long_answer",
                             "case_based",
-                            "internal_choice",
                         ],
                     },
                     "marks": {"type": "INTEGER"},
@@ -432,11 +440,11 @@ def _page_prompt() -> str:
         "Never translate Hindi; emit no Devanagari characters.\n\n"
         "Copy each question VERBATIM from the English text — never paraphrase, "
         "correct, complete, or summarise it.\n\n"
-        "ONE ENTRY PER QUESTION NUMBER: emit exactly one JSON entry per printed "
-        "question number. All sub-parts (i)/(ii)/(a)/(b) stay inside that entry "
-        "(content.subparts), and an 'OR' alternative stays inside it "
-        "(content.choices) — never split a question's parts or its OR-alternative "
-        "into separate entries.\n\n"
+        "ONE ENTRY PER PRINTED QUESTION OR OR-ALTERNATIVE: all sub-parts "
+        "(i)/(ii)/(a)/(b) that belong to one answer stay inside that entry "
+        "(content.subparts). If a question has an 'OR' alternative / internal "
+        "choice, emit EACH alternative as its own separate question entry with "
+        "the normal CBSE qtype implied by its marks.\n\n"
         "SYMBOLS: emit scientific symbols and units as LaTeX — an inline "
         "{type:'equation', latex:'...'} item, or the item's latex field (e.g. "
         "\\Omega for ohm, \\rightarrow, ^\\circ C). Never paste raw Unicode glyphs "
@@ -448,15 +456,11 @@ def _page_prompt() -> str:
         "  - mcq/assertion_reason: ALSO mirror the choices into content.options as "
         "labelled entries ([{label, content:[...]}]) — content.options is the "
         "source the renderer reads; never leave it empty for an objective question.\n"
-        "  - internal choice: an 'OR' (अथवा) alternative is part of the SAME "
-        "question — capture both alternatives in content.choices as one "
-        "internal_choice question. Never emit the alternative as a separate "
-        "question.\n\n"
         "Per question return:\n"
         "  section — the section letter (A–E) if a 'SECTION X' header is visible "
         "on this page, else your best guess; the importer re-derives it from marks.\n"
         "  qtype — one of: mcq, assertion_reason, very_short_answer, short_answer, "
-        "long_answer, case_based, internal_choice.\n"
+        "long_answer, case_based. Do not emit internal_choice as a qtype.\n"
         "  marks — the integer mark value printed for the question (the digit at "
         "the right margin). This is important: the section is derived from it.\n"
         "  rawText — the stem copied verbatim, WITHOUT any visible marks "
@@ -466,8 +470,6 @@ def _page_prompt() -> str:
         "    stem / assertion / reason / passage: arrays of {type, text, latex?} "
         "where type is 'paragraph', 'equation', or 'image_placeholder'.\n"
         "    options / subparts: [{label, marks?, content:[item, ...]}].\n"
-        "    choices (internal_choice): [{displayStyle:'or', chooseCount, "
-        "options:[{label, content:[item, ...]}]}].\n"
         "  chapter_slug — pick EXACTLY ONE slug from the allowed list the schema "
         "enumerates, or null if unsure. Never invent or reformat a slug.\n"
         "  cognitive_level — one of R, U, Ap, An.\n"
@@ -529,6 +531,77 @@ def _coerce_figures(value) -> list[dict]:
             figure["caption"] = caption.strip()
         figures.append(figure)
     return figures
+
+
+def _content_text(items: list[dict]) -> str:
+    parts: list[str] = []
+    for item in items:
+        if isinstance(item, dict):
+            text = str(item.get("text") or "").strip()
+            if text:
+                parts.append(text)
+    return "\n".join(parts).strip()
+
+
+def _split_internal_choice_question(q: dict) -> list[dict]:
+    """Split a legacy internal-choice row into one normal question per option.
+
+    Internal choice is not a CBSE-visible qtype; it is paper structure. Older
+    extractor payloads store both OR alternatives under ``content.choices`` as
+    one ``internal_choice`` row. At the ingestion boundary we flatten those into
+    independent bank questions typed from their marks (3 → short_answer,
+    5 → long_answer, etc.) so the picker can fill normal CBSE slots.
+    """
+    if q.get("qtype") != "internal_choice":
+        return [q]
+
+    content = q.get("content") or {}
+    choices = content.get("choices") or []
+    split: list[dict] = []
+    target_qtype = QTYPE_BY_MARKS.get(q.get("marks"), "short_answer")
+
+    for group in choices:
+        if not isinstance(group, dict):
+            continue
+        for option in group.get("options") or []:
+            if not isinstance(option, dict):
+                continue
+            option_content = option.get("content") or []
+            if not isinstance(option_content, list):
+                continue
+            text = _content_text(option_content)
+            if not text:
+                continue
+            label = str(option.get("label") or "").strip()
+            figures: list[dict] = []
+            for figure in q.get("figures", []):
+                if figure.get("region") == "choices":
+                    if label and figure.get("label") == label:
+                        copied = dict(figure)
+                        copied["region"] = "stem"
+                        copied.pop("label", None)
+                        figures.append(copied)
+                else:
+                    figures.append(dict(figure))
+            split.append(
+                {
+                    **q,
+                    "qtype": target_qtype,
+                    "text": text,
+                    "options": [],
+                    "content": {"stem": option_content},
+                    "figures": figures,
+                }
+            )
+
+    return split or [{**q, "qtype": target_qtype}]
+
+
+def _split_internal_choices(raw_questions: list[dict]) -> list[dict]:
+    split: list[dict] = []
+    for q in raw_questions:
+        split.extend(_split_internal_choice_question(q))
+    return split
 
 
 def _coerce_question(obj: dict) -> dict:
@@ -901,6 +974,11 @@ class Ingestor:
         """
         if not raw_questions:
             return IngestResult(created=0)
+
+        # Internal choice is paper structure, not a bank qtype. Flatten legacy
+        # payloads into one normal CBSE-typed question per OR alternative before
+        # quality checks, guardrails, de-dup, cropping, and persistence.
+        raw_questions = _split_internal_choices(raw_questions)
 
         # Structural self-assessment — no source-text verification (ADR-0004).
         for q in raw_questions:

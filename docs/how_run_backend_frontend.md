@@ -1,174 +1,112 @@
-# How To Run Backend And Frontend
+# Run The App With Docker
 
-Lean runbook for running the full local stack and the checks that catch missing
-seed data, stale auth, and frontend/backend drift.
+Use Docker for the demo stack. The browser opens the frontend on the host, but the
+frontend container proxies API calls to the backend container, and the backend
+uses the Postgres container.
 
-## Start The App
-
-```bash
-docker compose up --build
+```text
+browser -> http://localhost:5173 -> frontend -> web:8000 -> db:5432
 ```
 
-This starts:
+## Start
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:8000
-- Postgres with pgvector
-- Generation worker: drains queued Q&A generation batches
-
-On startup the backend must run:
+Stop any host Vite server first if it owns port 5173:
 
 ```bash
-python manage.py migrate --noinput
-python manage.py seed_questions
-python manage.py seed_textbook_corpus
+lsof -nP -iTCP:5173 -sTCP:LISTEN
+kill <PID>
 ```
 
-Use the seeded login:
+Start the stack:
+
+```bash
+docker compose up -d --build db web frontend
+```
+
+Check it:
+
+```bash
+docker compose ps
+```
+
+Expected services:
+
+```text
+db        Up healthy
+web       Up
+frontend  Up, 0.0.0.0:5173->5173
+```
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+Demo login:
 
 ```text
 teacher@example.com
 teacher123
 ```
 
-## Re-Run Seeds Manually
+## Load Questions And Answers
 
-Use this after changing seed/import code or when a running DB is missing demo
-data.
-
-```bash
-docker compose exec web python manage.py seed_questions
-docker compose exec web python manage.py seed_textbook_corpus
-```
-
-## Configure LLM Calls
-
-Copy the example env file when running real Q&A generation:
+The backend auto-runs migrations and seed questions on startup. To load the full
+committed bank and generated answers into the Docker DB, run:
 
 ```bash
-cp .env.example .env
+docker compose exec web python manage.py load_questions /content/parsed
+docker compose exec web python manage.py load_question_overrides /content/bank-overrides/question_overrides.json
 ```
 
-For Gemini:
+`load_questions` is idempotent; duplicates are skipped. `load_question_overrides`
+applies committed AI-generated answers and disables diagram-required questions.
+
+Verify the loaded bank:
 
 ```bash
-LLM_PROVIDER=gemini
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-3.5-flash
+docker compose exec web python manage.py shell -c '
+from bank.models import Question
+print("eligible", Question.objects.filter(parse_quality__in=["clean","partial"]).count())
+print("answered eligible", Question.objects.filter(parse_quality__in=["clean","partial"]).exclude(answer="").count())
+print("disabled diagrams", Question.objects.filter(review_flags__contains=["disabled_diagram_required"]).count())
+'
 ```
 
-For OpenRouter just for Q&A generation:
+Current expected result:
 
-```bash
-LLM_QUESTION_GENERATION_PROVIDER=openrouter
-LLM_QUESTION_GENERATION_MODEL=google/gemini-3.5-flash
-OPENROUTER_API_KEY=...
+```text
+eligible 344
+answered eligible 344
+disabled diagrams 34
 ```
 
-Restart after changing env:
+## Useful Commands
 
-```bash
-docker compose up -d --build web generation-worker frontend
-```
-
-Confirm the worker sees the intended configuration:
-
-```bash
-docker compose exec generation-worker sh -lc 'env | sort | grep -E "^(LLM|GEMINI|OPENAI|OPENROUTER|DEEPSEEK|ANTHROPIC)_"'
-```
-
-## Backend Checks
-
-Check queued Q&A generation batches without making model calls:
-
-```bash
-docker compose exec web python manage.py drain_generation_batches --dry-run
-```
-
-Drain one queued batch manually:
-
-```bash
-docker compose exec web python manage.py drain_generation_batches --limit 1
-```
-
-Run all backend tests:
-
-```bash
-docker compose exec web pytest
-```
-
-Run the corpus/topic tests only:
-
-```bash
-docker compose exec web pytest corpus/tests/test_textbook.py corpus/tests/test_chapter_map.py
-```
-
-Run Django system checks:
-
-```bash
-docker compose exec web python manage.py check
-```
-
-## Frontend Checks
-
-Run from the host:
-
-```bash
-cd frontend
-npm test
-npm run lint
-npm run type-check
-```
-
-## End-To-End Smoke Checks
-
-Get a fresh token:
-
-```bash
-TOKEN=$(
-  curl -sS -X POST http://localhost:5173/api/auth/login \
-    -H 'Content-Type: application/json' \
-    --data '{"email":"teacher@example.com","password":"teacher123"}' \
-  | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>console.log(JSON.parse(s).token))"
-)
-```
-
-Verify paper setup data:
-
-```bash
-curl -sS http://localhost:5173/api/papers/formats \
-  -H "Authorization: Token $TOKEN"
-
-curl -sS http://localhost:5173/api/bank/chapters/ \
-  -H "Authorization: Token $TOKEN"
-```
-
-Verify Chapter 4 topic metadata:
-
-```bash
-curl -sS http://localhost:5173/api/corpus/chapters/carbon-and-its-compounds/topics/ \
-  -H "Authorization: Token $TOKEN" \
-  | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{const j=JSON.parse(s); console.log({document: j.document?.id ?? null, topicCount: j.topics.length, firstTopic: j.topics[0]?.title ?? null}); if (!j.document || j.topics.length === 0) process.exit(1);})"
-```
-
-Verify invalid tokens are rejected:
-
-```bash
-curl -i http://localhost:5173/api/papers/formats \
-  -H 'Authorization: Token invalid-token'
-```
-
-Expected: `401 Unauthorized` with `{"detail":"Invalid token."}`.
-
-## Before Calling It Done
-
-Run this minimum suite:
+Backend checks:
 
 ```bash
 docker compose exec web python manage.py check
 docker compose exec web pytest
-cd frontend && npm test && npm run lint && npm run type-check
 ```
 
-Then run the Chapter 4 topic smoke check above. It must report a non-null
-`document` and `topicCount > 0`.
+Frontend checks:
+
+```bash
+docker compose exec frontend npm test
+docker compose exec frontend npm run lint
+docker compose exec frontend npm run type-check
+```
+
+Stop the stack:
+
+```bash
+docker compose down
+```
+
+Remove stopped containers:
+
+```bash
+docker container prune -f
+```
