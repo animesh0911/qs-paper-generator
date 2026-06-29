@@ -23,6 +23,8 @@ import {
   getToken,
   login,
   persistDraft,
+  persistEditorDraft,
+  downloadPaperPdfPackage,
 } from './api';
 
 const storage = new Map<string, string>();
@@ -30,6 +32,7 @@ const storage = new Map<string, string>();
 beforeEach(() => {
   storage.clear();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => storage.get(key) ?? null,
     setItem: (key: string, value: string) => storage.set(key, value),
@@ -344,6 +347,66 @@ describe('paper persistence', () => {
         body: JSON.stringify({ document: persistedDocument }),
       }),
     );
+  });
+
+  it('persists the editor draft document and answer document together', async () => {
+    const persistedDocument = structuredClone(mockPaperDocumentV1);
+    persistedDocument.paper.id = 'paper_123';
+    const answerDocument = {
+      schemaVersion: 'paper_answer_document.v1' as const,
+      paperId: 'paper_123',
+      answersBySlotId: {},
+    };
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({})));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await persistEditorDraft(persistedDocument, answerDocument);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/123/editor-draft/',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          document: persistedDocument,
+          answer_document: answerDocument,
+        }),
+      }),
+    );
+  });
+
+  it('downloads the one-click PDF package instead of opening the print route', async () => {
+    vi.useFakeTimers();
+    const persistedDocument = structuredClone(mockPaperDocumentV1);
+    persistedDocument.paper.id = 'paper_123';
+    const click = vi.fn();
+    const remove = vi.fn();
+    const anchor = { href: '', download: '', click, remove };
+    const fetchMock = vi.fn(async () => new Response(new Blob(['zip'])));
+    vi.stubGlobal('fetch', fetchMock);
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn(() => 'blob:package'),
+      revokeObjectURL,
+    });
+    vi.stubGlobal('document', {
+      createElement: vi.fn(() => anchor),
+      body: {
+        appendChild: vi.fn((node) => node),
+      },
+    });
+
+    await downloadPaperPdfPackage(persistedDocument);
+    vi.runAllTimers();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/papers/123/download-package/',
+      expect.objectContaining({ method: 'GET' }),
+    );
+    expect(anchor.href).toBe('blob:package');
+    expect(anchor.download).toBe('paper_123-pdfs.zip');
+    expect(click).toHaveBeenCalledOnce();
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:package');
+    expect(globalThis.open).toBeUndefined();
   });
 
   it('saves the canonical draft before approving the backend paper', async () => {

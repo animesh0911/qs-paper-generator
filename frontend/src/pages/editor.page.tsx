@@ -25,9 +25,8 @@ import {
 import {
   AlertTriangle,
   ArrowLeftRight,
-  CheckCircle2,
   Download,
-  FileCheck2,
+  Eye,
   Lock,
   RotateCcw,
   Save,
@@ -35,14 +34,21 @@ import {
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
 import { resolveEditorFixture } from '@/mocks';
-import { approvePaper, fetchEditorDraft, persistDraft } from '@/lib/api';
+import {
+  downloadPaperPdfPackage,
+  fetchEditorDraft,
+  persistEditorDraft,
+} from '@/lib/api';
 import {
   getPaperFormatRendererResult,
   type PaperFormatRenderer,
 } from '@/lib/paper-format-renderers';
 import { assertPaperDocument } from '@/lib/paper-document';
 import { editorSlotClipboardText } from '@/lib/editor-paper';
-import { openPersistedPrintDocument } from '@/lib/editor-print';
+import {
+  reconcileAnswerDocumentForPaper,
+  saveThenDownloadPdfPackage,
+} from '@/lib/editor-download';
 import { useEditorWorkspace } from '@/hooks/useEditorWorkspace.hook';
 import {
   AssistantChat,
@@ -121,6 +127,7 @@ function PersistedEditorPage({ paperId }: { paperId: string }) {
 
   return (
     <ResolvedEditorPage
+      key={document.paper.id}
       document={document}
       answerDocument={answerDocument}
       documentKey={document.paper.id}
@@ -140,6 +147,7 @@ function DemoEditorPage() {
   );
   return (
     <ResolvedEditorPage
+      key={`fixture:${selectedFixture.id}`}
       document={document}
       documentKey={`fixture:${selectedFixture.id}`}
     />
@@ -273,8 +281,10 @@ function EditorPageWorkspace({
     view,
   } = useEditorWorkspace({ document, renderer, selectedFixtureId });
   const [lastSavedDocument, setLastSavedDocument] = useState(document);
+  const [currentAnswerDocument, setCurrentAnswerDocument] =
+    useState(answerDocument);
   const [actionState, setActionState] = useState<
-    'idle' | 'saving' | 'saved' | 'approving' | 'approved' | 'error'
+    'idle' | 'saving' | 'saved' | 'downloading' | 'downloaded' | 'error'
   >('idle');
   const [actionError, setActionError] = useState('');
   const [answerOverlayOpen, setAnswerOverlayOpen] = useState(false);
@@ -283,7 +293,7 @@ function EditorPageWorkspace({
     JSON.stringify(paperState.document) !== JSON.stringify(lastSavedDocument);
   const warnings = view.validationSummary.warnings;
   const selectedAnswerEntry = selectedSlot
-    ? answerDocument?.answersBySlotId[selectedSlot.slotId]
+    ? currentAnswerDocument?.answersBySlotId[selectedSlot.slotId]
     : undefined;
   const currentSelectedAnswerEntry =
     selectedAnswerEntry?.questionId ===
@@ -303,23 +313,44 @@ function EditorPageWorkspace({
     setQuestionInfoOverlayOpen(true);
   }
 
-  async function runAction(action: 'save' | 'approve' | 'download') {
+  async function saveEditorDraft(documentSnapshot: PaperDocument) {
+    if (!currentAnswerDocument) {
+      throw new Error('Answer document is still loading.');
+    }
+    const reconciledAnswerDocument = reconcileAnswerDocumentForPaper(
+      documentSnapshot,
+      currentAnswerDocument,
+    );
+    await persistEditorDraft(documentSnapshot, reconciledAnswerDocument);
+    setCurrentAnswerDocument(reconciledAnswerDocument);
+    setLastSavedDocument(documentSnapshot);
+  }
+
+  async function runAction(action: 'save' | 'download') {
     if (!persisted) return;
     const documentSnapshot = structuredClone(paperState.document);
     setActionError('');
-    setActionState(action === 'approve' ? 'approving' : 'saving');
+    setActionState(action === 'download' ? 'downloading' : 'saving');
     try {
-      if (action === 'approve') {
-        await approvePaper(documentSnapshot);
-        setLastSavedDocument(documentSnapshot);
-        setActionState('approved');
-      } else {
-        await persistDraft(documentSnapshot);
-        setLastSavedDocument(documentSnapshot);
-        setActionState('saved');
-        if (action === 'download') {
-          openPersistedPrintDocument(documentSnapshot);
+      if (action === 'download') {
+        const reconciledAnswerDocument = await saveThenDownloadPdfPackage({
+          documentSnapshot,
+          answerDocument: currentAnswerDocument,
+          dirty,
+          persist: persistEditorDraft,
+          download: downloadPaperPdfPackage,
+          onSaved: (savedAnswerDocument) => {
+            setCurrentAnswerDocument(savedAnswerDocument);
+            setLastSavedDocument(documentSnapshot);
+          },
+        });
+        if (!dirty) {
+          setCurrentAnswerDocument(reconciledAnswerDocument);
         }
+        setActionState('downloaded');
+      } else {
+        await saveEditorDraft(documentSnapshot);
+        setActionState('saved');
       }
     } catch (reason) {
       setActionError((reason as Error).message);
@@ -384,7 +415,6 @@ function EditorPageWorkspace({
             onReview={runReview}
             onSave={() => void runAction('save')}
             onDownload={() => void runAction('download')}
-            onApprove={() => void runAction('approve')}
           />
         </div>
       </header>
@@ -1037,11 +1067,16 @@ export function EditorActionBar({
   onReview,
   onSave,
   onDownload,
-  onApprove,
 }: {
   persisted: boolean;
   dirty: boolean;
-  actionState: 'idle' | 'saving' | 'saved' | 'approving' | 'approved' | 'error';
+  actionState:
+    | 'idle'
+    | 'saving'
+    | 'saved'
+    | 'downloading'
+    | 'downloaded'
+    | 'error';
   actionError: string;
   warnings: string[];
   canUndo: boolean;
@@ -1049,13 +1084,9 @@ export function EditorActionBar({
   onReview: () => void;
   onSave: () => void;
   onDownload: () => void;
-  onApprove: () => void;
 }) {
-  const busy = actionState === 'saving' || actionState === 'approving';
+  const busy = actionState === 'saving' || actionState === 'downloading';
   const unavailable = !persisted;
-  const approved = actionState === 'approved';
-  const approvalBlocked =
-    unavailable || warnings.length > 0 || dirty || busy || approved;
   const status = unavailable
     ? 'Demo paper · actions unavailable'
     : actionStatus(actionState, actionError, dirty);
@@ -1086,7 +1117,7 @@ export function EditorActionBar({
       <Button
         variant="outline"
         size="sm"
-        disabled={unavailable || !dirty || busy || approved}
+        disabled={unavailable || !dirty || busy}
         onClick={onSave}
       >
         <Save className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -1098,8 +1129,8 @@ export function EditorActionBar({
         onClick={onReview}
         title="Run a sample paper review"
       >
-        <FileCheck2 className="mr-2 h-4 w-4" aria-hidden="true" />
-        Review paper
+        <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
+        Preview
       </Button>
       <Button
         variant="outline"
@@ -1110,32 +1141,25 @@ export function EditorActionBar({
         <Download className="mr-2 h-4 w-4" aria-hidden="true" />
         Download PDF
       </Button>
-      <Button
-        size="sm"
-        disabled={approvalBlocked}
-        title={
-          approvalBlocked
-            ? 'Save changes and resolve validation warnings before approval'
-            : undefined
-        }
-        onClick={onApprove}
-      >
-        <CheckCircle2 className="mr-2 h-4 w-4" aria-hidden="true" />
-        Approve
-      </Button>
     </div>
   );
 }
 
 function actionStatus(
-  actionState: 'idle' | 'saving' | 'saved' | 'approving' | 'approved' | 'error',
+  actionState:
+    | 'idle'
+    | 'saving'
+    | 'saved'
+    | 'downloading'
+    | 'downloaded'
+    | 'error',
   actionError: string,
   dirty: boolean,
 ) {
   if (actionState === 'saving') return 'Saving...';
-  if (actionState === 'approving') return 'Approving...';
+  if (actionState === 'downloading') return 'Preparing download...';
   if (dirty) return 'Unsaved changes';
-  if (actionState === 'approved') return 'Approved';
+  if (actionState === 'downloaded') return 'Download started';
   if (actionState === 'error') return actionError;
   return 'Saved';
 }

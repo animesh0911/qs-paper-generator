@@ -13,6 +13,7 @@ Domain rules live in ``papers.builder`` and ``papers.picker``.
 import io
 import logging
 import zipfile
+from types import SimpleNamespace
 
 from django.conf import settings
 from django.core.cache import cache
@@ -220,7 +221,40 @@ class PaperEditorDraftView(APIView):
                 {"error": f"document.schemaVersion must be '{_SCHEMA_VERSION}'."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        answer_document = request.data.get("answer_document")
+        # Strip the non-canonical asset ``url`` the GET added before persisting,
+        # so the editor round-trip never leaks a host-absolute/expiring URL into
+        # the stored documents (kept assetId-only, contract §13).
+        document = strip_resolved_asset_urls(document)
+        answer_document = strip_resolved_asset_urls(request.data.get("answer_document"))
+        if not isinstance(answer_document, dict):
+            return Response(
+                {"error": "answer_document must be an object."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if answer_document.get("schemaVersion") != "paper_answer_document.v1":
+            return Response(
+                {
+                    "error": "answer_document.schemaVersion must be "
+                    "'paper_answer_document.v1'."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(answer_document.get("answersBySlotId"), dict):
+            return Response(
+                {"error": "answer_document.answersBySlotId must be an object."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        # The frontend cannot know the bank answer for a newly-swapped question.
+        # Reconcile before validation so matching teacher-edited answers survive,
+        # while changed/missing slot entries are rebuilt from the bank instead of
+        # persisting empty placeholders into the answer key.
+        answer_document = build_answer_document(
+            SimpleNamespace(
+                pk=paper.pk,
+                document=document,
+                answer_document=answer_document,
+            )
+        )
         errors = validate_answer_document(document, answer_document)
         if errors:
             return Response(
@@ -230,11 +264,8 @@ class PaperEditorDraftView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        # Strip the non-canonical asset ``url`` the GET added before persisting,
-        # so the editor round-trip never leaks a host-absolute/expiring URL into
-        # the stored documents (kept assetId-only, contract §13).
-        paper.document = strip_resolved_asset_urls(document)
-        paper.answer_document = strip_resolved_asset_urls(answer_document)
+        paper.document = document
+        paper.answer_document = answer_document
         # Bump the revision so a queued AI job (#31) whose base_revision predates
         # this edit is cancelled by the drain instead of spending paid tokens on
         # a now-stale proposal (Rule 13).
