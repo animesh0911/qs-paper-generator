@@ -10,6 +10,10 @@ only path that reveals answers, gated to the paper owner.
 Domain rules live in ``papers.builder`` and ``papers.picker``.
 """
 
+import io
+import logging
+import zipfile
+
 from django.conf import settings
 from django.core.cache import cache
 from django.core.files.storage import default_storage
@@ -35,6 +39,8 @@ from .models import Paper, PaperFormat, PaperStatus
 from .pdf import render_answer_key_pdf, render_paper_pdf
 from .serializers import AssembleRequestSerializer, PaperSerializer
 from .template import TemplateBuilder
+
+logger = logging.getLogger(__name__)
 
 _PDF_CACHE_TTL = 60 * 60 * 24  # 1 day
 _SCHEMA_VERSION = "paper_document.v1"
@@ -271,6 +277,61 @@ class PaperPdfView(APIView):
         response["Content-Disposition"] = f'inline; filename="paper-{paper.pk}.pdf"'
         return response
 
+
+class PaperPdfPackageView(APIView):
+    """Download the final question paper and answer-key PDFs as one zip."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
+        if paper.status == PaperStatus.APPROVED:
+            cache_key = f"paper-pdf-package:{paper.pk}"
+            package_bytes = cache.get(cache_key)
+            if package_bytes is None:
+                rendered = self._render_package(request, paper)
+                if isinstance(rendered, Response):
+                    return rendered
+                package_bytes = rendered
+                cache.set(cache_key, package_bytes, timeout=_PDF_CACHE_TTL)
+        else:
+            rendered = self._render_package(request, paper)
+            if isinstance(rendered, Response):
+                return rendered
+            package_bytes = rendered
+
+        response = HttpResponse(package_bytes, content_type="application/zip")
+        response["Content-Disposition"] = (
+            f'attachment; filename="paper-{paper.pk}-pdfs.zip"'
+        )
+        return response
+
+    def _render_package(self, request, paper: Paper) -> bytes | Response:
+        document = _document_with_format_defaults(paper) or {}
+        answers = printable_answers_by_slot(build_answer_document(paper))
+        try:
+            question_pdf = render_paper_pdf(
+                document, print_url=_paper_print_url(request.user, paper.pk)
+            )
+            answer_key_pdf = render_answer_key_pdf(
+                document,
+                answers,
+                print_url=_answer_key_print_url(request.user, paper.pk),
+            )
+        except Exception:
+            logger.exception("PDF package render failed for paper %s", paper.pk)
+            return Response(
+                {"error": "Unable to render the PDF package."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(
+            buffer, mode="w", compression=zipfile.ZIP_DEFLATED
+        ) as package:
+            package.writestr("question-paper.pdf", question_pdf)
+            package.writestr("answer-key.pdf", answer_key_pdf)
+        return buffer.getvalue()
 
 class PaperAnswerKeyPdfView(APIView):
     """Render the marking-scheme PDF — the one endpoint that reveals answers.
