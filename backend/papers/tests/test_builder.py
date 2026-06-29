@@ -5,6 +5,8 @@ TemplateBuilder + QuestionPicker replace the skeleton in Slices 2/3, these
 tests still pass or fail loudly.
 """
 
+import io
+import zipfile
 from collections import Counter
 
 import fitz
@@ -96,7 +98,9 @@ def test_board_document_uses_three_subject_sections(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
-def test_board_subject_sections_only_pull_matching_chapter_strand(api_client, seeded_bank):
+def test_board_subject_sections_only_pull_matching_chapter_strand(
+    api_client, seeded_bank
+):
     """CBSE subject sections constrain retrieval by Chapter.subject_area."""
 
     resp = api_client.post("/api/papers/assemble", {}, format="json")
@@ -330,6 +334,158 @@ def test_answer_key_pdf_endpoint_targets_answer_key_print_route_with_auth_token(
     assert calls[0][2].startswith(
         f"http://frontend:5173/editor/{paper_pk}/answer-key/print?token="
     )
+
+@pytest.mark.django_db
+def test_pdf_package_endpoint_contains_question_paper_and_answer_key(
+    api_client, seeded_bank, settings
+):
+    """One download returns both saved final PDFs with teacher-readable names."""
+    from papers.models import Paper
+
+    settings.PAPER_PRINT_BASE_URL = ""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    document = create.data
+    paper_pk = int(document["paper"]["id"].removeprefix("paper_"))
+
+    paper = Paper.objects.get(pk=paper_pk)
+    slot_id = next(iter(paper.answer_document["answersBySlotId"]))
+    paper.answer_document["answersBySlotId"][slot_id]["content"] = [
+        {"type": "paragraph", "text": "PACKAGE_ANSWER_42"}
+    ]
+    paper.save(update_fields=["answer_document"])
+
+    resp = api_client.get(f"/api/papers/{paper_pk}/download-package/")
+
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp["Content-Type"] == "application/zip"
+    assert resp["Content-Disposition"] == (
+        f'attachment; filename="paper-{paper_pk}-pdfs.zip"'
+    )
+    with zipfile.ZipFile(io.BytesIO(resp.content)) as package:
+        assert package.namelist() == ["question-paper.pdf", "answer-key.pdf"]
+        question_pdf = package.read("question-paper.pdf")
+        answer_pdf = package.read("answer-key.pdf")
+    assert question_pdf[:4] == b"%PDF"
+    assert answer_pdf[:4] == b"%PDF"
+    assert "PACKAGE_ANSWER_42" in _pdf_text(answer_pdf)
+
+@pytest.mark.django_db
+def test_pdf_package_endpoint_uses_browser_print_urls_when_configured(
+    api_client, monkeypatch, seeded_bank, settings
+):
+    """Both packaged PDFs use their primary frontend print routes."""
+    settings.PAPER_PRINT_BASE_URL = "http://frontend:5173"
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+    calls = {"paper": [], "answer_key": []}
+
+    def fake_paper(document, print_url=None):
+        calls["paper"].append(print_url)
+        return b"%PDF question"
+
+    def fake_answer_key(document, answers_by_slot, print_url=None):
+        calls["answer_key"].append((answers_by_slot, print_url))
+        return b"%PDF answer"
+
+    monkeypatch.setattr("papers.views.render_paper_pdf", fake_paper)
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_answer_key)
+
+    resp = api_client.get(f"/api/papers/{paper_pk}/download-package/")
+
+    assert resp.status_code == status.HTTP_200_OK
+    assert calls["paper"][0].startswith(
+        f"http://frontend:5173/editor/{paper_pk}/print?token="
+    )
+    answers, answer_url = calls["answer_key"][0]
+    assert answers
+    assert answer_url.startswith(
+        f"http://frontend:5173/editor/{paper_pk}/answer-key/print?token="
+    )
+
+@pytest.mark.django_db
+def test_pdf_package_endpoint_caches_approved_package(
+    api_client, monkeypatch, seeded_bank
+):
+    """Approved package behavior matches existing PDF endpoints: cache for 24h."""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+    api_client.post(f"/api/papers/{paper_pk}/approve/")
+    calls = {"paper": 0, "answer_key": 0}
+
+    def fake_paper(document, print_url=None):
+        calls["paper"] += 1
+        return b"%PDF question"
+
+    def fake_answer_key(document, answers_by_slot, print_url=None):
+        calls["answer_key"] += 1
+        return b"%PDF answer"
+
+    monkeypatch.setattr("papers.views.render_paper_pdf", fake_paper)
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_answer_key)
+
+    first = api_client.get(f"/api/papers/{paper_pk}/download-package/")
+    second = api_client.get(f"/api/papers/{paper_pk}/download-package/")
+
+    assert first.status_code == status.HTTP_200_OK
+    assert second.status_code == status.HTTP_200_OK
+    assert second.content == first.content
+    assert calls == {"paper": 1, "answer_key": 1}
+
+@pytest.mark.django_db
+def test_pdf_package_endpoint_is_owner_scoped(api_client, seeded_bank):
+    """Package download follows the existing private paper scoping."""
+    from rest_framework.test import APIClient
+
+    from accounts.models import User
+
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+
+    intruder = User.objects.create_user(email="zip-intruder@example.com", password="x")
+    intruder_client = APIClient()
+    intruder_client.force_authenticate(intruder)
+
+    resp = intruder_client.get(f"/api/papers/{paper_pk}/download-package/")
+
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+@pytest.mark.django_db
+def test_pdf_package_renders_missing_answers_loudly(api_client, seeded_bank, settings):
+    """Packaged answer keys preserve the missing-answer fallback."""
+    from papers.models import Paper
+
+    settings.PAPER_PRINT_BASE_URL = ""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = int(create.data["paper"]["id"].removeprefix("paper_"))
+    paper = Paper.objects.get(pk=paper_pk)
+    slot_id = next(iter(paper.answer_document["answersBySlotId"]))
+    paper.answer_document["answersBySlotId"][slot_id]["content"] = []
+    paper.save(update_fields=["answer_document"])
+
+    resp = api_client.get(f"/api/papers/{paper_pk}/download-package/")
+
+    assert resp.status_code == status.HTTP_200_OK
+    with zipfile.ZipFile(io.BytesIO(resp.content)) as package:
+        answer_pdf = package.read("answer-key.pdf")
+    assert "Answer not available" in _pdf_text(answer_pdf)
+
+@pytest.mark.django_db
+def test_pdf_package_endpoint_fails_without_partial_zip(
+    api_client, monkeypatch, seeded_bank
+):
+    """If either render fails, return an error instead of a partial package."""
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+
+    def fail_answer_key(*args, **kwargs):
+        raise RuntimeError("answer key render failed")
+
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fail_answer_key)
+
+    resp = api_client.get(f"/api/papers/{paper_pk}/download-package/")
+
+    assert resp.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert resp["Content-Type"] != "application/zip"
 
 @pytest.mark.django_db
 def test_answer_key_pdf_endpoint_renders_saved_answers(api_client, seeded_bank):
