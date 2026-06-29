@@ -112,6 +112,106 @@ def test_answer_key_pdf_renders_from_saved_answer_document(api_client, user):
 
 
 @pytest.mark.django_db
+def test_editor_draft_patch_rejects_malformed_answer_document(api_client, user):
+    document = {
+        "schemaVersion": "paper_document.v1",
+        "paper": {
+            "id": "paper_1",
+            "title": "Science",
+            "sections": [],
+        },
+    }
+    paper = Paper.objects.create(
+        created_by=user, status=PaperStatus.DRAFT, document=document
+    )
+
+    resp = api_client.patch(
+        f"/api/papers/{paper.pk}/editor-draft/",
+        {"document": document, "answer_document": "not an object"},
+        format="json",
+    )
+
+    assert resp.status_code == 400
+    assert resp.data["error"] == "answer_document must be an object."
+
+
+@pytest.mark.django_db
+def test_editor_draft_patch_rebuilds_swapped_answer_from_bank(api_client, user):
+    """Frontend saves cannot carry bank answers for newly-swapped questions.
+
+    When the answer entry is missing/stale, PATCH reconciles from the bank before
+    persisting so the later package download does not permanently lose the new
+    question's source answer.
+    """
+    old = QuestionFactory(answer="STALE_OLD_ANSWER", answer_source=AnswerSource.HUMAN)
+    new = QuestionFactory(answer="FRESH_NEW_ANSWER", answer_source=AnswerSource.HUMAN)
+
+    document = {
+        "schemaVersion": "paper_document.v1",
+        "paper": {
+            "id": "paper_1",
+            "title": "Science",
+            "sections": [
+                {
+                    "id": "A",
+                    "title": "Section A",
+                    "slots": [
+                        {
+                            "id": "slot_A_01",
+                            "number": "1",
+                            "marks": 1,
+                            "type": "mcq",
+                            "selectedQuestionId": f"q_{old.pk}",
+                        }
+                    ],
+                }
+            ],
+        },
+    }
+    paper = Paper.objects.create(
+        created_by=user, status=PaperStatus.DRAFT, document=document
+    )
+    paper.answer_document = build_answer_document(paper)
+    paper.save(update_fields=["answer_document"])
+
+    swapped_document = {
+        **document,
+        "paper": {
+            **document["paper"],
+            "id": f"paper_{paper.pk}",
+            "sections": [
+                {
+                    **document["paper"]["sections"][0],
+                    "slots": [
+                        {
+                            **document["paper"]["sections"][0]["slots"][0],
+                            "selectedQuestionId": f"q_{new.pk}",
+                        }
+                    ],
+                }
+            ],
+        },
+    }
+    stale_answer_document = {
+        **paper.answer_document,
+        "paperId": f"paper_{paper.pk}",
+        "answersBySlotId": {},
+    }
+
+    resp = api_client.patch(
+        f"/api/papers/{paper.pk}/editor-draft/",
+        {"document": swapped_document, "answer_document": stale_answer_document},
+        format="json",
+    )
+
+    assert resp.status_code == 200
+    paper.refresh_from_db()
+    entry = paper.answer_document["answersBySlotId"]["slot_A_01"]
+    assert entry["questionId"] == f"q_{new.pk}"
+    assert entry["content"] == [{"type": "paragraph", "text": "FRESH_NEW_ANSWER"}]
+
+
+@pytest.mark.django_db
 def test_answer_key_pdf_never_prints_stale_answer_after_legacy_swap(api_client, user):
     """Regression: before #122 the PDF joined live bank answers by the slot's
     current question, so a swap printed the new answer. The saved snapshot must

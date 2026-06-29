@@ -22,6 +22,7 @@ import type {
   GenerationBatchCreateRequest,
   GeneratedQuestionCandidate,
   IngestionJob,
+  PaperAnswerDocument,
   PaperDocument,
   PaperFormatSummary,
   SourceType,
@@ -197,6 +198,20 @@ export async function persistDraft(paper: PaperDocument): Promise<void> {
   });
 }
 
+export async function persistEditorDraft(
+  paper: PaperDocument,
+  answerDocument: PaperAnswerDocument,
+): Promise<void> {
+  const id = paper.paper.id.replace(/^paper_/, '');
+  await request(`/papers/${id}/editor-draft/`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      document: paper,
+      answer_document: answerDocument,
+    }),
+  });
+}
+
 export async function approvePaper(paper: PaperDocument): Promise<void> {
   await persistDraft(paper);
   const id = paper.paper.id.replace(/^paper_/, '');
@@ -231,19 +246,21 @@ export async function fetchPaperFormats(): Promise<PaperFormatSummary[]> {
   return res.json();
 }
 
-export async function downloadPaperPdf(paper: PaperDocument) {
+export async function downloadPaperPdfPackage(paper: PaperDocument) {
   const paperId = paper.paper.id;
   const id = paperId.replace(/^paper_/, '');
-  const res = await request(`/papers/${id}/pdf/`, { method: 'GET' });
+  const res = await request(`/papers/${id}/download-package/`, {
+    method: 'GET',
+  });
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${paperId}.pdf`;
+  a.download = `${paperId}-pdfs.zip`;
   document.body.appendChild(a);
   a.click();
   a.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 /**
