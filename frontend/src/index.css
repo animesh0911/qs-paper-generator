@@ -657,6 +657,60 @@
     font-style: italic;
     font-weight: 700;
   }
+
+  .answer-key-paper {
+    font-size: 12.5pt;
+  }
+
+  .answer-key-header {
+    margin-bottom: 20pt;
+    text-align: center;
+  }
+
+  .answer-key-eyebrow {
+    font-size: 11pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .answer-key-section + .answer-key-section {
+    margin-top: 18pt;
+  }
+
+  .answer-key-section-header {
+    margin: 0 0 10pt;
+  }
+
+  .answer-key-answers {
+    display: grid;
+    gap: 10pt;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .answer-key-answer {
+    display: grid;
+    grid-template-columns: 74pt minmax(0, 1fr);
+    gap: 12pt;
+    break-inside: avoid;
+  }
+
+  .answer-key-answer-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 8pt;
+  }
+
+  .answer-key-answer-meta .paper-marks {
+    justify-self: auto;
+    white-space: nowrap;
+  }
+
+  .answer-key-answer-body p + p {
+    margin-top: 4pt;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

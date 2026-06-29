@@ -152,9 +152,14 @@ export async function fetchPaperDocument(
 
 export async function fetchEditorDraft(
   paperId: string,
+  token?: string | null,
 ): Promise<EditorDraftResponse> {
   const id = paperId.replace(/^paper_/, '');
-  const res = await request(`/papers/${id}/editor-draft/`, { method: 'GET' });
+  const res = await request(
+    `/papers/${id}/editor-draft/`,
+    { method: 'GET' },
+    token ?? undefined,
+  );
   const data = await res.json();
   const parsed = paperDocumentSchema.safeParse(data.document);
   if (!parsed.success) {
