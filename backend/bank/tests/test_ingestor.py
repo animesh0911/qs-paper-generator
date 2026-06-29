@@ -104,6 +104,58 @@ def test_ingestor_persists_unverified_questions_with_tags():
 
 
 @pytest.mark.django_db
+def test_ingestor_splits_internal_choice_into_normal_questions():
+    """Internal choice is a paper choice, not a bank qtype.
+
+    Legacy reviewed JSON may still contain one ``internal_choice`` with A/B
+    alternatives under content.choices. Ingestion must persist each alternative
+    as its own marks-derived CBSE question type so the picker can fill normal
+    slots.
+    """
+    q = _q(
+        section="D",
+        qtype="internal_choice",
+        marks=5,
+        text="Attempt either option (A) or (B).",
+        content={
+            "stem": [{"type": "paragraph", "text": "Attempt either option (A) or (B)."}],
+            "choices": [
+                {
+                    "displayStyle": "or",
+                    "chooseCount": 1,
+                    "options": [
+                        {
+                            "label": "A",
+                            "content": [
+                                {"type": "paragraph", "text": "Explain carbon bonding."}
+                            ],
+                        },
+                        {
+                            "label": "B",
+                            "content": [
+                                {"type": "paragraph", "text": "Explain ethanol reactions."}
+                            ],
+                        },
+                    ],
+                }
+            ],
+        },
+    )
+
+    result = Ingestor(extractor=StubExtractor([q])).ingest(b"%PDF")
+
+    assert result.created == 2
+    rows = list(Question.objects.order_by("id"))
+    assert [row.qtype for row in rows] == ["long_answer", "long_answer"]
+    assert [row.marks for row in rows] == [5, 5]
+    assert [row.text for row in rows] == [
+        "Explain carbon bonding.",
+        "Explain ethanol reactions.",
+    ]
+    assert all("choices" not in row.content for row in rows)
+
+
+@pytest.mark.django_db
 def test_ingestor_uses_injected_cropper(settings, tmp_path):
     """The DiagramCropper seam is injectable: a stub's asset reaches the row.
 
