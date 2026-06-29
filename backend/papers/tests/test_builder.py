@@ -307,6 +307,31 @@ def _first_selected_qid(document: dict) -> str:
 
 
 @pytest.mark.django_db
+def test_answer_key_pdf_endpoint_targets_answer_key_print_route_with_auth_token(
+    api_client, monkeypatch, seeded_bank, settings
+):
+    """Answer-key PDF uses the React answer-key print route as primary path."""
+    settings.PAPER_PRINT_BASE_URL = "http://frontend:5173"
+    create = api_client.post("/api/papers/assemble", {}, format="json")
+    paper_pk = create.data["paper"]["id"].removeprefix("paper_")
+    calls = []
+
+    def fake_render(document, answers_by_slot, print_url=None):
+        calls.append((document, answers_by_slot, print_url))
+        return b"%PDF answer-key-browser"
+
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_render)
+
+    pdf = api_client.get(f"/api/papers/{paper_pk}/answer-key/pdf/")
+
+    assert pdf.status_code == status.HTTP_200_OK
+    assert calls[0][0]["schemaVersion"] == "paper_document.v1"
+    assert calls[0][1]
+    assert calls[0][2].startswith(
+        f"http://frontend:5173/editor/{paper_pk}/answer-key/print?token="
+    )
+
+@pytest.mark.django_db
 def test_answer_key_pdf_endpoint_renders_saved_answers(api_client, seeded_bank):
     """The marking-scheme endpoint renders the saved paper-local answer document.
 

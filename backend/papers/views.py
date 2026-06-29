@@ -292,14 +292,15 @@ class PaperAnswerKeyPdfView(APIView):
         # legacy paper PATCH prints its current answer, never a stale one — the
         # join the old live-bank path gave for free, restored at the snapshot.
         answers = printable_answers_by_slot(build_answer_document(paper))
+        print_url = _answer_key_print_url(request.user, paper.pk)
         if paper.status == PaperStatus.APPROVED:
             cache_key = f"paper-answer-key-pdf:{paper.pk}"
             pdf = cache.get(cache_key)
             if pdf is None:
-                pdf = render_answer_key_pdf(document, answers)
+                pdf = render_answer_key_pdf(document, answers, print_url=print_url)
                 cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
         else:
-            pdf = render_answer_key_pdf(document, answers)
+            pdf = render_answer_key_pdf(document, answers, print_url=print_url)
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = (
             f'inline; filename="paper-{paper.pk}-answer-key.pdf"'
@@ -316,8 +317,14 @@ def _document_with_format_defaults(paper: Paper) -> dict | None:
 
 
 def _paper_print_url(user, paper_pk: int) -> str | None:
+    return _frontend_print_url(user, paper_pk, "print")
+
+def _answer_key_print_url(user, paper_pk: int) -> str | None:
+    return _frontend_print_url(user, paper_pk, "answer-key/print")
+
+def _frontend_print_url(user, paper_pk: int, route_suffix: str) -> str | None:
     base_url = settings.PAPER_PRINT_BASE_URL.rstrip("/")
     if not base_url:
         return None
     token, _ = Token.objects.get_or_create(user=user)
-    return f"{base_url}/editor/{paper_pk}/print?token={token.key}"
+    return f"{base_url}/editor/{paper_pk}/{route_suffix}?token={token.key}"
