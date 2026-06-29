@@ -1,0 +1,60 @@
+{
+  "schema": "agy.review.v1",
+  "verdict": "rejected",
+  "findings": [
+    {
+      "file": "backend/papers/document.py",
+      "severity": "high",
+      "description": "Global pollution/override of Section A, B, and C subtitles and instructions. By hardcoding _SECTION_SUBTITLE and _SECTION_INSTRUCTIONS globally for sections A, B, and C to 'Biology', 'Chemistry', and 'Physics' to suit the new board layout, the builder breaks all non-board presets (like 'unit_test' and 'half_yearly') which also use sections A, B, and C but map them to question types (MCQ, VSA, SA). For non-board papers, the MCQ section will get the label 'Biology' and Biology-related instructions, which is incorrect.",
+      "lines": [32, 40, 319]
+    },
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "severity": "medium",
+      "description": "Key casing discrepancy for marks_by_question_type. The backend endpoint PaperFormatsView in backend/papers/views.py returns lowercase keys like 'mcq', 'very_short_answer', etc., while the frontend component fallback structure maps keys as 'MCQ', 'VSA', 'Case'. This leads to inconsistent formatting on the UI when fallback is used versus when a format is selected, and will break tests if not aligned.",
+      "lines": [91, 107, 114, 120]
+    }
+  ],
+  "blockers": [],
+  "files_inspected": [
+    "backend/papers/template.py",
+    "backend/papers/picker.py",
+    "backend/papers/document.py",
+    "backend/papers/views.py",
+    "backend/papers/tests/test_template.py",
+    "backend/papers/tests/test_builder.py",
+    "backend/conftest.py",
+    "frontend/src/hooks/useCoverageForm.hook.ts",
+    "frontend/src/hooks/useCoverageForm.hook.test.ts",
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.test.tsx",
+    "frontend/src/pages/dashboard.page.test.tsx",
+    "backend/bank/models.py",
+    "backend/bank/serializers.py",
+    "backend/bank/views.py",
+    "backend/papers/tests/test_document.py",
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.tsx",
+    "frontend/src/pages/dashboard.page.tsx",
+    "frontend/package.json"
+  ],
+  "commands_run": [
+    "git status",
+    "git diff",
+    "git diff --stat",
+    "git diff backend/papers/template.py",
+    "which ctx_read || type ctx_read || echo 'no'",
+    "git diff backend/bank/",
+    "git diff backend/papers/picker.py",
+    "git diff backend/papers/document.py",
+    "git diff backend/papers/views.py",
+    "pytest",
+    "uv run pytest",
+    "DJANGO_DEBUG=1 uv run pytest papers/tests/test_template.py",
+    "DJANGO_DEBUG=1 uv run pytest papers/tests/test_builder.py -k test_document_slots_reference_questions_array",
+    "POSTGRES_HOST=localhost DJANGO_DEBUG=1 uv run pytest papers/tests/test_builder.py -k test_document_slots_reference_questions_array",
+    "POSTGRES_HOST=localhost DJANGO_DEBUG=1 uv run pytest",
+    "npm run test",
+    "git diff backend/papers/tests/test_template.py",
+    "git diff frontend/src/pages/dashboard.page.tsx",
+    "git diff frontend/src/components/coverage/coverage-form/coverage-form.component.tsx"
+  ]
+}

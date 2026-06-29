@@ -1,0 +1,75 @@
+{
+  "schema": "agy.review.v1",
+  "verdict": "accepted",
+  "findings": [
+    {
+      "category": "correctness",
+      "file": "backend/papers/template.py",
+      "detail": "CBSE Board preset successfully configures subject-specific visible sections (A: Biology, B: Chemistry, C: Physics) with matching subject_area properties on the Slots."
+    },
+    {
+      "category": "correctness",
+      "file": "backend/papers/picker.py",
+      "detail": "QuestionPicker correctly isolates candidates by chapter.subject_area filtering when present, while preserving non-board/no-subject behavior when subject_area is None."
+    },
+    {
+      "category": "correctness",
+      "file": "backend/conftest.py",
+      "detail": "seeded_bank fixture correctly retrieves and maps seeded NCERT chapters by subject area strands to populate the test question pool."
+    },
+    {
+      "category": "correctness",
+      "file": "backend/papers/document.py",
+      "detail": "PaperDocumentBuilder correctly sets visible numbering to 39, sharing display numbers across OR-group slots within each section."
+    },
+    {
+      "category": "correctness",
+      "file": "backend/papers/template.py",
+      "detail": "The bank lookup section remains qtype-derived (Section A for MCQ, B for VSA, C for SA, D for LA, E for CASE) regardless of the visible paper section mapping."
+    },
+    {
+      "category": "correctness",
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "detail": "Frontend coverage form hook and structure summaries align perfectly with the backend format metadata and correctly handle fallback preset scaling."
+    }
+  ],
+  "blockers": [],
+  "files_inspected": [
+    "backend/papers/template.py",
+    "backend/papers/picker.py",
+    "backend/papers/document.py",
+    "backend/papers/views.py",
+    "backend/conftest.py",
+    "backend/papers/tests/test_template.py",
+    "backend/papers/tests/test_picker.py",
+    "backend/papers/tests/test_builder.py",
+    "backend/papers/tests/test_contract_v1.py",
+    "frontend/src/hooks/useCoverageForm.hook.ts",
+    "frontend/src/hooks/useCoverageForm.hook.test.ts",
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.tsx",
+    "frontend/src/components/coverage/coverage-form/coverage-form.component.test.tsx",
+    "frontend/src/pages/dashboard.page.tsx",
+    "frontend/src/pages/dashboard.page.test.tsx",
+    "frontend/src/types/index.ts",
+    "backend/bank/models.py",
+    "backend/bank/serializers.py",
+    "backend/bank/views.py",
+    "backend/bank/migrations/0007_seed_chapter_subject_area.py"
+  ],
+  "commands_run": [
+    "git status",
+    "git diff HEAD backend/papers/template.py backend/papers/picker.py backend/papers/document.py",
+    "ls -la && ls -la backend",
+    "backend/.venv/bin/pytest",
+    "DJANGO_DEBUG=1 .venv/bin/pytest",
+    "git diff HEAD backend/papers/views.py backend/conftest.py backend/papers/tests/",
+    "docker ps",
+    "docker compose exec web pytest",
+    "git diff HEAD frontend/src/hooks/useCoverageForm.hook.ts frontend/src/hooks/useCoverageForm.hook.test.ts frontend/src/components/coverage/coverage-form/coverage-form.component.test.tsx frontend/src/pages/dashboard.page.test.tsx",
+    "git diff HEAD backend/papers/document.py",
+    "git diff HEAD backend/papers/tests/test_picker.py",
+    "npm run test",
+    "git diff HEAD backend/bank/serializers.py backend/bank/views.py frontend/src/components/coverage/coverage-form/coverage-form.component.tsx frontend/src/pages/dashboard.page.tsx frontend/src/types/index.ts",
+    "ls -la .run-logs/"
+  ]
+}

@@ -35,11 +35,7 @@ import {
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
 import { resolveEditorFixture } from '@/mocks';
-import {
-  approvePaper,
-  fetchEditorDraft,
-  persistDraft,
-} from '@/lib/api';
+import { approvePaper, fetchEditorDraft, persistDraft } from '@/lib/api';
 import {
   getPaperFormatRendererResult,
   type PaperFormatRenderer,
@@ -54,6 +50,7 @@ import {
   EditorAnswerOverlay,
   EditorInspector,
   EditorOutlineRail,
+  EditorQuestionInfoOverlay,
   PaperChromeEditor,
   QuestionActionRail,
   QuestionCopyButton,
@@ -281,6 +278,7 @@ function EditorPageWorkspace({
   >('idle');
   const [actionError, setActionError] = useState('');
   const [answerOverlayOpen, setAnswerOverlayOpen] = useState(false);
+  const [questionInfoOverlayOpen, setQuestionInfoOverlayOpen] = useState(false);
   const dirty =
     JSON.stringify(paperState.document) !== JSON.stringify(lastSavedDocument);
   const warnings = view.validationSummary.warnings;
@@ -288,9 +286,22 @@ function EditorPageWorkspace({
     ? answerDocument?.answersBySlotId[selectedSlot.slotId]
     : undefined;
   const currentSelectedAnswerEntry =
-    selectedAnswerEntry?.questionId === selectedSlot?.questionBlockTree.questionId
+    selectedAnswerEntry?.questionId ===
+    selectedSlot?.questionBlockTree.questionId
       ? selectedAnswerEntry
       : undefined;
+
+  function handleSelectQuestionSlot(slotId: string) {
+    setQuestionInfoOverlayOpen(false);
+    handleSelectSlot(slotId);
+  }
+
+  function handleOpenQuestionInfo(slotId?: string) {
+    if (slotId) {
+      handleShowInfo(slotId);
+    }
+    setQuestionInfoOverlayOpen(true);
+  }
 
   async function runAction(action: 'save' | 'approve' | 'download') {
     if (!persisted) return;
@@ -819,8 +830,12 @@ function EditorPageWorkspace({
                               reorderEnabled={slot.editCapabilities.reorder}
                               selected={selectedSlotId === slot.slotId}
                               hovered={hoveredSlotId === slot.slotId}
-                              onClick={() => handleSelectSlot(slot.slotId)}
-                              onFocus={() => handleSelectSlot(slot.slotId)}
+                              onClick={() =>
+                                handleSelectQuestionSlot(slot.slotId)
+                              }
+                              onFocus={() =>
+                                handleSelectQuestionSlot(slot.slotId)
+                              }
                               onMouseEnter={() => {
                                 setHoveredSlotId(slot.slotId);
                                 setHoveredSectionId(section.sectionId);
@@ -904,7 +919,9 @@ function EditorPageWorkspace({
                                   locked={slot.locked}
                                   lockEnabled={slot.editCapabilities.lock}
                                   swapEnabled={slot.editCapabilities.swap}
-                                  onInfo={() => handleShowInfo(slot.slotId)}
+                                  onInfo={() =>
+                                    handleOpenQuestionInfo(slot.slotId)
+                                  }
                                   onAnswer={() => {
                                     handleSelectSlot(slot.slotId);
                                     setAnswerOverlayOpen(true);
@@ -943,6 +960,7 @@ function EditorPageWorkspace({
           onInspectorModeChange={setInspectorMode}
           onShowAllAlternatives={() => setAlternativesIntent('swap')}
           onOpenAlternatives={openAlternativesOverlay}
+          onOpenQuestionInfo={() => handleOpenQuestionInfo()}
           onRestoreSelectedSlot={handleRestoreSelectedSlot}
           highlighted={inspectorHighlighted}
         />
@@ -969,6 +987,17 @@ function EditorPageWorkspace({
             selectedSlot={selectedSlot}
             answerEntry={currentSelectedAnswerEntry}
             onClose={() => setAnswerOverlayOpen(false)}
+          />
+        </div>
+      )}
+
+      {questionInfoOverlayOpen && selectedSlot && selectedQuestion && (
+        <div className="editor-question-info-overlay">
+          <EditorQuestionInfoOverlay
+            selectedSlot={selectedSlot}
+            selectedQuestion={selectedQuestion}
+            onClose={() => setQuestionInfoOverlayOpen(false)}
+            onRestoreSelectedSlot={handleRestoreSelectedSlot}
           />
         </div>
       )}

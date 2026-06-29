@@ -1,0 +1,56 @@
+{
+  "schema": "agy.review.v1",
+  "verdict": "rejected",
+  "findings": [
+    {
+      "file": "backend/corpus/tests/test_chapter_map.py",
+      "line": 262,
+      "type": "bug",
+      "priority": "high",
+      "description": "Adding 'subject_area' to ChapterSerializer broke the corpus mapping API integration test 'test_chapter_map_api_returns_document_specific_semantic_graph'. The test asserts a strict equality on the returned document object which now includes the 'subject_area' key in the nested chapter dictionary, causing an AssertionError.",
+      "fix": "Either update the hardcoded assertion in the test to include 'subject_area': 'Chemistry' (or whatever is correct for the document's chapter) OR define a dedicated serializer for the corpus app (e.g. CorpusChapterSerializer) to isolate Chapter mappings and avoid global changes in shared serializers."
+    },
+    {
+      "file": "frontend/src/hooks/useCoverageForm.hook.ts",
+      "line": 234,
+      "type": "bug",
+      "priority": "high",
+      "description": "The frontend's fallback classification helper 'inferSubjectArea' groups CBSE/NCERT Class 10 Science chapters incorrectly compared to the backend data migration mapping. It maps order 5 (Life Processes) to Chemistry (should be Biology) and order 13 (Our Environment) to Physics (should be Biology). This leads to mismatching chapter groups in the UI under fallback/mock environments.",
+      "fix": "Update the fallback helper logic to correctly map NCERT Science chapter order: order 1-4 is 'Chemistry', order 5-8 and 13 is 'Biology', and order 9-12 is 'Physics'."
+    },
+    {
+      "file": "backend/papers/tests/test_builder.py",
+      "line": 445,
+      "type": "testing-gap",
+      "priority": "medium",
+      "description": "The paper formats GET endpoint test 'test_formats_endpoint_lists_active_formats' does not assert the presence of the newly exposed 'preset_name' in the response. This leaves the API contract exposure of 'preset_name' uncovered by integration tests.",
+      "fix": "Add an assertion in 'test_formats_endpoint_lists_active_formats' verifying that 'preset_name' is present and matches the expected preset values (e.g. 'board') in the returned objects."
+    },
+    {
+      "file": "backend/bank/serializers.py",
+      "line": 34,
+      "type": "code-quality",
+      "priority": "medium",
+      "description": "Exposing 'subject_area' directly via the shared ChapterSerializer changes the output representation across multiple applications (e.g. the corpus app and the question bank APIs). Changing a shared serializer can cause unintended API contract changes in endpoints that do not require the field.",
+      "fix": "Define explicit, context-specific serializers instead of a single global model serializer when API contracts for different views differ."
+    }
+  ],
+  "blockers": [],
+  "files_inspected": [
+    "backend/bank/serializers.py",
+    "backend/papers/views.py",
+    "frontend/src/types/index.ts",
+    "frontend/src/lib/api.ts",
+    "backend/bank/models.py",
+    "backend/papers/models.py",
+    "backend/corpus/tests/test_chapter_map.py",
+    "backend/papers/tests/test_builder.py",
+    "frontend/src/hooks/useCoverageForm.hook.ts"
+  ],
+  "commands_run": [
+    "git status",
+    "git diff HEAD -- backend/bank/serializers.py backend/papers/views.py frontend/src/types/index.ts",
+    "docker compose exec web pytest",
+    "npm run test"
+  ]
+}
