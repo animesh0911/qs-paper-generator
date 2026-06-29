@@ -32,7 +32,19 @@ _SECTION_TITLE: dict[str, str] = {
     "E": "Section E",
 }
 
-_SECTION_INSTRUCTIONS: dict[str, str] = {
+_SUBJECT_SECTION_SUBTITLE: dict[str, str] = {
+    "A": "Biology",
+    "B": "Chemistry",
+    "C": "Physics",
+}
+
+_SUBJECT_SECTION_INSTRUCTIONS: dict[str, str] = {
+    "A": "Biology section. Answer each question in this section only.",
+    "B": "Chemistry section. Answer each question in this section only.",
+    "C": "Physics section. Answer each question in this section only.",
+}
+
+_QUESTION_TYPE_SECTION_INSTRUCTIONS: dict[str, str] = {
     "A": "Multiple Choice Questions. Select the correct option.",
     "B": "Very Short Answer type. Answer in 30–50 words.",
     "C": "Short Answer type. Answer in 50–80 words.",
@@ -265,6 +277,8 @@ class PaperDocumentBuilder:
         sections = []
         display_counter = 1
 
+        subject_section_layout = result.template.preset.name == "board"
+
         for section_key in ["A", "B", "C", "D", "E"]:
             entries = section_entries.get(section_key)
             if not entries:
@@ -280,10 +294,21 @@ class PaperDocumentBuilder:
                     section_marks += slot.marks
 
             slots_data = []
+            or_group_numbers: dict[int, int] = {}
             for local_idx, (slot, qid, alts) in enumerate(entries, start=1):
+                if slot.or_group is None:
+                    slot_number = display_counter
+                    display_counter += 1
+                elif slot.or_group in or_group_numbers:
+                    slot_number = or_group_numbers[slot.or_group]
+                else:
+                    slot_number = display_counter
+                    or_group_numbers[slot.or_group] = slot_number
+                    display_counter += 1
+
                 slot_data: dict = {
                     "id": f"slot_{section_key}_{local_idx:02d}",
-                    "number": str(display_counter),
+                    "number": str(slot_number),
                     "marks": slot.marks,
                     "type": slot.qtype,
                     "selectedQuestionId": f"q_{qid}" if qid is not None else None,
@@ -301,17 +326,22 @@ class PaperDocumentBuilder:
                 if slot.or_group is not None:
                     slot_data["orGroup"] = slot.or_group
                 slots_data.append(slot_data)
-                display_counter += 1
 
             section: dict = {
                 "id": section_key,
                 "title": _SECTION_TITLE[section_key],
                 "marks": section_marks,
-                "instructions": _SECTION_INSTRUCTIONS[section_key],
+                "instructions": (
+                    _SUBJECT_SECTION_INSTRUCTIONS
+                    if subject_section_layout
+                    else _QUESTION_TYPE_SECTION_INSTRUCTIONS
+                )[section_key],
                 "slots": slots_data,
             }
-            subtitle = self._section_subtitle(
-                [qid for _, qid, _ in entries], questions_by_pk
+            subtitle = (
+                _SUBJECT_SECTION_SUBTITLE.get(section_key)
+                if subject_section_layout
+                else self._section_subtitle([qid for _, qid, _ in entries], questions_by_pk)
             )
             if subtitle:
                 section["subtitle"] = subtitle

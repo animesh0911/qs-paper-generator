@@ -109,7 +109,8 @@ class FilledTemplate:
         return self.report.unfilled
 
 
-_BucketKey = tuple[str, str, int]
+# (bank section, question type, marks, required chapter subject_area)
+_BucketKey = tuple[str, str, int, str | None]
 # A pool row: (question_id, chapter_slug or None, cognitive_level code).
 PoolRow = tuple[int, str | None, str]
 # In-memory question pool keyed by bucket.
@@ -152,17 +153,20 @@ class QuestionPicker:
     def _fetch_candidates(opts: PaperOptions) -> QuestionPool:
         """Issue one ORM query per (section, qtype, marks) bucket."""
         buckets: set[_BucketKey] = {
-            (s.section, s.qtype, s.marks) for s in opts.template.slots
+            (s.bank_section, s.qtype, s.marks, s.subject_area)
+            for s in opts.template.slots
         }
         pool: QuestionPool = {}
         for key in buckets:
-            section, qtype, marks = key
+            section, qtype, marks, subject_area = key
             qs = Question.objects.filter(
                 section=section,
                 qtype=qtype,
                 marks=marks,
                 parse_quality__in=["clean", "partial"],
             )
+            if subject_area:
+                qs = qs.filter(chapter__subject_area=subject_area)
             if opts.chapter_slugs:
                 qs = qs.filter(chapter__slug__in=opts.chapter_slugs)
             pool[key] = list(
@@ -189,7 +193,9 @@ class QuestionPicker:
 
         bucket_slot_indices: dict[_BucketKey, list[int]] = defaultdict(list)
         for idx, slot in enumerate(opts.template.slots):
-            bucket_slot_indices[(slot.section, slot.qtype, slot.marks)].append(idx)
+            bucket_slot_indices[
+                (slot.bank_section, slot.qtype, slot.marks, slot.subject_area)
+            ].append(idx)
 
         chapter_weights = cls._normalise_weights(opts, pool)
 
@@ -200,7 +206,7 @@ class QuestionPicker:
         unfilled: list[dict] = []
 
         for key, slot_indices in bucket_slot_indices.items():
-            section, qtype, marks = key
+            section, qtype, marks, _subject_area = key
             n = len(slot_indices)
             chapter_target = cls._allocate(n, chapter_weights)
             cog_target = cls._allocate(n, profile)

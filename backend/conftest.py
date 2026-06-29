@@ -5,7 +5,7 @@ import pytest
 from factory.django import DjangoModelFactory
 
 from accounts.models import School, User
-from bank.models import Question, QuestionType, Section
+from bank.models import Chapter, Question, QuestionType, Section
 
 
 class SchoolFactory(DjangoModelFactory):
@@ -73,10 +73,22 @@ def seeded_bank(db):
     spec = TemplateBuilder().build("board")
     needs: Counter = Counter()
     for slot in spec.slots:
-        needs[(slot.section, slot.qtype, slot.marks)] += 1
+        needs[(slot.bank_section, slot.qtype, slot.marks, slot.subject_area)] += 1
 
     questions = []
-    for (section, qtype, marks), count in needs.items():
+    chapter_by_area = {
+        area: Chapter.objects.filter(subject_area=area).order_by("order").first()
+        for *_, area in needs
+        if area
+    }
+    for (section, qtype, marks, subject_area), count in needs.items():
         for _ in range(count):
-            questions.append(QuestionFactory(section=section, qtype=qtype, marks=marks))
+            questions.append(
+                QuestionFactory(
+                    section=section,
+                    qtype=qtype,
+                    marks=marks,
+                    chapter=chapter_by_area.get(subject_area),
+                )
+            )
     return questions

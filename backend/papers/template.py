@@ -15,7 +15,7 @@ from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from bank.models import QuestionType, Section
+from bank.models import QuestionType, Section, SubjectArea
 
 
 @dataclass
@@ -26,26 +26,112 @@ class Slot:
               None means the question is mandatory with no alternative.
     """
 
+    # Visible paper section (CBSE 2026 target: A/B/C = Biology/Chemistry/Physics).
     section: str
     qtype: str
     marks: int
     or_group: int | None = None
+    # Required subject strand for visible CBSE subject sections. None means the
+    # slot can draw from any selected chapter (used by non-board presets/tests).
+    subject_area: str | None = None
+
+    @property
+    def bank_section(self) -> str:
+        """Question-bank section/mark band used for candidate lookup.
+
+        The bank still stores Section A/B/C/D/E as question-type bands. Visible
+        paper sections are now subject strands, so selection must derive the
+        bank section from the slot's question type instead of reusing the
+        visible section label.
+        """
+
+        return _BANK_SECTION_BY_QTYPE[self.qtype]
+
+
+_BANK_SECTION_BY_QTYPE: dict[str, str] = {
+    QuestionType.MCQ: Section.A,
+    QuestionType.VSA: Section.B,
+    QuestionType.SA: Section.C,
+    QuestionType.LA: Section.D,
+    QuestionType.CASE: Section.E,
+}
+
+
+def _append_subject_slots(
+    slots: list[Slot],
+    *,
+    section: str,
+    mcq: int,
+    vsa: int,
+    sa: int,
+    la: int,
+    case: int,
+    next_or_group: int,
+    subject_area: str,
+) -> int:
+    for _ in range(mcq):
+        slots.append(Slot(section, QuestionType.MCQ, 1, subject_area=subject_area))
+    for _ in range(vsa):
+        slots.append(Slot(section, QuestionType.VSA, 2, subject_area=subject_area))
+    for _ in range(sa):
+        slots.append(Slot(section, QuestionType.SA, 3, subject_area=subject_area))
+    for _ in range(la):
+        slots.append(
+            Slot(section, QuestionType.LA, 5, next_or_group, subject_area=subject_area)
+        )
+        slots.append(
+            Slot(section, QuestionType.LA, 5, next_or_group, subject_area=subject_area)
+        )
+        next_or_group += 1
+    for _ in range(case):
+        slots.append(
+            Slot(section, QuestionType.CASE, 4, next_or_group, subject_area=subject_area)
+        )
+        slots.append(
+            Slot(section, QuestionType.CASE, 4, next_or_group, subject_area=subject_area)
+        )
+        next_or_group += 1
+    return next_or_group
 
 
 def _board_slots() -> list[Slot]:
+    """CBSE 2026-style board paper: 39 questions, 80 marks, 3 subject sections."""
+
     slots: list[Slot] = []
-    for _ in range(20):
-        slots.append(Slot(Section.A, QuestionType.MCQ, 1))
-    for _ in range(6):
-        slots.append(Slot(Section.B, QuestionType.VSA, 2))
-    for _ in range(7):
-        slots.append(Slot(Section.C, QuestionType.SA, 3))
-    for g in range(3):
-        slots.append(Slot(Section.D, QuestionType.LA, 5, g))
-        slots.append(Slot(Section.D, QuestionType.LA, 5, g))
-    for g in range(3):
-        slots.append(Slot(Section.E, QuestionType.CASE, 4, 3 + g))
-        slots.append(Slot(Section.E, QuestionType.CASE, 4, 3 + g))
+    next_or_group = 0
+    next_or_group = _append_subject_slots(
+        slots,
+        section=Section.A,
+        mcq=9,
+        vsa=3,
+        sa=2,
+        la=1,
+        case=1,
+        next_or_group=next_or_group,
+        subject_area=SubjectArea.BIOLOGY,
+    )
+    next_or_group = _append_subject_slots(
+        slots,
+        section=Section.B,
+        mcq=8,
+        vsa=1,
+        sa=2,
+        la=1,
+        case=1,
+        next_or_group=next_or_group,
+        subject_area=SubjectArea.CHEMISTRY,
+    )
+    _append_subject_slots(
+        slots,
+        section=Section.C,
+        mcq=3,
+        vsa=2,
+        sa=3,
+        la=1,
+        case=1,
+        next_or_group=next_or_group,
+        subject_area=SubjectArea.PHYSICS,
+    )
     return slots
 
 

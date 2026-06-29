@@ -26,6 +26,10 @@ export default function Dashboard() {
   const [error, setError] = useState('');
 
   async function generate() {
+    if (!form.hasSelectedChapters) {
+      setError('Select at least one Chapter to generate a paper.');
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -42,7 +46,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-secondary">
       <AppHeader />
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-10">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-10">
         <Card className="overflow-hidden rounded-lg border-white/70 bg-white/80 shadow-none backdrop-blur-2xl">
           <CardHeader className="border-b border-white/70 bg-white/60 px-5 py-5 sm:px-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -51,8 +55,8 @@ export default function Dashboard() {
                   Generate paper
                 </CardTitle>
                 <p className="max-w-2xl text-[0.9375rem] leading-6 text-muted-foreground">
-                  Select chapters — they are distributed equally. Difficulty
-                  profile sets the Remember / Understand / Apply / Analyse mix.
+                  Set up a CBSE Class 10 Science paper, choose chapters, then
+                  open the editor for review, swaps, answers, and export.
                 </p>
               </div>
               <span className="inline-flex w-fit items-center gap-1 rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
