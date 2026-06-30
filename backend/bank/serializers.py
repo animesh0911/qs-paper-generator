@@ -122,6 +122,8 @@ class IngestionJobSerializer(serializers.ModelSerializer):
             "status",
             "source_type",
             "source_file_name",
+            "total_pages",
+            "pages_done",
             "created_count",
             "skipped_count",
             "error",

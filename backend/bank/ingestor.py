@@ -925,6 +925,7 @@ class Ingestor:
         source_type: str = "",
         school=None,
         pdf_bytes: bytes | None = None,
+        ingestion_job=None,
     ) -> IngestResult:
         """Persist already-extracted question dicts through the shared tail.
 
@@ -947,6 +948,7 @@ class Ingestor:
             school=school,
             pdf_bytes=pdf_bytes,
             chapter_by_slug=chapter_by_slug,
+            ingestion_job=ingestion_job,
         )
 
     def _ingest_raw(
@@ -957,6 +959,7 @@ class Ingestor:
         school,
         pdf_bytes: bytes | None,
         chapter_by_slug: dict[str, Chapter],
+        ingestion_job=None,
     ) -> IngestResult:
         """Shared tail of both ingestion front doors.
 
@@ -1027,6 +1030,7 @@ class Ingestor:
             chapter_by_slug,
             provenance,
             school,
+            ingestion_job,
         )
         return IngestResult(created=created, skipped_duplicates=skipped)
 
@@ -1038,6 +1042,7 @@ class Ingestor:
         chapter_by_slug: dict[str, Chapter],
         provenance: _Provenance,
         school=None,
+        ingestion_job=None,
     ) -> int:
         rows: list[Question] = []
         for i, q in enumerate(tagged):
@@ -1058,6 +1063,7 @@ class Ingestor:
 
             row = Question(
                 school=school,
+                ingestion_job=ingestion_job,
                 chapter=chapter_by_slug.get(q.get("chapter_slug")),
                 section=q["section"],
                 qtype=q["qtype"],

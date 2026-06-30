@@ -200,6 +200,16 @@ class Question(models.Model):
     diagram = models.FileField(upload_to="diagrams/", null=True, blank=True)
     # MD5 of normalised question text — used for de-duplication on re-ingest.
     source_hash = models.CharField(max_length=32, blank=True, db_index=True)
+    # The ingestion job that created this row (live HTTP upload path only). Lets
+    # the upload status card list exactly the questions a given upload produced.
+    # SET_NULL so pruning old jobs never drops the questions they created.
+    ingestion_job = models.ForeignKey(
+        "bank.IngestionJob",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="questions",
+    )
     # Source provenance — maps to PaperDocumentV1 `source` object.
     source_type = models.CharField(
         max_length=32,
@@ -287,6 +297,12 @@ class IngestionJob(models.Model):
     # Ledger-internal — never exposed by the poll serializer. 64 leaves margin
     # over both id conventions in play (uuid4().hex = 32, str(uuid4()) = 36).
     thread_id = models.CharField(max_length=64, blank=True, default="")
+    # Live extraction progress, surfaced by the poll endpoint so the upload card
+    # can show "page N of M" while the (multi-minute) drain runs. ``total_pages``
+    # is set when the graph plans the PDF; ``pages_done`` advances per extracted
+    # page. Both are 0 until the drainer picks the job up.
+    total_pages = models.PositiveIntegerField(default=0)
+    pages_done = models.PositiveIntegerField(default=0)
     # Result counts, populated on success (mirror IngestResult).
     created_count = models.PositiveIntegerField(default=0)
     skipped_count = models.PositiveIntegerField(default=0)
