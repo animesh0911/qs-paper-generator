@@ -226,3 +226,50 @@ export interface IngestionJob {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * A bank question as surfaced by the browsable Question Bank view. Mirrors
+ * `bank.serializers.BankQuestionSerializer`. The `answer` is never exposed.
+ */
+export interface BankQuestion {
+  id: number;
+  section: string;
+  qtype: string;
+  marks: number;
+  chapter: Chapter | null;
+  cognitive_level: string;
+  text: string;
+  /**
+   * Structured PaperDocumentV1 `content` (stem, options, etc.). The `stem`
+   * items may carry LaTeX, rendered with KaTeX in the bank view. Empty dict
+   * means "no structured content" — fall back to `text`.
+   */
+  content: { stem?: ContentItem[]; [key: string]: unknown };
+  options: { label: string; text: string }[];
+  primary_form: string;
+  parse_quality: string;
+  verified: boolean;
+  source_type: SourceType | '';
+  source_name: string;
+  source_file_name: string;
+  created_at: string;
+}
+
+/** Filters accepted by `GET /api/bank/questions/`. All optional. */
+export interface BankQuestionFilters {
+  chapter?: string;
+  section?: string;
+  qtype?: string;
+  source_type?: SourceType;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+/** Paginated response shape from `GET /api/bank/questions/`. */
+export interface BankQuestionsResponse {
+  count: number;
+  limit: number;
+  offset: number;
+  results: BankQuestion[];
+}
