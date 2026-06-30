@@ -10,8 +10,12 @@
  * @module useIngestionUpload.hook
  */
 import { useEffect, useRef, useState } from 'react';
-import type { IngestionJob, SourceType } from '@/types';
-import { fetchIngestionJob, uploadIngestionPdf } from '@/lib/api';
+import type { BankQuestion, IngestionJob, SourceType } from '@/types';
+import {
+  fetchIngestionJob,
+  fetchIngestionJobQuestions,
+  uploadIngestionPdf,
+} from '@/lib/api';
 import {
   DEFAULT_SOURCE_TYPE,
   isIngestionTerminal,
@@ -28,6 +32,10 @@ export interface IngestionUploadState {
   /** True while a non-terminal job is being polled. */
   polling: boolean;
   pollError: string;
+  /** Questions a finished job added to the bank (empty until it's `done`). */
+  parsedQuestions: BankQuestion[];
+  /** True while the parsed-questions list is loading after the job settles. */
+  loadingQuestions: boolean;
   selectFile: (file: File | null) => void;
   setSourceType: (sourceType: SourceType) => void;
   upload: () => Promise<void>;
@@ -44,6 +52,8 @@ export function useIngestionUpload(
   const [uploadError, setUploadError] = useState('');
   const [job, setJob] = useState<IngestionJob | null>(null);
   const [pollError, setPollError] = useState('');
+  const [parsedQuestions, setParsedQuestions] = useState<BankQuestion[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
   const jobId = job?.id;
   const settled = job ? isIngestionTerminal(job.status) : false;
   const polling = job != null && !settled;
@@ -86,6 +96,29 @@ export function useIngestionUpload(
     };
   }, [jobId, pollIntervalMs]);
 
+  // Once a job lands `done`, fetch the questions it added so the status card
+  // can show exactly what was parsed (after extraction + validation finished).
+  const isDone = job?.status === 'done';
+  useEffect(() => {
+    if (jobId == null || !isDone) return;
+    let cancelled = false;
+    setLoadingQuestions(true);
+    fetchIngestionJobQuestions(jobId)
+      .then((questions) => {
+        if (!cancelled) setParsedQuestions(questions);
+      })
+      .catch(() => {
+        // Non-fatal: the counts in the status card still tell the story.
+        if (!cancelled) setParsedQuestions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingQuestions(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [jobId, isDone]);
+
   function selectFile(next: File | null) {
     setUploadError('');
     if (!next) {
@@ -124,6 +157,8 @@ export function useIngestionUpload(
     setUploadError('');
     setPollError('');
     setJob(null);
+    setParsedQuestions([]);
+    setLoadingQuestions(false);
   }
 
   return {
@@ -135,6 +170,8 @@ export function useIngestionUpload(
     job,
     polling,
     pollError,
+    parsedQuestions,
+    loadingQuestions,
     selectFile,
     setSourceType,
     upload,

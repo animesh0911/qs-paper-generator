@@ -220,6 +220,9 @@ export interface IngestionJob {
   status: IngestionJobStatus;
   source_type: SourceType;
   source_file_name: string;
+  /** Live extraction progress while `running` (0 until the drainer plans it). */
+  total_pages: number;
+  pages_done: number;
   created_count: number;
   skipped_count: number;
   error: string;

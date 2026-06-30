@@ -88,14 +88,26 @@ def build_extraction_graph(
 
     def plan(state: ExtractionState) -> dict:
         _, pdf_bytes = _load_job_pdf(state["job_id"])
-        return {"total_pages": count_pages(pdf_bytes), "next_page": 0}
+        total_pages = count_pages(pdf_bytes)
+        # Publish the page count (and reset progress) on the ledger row so the
+        # poll endpoint can show "page N of M" while the drain runs. A targeted
+        # update() avoids clobbering the status the drainer owns.
+        IngestionJob.objects.filter(pk=state["job_id"]).update(
+            total_pages=total_pages, pages_done=0
+        )
+        return {"total_pages": total_pages, "next_page": 0}
 
     def extract_page(state: ExtractionState) -> dict:
         _, pdf_bytes = _load_job_pdf(state["job_id"])
         page = slice_page(pdf_bytes, state["next_page"])
+        payload = extractor.extract_page(page)
+        # Advance live progress as each (paid) page lands. On resume this is set
+        # from next_page, so it stays correct without re-reading the checkpoint.
+        pages_done = state["next_page"] + 1
+        IngestionJob.objects.filter(pk=state["job_id"]).update(pages_done=pages_done)
         return {
-            "payloads": [extractor.extract_page(page)],
-            "next_page": state["next_page"] + 1,
+            "payloads": [payload],
+            "next_page": pages_done,
         }
 
     def persist(state: ExtractionState) -> dict:
@@ -106,6 +118,7 @@ def build_extraction_graph(
             source_type=job.source_type,
             school=job.school,
             pdf_bytes=pdf_bytes,
+            ingestion_job=job,
         )
         return {"created": result.created, "skipped": result.skipped_duplicates}
 
