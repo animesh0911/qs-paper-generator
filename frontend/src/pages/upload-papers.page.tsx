@@ -54,6 +54,8 @@ export default function UploadPapersPage() {
               <IngestionStatusCard
                 job={upload.job}
                 pollError={upload.pollError}
+                parsedQuestions={upload.parsedQuestions}
+                loadingQuestions={upload.loadingQuestions}
                 onUploadAnother={upload.reset}
                 onGeneratePaper={() => navigate('/')}
               />

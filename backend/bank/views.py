@@ -119,6 +119,28 @@ def ingest_status(request, job_id):
     return Response(IngestionJobSerializer(job).data)
 
 
+@api_view(["GET"])
+@permission_classes([IsTeacher])
+def ingest_questions(request, job_id):
+    """Return the questions a finished ingestion job added to the bank.
+
+    Scoped to the teacher's school (a cross-school id is a 404, never a 403).
+    Powers the upload status card's "what was parsed" list, so it mirrors the
+    bank view's exclusion of structurally ``broken`` rows — only usable
+    (clean/partial) questions the teacher could actually pick.
+    """
+    try:
+        job = IngestionJob.objects.get(pk=job_id, school=request.user.school)
+    except IngestionJob.DoesNotExist:
+        return Response({"detail": "Not found."}, status=404)
+    questions_qs = (
+        job.questions.filter(parse_quality__in=["clean", "partial"])
+        .select_related("chapter")
+        .order_by("section", "id")
+    )
+    return Response(BankQuestionSerializer(questions_qs, many=True).data)
+
+
 QUESTIONS_PAGE_SIZE = 50
 QUESTIONS_MAX_PAGE_SIZE = 200
 

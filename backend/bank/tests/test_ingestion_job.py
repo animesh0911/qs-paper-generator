@@ -224,6 +224,65 @@ def test_status_hides_other_schools_jobs_as_404(api_client):
 
 
 # ---------------------------------------------------------------------------
+# Parsed-questions endpoint — GET /api/bank/ingest/{id}/questions/
+# ---------------------------------------------------------------------------
+
+
+def test_questions_lists_what_a_job_added(api_client, user):
+    """The upload card's "what was parsed" list: only the job's own usable rows,
+    excluding structurally ``broken`` ones (mirrors the bank view)."""
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        status=IngestionJobStatus.DONE,
+    )
+    kept = Question.objects.create(
+        school=user.school,
+        ingestion_job=job,
+        section="A",
+        qtype="mcq",
+        marks=1,
+        text="Kept question",
+        parse_quality="clean",
+    )
+    Question.objects.create(
+        school=user.school,
+        ingestion_job=job,
+        section="A",
+        qtype="mcq",
+        marks=1,
+        text="Broken fragment",
+        parse_quality="broken",
+    )
+    # A row from a different job must not leak in.
+    Question.objects.create(
+        school=user.school,
+        section="A",
+        qtype="mcq",
+        marks=1,
+        text="Other upload",
+        parse_quality="clean",
+    )
+
+    resp = api_client.get(f"/api/bank/ingest/{job.pk}/questions/")
+
+    assert resp.status_code == 200
+    assert [q["id"] for q in resp.data] == [kept.pk]
+
+
+def test_questions_hides_other_schools_jobs_as_404(api_client):
+    """Same tenancy rule as the status poll — a cross-school id is a 404."""
+    from accounts.models import School
+
+    other = School.objects.create(name="Other School")
+    job = IngestionJob.objects.create(school=other, pdf=_pdf_upload())
+
+    resp = api_client.get(f"/api/bank/ingest/{job.pk}/questions/")
+    assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
 # drain_ingestion_jobs — the cron drainer
 # ---------------------------------------------------------------------------
 
@@ -248,10 +307,17 @@ def test_drain_processes_pending_job_into_bank(db, user, monkeypatch):
     assert job.status == IngestionJobStatus.DONE
     assert job.created_count == 1
     assert job.thread_id  # the ledger now points at its graph thread
+    # Progress was published as the graph planned + extracted the (1-page) PDF,
+    # so the poll endpoint can show "page N of M" mid-run.
+    assert job.total_pages == 1
+    assert job.pages_done == 1
     q = Question.objects.get()
     assert q.school == user.school
     assert q.source_type == SourceType.SAMPLE_PAPER
     assert q.verified is False
+    # The created row is back-linked to the job that made it, so the upload
+    # status card can list exactly what this upload parsed.
+    assert q.ingestion_job_id == job.pk
 
 
 def test_drain_records_failure_without_aborting(db, user, monkeypatch):

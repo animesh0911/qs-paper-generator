@@ -15,6 +15,7 @@
  */
 import type {
   AssembleRequest,
+  BankQuestion,
   BankQuestionFilters,
   BankQuestionsResponse,
   Chapter,
@@ -180,7 +181,9 @@ export async function fetchEditorDraft(
   };
 }
 
-function isPaperAnswerDocument(value: unknown): value is EditorDraftResponse['answer_document'] {
+function isPaperAnswerDocument(
+  value: unknown,
+): value is EditorDraftResponse['answer_document'] {
   return (
     Boolean(value) &&
     typeof value === 'object' &&
@@ -300,6 +303,19 @@ export async function fetchIngestionJob(
   jobId: number | string,
 ): Promise<IngestionJob> {
   const res = await request(`/bank/ingest/${jobId}/`, { method: 'GET' });
+  return res.json();
+}
+
+/**
+ * List the questions a finished ingestion job added to the bank — what the
+ * upload status card shows once extraction + validation complete.
+ */
+export async function fetchIngestionJobQuestions(
+  jobId: number | string,
+): Promise<BankQuestion[]> {
+  const res = await request(`/bank/ingest/${jobId}/questions/`, {
+    method: 'GET',
+  });
   return res.json();
 }
 

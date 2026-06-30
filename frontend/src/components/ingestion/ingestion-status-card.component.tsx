@@ -12,13 +12,15 @@ import {
   FileText,
   LoaderCircle,
 } from 'lucide-react';
-import type { IngestionJob } from '@/types';
+import type { BankQuestion, IngestionJob } from '@/types';
 import { Button } from '@/components/ui/button';
 import { sourceTypeLabel } from '@/lib/ingestion';
 
 interface IngestionStatusCardProps {
   job: IngestionJob;
   pollError?: string;
+  parsedQuestions: BankQuestion[];
+  loadingQuestions: boolean;
   onUploadAnother: () => void;
   onGeneratePaper: () => void;
 }
@@ -26,11 +28,18 @@ interface IngestionStatusCardProps {
 export function IngestionStatusCard({
   job,
   pollError,
+  parsedQuestions,
+  loadingQuestions,
   onUploadAnother,
   onGeneratePaper,
 }: IngestionStatusCardProps) {
   const fileName = job.source_file_name || 'Uploaded PDF';
   const inProgress = job.status === 'pending' || job.status === 'running';
+  // Show page progress once the drainer has planned the PDF (total_pages > 0).
+  const hasProgress = job.status === 'running' && job.total_pages > 0;
+  const progressPct = hasProgress
+    ? Math.min(100, Math.round((job.pages_done / job.total_pages) * 100))
+    : 0;
 
   return (
     <div className="space-y-5">
@@ -52,16 +61,33 @@ export function IngestionStatusCard({
             className="mt-0.5 size-5 shrink-0 animate-spin text-foreground"
             aria-hidden="true"
           />
-          <div className="space-y-1">
+          <div className="flex-1 space-y-1">
             <p className="text-sm font-medium" aria-live="polite">
               {job.status === 'pending'
                 ? 'Queued for extraction…'
-                : 'Extracting questions…'}
+                : hasProgress
+                  ? `Extracting questions — page ${job.pages_done} of ${job.total_pages}…`
+                  : 'Extracting questions…'}
             </p>
             <p className="text-sm text-muted-foreground">
               This runs in the background — you can leave this page and the
               questions will be added to your bank when it finishes.
             </p>
+            {hasProgress && (
+              <div
+                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={job.total_pages}
+                aria-valuenow={job.pages_done}
+                aria-label="Extraction progress"
+              >
+                <div
+                  className="h-full rounded-full bg-foreground/70 transition-[width] duration-500"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+            )}
             {pollError && (
               <p className="text-xs text-muted-foreground">
                 Couldn’t refresh status just now — retrying. ({pollError})
@@ -95,6 +121,53 @@ export function IngestionStatusCard({
               </p>
             </div>
           </div>
+
+          {job.created_count > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">
+                Questions added to your bank
+              </p>
+              {loadingQuestions ? (
+                <p className="text-sm text-muted-foreground">
+                  Loading the parsed questions…
+                </p>
+              ) : parsedQuestions.length > 0 ? (
+                <ul className="divide-y divide-input overflow-hidden rounded-lg border border-input bg-background">
+                  {parsedQuestions.map((question, index) => (
+                    <li key={question.id} className="flex gap-3 px-4 py-3">
+                      <span className="w-6 shrink-0 text-sm tabular-nums text-muted-foreground">
+                        {index + 1}.
+                      </span>
+                      <div className="min-w-0 space-y-1">
+                        <p className="text-sm leading-5">{question.text}</p>
+                        <p className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                          <span>Section {question.section}</span>
+                          <span aria-hidden="true">·</span>
+                          <span>
+                            {question.marks}{' '}
+                            {question.marks === 1 ? 'mark' : 'marks'}
+                          </span>
+                          {question.chapter && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              <span className="truncate">
+                                {question.chapter.name}
+                              </span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  The questions are in your bank, ready to use in a paper.
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
             <Button onClick={onGeneratePaper}>Generate a paper</Button>
             <Button variant="outline" onClick={onUploadAnother}>
