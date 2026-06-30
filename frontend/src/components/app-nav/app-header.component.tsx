@@ -6,7 +6,7 @@
  * @module AppHeader
  */
 import { NavLink } from 'react-router-dom';
-import { FileText, Sparkles, Upload } from 'lucide-react';
+import { FileText, Library, Sparkles, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth.hook';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 const NAV_ITEMS = [
   { to: '/', label: 'Generate paper', icon: FileText, end: true },
   { to: '/upload', label: 'Upload papers', icon: Upload, end: false },
+  { to: '/question-bank', label: 'Question bank', icon: Library, end: false },
   { to: '/ai-qa', label: 'AI Q&A', icon: Sparkles, end: false },
 ] as const;
 

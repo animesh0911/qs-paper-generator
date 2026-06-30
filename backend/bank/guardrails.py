@@ -140,7 +140,16 @@ def resolve_chapter_slug(emitted, canonical) -> tuple[str | None, bool]:
 # Structural gate
 # ---------------------------------------------------------------------------
 
-_BARE_NUMBER_RE = re.compile(r"^\s*\d{1,3}[.):]?\s*$")
+# A stem carrying no real content — only enumeration scaffolding: a question
+# number ("37."), a sub-part label ("(b)"), or a run of them ("39. (a)",
+# "(a) (i)"). These are segmentation fragments the model emitted as standalone
+# rows; there is nothing to ask. Note a label *with* a question after it
+# ("(b) Define …") does NOT match — the trailing prose breaks the full-string
+# anchor — so it falls through to the orphan-label check below instead.
+_ENUMERATION_ONLY_RE = re.compile(
+    r"^(?:\s*(?:\d{1,3}[.):]?|\(\s*[a-z0-9ivxlcdm]{1,4}\s*\)))+\s*$",
+    re.IGNORECASE,
+)
 _CONTINUATION_RE = re.compile(r"continued\s+(?:on|from)\b", re.I)
 # A stem that *begins* at a non-first sub-part label — "(b)", "(c)", … (never
 # "(a)" or roman "(i)") — is an orphaned OR/sub-part half the model split into
@@ -173,14 +182,15 @@ def _derive_options(content: dict) -> list[dict]:
 def _stem_flag(text) -> str | None:
     """Flag a lost/continued/split stem.
 
-    ``empty_stem`` for an empty stem or a bare question number ("37."); otherwise
-    ``possible_split`` for a "continued on/from" placeholder or a stem that begins
-    at an orphaned non-first sub-part label ("(b) …") — the OR-half segmentation
-    defect. Returns ``None`` for a normal stem (incl. a legitimate "(a) …" first
-    part and roman "(i)").
+    ``empty_stem`` for a stem with no real content — empty, or only enumeration
+    scaffolding ("37.", "(b)", "39. (a)"); otherwise ``possible_split`` for a
+    "continued on/from" placeholder or a stem that begins at an orphaned non-first
+    sub-part label *with content* ("(b) …") — the OR-half segmentation defect.
+    Returns ``None`` for a normal stem (incl. a legitimate "(a) …" first part and
+    roman "(i)").
     """
     stripped = (text or "").strip()
-    if not stripped or _BARE_NUMBER_RE.match(stripped):
+    if not stripped or _ENUMERATION_ONLY_RE.match(stripped):
         return FLAG_EMPTY_STEM
     if _CONTINUATION_RE.search(stripped):
         return FLAG_POSSIBLE_SPLIT

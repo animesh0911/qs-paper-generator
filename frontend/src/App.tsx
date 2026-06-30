@@ -16,6 +16,7 @@ import {
   LoginPage,
   PrintAnswerKeyPage,
   PrintPaperPage,
+  QuestionBankPage,
   UploadPapersPage,
 } from '@/pages';
 
@@ -73,6 +74,14 @@ export default function App() {
         element={
           <RequireAuth>
             <UploadPapersPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/question-bank"
+        element={
+          <RequireAuth>
+            <QuestionBankPage />
           </RequireAuth>
         }
       />

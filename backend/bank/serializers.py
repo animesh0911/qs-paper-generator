@@ -65,6 +65,38 @@ class QuestionSerializer(serializers.ModelSerializer):
         ]
 
 
+class BankQuestionSerializer(serializers.ModelSerializer):
+    """Question shape for the browsable bank view.
+
+    Extends the default shape with provenance and quality metadata a teacher
+    needs to scan the bank (source, parse quality, verification, created_at).
+    Still omits ``answer`` — answers only reach the paper-local answer document.
+    """
+
+    chapter = ChapterSerializer(read_only=True)
+
+    class Meta:
+        model = Question
+        fields = [
+            "id",
+            "section",
+            "qtype",
+            "marks",
+            "chapter",
+            "cognitive_level",
+            "text",
+            "content",
+            "options",
+            "primary_form",
+            "parse_quality",
+            "verified",
+            "source_type",
+            "source_name",
+            "source_file_name",
+            "created_at",
+        ]
+
+
 class IngestionUploadSerializer(serializers.Serializer):
     """Validates a teacher's PDF-upload request (multipart/form-data).
 

@@ -21,6 +21,7 @@ PDFs at runtime); the committed-JSON CLI path (``extract_paper`` →
 two-front-door note in CONTEXT.md ``Ingestor``.
 """
 
+from django.db.models import Q
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
@@ -34,9 +35,17 @@ from .generation_batches import (
     list_generation_batches,
     queue_generation_batch,
 )
-from .models import Chapter, CognitiveLevel, IngestionJob, QuestionType, Section
+from .models import (
+    Chapter,
+    CognitiveLevel,
+    IngestionJob,
+    Question,
+    QuestionType,
+    Section,
+)
 from .permissions import IsTeacher
 from .serializers import (
+    BankQuestionSerializer,
     ChapterTaxonomySerializer,
     GeneratedQuestionCandidateSerializer,
     GenerationBatchAcceptSerializer,
@@ -108,6 +117,73 @@ def ingest_status(request, job_id):
     except IngestionJob.DoesNotExist:
         return Response({"detail": "Not found."}, status=404)
     return Response(IngestionJobSerializer(job).data)
+
+
+QUESTIONS_PAGE_SIZE = 50
+QUESTIONS_MAX_PAGE_SIZE = 200
+
+
+def _int_param(request, key, default):
+    """Parse a non-negative int query param, falling back to ``default``."""
+    try:
+        value = int(request.query_params.get(key, default))
+    except (TypeError, ValueError):
+        return default
+    return value if value >= 0 else default
+
+
+@api_view(["GET"])
+@permission_classes([IsTeacher])
+def questions(request):
+    """List bank questions visible to the teacher, with filters + pagination.
+
+    Tenancy: the global/seeded bank (``school IS NULL``) plus the teacher's own
+    school. Optional filters: ``chapter`` (slug), ``section``, ``qtype``,
+    ``source_type``, and ``search`` (case-insensitive substring of the question
+    text). Paginated with ``limit``/``offset``; the response carries ``count``
+    so the client can page. Answers are never serialized (see serializers).
+    """
+    # Only usable rows: the picker draws from clean+partial and excludes
+    # ``broken`` (structurally unusable — empty/fragment stems, bad enums). The
+    # bank view promises "what's available", so it mirrors that exclusion.
+    qs = (
+        Question.objects.filter(Q(school__isnull=True) | Q(school=request.user.school))
+        .filter(parse_quality__in=["clean", "partial"])
+        .select_related("chapter")
+    )
+
+    chapter_slug = request.query_params.get("chapter")
+    if chapter_slug:
+        qs = qs.filter(chapter__slug=chapter_slug)
+    section = request.query_params.get("section")
+    if section:
+        qs = qs.filter(section=section)
+    qtype = request.query_params.get("qtype")
+    if qtype:
+        qs = qs.filter(qtype=qtype)
+    source_type = request.query_params.get("source_type")
+    if source_type:
+        qs = qs.filter(source_type=source_type)
+    search = (request.query_params.get("search") or "").strip()
+    if search:
+        qs = qs.filter(text__icontains=search)
+
+    qs = qs.order_by("-created_at", "-id")
+    count = qs.count()
+
+    limit = _int_param(request, "limit", QUESTIONS_PAGE_SIZE) or QUESTIONS_PAGE_SIZE
+    limit = min(limit, QUESTIONS_MAX_PAGE_SIZE)
+    offset = _int_param(request, "offset", 0)
+    page = qs[offset : offset + limit]
+
+    return Response(
+        {
+            "count": count,
+            "limit": limit,
+            "offset": offset,
+            "results": BankQuestionSerializer(page, many=True).data,
+        }
+    )
 
 
 @api_view(["GET", "POST"])

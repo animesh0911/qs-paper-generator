@@ -153,6 +153,18 @@ def test_gate_flags_lost_or_continued_stem():
     assert FLAG_POSSIBLE_SPLIT in cont["review_flags"]
 
 
+def test_gate_flags_enumeration_only_stem_as_empty():
+    """A stem that is *only* enumeration scaffolding — a sub-part label or a
+    number+label with no question after it ("(b)", "39. (a)", "(a) (i)") → it has
+    nothing to ask, so empty_stem/broken (excluded from the usable bank), not the
+    softer possible_split that a content-bearing "(b) …" gets."""
+    for text in ("(b)", "39. (a)", "(a) (i)", "(i)"):
+        q = _q(text=text)
+        apply_guardrails([q], CANONICAL)
+        assert FLAG_EMPTY_STEM in q["review_flags"], text
+        assert q["parse_quality"] == "broken", text
+
+
 def test_gate_flags_orphan_subpart_label_as_split():
     """A stem starting at "(b)" is an OR-half the model split out (validated on
     31-2-3) → possible_split; a legitimate "(a)" first part or roman "(i)" is not.
