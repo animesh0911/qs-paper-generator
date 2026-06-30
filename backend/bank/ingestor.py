@@ -41,7 +41,7 @@ from ai_services.llm import LLMClient, ModelPurpose, make_chat_model, make_llm_c
 from . import content as content_mod
 from .diagram_cropper import DiagramCropper, PyMuPdfCropper
 from .models import Chapter, CognitiveLevel, Question
-from .question_content import normalise_question_content
+from .question_content import normalise_question_content, repair_stem
 from .question_shape import compute_parse_quality
 
 # Numerical: equation-like text, SI units, or standalone numbers with units.
@@ -1043,9 +1043,12 @@ class Ingestor:
         for i, q in enumerate(tagged):
             primary_asset = primary_assets[i] if i < len(primary_assets) else None
             primary_form = q.get("primary_form", "none")
-            # Repair contract gaps (e.g. a ChoiceGroup missing displayStyle) at
-            # the door so the bank never stores content the editor would reject.
+            # Repair contract gaps (e.g. a ChoiceGroup missing displayStyle) and
+            # a stem that lost its body to a bare sub-part label at the door, so
+            # the bank never stores content the editor would reject or a fragment
+            # the renderer would show in place of the real question.
             content = normalise_question_content(q.get("content", {}))
+            content = repair_stem(content, q["text"])
             has_diagram = (
                 primary_asset is not None
                 or primary_form == "diagram_based"

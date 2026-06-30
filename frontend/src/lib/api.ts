@@ -15,6 +15,8 @@
  */
 import type {
   AssembleRequest,
+  BankQuestionFilters,
+  BankQuestionsResponse,
   Chapter,
   ChapterTopicsResponse,
   EditorDraftResponse,
@@ -231,6 +233,21 @@ export async function fetchMetadata(): Promise<Metadata> {
 
 export async function fetchChapters(): Promise<Chapter[]> {
   const res = await request('/bank/chapters/');
+  return res.json();
+}
+
+/** List bank questions for the browsable Question Bank view (paginated). */
+export async function fetchBankQuestions(
+  filters: BankQuestionFilters = {},
+): Promise<BankQuestionsResponse> {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== null && value !== '') {
+      params.set(key, String(value));
+    }
+  }
+  const query = params.toString();
+  const res = await request(`/bank/questions/${query ? `?${query}` : ''}`);
   return res.json();
 }
 
