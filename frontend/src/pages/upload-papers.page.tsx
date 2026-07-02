@@ -57,7 +57,7 @@ export default function UploadPapersPage() {
                 parsedQuestions={upload.parsedQuestions}
                 loadingQuestions={upload.loadingQuestions}
                 onUploadAnother={upload.reset}
-                onGeneratePaper={() => navigate('/')}
+                onGeneratePaper={() => navigate('/generate')}
               />
             ) : (
               <>

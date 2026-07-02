@@ -25,6 +25,7 @@ import {
   persistDraft,
   persistEditorDraft,
   downloadPaperPdfPackage,
+  openPaperPrintPreview,
 } from './api';
 
 const storage = new Map<string, string>();
@@ -374,7 +375,7 @@ describe('paper persistence', () => {
     );
   });
 
-  it('downloads the one-click PDF package instead of opening the print route', async () => {
+  it('downloads the one-click PDF package', async () => {
     vi.useFakeTimers();
     const persistedDocument = structuredClone(mockPaperDocumentV1);
     persistedDocument.paper.id = 'paper_123';
@@ -396,7 +397,6 @@ describe('paper persistence', () => {
     });
 
     await downloadPaperPdfPackage(persistedDocument);
-    vi.runAllTimers();
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/papers/123/download-package/',
@@ -405,8 +405,27 @@ describe('paper persistence', () => {
     expect(anchor.href).toBe('blob:package');
     expect(anchor.download).toBe('paper_123-pdfs.zip');
     expect(click).toHaveBeenCalledOnce();
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(60_000);
+
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:package');
     expect(globalThis.open).toBeUndefined();
+  });
+
+  it('opens the question-paper print preview in a new tab', () => {
+    const persistedDocument = structuredClone(mockPaperDocumentV1);
+    persistedDocument.paper.id = 'paper_123';
+    const open = vi.fn();
+    vi.stubGlobal('open', open);
+
+    openPaperPrintPreview(persistedDocument);
+
+    expect(open).toHaveBeenCalledWith(
+      '/editor/paper_123/print',
+      '_blank',
+      'noopener,noreferrer',
+    );
   });
 
   it('saves the canonical draft before approving the backend paper', async () => {

@@ -60,6 +60,43 @@ describe('PaperDocumentView', () => {
     );
   });
 
+  it('prints OR before the second filled slot in a CBSE internal-choice pair', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const [firstSlot, secondSlot] = document.paper.sections[0].slots;
+    firstSlot.number = '16';
+    secondSlot.number = '16';
+    firstSlot.orGroup = 12;
+    secondSlot.orGroup = 12;
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('aria-label="Internal choice"');
+    expect(html).toContain('>OR</li>');
+    expect(
+      html.match(/<span class="paper-question-number">16\.<\/span>/g),
+    ).toHaveLength(2);
+  });
+
+  it('does not print OR before an empty internal-choice slot', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const [firstSlot, secondSlot] = document.paper.sections[0].slots;
+    firstSlot.number = '38';
+    secondSlot.number = '38';
+    firstSlot.orGroup = 12;
+    secondSlot.orGroup = 12;
+    secondSlot.selectedQuestionId = null;
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).not.toContain('aria-label="Internal choice"');
+    expect(html).not.toContain('>OR</li>');
+    expect(html).toContain('No question selected');
+  });
+
   it('uses format layout rules for MCQ options and right-column marks', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     document.format.layout.mcqOptions = 'two_column';

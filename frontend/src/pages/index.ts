@@ -1,4 +1,5 @@
 export { default as LoginPage } from './login.page';
+export { default as WelcomePage } from './welcome.page';
 export { default as DashboardPage } from './dashboard.page';
 export { default as UploadPapersPage } from './upload-papers.page';
 export { default as QuestionBankPage } from './question-bank.page';

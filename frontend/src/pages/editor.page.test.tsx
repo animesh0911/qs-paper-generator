@@ -48,9 +48,10 @@ describe('editor final download flow', () => {
     };
   }
 
-  it('downloads immediately when the draft is clean', async () => {
+  it('opens the print preview and downloads immediately when the draft is clean', async () => {
     const persist = vi.fn(async () => undefined);
     const download = vi.fn(async () => undefined);
+    const preview = vi.fn();
 
     await saveThenDownloadPdfPackage({
       documentSnapshot: mockPaperDocumentV1,
@@ -58,15 +59,19 @@ describe('editor final download flow', () => {
       dirty: false,
       persist,
       download,
+      preview,
     });
 
     expect(persist).not.toHaveBeenCalled();
+    expect(preview).toHaveBeenCalledWith(mockPaperDocumentV1);
+    expect(preview).toHaveBeenCalledBefore(download);
     expect(download).toHaveBeenCalledWith(mockPaperDocumentV1);
   });
 
-  it('saves a dirty draft before downloading the package', async () => {
+  it('saves a dirty draft before previewing and downloading the package', async () => {
     const persist = vi.fn(async () => undefined);
     const download = vi.fn(async () => undefined);
+    const preview = vi.fn();
 
     await saveThenDownloadPdfPackage({
       documentSnapshot: mockPaperDocumentV1,
@@ -74,17 +79,20 @@ describe('editor final download flow', () => {
       dirty: true,
       persist,
       download,
+      preview,
     });
 
-    expect(persist).toHaveBeenCalledBefore(download);
+    expect(persist).toHaveBeenCalledBefore(preview);
+    expect(preview).toHaveBeenCalledBefore(download);
     expect(download).toHaveBeenCalledWith(mockPaperDocumentV1);
   });
 
-  it('does not download when the dirty save fails', async () => {
+  it('does not preview or download when the dirty save fails', async () => {
     const persist = vi.fn(async () => {
       throw new Error('save failed');
     });
     const download = vi.fn(async () => undefined);
+    const preview = vi.fn();
 
     await expect(
       saveThenDownloadPdfPackage({
@@ -93,9 +101,11 @@ describe('editor final download flow', () => {
         dirty: true,
         persist,
         download,
+        preview,
       }),
     ).rejects.toThrow('save failed');
 
+    expect(preview).not.toHaveBeenCalled();
     expect(download).not.toHaveBeenCalled();
   });
 

@@ -39,6 +39,9 @@ const UPCOMING_CHAPTERS: { order: number; name: string }[] = [
 ];
 
 export interface BulkQuestionGenerationSetupProps {
+  batches?: GenerationBatch[];
+  batchesLoading?: boolean;
+  batchesError?: string;
   chapters: Chapter[];
   chaptersLoading: boolean;
   chaptersError: string;
@@ -57,6 +60,7 @@ export interface BulkQuestionGenerationSetupProps {
   onDifficultyChange: (difficulty: GenerationDifficultyLabel) => void;
   onStart: () => void;
   onOpenActiveBatch?: () => void;
+  onOpenBatch?: (batchId: number) => void;
 }
 
 function formatPageRange(topic: ChapterTopicNode): string {
@@ -97,6 +101,9 @@ function formatTopicTitle(title: string): string {
 }
 
 export function BulkQuestionGenerationSetup({
+  batches = [],
+  batchesLoading = false,
+  batchesError = '',
   chapters,
   chaptersLoading,
   chaptersError,
@@ -115,6 +122,7 @@ export function BulkQuestionGenerationSetup({
   onDifficultyChange,
   onStart,
   onOpenActiveBatch,
+  onOpenBatch,
 }: BulkQuestionGenerationSetupProps) {
   const selectedTopicCount = selectedTopicIds.size;
   const selectedChapter = chapters.find(
@@ -122,9 +130,66 @@ export function BulkQuestionGenerationSetup({
   );
   const canStart =
     Boolean(selectedChapterSlug) && selectedTopicCount > 0 && !busy;
+  const reviewableBatches = batches.filter((batch) =>
+    ['queued', 'generating_questions', 'validating', 'ready_for_review'].includes(
+      batch.status,
+    ),
+  );
 
   return (
     <div className="space-y-5 rounded-lg border border-white/70 bg-white/55 p-4">
+      {(batchesLoading || batchesError || reviewableBatches.length > 0) && (
+        <section className="space-y-3 rounded-lg border border-white/70 bg-white/60 p-3">
+          <div>
+            <p className="text-sm font-medium">Generation drafts</p>
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">
+              Return to an in-progress batch or review generated Q&amp;A that is ready.
+            </p>
+          </div>
+          {batchesLoading && (
+            <p className="text-sm text-muted-foreground">Checking for drafts…</p>
+          )}
+          {batchesError && (
+            <p className="text-sm text-muted-foreground" role="alert">
+              {batchesError}
+            </p>
+          )}
+          {reviewableBatches.length > 0 && (
+            <ul className="space-y-2">
+              {reviewableBatches.map((batch) => {
+                const ready = batch.status === 'ready_for_review';
+                return (
+                  <li
+                    key={batch.id}
+                    className="flex flex-col gap-2 rounded-lg border border-white/70 bg-white/70 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <span className="text-sm leading-5">
+                      <span className="font-medium">
+                        Batch #{batch.id} · {ready ? 'Ready for review' : 'Generating'}
+                      </span>
+                      <span className="block text-muted-foreground">
+                        {ready
+                          ? `${batch.candidate_count} candidate${batch.candidate_count === 1 ? '' : 's'} ready`
+                          : 'We’ll update this when candidates are ready.'}
+                      </span>
+                    </span>
+                    {onOpenBatch && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={ready ? 'default' : 'outline'}
+                        onClick={() => onOpenBatch(batch.id)}
+                      >
+                        {ready ? 'Review draft' : 'View progress'}
+                      </Button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      )}
       <fieldset className="space-y-2">
         <legend className="text-[0.8125rem] font-medium leading-5">
           Difficulty

@@ -6,6 +6,7 @@ import Dashboard from './dashboard.page';
 vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ state: null }),
+  Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
   NavLink: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
 

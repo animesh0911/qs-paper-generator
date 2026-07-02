@@ -98,7 +98,22 @@ async function request(
   return res;
 }
 
-async function authResult(path: string, email: string, password: string) {
+export interface AuthUser {
+  id: number;
+  email: string;
+  school?: number | null;
+}
+
+export interface AuthResponse {
+  token: string;
+  user?: AuthUser;
+}
+
+async function authResult(
+  path: string,
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   const res = await request(
     path,
     {
@@ -107,7 +122,7 @@ async function authResult(path: string, email: string, password: string) {
     },
     null,
   );
-  const data = await res.json();
+  const data = (await res.json()) as AuthResponse;
   setToken(data.token);
   return data;
 }
@@ -266,6 +281,16 @@ export async function fetchPaperFormats(): Promise<PaperFormatSummary[]> {
   return res.json();
 }
 
+const DOWNLOAD_OBJECT_URL_REVOKE_DELAY_MS = 60_000;
+
+export function openPaperPrintPreview(paper: PaperDocument) {
+  globalThis.open?.(
+    `/editor/${paper.paper.id}/print`,
+    '_blank',
+    'noopener,noreferrer',
+  );
+}
+
 export async function downloadPaperPdfPackage(paper: PaperDocument) {
   const paperId = paper.paper.id;
   const id = paperId.replace(/^paper_/, '');
@@ -280,7 +305,10 @@ export async function downloadPaperPdfPackage(paper: PaperDocument) {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
+  setTimeout(
+    () => URL.revokeObjectURL(url),
+    DOWNLOAD_OBJECT_URL_REVOKE_DELAY_MS,
+  );
 }
 
 /**

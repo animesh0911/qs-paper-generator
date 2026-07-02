@@ -140,21 +140,19 @@ describe('CoverageFormView', () => {
     );
 
     expect(html).toContain('Total marks');
-    expect(html).toContain('Set by the selected PaperFormat');
     expect(html).toContain('readOnly=""');
     expect(html).toContain('Paper structure');
     expect(html).toContain('Marks by QuestionType');
     expect(html).toContain('≈ 39');
   });
 
-  it('keeps Advanced settings collapsed by default', () => {
+  it('omits Advanced settings for the MVP setup surface', () => {
     const html = renderToStaticMarkup(
       <CoverageFormView form={makeForm()} busy={false} onGenerate={vi.fn()} />,
     );
 
-    expect(html).toContain('<details');
-    expect(html).not.toContain('<details open');
-    expect(html).toContain('Advanced settings');
+    expect(html).not.toContain('Advanced settings');
+    expect(html).not.toContain('Difficulty');
   });
 
   it('disables chapter bulk controls while chapters are loading', () => {

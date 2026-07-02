@@ -8,12 +8,13 @@
  *
  * @module AiQaPage
  */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   createGenerationBatch,
   fetchChapters,
   fetchChapterTopics,
+  fetchGenerationBatches,
 } from '@/lib/api';
 import { buildGenerationBatchPayload } from '@/lib/question-generation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,7 @@ import { BulkQuestionGenerationSetup } from '@/components/question-generation';
 import type {
   Chapter,
   ChapterTopicNode,
+  GenerationBatch,
   GenerationDifficultyLabel,
 } from '@/types';
 
@@ -51,6 +53,28 @@ export default function AiQaPage() {
     useState<GenerationDifficultyLabel>('Standard');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [batches, setBatches] = useState<GenerationBatch[]>([]);
+  const [batchesLoading, setBatchesLoading] = useState(true);
+  const [batchesError, setBatchesError] = useState('');
+
+  const loadBatches = useCallback(async () => {
+    try {
+      const nextBatches = await fetchGenerationBatches();
+      setBatches(nextBatches.slice().reverse());
+      setBatchesError('');
+    } catch (err) {
+      setBatches([]);
+      setBatchesError((err as Error).message);
+    } finally {
+      setBatchesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadBatches();
+    const timer = window.setInterval(() => void loadBatches(), 5000);
+    return () => window.clearInterval(timer);
+  }, [loadBatches]);
 
   useEffect(() => {
     let cancelled = false;
@@ -145,8 +169,10 @@ export default function AiQaPage() {
       const batch = await createGenerationBatch(payload);
       navigate(`/generation-batches/${batch.id}`);
     } catch (err) {
-      // A 409 here means the per-teacher queue cap is reached; surface it.
+      // A 409 here means the per-teacher queue cap is reached; surface it and
+      // refresh the draft list so the teacher can jump to the blocking batch.
       setError((err as Error).message);
+      void loadBatches();
     } finally {
       setBusy(false);
     }
@@ -172,6 +198,9 @@ export default function AiQaPage() {
           </CardHeader>
           <CardContent className="bg-white/45 px-5 py-6 sm:px-6">
             <BulkQuestionGenerationSetup
+              batches={batches}
+              batchesLoading={batchesLoading}
+              batchesError={batchesError}
               chapters={chapters}
               chaptersLoading={chaptersLoading}
               chaptersError={chaptersError}
@@ -190,6 +219,7 @@ export default function AiQaPage() {
               onDifficultyChange={setDifficulty}
               onStart={start}
               onOpenActiveBatch={() => {}}
+              onOpenBatch={(batchId) => navigate(`/generation-batches/${batchId}`)}
             />
           </CardContent>
         </Card>

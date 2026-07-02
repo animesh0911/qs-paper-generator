@@ -6,6 +6,7 @@ export async function saveThenDownloadPdfPackage({
   dirty,
   persist,
   download,
+  preview,
   onSaved,
 }: {
   documentSnapshot: PaperDocument;
@@ -16,6 +17,7 @@ export async function saveThenDownloadPdfPackage({
     answerDocument: PaperAnswerDocument,
   ) => Promise<void>;
   download: (paper: PaperDocument) => Promise<void>;
+  preview?: (paper: PaperDocument) => void;
   onSaved?: (answerDocument: PaperAnswerDocument) => void;
 }): Promise<PaperAnswerDocument> {
   if (!answerDocument) {
@@ -29,6 +31,7 @@ export async function saveThenDownloadPdfPackage({
     await persist(documentSnapshot, reconciledAnswerDocument);
     onSaved?.(reconciledAnswerDocument);
   }
+  preview?.(documentSnapshot);
   await download(documentSnapshot);
   return reconciledAnswerDocument;
 }
