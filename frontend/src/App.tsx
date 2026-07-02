@@ -18,6 +18,7 @@ import {
   PrintPaperPage,
   QuestionBankPage,
   UploadPapersPage,
+  WelcomePage,
 } from '@/pages';
 
 const EditorPage = lazy(() => import('@/pages/editor.page'));
@@ -111,6 +112,14 @@ export default function App() {
       />
       <Route
         path="/"
+        element={
+          <RequireAuth>
+            <WelcomePage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/generate"
         element={
           <RequireAuth>
             <DashboardPage />

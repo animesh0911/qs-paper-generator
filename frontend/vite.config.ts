@@ -2,9 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// In Docker the dev server proxies /api to the backend service ("web").
-// Override with VITE_API_PROXY for local (non-Docker) runs, e.g. http://localhost:8000
-const apiTarget = process.env.VITE_API_PROXY || 'http://web:8000';
+// Host-side Vite proxies /api to the published Django port. Docker compose
+// overrides this with VITE_API_PROXY=http://web:8000, where the service name is
+// resolvable inside the Compose network.
+const apiTarget = process.env.VITE_API_PROXY || 'http://127.0.0.1:8000';
 
 export default defineConfig({
   plugins: [react()],

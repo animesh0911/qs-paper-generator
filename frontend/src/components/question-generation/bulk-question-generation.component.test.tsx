@@ -143,6 +143,59 @@ describe('BulkQuestionGenerationSetup', () => {
     expect(topicsErrorHtml).toContain('Topics could not be loaded.');
   });
 
+  it('links to in-progress and ready generation drafts from setup', () => {
+    const html = renderToStaticMarkup(
+      <BulkQuestionGenerationSetup
+        {...setupProps({
+          batches: [
+            {
+              id: 41,
+              status: 'generating_questions',
+              chapter_slugs: ['carbon-and-its-compounds'],
+              chapter_map_node_ids: ['carbon:4.1'],
+              topic_names: [],
+              difficulty_preset: 'balanced',
+              requested_count: 10,
+              candidate_count: 0,
+              error: '',
+              ready_at: null,
+              accepted_at: null,
+              expired_at: null,
+              discarded_at: null,
+              created_at: '2026-06-21T00:00:00Z',
+              updated_at: '2026-06-21T00:00:00Z',
+            },
+            {
+              id: 42,
+              status: 'ready_for_review',
+              chapter_slugs: ['carbon-and-its-compounds'],
+              chapter_map_node_ids: ['carbon:4.2'],
+              topic_names: [],
+              difficulty_preset: 'balanced',
+              requested_count: 10,
+              candidate_count: 3,
+              error: '',
+              ready_at: '2026-06-21T00:00:03Z',
+              accepted_at: null,
+              expired_at: null,
+              discarded_at: null,
+              created_at: '2026-06-21T00:00:00Z',
+              updated_at: '2026-06-21T00:00:03Z',
+            },
+          ],
+          onOpenBatch: vi.fn(),
+        })}
+      />,
+    );
+
+    expect(html).toContain('Generation drafts');
+    expect(html).toContain('Batch #41 · Generating');
+    expect(html).toContain('View progress');
+    expect(html).toContain('Batch #42 · Ready for review');
+    expect(html).toContain('3 candidates ready');
+    expect(html).toContain('Review draft');
+  });
+
   it('shows a friendly active-batch message when Q&A is already generating', () => {
     const html = renderToStaticMarkup(
       <BulkQuestionGenerationSetup

@@ -2,8 +2,8 @@
  * Login / Register page — the only anonymous route.
  *
  * Talks directly to `lib/api.login` / `lib/api.register`, which store the
- * returned token in localStorage. On success, navigates to `/` where the
- * Dashboard renders.
+ * returned token in localStorage. On success, navigates to `/` with a small
+ * welcome name for the authenticated welcome screen.
  *
  * @module LoginPage
  */
@@ -27,9 +27,13 @@ export default function Login() {
     setError('');
     setBusy(true);
     try {
-      if (mode === 'login') await login(email, password);
-      else await register(email, password);
-      navigate('/');
+      const result =
+        mode === 'login'
+          ? await login(email, password)
+          : await register(email, password);
+      const welcomeName = displayNameFromEmail(result.user?.email || email);
+      rememberWelcomeName(welcomeName);
+      navigate('/', { state: { welcomeName } });
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -88,4 +92,18 @@ export default function Login() {
       </Card>
     </div>
   );
+}
+
+const WELCOME_NAME_STORAGE_KEY = 'qpg_welcome_name';
+
+function rememberWelcomeName(name: string) {
+  if (typeof sessionStorage === 'undefined') return;
+  sessionStorage.setItem(WELCOME_NAME_STORAGE_KEY, name);
+}
+
+function displayNameFromEmail(email: string): string {
+  const localPart = email.split('@')[0] || 'teacher';
+  const [firstName] = localPart.split(/[._-]+/).filter(Boolean);
+  if (!firstName) return 'Teacher';
+  return firstName.charAt(0).toUpperCase() + firstName.slice(1);
 }

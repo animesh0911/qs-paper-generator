@@ -105,6 +105,7 @@ export interface EditorPaperSlotView {
   showMarksLabel: boolean;
   questionText: string;
   questionType: string;
+  internalChoicePrefix?: string;
   locked: boolean;
   editCapabilities: EditorSlotCapabilities;
   modifiedFromSource: boolean;
@@ -123,6 +124,7 @@ export interface EditorPaperSectionView {
   instructions?: string;
   instructionsBlock?: EditorPaperChromeBlock;
   slots: EditorPaperSlotView[];
+  logicalSlotCount: number;
 }
 
 export interface EditorPaperOutlineItem {
@@ -182,6 +184,10 @@ export function buildEditorPaperView(
   let lockedSlots = 0;
 
   const sections = document.paper.sections.map((section) => {
+    const logicalSlotCount = countLogicalSlots(section.slots);
+    totalSlots += logicalSlotCount;
+    filledSlots += countFilledLogicalSlots(section.slots);
+    lockedSlots += countLockedLogicalSlots(section.slots);
     const titleBlock = paperChromeBlock(
       `section:${section.id}:title`,
       'section_heading',
@@ -204,8 +210,6 @@ export function buildEditorPaperView(
     const slotNumberCounts = countSlotNumbers(section.slots);
     const seenSlotNumbers = new Map<string, number>();
     const slots = section.slots.map((slot) => {
-      totalSlots += 1;
-      if (slot.locked) lockedSlots += 1;
       const slotNumberSeen = (seenSlotNumbers.get(slot.number) ?? 0) + 1;
       seenSlotNumbers.set(slot.number, slotNumberSeen);
 
@@ -213,9 +217,7 @@ export function buildEditorPaperView(
         ? questionsById.get(slot.selectedQuestionId)
         : undefined;
 
-      if (question) {
-        filledSlots += 1;
-      } else {
+      if (!question) {
         warnings.push(
           `${slotWarningLabel(slot, slotNumberSeen, slotNumberCounts.get(slot.number) ?? 1)} has no selected question.`,
         );
@@ -243,6 +245,10 @@ export function buildEditorPaperView(
         questionText:
           firstRegionText ?? question?.rawText ?? 'No question selected.',
         questionType: slot.type,
+        internalChoicePrefix:
+          slot.orGroup !== undefined && slotNumberSeen > 1 && question
+            ? 'OR'
+            : undefined,
         locked: slot.locked,
         editCapabilities,
         modifiedFromSource: slotOverrides?.modified ?? false,
@@ -279,6 +285,7 @@ export function buildEditorPaperView(
       instructions: section.instructions,
       instructionsBlock,
       slots,
+      logicalSlotCount,
     };
   });
   const chromeBlocks = paperChromeBlocks(document.paper.chromeBlocks, 'chrome');
@@ -333,7 +340,7 @@ export function buildEditorPaperView(
     outline: sections.map((section) => ({
       sectionId: section.sectionId,
       title: section.title,
-      slotCount: section.slots.length,
+      slotCount: section.logicalSlotCount,
       marks: section.marks,
     })),
     validationSummary: {
@@ -351,6 +358,42 @@ function countSlotNumbers(slots: DocSlot[]): Map<string, number> {
     counts.set(slot.number, (counts.get(slot.number) ?? 0) + 1);
   }
   return counts;
+}
+
+function countLogicalSlots(slots: DocSlot[]): number {
+  return logicalSlotGroups(slots).size;
+}
+
+function countFilledLogicalSlots(slots: DocSlot[]): number {
+  return countLogicalSlotsWhere(slots, (group) =>
+    group.every((slot) => Boolean(slot.selectedQuestionId)),
+  );
+}
+
+function countLockedLogicalSlots(slots: DocSlot[]): number {
+  return countLogicalSlotsWhere(slots, (group) =>
+    group.some((slot) => slot.locked),
+  );
+}
+
+function countLogicalSlotsWhere(
+  slots: DocSlot[],
+  predicate: (group: DocSlot[]) => boolean,
+): number {
+  return Array.from(logicalSlotGroups(slots).values()).filter(predicate).length;
+}
+
+function logicalSlotGroups(slots: DocSlot[]): Map<string, DocSlot[]> {
+  const groups = new Map<string, DocSlot[]>();
+  for (const slot of slots) {
+    const key = logicalSlotKey(slot);
+    groups.set(key, [...(groups.get(key) ?? []), slot]);
+  }
+  return groups;
+}
+
+function logicalSlotKey(slot: DocSlot): string {
+  return slot.orGroup === undefined ? `slot:${slot.id}` : `or:${slot.orGroup}`;
 }
 
 function slotWarningLabel(

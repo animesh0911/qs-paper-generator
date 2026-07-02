@@ -37,6 +37,7 @@ import { resolveEditorFixture } from '@/mocks';
 import {
   downloadPaperPdfPackage,
   fetchEditorDraft,
+  openPaperPrintPreview,
   persistEditorDraft,
 } from '@/lib/api';
 import {
@@ -339,6 +340,7 @@ function EditorPageWorkspace({
           dirty,
           persist: persistEditorDraft,
           download: downloadPaperPdfPackage,
+          preview: openPaperPrintPreview,
           onSaved: (savedAnswerDocument) => {
             setCurrentAnswerDocument(savedAnswerDocument);
             setLastSavedDocument(documentSnapshot);
@@ -398,7 +400,7 @@ function EditorPageWorkspace({
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           <Link
-            to={persisted ? '/editor' : '/'}
+            to={persisted ? '/editor' : '/generate'}
             className={buttonVariants({ variant: 'outline', size: 'sm' })}
           >
             <ArrowLeftRight className="mr-2 size-4" />
@@ -873,6 +875,14 @@ function EditorPageWorkspace({
                               onMouseLeave={() => setHoveredSlotId(null)}
                             >
                               <div>
+                                {slot.internalChoicePrefix && (
+                                  <div
+                                    data-editor-chrome
+                                    className="qpg-internal-choice-divider"
+                                  >
+                                    {slot.internalChoicePrefix}
+                                  </div>
+                                )}
                                 <div className="space-y-1">
                                   {slot.questionBlockTree.children.map(
                                     (region) => (

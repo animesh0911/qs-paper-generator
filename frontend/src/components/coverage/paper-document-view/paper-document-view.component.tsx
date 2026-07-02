@@ -14,7 +14,7 @@
  *
  * @module PaperDocumentView
  */
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import { MathExpression } from '@/components/math/math-expression.component';
 import { contentItemsToPlainText } from '@/lib/content-items';
 import { getPaperFormatRendererResult } from '@/lib/paper-format-renderers';
@@ -84,11 +84,13 @@ export function PaperDocumentView({
                 )}
               </header>
               <ol className="paper-questions">
-                {slots.map(({ slot, question }) => (
-                  <PrintQuestion
+                {slots.map(({ slot, question }, index) => (
+                  <PrintQuestionWithChoiceMarker
                     key={slot.id}
                     slot={slot}
                     question={question}
+                    slots={slots.map((entry) => entry.slot)}
+                    index={index}
                     marksPlacement={paper.format.layout.marks}
                     mcqLayout={paper.format.layout.mcqOptions}
                   />
@@ -149,57 +151,62 @@ export function PaperDocumentView({
               </p>
             )}
             <ol className={printMode ? 'paper-questions' : 'space-y-3'}>
-              {slots.map(({ slot, question }) => (
-                <li
-                  key={slot.id}
-                  className={printMode ? 'paper-question' : 'text-sm'}
-                >
-                  <span
-                    className={
-                      printMode ? 'paper-question-number' : 'font-medium'
-                    }
-                  >
-                    Q{slot.number}.
-                  </span>{' '}
-                  {question ? (
-                    <>
-                      {compactQuestionText(question)}{' '}
-                      <span
-                        className={
-                          printMode ? 'paper-marks' : 'text-muted-foreground'
-                        }
-                      >
-                        ({slot.marks} mark{slot.marks !== 1 ? 's' : ''})
-                      </span>
-                      {question.content.options &&
-                        question.content.options.length > 0 && (
-                          <ul
-                            className={
-                              printMode
-                                ? 'paper-options'
-                                : 'ml-6 mt-1 space-y-0.5 text-muted-foreground'
-                            }
-                          >
-                            {question.content.options.map((option) => (
-                              <li key={option.label}>
-                                ({option.label}) {compactOptionContentText(option)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                    </>
-                  ) : (
+              {slots.map(({ slot, question }, index) => (
+                <Fragment key={slot.id}>
+                  {isInternalChoiceContinuation(
+                    slot,
+                    slots.map((entry) => entry.slot),
+                    index,
+                  ) && <li className="paper-or-divider">OR</li>}
+                  <li className={printMode ? 'paper-question' : 'text-sm'}>
                     <span
                       className={
-                        printMode
-                          ? 'paper-unfilled'
-                          : 'text-muted-foreground italic'
+                        printMode ? 'paper-question-number' : 'font-medium'
                       }
                     >
-                      No question selected ({slot.marks}m)
-                    </span>
-                  )}
-                </li>
+                      Q{slot.number}.
+                    </span>{' '}
+                    {question ? (
+                      <>
+                        {compactQuestionText(question)}{' '}
+                        <span
+                          className={
+                            printMode ? 'paper-marks' : 'text-muted-foreground'
+                          }
+                        >
+                          ({slot.marks} mark{slot.marks !== 1 ? 's' : ''})
+                        </span>
+                        {question.content.options &&
+                          question.content.options.length > 0 && (
+                            <ul
+                              className={
+                                printMode
+                                  ? 'paper-options'
+                                  : 'ml-6 mt-1 space-y-0.5 text-muted-foreground'
+                              }
+                            >
+                              {question.content.options.map((option) => (
+                                <li key={option.label}>
+                                  ({option.label}){' '}
+                                  {compactOptionContentText(option)}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                      </>
+                    ) : (
+                      <span
+                        className={
+                          printMode
+                            ? 'paper-unfilled'
+                            : 'text-muted-foreground italic'
+                        }
+                      >
+                        No question selected ({slot.marks}m)
+                      </span>
+                    )}
+                  </li>
+                </Fragment>
               ))}
             </ol>
           </section>
@@ -297,6 +304,38 @@ function PrintInstructionBlocks({ paper }: { paper: PaperDocument }) {
         </section>
       )}
     </div>
+  );
+}
+
+function PrintQuestionWithChoiceMarker({
+  slot,
+  question,
+  slots,
+  index,
+  marksPlacement,
+  mcqLayout,
+}: {
+  slot: DocSlot;
+  question: DocQuestion | null;
+  slots: DocSlot[];
+  index: number;
+  marksPlacement: string;
+  mcqLayout: string;
+}) {
+  return (
+    <>
+      {isInternalChoiceContinuation(slot, slots, index) && (
+        <li className="paper-or-divider" aria-label="Internal choice">
+          OR
+        </li>
+      )}
+      <PrintQuestion
+        slot={slot}
+        question={question}
+        marksPlacement={marksPlacement}
+        mcqLayout={mcqLayout}
+      />
+    </>
   );
 }
 
@@ -569,6 +608,17 @@ function compactOptionContentText(option: ChoiceOption) {
 
 function compactQuestionText(question: DocQuestion) {
   return contentItemsToPlainText(question.content.stem) || question.rawText;
+}
+
+function isInternalChoiceContinuation(
+  slot: DocSlot,
+  slots: DocSlot[],
+  index: number,
+): boolean {
+  if (slot.orGroup === undefined || !slot.selectedQuestionId) return false;
+  return (
+    slots.findIndex((candidate) => candidate.orGroup === slot.orGroup) < index
+  );
 }
 
 function chromeBlock(

@@ -7,6 +7,7 @@ import UploadPapersPage from './upload-papers.page';
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
+  Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
   NavLink: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
 

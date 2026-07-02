@@ -513,6 +513,26 @@ describe('editor paper view model', () => {
     );
   });
 
+  it('counts internal-choice pairs as one CBSE question in outline and validation totals', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const [firstSlot, secondSlot] = document.paper.sections[0].slots;
+    firstSlot.number = '16';
+    secondSlot.number = '16';
+    firstSlot.orGroup = 12;
+    secondSlot.orGroup = 12;
+
+    const view = buildEditorPaperView(document);
+
+    expect(view.outline[0]).toMatchObject({ slotCount: 4 });
+    expect(view.sections[0].slots[0].internalChoicePrefix).toBeUndefined();
+    expect(view.sections[0].slots[1].internalChoicePrefix).toBe('OR');
+    expect(view.validationSummary).toMatchObject({
+      totalSlots: 8,
+      filledSlots: 8,
+      lockedSlots: 1,
+    });
+  });
+
   it('disambiguates unfilled internal-choice slots in validation warnings', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const [firstSlot, secondSlot] = document.paper.sections[0].slots;
@@ -525,6 +545,12 @@ describe('editor paper view model', () => {
 
     const view = buildEditorPaperView(document);
 
+    expect(view.sections[0].slots[0].internalChoicePrefix).toBeUndefined();
+    expect(view.sections[0].slots[1].internalChoicePrefix).toBeUndefined();
+    expect(view.validationSummary).toMatchObject({
+      totalSlots: 8,
+      filledSlots: 7,
+    });
     expect(view.validationSummary.warnings).toEqual(
       expect.arrayContaining([
         'Slot 16 (choice 1 of 2) has no selected question.',
