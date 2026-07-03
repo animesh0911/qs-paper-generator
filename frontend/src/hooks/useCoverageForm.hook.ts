@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fetchChapters, fetchPaperFormats } from '@/lib/api';
-import type { AssembleRequest, Chapter, PaperFormatSummary } from '@/types';
+import { fetchChapters, fetchPaperFormats, fetchPaperSources } from '@/lib/api';
+import type {
+  AssembleRequest,
+  Chapter,
+  PaperFormatSummary,
+  PaperSourceSummary,
+} from '@/types';
 
 type Difficulty = NonNullable<AssembleRequest['difficulty']>;
 export const DIFFICULTIES: Difficulty[] = ['easy', 'standard', 'hard'];
@@ -26,6 +31,9 @@ export interface CoverageForm {
   chaptersLoading: boolean;
   chaptersError: string;
   formats: PaperFormatSummary[];
+  sources: PaperSourceSummary[];
+  sourcesLoading: boolean;
+  sourcesError: string;
   selectedFormatId: string;
   selectedFormat?: PaperFormatSummary;
   totalMarks: number;
@@ -33,7 +41,11 @@ export interface CoverageForm {
   chapterNameBySlug: Record<string, string>;
   selectedSlugs: Set<string>;
   difficulty: Difficulty;
+  selectedSourceKeys: Set<string>;
   hasSelectedChapters: boolean;
+  toggleSource: (key: string) => void;
+  selectAllSources: () => void;
+  clearAllSources: () => void;
   toggleChapter: (slug: string) => void;
   selectAllChapters: () => void;
   clearAllChapters: () => void;
@@ -48,15 +60,18 @@ export function buildCoverageAssemblePayload({
   selectedFormatId,
   difficulty,
   selectedSlugs,
+  selectedSourceKeys,
 }: {
   selectedFormatId: string;
   difficulty: Difficulty;
   selectedSlugs: Set<string>;
+  selectedSourceKeys: Set<string>;
 }): AssembleRequest {
   return {
     ...(selectedFormatId ? { format_id: selectedFormatId } : {}),
     difficulty,
     chapter_slugs: Array.from(selectedSlugs),
+    preferred_source_keys: Array.from(selectedSourceKeys),
   };
 }
 
@@ -164,11 +179,17 @@ export function useCoverageForm(): CoverageForm {
   const [chaptersLoading, setChaptersLoading] = useState(true);
   const [chaptersError, setChaptersError] = useState('');
   const [formats, setFormats] = useState<PaperFormatSummary[]>([]);
+  const [sources, setSources] = useState<PaperSourceSummary[]>([]);
+  const [sourcesLoading, setSourcesLoading] = useState(true);
+  const [sourcesError, setSourcesError] = useState('');
   const [selectedFormatId, setSelectedFormatId] = useState(
     saved.selectedFormatId,
   );
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(
     new Set(saved.selectedSlugs),
+  );
+  const [selectedSourceKeys, setSelectedSourceKeys] = useState<Set<string>>(
+    new Set(saved.selectedSourceKeys),
   );
   const [difficulty, setDifficulty] = useState<Difficulty>(saved.difficulty);
   const [totalMarks, setTotalMarks] = useState(saved.totalMarks);
@@ -199,17 +220,59 @@ export function useCoverageForm(): CoverageForm {
       .catch(() => setFormats([]));
   }, []);
 
+  const selectedChapterSlugs = useMemo(
+    () => Array.from(selectedSlugs).sort(),
+    [selectedSlugs],
+  );
+  const selectedChapterSourceKey = selectedChapterSlugs.join('|');
+
+  useEffect(() => {
+    if (selectedChapterSlugs.length === 0) {
+      setSources([]);
+      setSourcesError('');
+      setSourcesLoading(false);
+      setSelectedSourceKeys(new Set());
+      return;
+    }
+
+    let cancelled = false;
+    setSourcesLoading(true);
+    fetchPaperSources(selectedChapterSlugs)
+      .then((nextSources) => {
+        if (cancelled) return;
+        const validKeys = new Set(nextSources.map((source) => source.key));
+        setSources(nextSources);
+        setSelectedSourceKeys(
+          (current) =>
+            new Set([...current].filter((key) => validKeys.has(key))),
+        );
+        setSourcesError('');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setSources([]);
+        setSourcesError((err as Error).message);
+      })
+      .finally(() => {
+        if (!cancelled) setSourcesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedChapterSourceKey]);
+
   useEffect(() => {
     sessionStorage.setItem(
       COVERAGE_FORM_STORAGE_KEY,
       JSON.stringify({
         selectedFormatId,
         selectedSlugs: Array.from(selectedSlugs),
+        selectedSourceKeys: Array.from(selectedSourceKeys),
         difficulty,
         totalMarks,
       }),
     );
-  }, [selectedFormatId, selectedSlugs, difficulty, totalMarks]);
+  }, [selectedFormatId, selectedSlugs, selectedSourceKeys, difficulty, totalMarks]);
 
   const chapterNameBySlug = useMemo(
     () => Object.fromEntries(chapters.map((c) => [c.slug, c.name])),
@@ -229,6 +292,23 @@ export function useCoverageForm(): CoverageForm {
       }),
     [selectedFormat, effectiveTotalMarks],
   );
+
+  function toggleSource(key: string) {
+    setSelectedSourceKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  function selectAllSources() {
+    setSelectedSourceKeys(new Set(sources.map((source) => source.key)));
+  }
+
+  function clearAllSources() {
+    setSelectedSourceKeys(new Set());
+  }
 
   function toggleChapter(slug: string) {
     setSelectedSlugs((prev) => {
@@ -268,6 +348,7 @@ export function useCoverageForm(): CoverageForm {
       selectedFormatId,
       difficulty,
       selectedSlugs,
+      selectedSourceKeys,
     });
   }
 
@@ -277,6 +358,9 @@ export function useCoverageForm(): CoverageForm {
     chaptersLoading,
     chaptersError,
     formats,
+    sources,
+    sourcesLoading,
+    sourcesError,
     selectedFormatId,
     selectedFormat,
     totalMarks: structureSummary.totalMarks,
@@ -284,7 +368,11 @@ export function useCoverageForm(): CoverageForm {
     chapterNameBySlug,
     selectedSlugs,
     difficulty,
+    selectedSourceKeys,
     hasSelectedChapters: selectedSlugs.size > 0,
+    toggleSource,
+    selectAllSources,
+    clearAllSources,
     toggleChapter,
     selectAllChapters,
     clearAllChapters,
@@ -337,6 +425,7 @@ function scaleSummary(
 function readSavedCoverageForm(): {
   selectedFormatId: string;
   selectedSlugs: string[];
+  selectedSourceKeys: string[];
   difficulty: Difficulty;
   totalMarks: number;
 } {
@@ -353,6 +442,11 @@ function readSavedCoverageForm(): {
       selectedSlugs: Array.isArray(parsed.selectedSlugs)
         ? parsed.selectedSlugs.filter(
             (slug): slug is string => typeof slug === 'string',
+          )
+        : [],
+      selectedSourceKeys: Array.isArray(parsed.selectedSourceKeys)
+        ? parsed.selectedSourceKeys.filter(
+            (key): key is string => typeof key === 'string',
           )
         : [],
       difficulty: DIFFICULTIES.includes(parsed.difficulty as Difficulty)
@@ -373,6 +467,7 @@ function emptySavedCoverageForm() {
   return {
     selectedFormatId: '',
     selectedSlugs: [] as string[],
+    selectedSourceKeys: [] as string[],
     difficulty: 'standard' as Difficulty,
     totalMarks: DEFAULT_TOTAL_MARKS,
   };

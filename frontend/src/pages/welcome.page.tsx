@@ -6,28 +6,34 @@
  *
  * @module WelcomePage
  */
+import type { CSSProperties } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, FileText, Sparkles, UploadCloud } from 'lucide-react';
-import { AppHeader } from '@/components/app-nav';
+import {
+  ArrowDown,
+  ArrowUpRight,
+  FileText,
+  Sparkles,
+  UploadCloud,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const WORKFLOWS = [
   {
     to: '/generate',
     title: 'Generate',
-    description: 'Build a CBSE paper from selected chapters.',
+    description: 'Build from the bank.',
     icon: FileText,
   },
   {
     to: '/upload',
     title: 'Upload',
-    description: 'Add PDF papers to grow the question bank.',
+    description: 'Add PDFs.',
     icon: UploadCloud,
   },
   {
     to: '/ai-qa',
     title: 'AI Q&A',
-    description: 'Draft question-and-answer candidates.',
+    description: 'Create candidates.',
     icon: Sparkles,
   },
 ] as const;
@@ -38,30 +44,24 @@ export default function WelcomePage() {
 
   return (
     <div className="min-h-screen bg-secondary">
-      <AppHeader />
-
-      <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center px-4 py-8 sm:px-6">
+      <main className="mx-auto flex min-h-screen max-w-6xl items-center px-4 py-8 sm:px-6 lg:py-10">
         <section aria-labelledby="welcome-heading" className="w-full">
-          <div className="mb-6 max-w-2xl">
+          <div className="mb-7 max-w-2xl lg:mb-8">
             <p className="text-sm font-medium text-muted-foreground">
-              Class 10 Science exam desk
+              Exam desk
             </p>
             <h1
               id="welcome-heading"
-              className="mt-2 text-2xl font-semibold leading-8 tracking-[-0.01em] text-foreground sm:text-3xl sm:leading-10"
+              className="mt-2 text-3xl font-semibold leading-9 tracking-[-0.01em] text-foreground"
             >
               Welcome, {welcomeName}.
             </h1>
-            <p className="mt-1 text-lg font-medium leading-7 text-foreground/80">
-              What would you like to do?
+            <p className="mt-2 text-base leading-7 text-muted-foreground">
+              Upload and AI Q&A feed the bank. Generate uses it.
             </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
-            {WORKFLOWS.map((workflow) => (
-              <WorkflowCard key={workflow.to} workflow={workflow} />
-            ))}
-          </div>
+          <ConvergeDiagram />
         </section>
       </main>
     </div>
@@ -81,35 +81,125 @@ function resolveWelcomeName(state: unknown): string {
   return sessionStorage.getItem(WELCOME_NAME_STORAGE_KEY) || 'Teacher';
 }
 
-function WorkflowCard({ workflow }: { workflow: (typeof WORKFLOWS)[number] }) {
+function ConvergeDiagram() {
+  const upload = WORKFLOWS[1];
+  const aiQa = WORKFLOWS[2];
+  const generate = WORKFLOWS[0];
+
+  return (
+    <div className="qpg-flow-stage relative overflow-hidden rounded-lg border bg-background p-4 sm:p-5 lg:p-7">
+      <div className="hidden lg:block" aria-hidden="true">
+        <div className="qpg-flow-line qpg-flow-line-east absolute left-[31%] top-[29%] h-px w-[19%]" />
+        <div className="qpg-flow-line qpg-flow-line-east absolute left-[31%] top-[71%] h-px w-[19%]" />
+        <div className="qpg-flow-line qpg-flow-line-south absolute left-1/2 top-[29%] h-[42%] w-px" />
+        <div className="qpg-flow-line qpg-flow-line-east qpg-flow-line-final absolute left-1/2 top-1/2 h-px w-[28%]" />
+      </div>
+      <FlowBridge variant="desktop" />
+
+      <div className="relative grid gap-5 lg:grid-cols-[minmax(220px,0.9fr)_minmax(132px,0.38fr)_minmax(240px,0.9fr)] lg:items-center">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <WorkflowNode workflow={upload} tone="source" animationOrder={1} />
+          <WorkflowNode workflow={aiQa} tone="source" animationOrder={2} />
+        </div>
+
+        <FlowBridge variant="mobile" />
+        <div className="hidden lg:block" aria-hidden="true" />
+        <WorkflowNode workflow={generate} tone="primary" animationOrder={4} />
+      </div>
+    </div>
+  );
+}
+
+function FlowBridge({ variant }: { variant: 'desktop' | 'mobile' }) {
+  return (
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-2 py-1 text-muted-foreground',
+        variant === 'desktop'
+          ? 'absolute left-1/2 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 lg:flex'
+          : 'qpg-flow-node lg:hidden',
+      )}
+      style={{ '--qpg-flow-order': 3 } as CSSProperties}
+    >
+      <ArrowDown className="size-4 lg:hidden" aria-hidden="true" />
+      <span className="qpg-flow-bridge-label rounded-md border bg-background px-2.5 py-1 text-[0.6875rem] font-medium leading-4 text-foreground/70">
+        Question bank
+      </span>
+      <ArrowDown className="size-4 lg:hidden" aria-hidden="true" />
+    </div>
+  );
+}
+
+function WorkflowNode({
+  workflow,
+  tone,
+  animationOrder,
+}: {
+  workflow: (typeof WORKFLOWS)[number];
+  tone: 'source' | 'primary';
+  animationOrder: 1 | 2 | 4;
+}) {
   const Icon = workflow.icon;
+  const isPrimary = tone === 'primary';
 
   return (
     <Link
       to={workflow.to}
+      style={{ '--qpg-flow-order': animationOrder } as CSSProperties}
       className={cn(
-        'group flex min-h-48 flex-col rounded-xl border bg-background p-5 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'qpg-flow-card qpg-flow-node group flex min-h-40 flex-col rounded-lg border bg-background p-5 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         'hover:border-foreground/25 hover:bg-secondary/35 active:bg-secondary/55',
+        isPrimary && 'border-foreground/25 hover:bg-secondary/70',
       )}
       aria-label={workflow.title}
     >
-      <div className="flex size-11 items-center justify-center rounded-lg border bg-secondary/55 text-foreground transition-colors duration-200 group-hover:bg-foreground group-hover:text-background">
-        <Icon className="size-5" aria-hidden="true" />
+      <div
+        className={cn(
+          'flex size-9 shrink-0 items-center justify-center rounded-md border transition-colors duration-200',
+          isPrimary
+            ? 'bg-background/85 text-foreground'
+            : 'bg-secondary/55 text-foreground group-hover:bg-foreground group-hover:text-background',
+        )}
+      >
+        <Icon className="size-[1.0625rem]" aria-hidden="true" />
       </div>
 
-      <div className="mt-5">
-        <h2 className="text-xl font-semibold leading-7 text-foreground">
+      <div className="mt-3 min-w-0">
+        <p
+          className={cn(
+            'text-[0.6875rem] font-medium leading-4',
+            isPrimary ? 'text-foreground/70' : 'text-muted-foreground',
+          )}
+        >
+          {isPrimary ? 'Uses bank' : 'Feeds bank'}
+        </p>
+        <h2
+          className={cn(
+            'mt-0.5 text-lg font-semibold leading-7',
+            isPrimary ? 'text-foreground' : 'text-foreground',
+          )}
+        >
           {workflow.title}
         </h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        <p
+          className={cn(
+            'mt-1 text-[0.9375rem] leading-6',
+            isPrimary ? 'text-muted-foreground' : 'text-muted-foreground',
+          )}
+        >
           {workflow.description}
         </p>
       </div>
 
-      <div className="mt-auto flex items-center justify-between pt-6 text-sm font-medium text-foreground">
-        <span>Open</span>
-        <ArrowRight
-          className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+      <div
+        className={cn(
+          'mt-auto flex w-full items-center justify-end gap-1 pt-4 text-[0.6875rem] font-medium leading-4',
+          isPrimary ? 'text-foreground' : 'text-foreground',
+        )}
+      >
+        <span className="text-foreground/70">{isPrimary ? 'Generate' : 'Open'}</span>
+        <ArrowUpRight
+          className="size-3 shrink-0 text-foreground/55 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
           aria-hidden="true"
         />
       </div>

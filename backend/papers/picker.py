@@ -53,6 +53,10 @@ class PaperOptions:
     reuse_question_ids: set[int] = field(default_factory=set)
     # Selected format ID echoed into request.filters.formatId in the contract.
     format_id: str | None = None
+    # Question ids from teacher-selected sources. These are a priority signal for
+    # the main paper picks only; alternatives still expose the full compatible
+    # bank so the editor can swap outside the preferred sources.
+    preferred_question_ids: set[int] = field(default_factory=set)
 
 
 @dataclass
@@ -213,7 +217,14 @@ class QuestionPicker:
             candidates = pool.get(key, [])
 
             for slot_idx in slot_indices:
-                pick = cls._pick(candidates, used, chapter_target, cog_target, usage)
+                pick = cls._pick(
+                    candidates,
+                    used,
+                    chapter_target,
+                    cog_target,
+                    usage,
+                    opts.preferred_question_ids,
+                )
                 if pick is None:
                     unfilled.append(
                         {
@@ -299,22 +310,26 @@ class QuestionPicker:
         chapter_target: dict[str, int],
         cog_target: dict[str, int],
         usage: dict[int, int],
+        preferred_question_ids: set[int] | None = None,
     ) -> PoolRow | None:
         """Pick the unused candidate that best fills remaining quotas.
 
         Priority: highest remaining chapter quota, then highest remaining
-        cognitive-level quota, then fewest prior uses (freshness), then lowest
-        id (deterministic). Freshness sits below the quota goals so coverage
-        and difficulty mix are never sacrificed to avoid a repeat.
+        cognitive-level quota, then teacher-selected source priority, then fewest
+        prior uses (freshness), then lowest id (deterministic). Source priority
+        affects the first draft only; alternatives are still built from all
+        compatible candidates.
         """
+        preferred_question_ids = preferred_question_ids or set()
         best: PoolRow | None = None
-        best_key: tuple[int, int, int, int] | None = None
+        best_key: tuple[int, int, int, int, int] | None = None
         for qid, ch_slug, level in candidates:
             if qid in used:
                 continue
             ch_score = chapter_target.get(ch_slug, 0) if ch_slug else 0
             cog_score = cog_target.get(level, 0)
-            key = (-ch_score, -cog_score, usage.get(qid, 0), qid)
+            source_priority = 0 if qid in preferred_question_ids else 1
+            key = (-ch_score, -cog_score, source_priority, usage.get(qid, 0), qid)
             if best_key is None or key < best_key:
                 best = (qid, ch_slug, level)
                 best_key = key

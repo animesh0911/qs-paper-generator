@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mistral OCR + LLM + LangGraph Ingestion Flow</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        background: '#ffffff',
+        primaryColor: '#f8fafc',
+        primaryTextColor: '#020817',
+        primaryBorderColor: '#cbd5e1',
+        lineColor: '#475569',
+        secondaryColor: '#eef2ff',
+        tertiaryColor: '#f1f5f9',
+        fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #020817;
+      --muted: #475569;
+      --soft: #f8fafc;
+      --panel: #f1f5f9;
+      --line: #e2e8f0;
+      --line-strong: #cbd5e1;
+      --code-bg: #0f172a;
+      --code-ink: #e2e8f0;
+      --accent: #1e293b;
+      --success: #166534;
+      --warning: #92400e;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-right: 1px solid var(--line);
+      background: var(--soft);
+      padding: 24px 20px;
+    }
+
+    aside h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    aside p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    nav a {
+      display: block;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #334155;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    nav a:hover,
+    nav a:focus-visible {
+      background: #e2e8f0;
+      color: var(--ink);
+      outline: none;
+    }
+
+    main {
+      width: min(1120px, 100%);
+      padding: 44px 36px 72px;
+    }
+
+    header {
+      max-width: 820px;
+      margin-bottom: 34px;
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      margin-bottom: 14px;
+      padding: 5px 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: var(--soft);
+      color: #334155;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 16px 0 0;
+      color: #334155;
+      font-size: 16px;
+      max-width: 72ch;
+      text-wrap: pretty;
+    }
+
+    section {
+      margin-top: 30px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      line-height: 1.25;
+      letter-spacing: -0.015em;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin: 24px 0 10px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    p { max-width: 76ch; }
+
+    .note {
+      max-width: 860px;
+      padding: 14px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--soft);
+      color: #334155;
+      font-size: 14px;
+    }
+
+    .callout {
+      max-width: 860px;
+      padding: 14px 16px;
+      border: 1px solid #fbbf24;
+      border-radius: var(--radius);
+      background: #fffbeb;
+      color: #78350f;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      max-width: 980px;
+    }
+
+    .tile {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 16px;
+    }
+
+    .tile strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .tile p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .diagram {
+      max-width: 1040px;
+      overflow-x: auto;
+      margin: 18px 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    pre {
+      max-width: 980px;
+      overflow-x: auto;
+      margin: 14px 0;
+      padding: 16px;
+      border-radius: var(--radius);
+      background: var(--code-bg);
+      color: var(--code-ink);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    :not(pre) > code {
+      padding: 2px 5px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+      color: #0f172a;
+    }
+
+    table {
+      width: 100%;
+      max-width: 980px;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--soft);
+      font-weight: 650;
+    }
+
+    .status {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .status.persisted { background: #dcfce7; color: var(--success); }
+    .status.review { background: #fef3c7; color: var(--warning); }
+
+    @media (max-width: 860px) {
+      .shell { display: block; }
+      aside {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      nav {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      nav a { white-space: nowrap; }
+      main { padding: 30px 18px 56px; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h2>Ingestion flow guide</h2>
+      <p>Exact code names for upload, OCR, LLM structuring, LangGraph checkpointing, and approval.</p>
+      <nav aria-label="Page sections">
+        <a href="#big-picture">Big picture</a>
+        <a href="#current-flow">Current flow</a>
+        <a href="#mistral-llm">Mistral + LLM</a>
+        <a href="#langgraph">LangGraph</a>
+        <a href="#approval">Approve button</a>
+        <a href="#function-map">Function map</a>
+      </nav>
+    </aside>
+
+    <main>
+      <header>
+        <div class="label">Question Paper Generator · OCR ingestion</div>
+        <h1>How upload, Mistral OCR, the LLM, and LangGraph work together</h1>
+        <p class="lede">
+          This page explains the current implementation and the change needed if extracted questions should only enter the real Question Bank after a teacher clicks Approve.
+        </p>
+      </header>
+
+      <section id="big-picture">
+        <h2>1. Big picture</h2>
+        <p>
+          Upload is intentionally asynchronous. The frontend uploads a PDF and gets an <code>IngestionJob</code>. A background management command later runs the extraction graph. The graph either uses Gemini native-PDF extraction or the experimental Mistral OCR batch pipeline.
+        </p>
+        <div class="diagram">
+          <pre class="mermaid">flowchart TD
+  A[Teacher uploads PDF] --> B[bank.views.ingest]
+  B --> C[Create IngestionJob: pending]
+  C --> D[drain_ingestion_jobs command]
+  D --> E{EXTRACTION_PIPELINE}
+  E -->|gemini-native-pdf| F[build_extraction_graph]
+  E -->|mistral-ocr-batch| G[build_ocr_batch_extraction_graph]
+  F --> H[LLM extracts structured JSON]
+  G --> I[Mistral OCR gives markdown]
+  I --> J[LLM structures markdown into JSON]
+  H --> K[Ingestor.ingest_extracted]
+  J --> K
+  K --> L[Question.objects.bulk_create]
+  L --> M[Scrollable extracted question review]</pre>
+        </div>
+        <div class="callout">
+          Current behavior: by the time the scrollable review list appears, the rows are already persisted as <code>Question</code> records.
+        </div>
+      </section>
+
+      <section id="current-flow">
+        <h2>2. Current frontend/backend flow</h2>
+        <div class="grid">
+          <div class="tile">
+            <strong>Frontend upload</strong>
+            <p><code>useIngestionUpload.upload()</code> calls <code>uploadIngestionPdf()</code>.</p>
+          </div>
+          <div class="tile">
+            <strong>Backend queue</strong>
+            <p><code>bank.views.ingest()</code> creates an <code>IngestionJob</code>. No OCR or LLM call happens in the HTTP request.</p>
+          </div>
+          <div class="tile">
+            <strong>Background drain</strong>
+            <p><code>drain_ingestion_jobs.Command._process()</code> runs or resumes the LangGraph thread.</p>
+          </div>
+          <div class="tile">
+            <strong>Review list</strong>
+            <p><code>fetchIngestionJobQuestions()</code> calls <code>bank.views.ingest_questions()</code> and renders <code>ExtractedQuestionsPanel</code>.</p>
+          </div>
+        </div>
+        <pre><code>frontend/src/hooks/useIngestionUpload.hook.ts
+  upload()
+    -> uploadIngestionPdf(file, sourceType)
+
+backend/bank/views.py
+  ingest(request)
+    -> IngestionJob.objects.create(...)
+
+backend/bank/management/commands/drain_ingestion_jobs.py
+  Command._process(job)
+    -> Command._run_graph(job)
+    -> graph.invoke(...)
+
+frontend/src/components/ingestion/ingestion-status-card.component.tsx
+  IngestionStatusCard
+    -> ExtractedQuestionsPanel</code></pre>
+      </section>
+
+      <section id="mistral-llm">
+        <h2>3. How Mistral OCR and the LLM work together</h2>
+        <p>
+          Mistral OCR does not decide what a valid bank question is. Its job is to turn PDF pages into markdown. The configured extraction LLM then reads that markdown and emits structured JSON matching the question schema.
+        </p>
+        <div class="diagram">
+          <pre class="mermaid">sequenceDiagram
+  participant PDF as Uploaded PDF bytes
+  participant OCR as MistralOcrClient.process_pdf
+  participant Filter as pages_from_ocr_response + is_english_question_page
+  participant Batch as batch_ocr_markdown
+  participant LLM as MistralOcrMarkdownExtractor.structure_markdown
+  participant Parse as _parse_json_response
+  participant Tail as Ingestor.ingest_extracted
+
+  PDF->>OCR: base64 PDF to /v1/ocr
+  OCR-->>Filter: pages with markdown/text
+  Filter-->>Batch: English question pages only
+  Batch-->>LLM: combined OCR markdown
+  LLM->>LLM: _markdown_extraction_prompt(markdown, schema)
+  LLM->>LLM: chat_model.invoke([HumanMessage])
+  LLM-->>Parse: JSON text
+  Parse-->>Tail: { questions: [...] }</pre>
+        </div>
+        <pre><code>backend/bank/ocr_extractor.py
+  MistralOcrClient.process_pdf(pdf_bytes)
+  pages_from_ocr_response(ocr)
+  is_english_question_page(markdown)
+  batch_ocr_markdown(pages)
+  MistralOcrMarkdownExtractor.structure_markdown(markdown)
+  _markdown_extraction_prompt(markdown, schema)
+  _parse_json_response(response.content)</code></pre>
+      </section>
+
+      <section id="langgraph">
+        <h2>4. How LangGraph is used</h2>
+        <p>
+          LangGraph is the resumable orchestration layer. It stores progress under a stable <code>thread_id</code>, so a killed process can resume without repeating already-checkpointed work.
+        </p>
+        <h3>OCR batch graph shape</h3>
+        <div class="diagram">
+          <pre class="mermaid">flowchart TD
+  A[StateGraph OcrBatchExtractionState] --> B[Node: plan]
+  B --> C{_next_ocr_batch_step}
+  C -->|more batches| D[Node: structure_batch]
+  D --> E{_next_ocr_batch_step}
+  E -->|more batches| D
+  C -->|all done| F[Node: persist]
+  E -->|all done| F
+  F --> G[END]</pre>
+        </div>
+        <h3>Exact LangGraph code concepts</h3>
+        <table>
+          <thead>
+            <tr><th>Concept</th><th>Exact code</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>State</td>
+              <td><code>OcrBatchExtractionState</code></td>
+              <td>The typed dictionary carried between graph nodes.</td>
+            </tr>
+            <tr>
+              <td>Reducer annotation</td>
+              <td><code>payloads: Annotated[list[dict], operator.add]</code></td>
+              <td>When a node returns a new payload list, LangGraph appends it to existing payloads instead of replacing it.</td>
+            </tr>
+            <tr>
+              <td>Nodes</td>
+              <td><code>plan</code>, <code>structure_batch</code>, <code>persist</code></td>
+              <td>Python functions registered with <code>graph.add_node(...)</code>.</td>
+            </tr>
+            <tr>
+              <td>Conditional edge</td>
+              <td><code>graph.add_conditional_edges(..., _next_ocr_batch_step)</code></td>
+              <td>Chooses whether to loop into another batch or move to persist.</td>
+            </tr>
+            <tr>
+              <td>Checkpoint thread</td>
+              <td><code>{"configurable": {"thread_id": job.thread_id}}</code></td>
+              <td>Identifies the resumable graph run for this upload.</td>
+            </tr>
+            <tr>
+              <td>Synchronous checkpointing</td>
+              <td><code>graph.invoke(state, config, durability="sync")</code></td>
+              <td>Writes checkpoints durably after steps so paid work is not lost.</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>class OcrBatchExtractionState(TypedDict, total=False):
+    job_id: int
+    total_pages: int
+    batch_pages: int
+    next_batch: int
+    ocr_pages: list[dict]
+    payloads: Annotated[list[dict], operator.add]
+    created: int
+    skipped: int</code></pre>
+        <pre><code>graph = StateGraph(OcrBatchExtractionState)
+graph.add_node("plan", plan)
+graph.add_node("structure_batch", structure_batch)
+graph.add_node("persist", persist)
+graph.set_entry_point("plan")
+graph.add_conditional_edges("plan", _next_ocr_batch_step)
+graph.add_conditional_edges("structure_batch", _next_ocr_batch_step)
+graph.add_edge("persist", END)
+return graph.compile(checkpointer=checkpointer)</code></pre>
+      </section>
+
+      <section id="approval">
+        <h2>5. Where the Approve button should fit</h2>
+        <p>
+          If approval should be the moment a question enters the database as a usable bank question, do not call <code>Ingestor.ingest_extracted()</code> from the graph's <code>persist</code> node. Instead, save extracted items into a candidate/review table, render those candidates, and only create <code>Question</code> rows after approval.
+        </p>
+        <div class="diagram">
+          <pre class="mermaid">flowchart TD
+  A[PDF upload] --> B[LangGraph: OCR + LLM]
+  B --> C[Save ExtractedQuestionCandidate rows]
+  C --> D[Scrollable review list]
+  D --> E{Teacher action}
+  E -->|Approve| F[approve_ingestion_questions endpoint]
+  F --> G[Ingestor.ingest_questions]
+  G --> H[Question.objects.bulk_create]
+  H --> I[Question appears in bank]
+  E -->|Reject| J[Candidate status = rejected]
+
+  C:::review
+  D:::review
+  H:::persisted
+  I:::persisted
+
+  classDef review fill:#fef3c7,stroke:#f59e0b,color:#78350f;
+  classDef persisted fill:#dcfce7,stroke:#16a34a,color:#14532d;</pre>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Current</th><th>Approval-based</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="status persisted">persisted before review</span></td>
+              <td><span class="status review">candidate before review</span></td>
+            </tr>
+            <tr>
+              <td><code>persist()</code> calls <code>Ingestor.ingest_extracted()</code>.</td>
+              <td><code>persist()</code> creates candidate rows only.</td>
+            </tr>
+            <tr>
+              <td><code>ingest_questions()</code> returns real <code>Question</code> rows.</td>
+              <td><code>ingest_questions()</code> should run inside the approve endpoint.</td>
+            </tr>
+            <tr>
+              <td>Review list displays <code>BankQuestion[]</code>.</td>
+              <td>Review list should display <code>ExtractedQuestionCandidate[]</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>Suggested backend additions:
+
+class ExtractedQuestionCandidate(models.Model):
+    ingestion_job = ForeignKey(IngestionJob, related_name="candidates")
+    raw_payload = JSONField()
+    status = pending / approved / rejected
+    question = nullable ForeignKey(Question)
+
+POST /api/bank/ingest/{job_id}/approve/
+  -> approve_ingestion_questions(request, job_id)
+  -> Ingestor.ingest_questions(selected_raw_payloads, ...)
+  -> Question rows created</code></pre>
+      </section>
+
+      <section id="function-map">
+        <h2>6. Exact function map</h2>
+        <pre><code>Upload:
+  frontend/src/hooks/useIngestionUpload.hook.ts
+    useIngestionUpload.upload()
+  frontend/src/lib/api.ts
+    uploadIngestionPdf()
+  backend/bank/views.py
+    ingest()
+
+Job drain:
+  backend/bank/management/commands/drain_ingestion_jobs.py
+    Command._process()
+    Command._run_graph()
+
+LangGraph:
+  backend/workflows/extraction.py
+    build_extraction_graph()
+    build_ocr_batch_extraction_graph()
+    _next_ocr_batch_step()
+
+Mistral OCR + LLM:
+  backend/bank/ocr_extractor.py
+    MistralOcrClient.process_pdf()
+    pages_from_ocr_response()
+    is_english_question_page()
+    batch_ocr_markdown()
+    MistralOcrMarkdownExtractor.structure_markdown()
+    _markdown_extraction_prompt()
+    _parse_json_response()
+
+LLM seam:
+  backend/ai_services/llm.py
+    make_chat_model(ModelPurpose.EXTRACTION)
+    resolve_chat_model_config()
+
+Persistence today:
+  backend/bank/ingestor.py
+    Ingestor.ingest_extracted()
+    Ingestor.ingest_questions()
+    Ingestor._ingest_batch()
+    Ingestor._persist()
+    Question.objects.bulk_create()
+
+Review list today:
+  frontend/src/hooks/useIngestionUpload.hook.ts
+    fetchIngestionJobQuestions()
+  backend/bank/views.py
+    ingest_questions()
+  frontend/src/components/ingestion/ingestion-status-card.component.tsx
+    ExtractedQuestionsPanel()</code></pre>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -8,13 +8,13 @@
  * @module CoverageFormView
  */
 import type { ReactNode } from 'react';
-import { Check, ChevronDown, Sparkles } from 'lucide-react';
+import { Bot, Check, ChevronDown, FileText, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   type ChapterGroup,
   type CoverageForm,
 } from '@/hooks/useCoverageForm.hook';
-import type { Chapter } from '@/types';
+import type { Chapter, PaperSourceSummary } from '@/types';
 import { cn } from '@/lib/utils';
 
 export interface CoverageFormProps {
@@ -106,6 +106,7 @@ export function CoverageFormView({
 
       <PaperStructureSummary form={form} />
       <ReviewDeskVariant form={form} />
+      <SourceSelection form={form} />
 
       <div className="sticky bottom-0 z-10 flex flex-col gap-2 rounded-lg border bg-background/95 px-4 py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
@@ -122,6 +123,181 @@ export function CoverageFormView({
       </div>
     </div>
   );
+}
+
+function SourceSelection({ form }: { form: CoverageForm }) {
+  const selectedCount = form.selectedSourceKeys.size;
+  const matchingQuestionCount = form.sources.reduce(
+    (sum, source) => sum + sourceMatchingCount(source),
+    0,
+  );
+  const totalQuestionCount = form.sources.reduce(
+    (sum, source) => sum + source.question_count,
+    0,
+  );
+
+  return (
+    <section
+      className="rounded-lg border bg-background p-4"
+      aria-labelledby="paper-sources-heading"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="max-w-2xl">
+          <h2
+            id="paper-sources-heading"
+            className="text-base font-semibold leading-6"
+          >
+            Sources for selected chapters
+          </h2>
+          <p className="text-sm leading-6 text-muted-foreground">
+            Pick which 2026 papers should be tried first. The count on each row
+            shows matches inside your selected chapters, not the full paper size.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={form.sourcesLoading || form.sources.length === 0}
+            onClick={form.selectAllSources}
+          >
+            Select all shown
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={form.sourcesLoading || selectedCount === 0}
+            onClick={form.clearAllSources}
+          >
+            Clear
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+        <SummaryItem label="Chapter matches" value={matchingQuestionCount} />
+        <SummaryItem label="Sources shown" value={form.sources.length} />
+        <SummaryItem label="Questions in sources" value={totalQuestionCount} />
+      </div>
+
+      <div className="mt-3">
+        {form.sourcesLoading ? (
+          <p className="rounded-lg border bg-background p-3 text-sm text-muted-foreground">
+            Loading sources for the selected chapters...
+          </p>
+        ) : form.sourcesError ? (
+          <p className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+            Could not load sources: {form.sourcesError}
+          </p>
+        ) : form.sources.length === 0 ? (
+          <p className="rounded-lg border bg-secondary/45 p-3 text-sm leading-6 text-muted-foreground">
+            No tagged sources match the selected chapters yet. Generation will
+            use the selected chapters from the full bank.
+          </p>
+        ) : (
+          <ul className="divide-y rounded-lg border">
+            {form.sources.map((source) => (
+              <SourceChoice
+                key={source.key}
+                source={source}
+                selected={form.selectedSourceKeys.has(source.key)}
+                onToggle={() => form.toggleSource(source.key)}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <p className="mt-3 text-xs leading-5 text-muted-foreground">
+        {selectedCount > 0
+          ? `${selectedCount} source${selectedCount === 1 ? '' : 's'} selected for first picks.`
+          : form.selectedSlugs.size > 0
+            ? 'Optional: leave empty to let the picker balance across all compatible questions.'
+            : 'Select chapters first; sources refresh to match that coverage.'}
+      </p>
+    </section>
+  );
+}
+
+function SourceChoice({
+  source,
+  selected,
+  onToggle,
+}: {
+  source: PaperSourceSummary;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  const sourceInputId = `paper-source-${source.key.replace(/[^a-z0-9_-]/gi, '-')}`;
+  const matchingCount = sourceMatchingCount(source);
+
+  return (
+    <li>
+      <label
+        htmlFor={sourceInputId}
+        className={cn(
+          'grid cursor-pointer grid-cols-[auto_minmax(0,1fr)] gap-3 px-3 py-3 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring sm:grid-cols-[auto_minmax(0,1fr)_12rem_auto] sm:items-center',
+          selected ? 'bg-secondary text-foreground' : 'bg-background hover:bg-secondary/55',
+        )}
+      >
+        <input
+          id={sourceInputId}
+          type="checkbox"
+          className="sr-only"
+          checked={selected}
+          onChange={onToggle}
+        />
+        <span
+          className={cn(
+            'mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md sm:mt-0',
+            selected
+              ? 'bg-primary text-primary-foreground'
+              : 'border bg-background text-muted-foreground',
+          )}
+          aria-hidden="true"
+        >
+          {source.kind === 'ai_session' ? (
+            <Bot className="size-4" />
+          ) : (
+            <FileText className="size-4" />
+          )}
+        </span>
+        <span className="min-w-0 pr-7 sm:pr-0">
+          <span className="block truncate font-medium">{source.title}</span>
+          <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
+            {source.detail || 'Tagged source'} · {formatSourceDate(source.created_at)}
+          </span>
+        </span>
+        <span className="col-start-2 flex flex-wrap gap-1.5 sm:col-start-auto sm:justify-end">
+          <span className="rounded-md bg-secondary/70 px-2 py-1 text-xs font-medium text-foreground">
+            {matchingCount} chapter match{matchingCount === 1 ? '' : 'es'}
+          </span>
+          {source.question_count !== matchingCount && (
+            <span className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
+              {source.question_count} in full source
+            </span>
+          )}
+        </span>
+        <span
+          className={cn(
+            'col-start-2 row-start-1 mt-1 flex size-5 shrink-0 items-center justify-center justify-self-end rounded-md sm:col-start-auto sm:row-start-auto sm:mt-0',
+            selected
+              ? 'bg-primary text-primary-foreground'
+              : 'border bg-background text-transparent',
+          )}
+          aria-hidden="true"
+        >
+          <Check className="size-3.5" />
+        </span>
+      </label>
+    </li>
+  );
+}
+
+function sourceMatchingCount(source: PaperSourceSummary) {
+  return source.matching_question_count ?? source.question_count;
 }
 
 function ReviewDeskVariant({ form }: { form: CoverageForm }) {
@@ -374,6 +550,15 @@ function PaperStructureSummary({ form }: { form: CoverageForm }) {
       </details>
     </aside>
   );
+}
+
+function formatSourceDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'recent';
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    month: 'short',
+  }).format(date);
 }
 
 function SummaryItem({ label, value }: { label: string; value: ReactNode }) {

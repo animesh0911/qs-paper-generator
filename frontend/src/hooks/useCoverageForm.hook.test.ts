@@ -17,11 +17,13 @@ describe('buildCoverageAssemblePayload', () => {
         selectedFormatId: 'cbse_science_class_10_board_compact_2026_v1',
         difficulty: 'standard',
         selectedSlugs: new Set(['life-processes']),
+        selectedSourceKeys: new Set(['upload:7']),
       }),
     ).toEqual({
       format_id: 'cbse_science_class_10_board_compact_2026_v1',
       difficulty: 'standard',
       chapter_slugs: ['life-processes'],
+      preferred_source_keys: ['upload:7'],
     });
   });
 });

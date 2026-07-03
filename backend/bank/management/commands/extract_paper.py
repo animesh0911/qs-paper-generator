@@ -31,7 +31,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from bank.content import has_item
 from bank.diagram_cropper import crop_to_dir
-from bank.ingestor import SeamExtractor, _fingerprint
+from bank.extraction import SeamExtractor, _fingerprint
 
 
 class Command(BaseCommand):

@@ -25,6 +25,162 @@ interface IngestionStatusCardProps {
   onGeneratePaper: () => void;
 }
 
+interface TopicGroup {
+  key: string;
+  label: string;
+  questions: BankQuestion[];
+}
+
+const QTYPE_LABELS: Record<string, string> = {
+  mcq: 'MCQ',
+  assertion_reason: 'Assertion–reason',
+  very_short_answer: 'Very short',
+  short_answer: 'Short answer',
+  long_answer: 'Long answer',
+  case_based: 'Case-based',
+};
+
+const COGNITIVE_LABELS: Record<string, string> = {
+  R: 'Remember',
+  U: 'Understand',
+  Ap: 'Apply',
+  An: 'Analyse',
+};
+
+function questionTopic(question: BankQuestion): string {
+  return (
+    question.topic_names?.find((topic) => topic.trim()) ||
+    question.chapter?.name ||
+    'Unmapped topic'
+  );
+}
+
+function groupByTopic(questions: BankQuestion[]): TopicGroup[] {
+  const groups = new Map<string, TopicGroup>();
+  for (const question of questions) {
+    const label = questionTopic(question);
+    const key = label.toLowerCase();
+    const group = groups.get(key) ?? { key, label, questions: [] };
+    group.questions.push(question);
+    groups.set(key, group);
+  }
+  return Array.from(groups.values()).sort((a, b) =>
+    a.label.localeCompare(b.label),
+  );
+}
+
+function labelForQuestionType(qtype: string): string {
+  return QTYPE_LABELS[qtype] || qtype.replace(/_/g, ' ');
+}
+
+function labelForCognitiveLevel(level: string): string {
+  return COGNITIVE_LABELS[level] || level;
+}
+
+function qualityClass(question: BankQuestion): string {
+  if (question.parse_quality === 'clean') {
+    return 'border-emerald-200 bg-emerald-50 text-emerald-900';
+  }
+  if (question.parse_quality === 'broken' || question.review_flags?.length) {
+    return 'border-amber-200 bg-amber-50 text-amber-950';
+  }
+  return 'border-slate-200 bg-slate-50 text-slate-700';
+}
+
+function ExtractedQuestionsPanel({
+  questions,
+}: {
+  questions: BankQuestion[];
+}) {
+  const groups = groupByTopic(questions);
+
+  return (
+    <section
+      className="overflow-hidden rounded-lg border border-input bg-background"
+      aria-labelledby="extracted-questions-heading"
+    >
+      <div className="flex flex-col gap-2 border-b border-input bg-secondary/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 id="extracted-questions-heading" className="text-sm font-medium">
+            Extracted question review
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Grouped by topic so you can quickly spot weak tags or missing labels.
+          </p>
+        </div>
+        <span className="w-fit rounded-md border border-input bg-background px-2 py-1 text-xs font-medium text-muted-foreground">
+          {questions.length} {questions.length === 1 ? 'question' : 'questions'}
+        </span>
+      </div>
+
+      <div className="max-h-[28rem] overflow-y-auto" tabIndex={0}>
+        {groups.map((group) => (
+          <div key={group.key} className="border-b border-input last:border-b-0">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-input bg-background/95 px-4 py-2 backdrop-blur">
+              <p className="truncate text-xs font-semibold text-foreground">
+                {group.label}
+              </p>
+              <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                {group.questions.length}
+              </span>
+            </div>
+            <ol className="divide-y divide-input" aria-label={`${group.label} questions`}>
+              {group.questions.map((question, index) => (
+                <li key={question.id} className="px-4 py-3">
+                  <div className="flex gap-3">
+                    <span className="mt-0.5 w-7 shrink-0 text-xs tabular-nums text-muted-foreground">
+                      {index + 1}.
+                    </span>
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <p className="text-sm leading-5 text-foreground">
+                        {question.text}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 text-xs">
+                        <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
+                          Section {question.section}
+                        </span>
+                        <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
+                          {question.marks} {question.marks === 1 ? 'mark' : 'marks'}
+                        </span>
+                        <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
+                          {labelForQuestionType(question.qtype)}
+                        </span>
+                        <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
+                          {labelForCognitiveLevel(question.cognitive_level)}
+                        </span>
+                        {question.chapter && (
+                          <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
+                            {question.chapter.name}
+                          </span>
+                        )}
+                        <span
+                          className={`rounded border px-1.5 py-0.5 ${qualityClass(question)}`}
+                        >
+                          {question.parse_quality}
+                        </span>
+                        {question.primary_form !== 'none' && (
+                          <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
+                            {question.primary_form.replace(/_/g, ' ')}
+                          </span>
+                        )}
+                      </div>
+                      {question.review_flags?.length > 0 && (
+                        <p className="text-xs text-amber-950">
+                          Review: {question.review_flags.join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function IngestionStatusCard({
   job,
   pollError,
@@ -124,44 +280,14 @@ export function IngestionStatusCard({
 
           {job.created_count > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-medium">
-                Questions added to your bank
-              </p>
               {loadingQuestions ? (
-                <p className="text-sm text-muted-foreground">
-                  Loading the parsed questions…
+                <p className="rounded-lg border border-input bg-background px-4 py-3 text-sm text-muted-foreground">
+                  Loading the extracted question review…
                 </p>
               ) : parsedQuestions.length > 0 ? (
-                <ul className="divide-y divide-input overflow-hidden rounded-lg border border-input bg-background">
-                  {parsedQuestions.map((question, index) => (
-                    <li key={question.id} className="flex gap-3 px-4 py-3">
-                      <span className="w-6 shrink-0 text-sm tabular-nums text-muted-foreground">
-                        {index + 1}.
-                      </span>
-                      <div className="min-w-0 space-y-1">
-                        <p className="text-sm leading-5">{question.text}</p>
-                        <p className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-                          <span>Section {question.section}</span>
-                          <span aria-hidden="true">·</span>
-                          <span>
-                            {question.marks}{' '}
-                            {question.marks === 1 ? 'mark' : 'marks'}
-                          </span>
-                          {question.chapter && (
-                            <>
-                              <span aria-hidden="true">·</span>
-                              <span className="truncate">
-                                {question.chapter.name}
-                              </span>
-                            </>
-                          )}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <ExtractedQuestionsPanel questions={parsedQuestions} />
               ) : (
-                <p className="text-sm text-muted-foreground">
+                <p className="rounded-lg border border-input bg-background px-4 py-3 text-sm text-muted-foreground">
                   The questions are in your bank, ready to use in a paper.
                 </p>
               )}

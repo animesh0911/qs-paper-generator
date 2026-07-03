@@ -23,6 +23,8 @@ const LABEL_BY_BACKEND_DIFFICULTY: Record<string, GenerationDifficultyLabel> = {
   hard: 'Challenging',
 };
 
+export const GENERATION_BATCH_QUESTION_COUNT = 30;
+
 export function difficultyLabelFromPreset(
   preset: string,
 ): GenerationDifficultyLabel {
@@ -49,6 +51,7 @@ export function buildGenerationBatchPayload({
     chapter_slugs: [chapterSlug],
     chapter_map_node_ids: chapterMapNodeIds,
     difficulty_preset: BACKEND_DIFFICULTY_BY_LABEL[difficulty],
+    count: GENERATION_BATCH_QUESTION_COUNT,
   };
 }
 

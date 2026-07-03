@@ -21,7 +21,9 @@ PDFs at runtime); the committed-JSON CLI path (``extract_paper`` →
 two-front-door note in CONTEXT.md ``Ingestor``.
 """
 
-from django.db.models import Q
+import base64
+
+from django.db.models import Count, Max, Q
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
@@ -38,6 +40,8 @@ from .generation_batches import (
 from .models import (
     Chapter,
     CognitiveLevel,
+    GeneratedQuestionCandidate,
+    GenerationBatch,
     IngestionJob,
     Question,
     QuestionType,
@@ -75,6 +79,144 @@ def metadata(request):
 @api_view(["GET"])
 def chapters(request):
     return Response(ChapterTaxonomySerializer(Chapter.objects.all(), many=True).data)
+
+
+@api_view(["GET"])
+@permission_classes([IsTeacher])
+def sources(request):
+    """Source groups for generate-page prioritisation.
+
+    Returns tagged bank sources (including committed 2026 CBSE papers), uploaded
+    PDFs, and accepted AI-generation sessions in recency order. The opaque
+    ``key`` is the only value the assemble endpoint needs; selecting a source
+    prioritises its questions for the first draft while editor alternatives
+    continue to show every compatible question. Optional ``chapter`` query
+    params narrow the list after chapter selection.
+    """
+    chapter_slugs = request.query_params.getlist("chapter")
+    visible_questions = Question.objects.filter(
+        Q(school__isnull=True) | Q(school=request.user.school),
+        parse_quality__in=["clean", "partial"],
+    )
+    source_fields = ("source_type", "source_name", "source_file_name")
+    bank_sources = (
+        visible_questions.exclude(source_file_name="")
+        .values(*source_fields)
+        .annotate(question_count=Count("id"), created_at=Max("created_at"))
+    )
+    matching_counts: dict[tuple[str, str, str], int] = {}
+    if chapter_slugs:
+        matching_counts = {
+            (row["source_type"], row["source_name"], row["source_file_name"]): row[
+                "matching_question_count"
+            ]
+            for row in visible_questions.filter(chapter__slug__in=chapter_slugs)
+            .exclude(source_file_name="")
+            .values(*source_fields)
+            .annotate(matching_question_count=Count("id"))
+        }
+
+    bank_items = []
+    for row in bank_sources:
+        source_key = (row["source_type"], row["source_name"], row["source_file_name"])
+        matching_question_count = (
+            matching_counts.get(source_key, 0) if chapter_slugs else row["question_count"]
+        )
+        if chapter_slugs and matching_question_count == 0:
+            continue
+        bank_items.append(
+            {
+                "key": f"source_file:{_source_file_key(row['source_file_name'])}",
+                "kind": "bank_source",
+                "title": row["source_name"] or row["source_file_name"],
+                "detail": dict(Question._meta.get_field("source_type").choices).get(
+                    row["source_type"], row["source_type"] or "Tagged bank source"
+                ),
+                "question_count": row["question_count"],
+                "matching_question_count": matching_question_count,
+                "created_at": row["created_at"],
+                "status": "available",
+            }
+        )
+    bank_items.sort(
+        key=lambda item: (item["matching_question_count"], item["question_count"]),
+        reverse=True,
+    )
+    bank_items = bank_items[:40]
+
+    uploads = (
+        IngestionJob.objects.filter(school=request.user.school)
+        .annotate(question_count=Count("questions"))
+        .order_by("-created_at")[:20]
+    )
+    upload_items = [
+        {
+            "key": f"upload:{job.pk}",
+            "kind": "upload",
+            "title": job.source_file_name or f"Upload #{job.pk}",
+            "detail": job.get_source_type_display(),
+            "question_count": job.question_count,
+            "matching_question_count": job.question_count,
+            "created_at": job.created_at,
+            "status": job.status,
+        }
+        for job in uploads
+    ]
+
+    batches = (
+        GenerationBatch.objects.filter(
+            created_by=request.user,
+            school=request.user.school,
+            accepted_at__isnull=False,
+        )
+        .prefetch_related("chapters")
+        .order_by("-accepted_at", "-created_at")[:20]
+    )
+    batch_ids = [batch.pk for batch in batches]
+    counts = dict(
+        GeneratedQuestionCandidate.objects.filter(
+            batch_id__in=batch_ids,
+            question_id__isnull=False,
+        )
+        .values("batch_id")
+        .annotate(n=Count("question_id"))
+        .values_list("batch_id", "n")
+    )
+    batch_items = [
+        {
+            "key": f"ai_batch:{batch.pk}",
+            "kind": "ai_session",
+            "title": "AI Q&A session",
+            "detail": ", ".join(
+                batch.chapters.order_by("order").values_list("name", flat=True)[:3]
+            )
+            or batch.difficulty_preset,
+            "question_count": counts.get(batch.pk, 0),
+            "matching_question_count": counts.get(batch.pk, 0),
+            "created_at": batch.accepted_at or batch.created_at,
+            "status": batch.status,
+        }
+        for batch in batches
+    ]
+
+    kind_rank = {"bank_source": 2, "upload": 1, "ai_session": 0}
+    items = sorted(
+        [*bank_items, *upload_items, *batch_items],
+        key=lambda item: (
+            kind_rank.get(item["kind"], 0),
+            item.get("matching_question_count") or 0,
+            item.get("question_count") or 0,
+            item["created_at"],
+        ),
+        reverse=True,
+    )
+    return Response(items)
+
+
+def _source_file_key(source_file_name: str) -> str:
+    """URL-safe opaque key for a bank source filename."""
+    encoded = base64.urlsafe_b64encode(source_file_name.encode()).decode()
+    return encoded.rstrip("=")
 
 
 @api_view(["POST"])

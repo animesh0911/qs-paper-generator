@@ -14,11 +14,13 @@ from .views import (
     ingest_status,
     metadata,
     questions,
+    sources,
 )
 
 urlpatterns = [
     path("metadata/", metadata),
     path("chapters/", chapters),
+    path("sources/", sources),
     path("questions/", questions),
     path("ingest/", ingest),
     path("ingest/<int:job_id>/", ingest_status),

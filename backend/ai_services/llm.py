@@ -203,6 +203,16 @@ _PROVIDERS: dict[str, _Provider] = {
         "deepseek-chat",
         "https://api.deepseek.com",
     ),
+    # GLM/Zhipu is OpenAI-compatible; keep it behind the same seam so OCR
+    # structuring experiments can use a cheap model without feature code knowing
+    # about another SDK.
+    "glm": _Provider(
+        "openai",
+        "GLM",
+        "api_key",
+        "glm-4-flash",
+        "https://open.bigmodel.cn/api/paas/v4",
+    ),
     "ollama": _Provider("ollama", "OLLAMA", None, None),
 }
 

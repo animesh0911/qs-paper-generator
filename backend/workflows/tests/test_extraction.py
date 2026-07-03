@@ -108,6 +108,41 @@ def test_resume_after_mid_paper_kill_only_bills_unextracted_pages(three_pages):
     assert set(Question.objects.values_list("text", flat=True)) == {"Q1", "Q2", "Q3"}
 
 
+def test_graph_can_swap_in_page_extractor_without_model_factory(three_pages):
+    """OCR-first POC seam: a page-level extractor can replace SeamExtractor
+    while retaining the same resumable graph and persist tail."""
+    job = _job()
+    model_factory = PageFake(fail_on=1)
+
+    class FakeExtractor:
+        def __init__(self):
+            self.calls = 0
+
+        def extract_page(self, page_bytes):
+            self.calls += 1
+            return _payload(f"ocr:{page_bytes.decode()}")
+
+    extractor = FakeExtractor()
+    with get_checkpointer() as checkpointer:
+        graph = build_extraction_graph(
+            checkpointer,
+            make_model=model_factory,
+            make_extractor=lambda: extractor,
+        )
+        final = graph.invoke(
+            {"job_id": job.pk}, _cfg(uuid.uuid4().hex), durability="sync"
+        )
+
+    assert model_factory.calls == 0
+    assert extractor.calls == 3
+    assert final["created"] == 3
+    assert set(Question.objects.values_list("text", flat=True)) == {
+        "ocr:p1",
+        "ocr:p2",
+        "ocr:p3",
+    }
+
+
 def test_rerunning_persist_dedups_instead_of_duplicating(three_pages):
     """A crash between persisting rows and checkpointing re-runs persist on
     resume; the ``source_hash`` dedup means a re-run can only skip. Proven the

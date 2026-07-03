@@ -119,7 +119,7 @@ class Command(BaseCommand):
         """Load one committed JSON file into Question rows. Returns (created, skipped).
 
         Reads the reviewed dicts (extraction and tagging already happened
-        offline) and hands them to ``Ingestor._ingest_raw`` — the same
+        offline) and hands them to ``Ingestor.ingest_questions`` — the same
         quality/guardrail/dedup/persist tail the live Gemini path runs
         (``pdf_bytes=None``: no PDF in hand, so no cropping; committed content
         keeps whatever image/image_placeholder items it already carries).
@@ -142,7 +142,7 @@ class Command(BaseCommand):
             source_file_name=prov["source_file_name"],
         )
 
-        result = Ingestor()._ingest_raw(
+        result = Ingestor().ingest_questions(
             questions,
             provenance=provenance,
             school=None,

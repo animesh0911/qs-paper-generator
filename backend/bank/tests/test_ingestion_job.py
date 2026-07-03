@@ -244,7 +244,9 @@ def test_questions_lists_what_a_job_added(api_client, user):
         qtype="mcq",
         marks=1,
         text="Kept question",
+        topic_names=["Acids and bases"],
         parse_quality="clean",
+        review_flags=["mcq_too_few_options"],
     )
     Question.objects.create(
         school=user.school,
@@ -269,6 +271,8 @@ def test_questions_lists_what_a_job_added(api_client, user):
 
     assert resp.status_code == 200
     assert [q["id"] for q in resp.data] == [kept.pk]
+    assert resp.data[0]["topic_names"] == ["Acids and bases"]
+    assert resp.data[0]["review_flags"] == ["mcq_too_few_options"]
 
 
 def test_questions_hides_other_schools_jobs_as_404(api_client):
@@ -334,6 +338,38 @@ def test_drain_records_failure_without_aborting(db, user, monkeypatch):
     assert job.status == IngestionJobStatus.FAILED
     assert "extraction blew up" in job.error
     assert Question.objects.count() == 0
+
+
+def test_drain_rewrites_google_adc_failure_to_actionable_setup_message(
+    db, user, monkeypatch
+):
+    """Missing Google ADC should tell the operator what to configure.
+
+    The provider's raw DefaultCredentialsError mentions Application Default
+    Credentials, but this app normally expects GEMINI_API_KEY for Gemini
+    extraction or the explicit Mistral OCR pipeline when using Mistral keys.
+    """
+
+    def _raise_adc(*args, **kwargs):
+        raise RuntimeError(
+            "Your default credentials were not found. To set up Application "
+            "Default Credentials, see https://cloud.google.com/docs/authentication/"
+            "external/set-up-adc for more information."
+        )
+
+    monkeypatch.setattr(drain_mod.Command, "_run_graph", staticmethod(_raise_adc))
+    job = IngestionJob.objects.create(
+        school=user.school, pdf=_pdf_upload(), source_file_name="adc.pdf"
+    )
+
+    call_command("drain_ingestion_jobs")
+
+    job.refresh_from_db()
+    assert job.status == IngestionJobStatus.FAILED
+    assert "Gemini extraction credentials are not configured" in job.error
+    assert "GEMINI_API_KEY" in job.error
+    assert "EXTRACTION_PIPELINE=mistral-ocr-batch" in job.error
+    assert "DefaultCredentialsError" not in job.error
 
 
 def test_drain_dry_run_makes_no_changes(db, user, monkeypatch):

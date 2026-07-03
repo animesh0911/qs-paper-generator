@@ -42,27 +42,46 @@ Where it fits:
 from __future__ import annotations
 
 import operator
-from typing import Annotated, TypedDict
+from collections.abc import Callable
+from typing import Annotated, Protocol, TypedDict
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, StateGraph
 
 from ai_services.llm import make_chat_model
-from bank.ingestor import (
-    Ingestor,
+from bank.extraction import (
     MakeChatModel,
     SeamExtractor,
     count_pages,
     merge_page_payloads,
     slice_page,
 )
+from bank.ingestor import Ingestor
 from bank.models import IngestionJob
+
+
+class PageExtractor(Protocol):
+    def extract_page(self, page_bytes: bytes) -> dict: ...
+
+
+ExtractorFactory = Callable[[], PageExtractor]
 
 
 class ExtractionState(TypedDict, total=False):
     job_id: int
     total_pages: int
     next_page: int
+    payloads: Annotated[list[dict], operator.add]
+    created: int
+    skipped: int
+
+
+class OcrBatchExtractionState(TypedDict, total=False):
+    job_id: int
+    total_pages: int
+    batch_pages: int
+    next_batch: int
+    ocr_pages: list[dict]
     payloads: Annotated[list[dict], operator.add]
     created: int
     skipped: int
@@ -78,12 +97,27 @@ def _next_step(state: ExtractionState) -> str:
     return "extract_page" if state["next_page"] < state["total_pages"] else "persist"
 
 
+def _next_ocr_batch_step(state: OcrBatchExtractionState) -> str:
+    return (
+        "structure_batch"
+        if state["next_batch"] * state["batch_pages"] < state["total_pages"]
+        else "persist"
+    )
+
+
 def build_extraction_graph(
     checkpointer: BaseCheckpointSaver,
     make_model: MakeChatModel = make_chat_model,
+    make_extractor: ExtractorFactory | None = None,
 ):
-    """Compile the per-page extraction graph against the given checkpointer."""
-    extractor = SeamExtractor(make_model=make_model)
+    """Compile the per-page extraction graph against the given checkpointer.
+
+    ``make_extractor`` is the experiment seam for OCR-first adapters. When it is
+    omitted, production keeps using the native-PDF ``SeamExtractor`` path.
+    """
+    extractor = (
+        make_extractor() if make_extractor else SeamExtractor(make_model=make_model)
+    )
     ingestor = Ingestor(extractor=extractor)
 
     def plan(state: ExtractionState) -> dict:
@@ -129,5 +163,88 @@ def build_extraction_graph(
     graph.set_entry_point("plan")
     graph.add_edge("plan", "extract_page")
     graph.add_conditional_edges("extract_page", _next_step)
+    graph.add_edge("persist", END)
+    return graph.compile(checkpointer=checkpointer)
+
+
+def build_ocr_batch_extraction_graph(
+    checkpointer: BaseCheckpointSaver,
+    *,
+    batch_pages: int = 999,
+):
+    """Compile the whole-PDF OCR + structuring extraction graph.
+
+    This experimental graph is optimized for bilingual CBSE papers: it OCRs the
+    uploaded PDF once, filters to English/question pages, then sends the selected
+    OCR markdown to the LLM in one large batch by default. Keeping the full
+    English paper together avoids splitting long/internal-choice questions across
+    page-count batch boundaries.
+    """
+    from bank.ocr_extractor import (
+        MistralOcrClient,
+        MistralOcrMarkdownExtractor,
+        batch_ocr_markdown,
+        is_english_question_page,
+        pages_from_ocr_response,
+    )
+
+    ocr_client = MistralOcrClient()
+    extractor = MistralOcrMarkdownExtractor(ocr_client=ocr_client)
+    ingestor = Ingestor(extractor=extractor)
+
+    def plan(state: OcrBatchExtractionState) -> dict:
+        _, pdf_bytes = _load_job_pdf(state["job_id"])
+        ocr = ocr_client.process_pdf(pdf_bytes)
+        pages = [
+            page
+            for page in pages_from_ocr_response(ocr)
+            if is_english_question_page(page["markdown"])
+        ]
+        total_pages = len(pages)
+        IngestionJob.objects.filter(pk=state["job_id"]).update(
+            total_pages=total_pages,
+            pages_done=0,
+        )
+        return {
+            "ocr_pages": pages,
+            "total_pages": total_pages,
+            "batch_pages": batch_pages,
+            "next_batch": 0,
+        }
+
+    def structure_batch(state: OcrBatchExtractionState) -> dict:
+        start = state["next_batch"] * state["batch_pages"]
+        end = start + state["batch_pages"]
+        batch = state["ocr_pages"][start:end]
+        payload = extractor.structure_markdown(batch_ocr_markdown(batch))
+        next_batch = state["next_batch"] + 1
+        pages_done = min(end, state["total_pages"])
+        IngestionJob.objects.filter(pk=state["job_id"]).update(pages_done=pages_done)
+        return {
+            "payloads": [payload],
+            "next_batch": next_batch,
+        }
+
+    def persist(state: OcrBatchExtractionState) -> dict:
+        job, _ = _load_job_pdf(state["job_id"])
+        result = ingestor.ingest_extracted(
+            merge_page_payloads(state.get("payloads", [])),
+            source_file_name=job.source_file_name,
+            source_type=job.source_type,
+            school=job.school,
+            # OCR batch payloads intentionally do not carry source-page figure
+            # boxes yet, so skip diagram cropping for this experiment.
+            pdf_bytes=None,
+            ingestion_job=job,
+        )
+        return {"created": result.created, "skipped": result.skipped_duplicates}
+
+    graph = StateGraph(OcrBatchExtractionState)
+    graph.add_node("plan", plan)
+    graph.add_node("structure_batch", structure_batch)
+    graph.add_node("persist", persist)
+    graph.set_entry_point("plan")
+    graph.add_conditional_edges("plan", _next_ocr_batch_step)
+    graph.add_conditional_edges("structure_batch", _next_ocr_batch_step)
     graph.add_edge("persist", END)
     return graph.compile(checkpointer=checkpointer)

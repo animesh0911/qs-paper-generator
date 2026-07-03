@@ -1,7 +1,7 @@
 """Deterministic ingest guardrails — resolve toward the taxonomy, flag the rest.
 
 The Layer-2 safety net behind the Layer-1 schema constraint (``build_question_schema``
-in ``bank.ingestor``). Where Layer 1 stops a live Gemini extraction from *emitting*
+in ``bank.extraction``). Where Layer 1 stops a live Gemini extraction from *emitting*
 a non-canonical ``chapter_slug``, this module is the **general, deterministic**
 backstop that runs on **every** ingest — both the live ``Ingestor.ingest`` path
 and the committed-JSON ``load_questions`` path (which carries pre-Layer-1 data) —
@@ -18,8 +18,8 @@ Patterns / invariants:
 - Mutates the question dicts in place; call it after ``parse_quality`` is set and
   before de-duplication, on the full per-paper batch (blueprint needs the batch).
 - Never *upgrades* ``parse_quality`` — flags only drag it down.
-- Imports ``MARKS_TO_SECTION`` from ``bank.ingestor`` at module top; ``ingestor``
-  imports this module *lazily* (inside ``ingest``) to keep the dependency acyclic.
+- Imports ``MARKS_TO_SECTION`` from ``bank.extraction`` at module top; ``ingestor``
+  imports this module lazily inside the tail.
 
 Where it fits:
 - Called by: ``bank.ingestor.Ingestor.ingest`` and the ``load_questions`` command
@@ -33,7 +33,7 @@ import re
 from collections import Counter
 
 from . import content as content_mod
-from .ingestor import MARKS_TO_SECTION
+from .extraction import MARKS_TO_SECTION
 from .models import QuestionType, Section
 
 # ---------------------------------------------------------------------------

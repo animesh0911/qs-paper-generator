@@ -28,6 +28,7 @@ import type {
   PaperAnswerDocument,
   PaperDocument,
   PaperFormatSummary,
+  PaperSourceSummary,
   SourceType,
 } from '@/types';
 import { paperDocumentSchema } from '@/types/paper-document.schema';
@@ -278,6 +279,18 @@ export async function fetchChapterTopics(
 
 export async function fetchPaperFormats(): Promise<PaperFormatSummary[]> {
   const res = await request('/papers/formats', { method: 'GET' });
+  return res.json();
+}
+
+export async function fetchPaperSources(
+  chapterSlugs: string[] = [],
+): Promise<PaperSourceSummary[]> {
+  const params = new URLSearchParams();
+  for (const slug of chapterSlugs) params.append('chapter', slug);
+  const query = params.toString();
+  const res = await request(`/bank/sources/${query ? `?${query}` : ''}`, {
+    method: 'GET',
+  });
   return res.json();
 }
 

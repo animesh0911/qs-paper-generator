@@ -22,10 +22,18 @@ describe('WelcomePage', () => {
     const html = renderToStaticMarkup(<WelcomePage />);
 
     expect(html).toContain('Welcome, Varad.');
-    expect(html).toContain('What would you like to do?');
-    expect(html).toContain('Generate paper');
-    expect(html).toContain('Upload papers');
+    expect(html).toContain('Exam desk');
+    expect(html).toContain('Upload and AI Q&amp;A feed the bank. Generate uses it.');
+    expect(html).toContain('Generate');
+    expect(html).toContain('Upload');
     expect(html).toContain('AI Q&amp;A');
+    expect(html).toContain('Question bank');
+    expect(html).toContain('Feeds bank');
+    expect(html).toContain('Uses bank');
+    expect(html).not.toContain('Class 10 Science exam desk');
+    expect(html).not.toContain('Verified question bank');
+    expect(html).not.toContain('Sign out');
+    expect(html).not.toContain('Diagram variants');
     expect(html).toContain('href="/generate"');
     expect(html).toContain('href="/upload"');
     expect(html).toContain('href="/ai-qa"');
