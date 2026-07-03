@@ -26,6 +26,9 @@ command runs for real.
 
 from __future__ import annotations
 
+import os
+import shlex
+from pathlib import Path
 from uuid import uuid4
 
 from django.core.management.base import BaseCommand
@@ -33,9 +36,55 @@ from django.core.management.base import BaseCommand
 from ai_services.llm import make_chat_model
 from bank.models import IngestionJob, IngestionJobStatus
 from workflows.checkpointer import get_checkpointer
-from workflows.extraction import build_extraction_graph
+from workflows.extraction import (
+    build_extraction_graph,
+    build_ocr_batch_extraction_graph,
+)
 
 _RESUMABLE = (IngestionJobStatus.PENDING, IngestionJobStatus.RUNNING)
+
+
+def _format_extraction_error(exc: Exception) -> str:
+    """Turn provider setup failures into operator-facing job errors."""
+    message = str(exc)
+    if "Your default credentials were not found" in message:
+        return (
+            "Gemini extraction credentials are not configured. Set GEMINI_API_KEY "
+            "for the default gemini-native-pdf pipeline, configure Google ADC, or "
+            "run the drainer with EXTRACTION_PIPELINE=mistral-ocr-batch if you "
+            "intend to use Mistral OCR credentials."
+        )
+    return f"{type(exc).__name__}: {message}"
+
+
+def _load_dotenv() -> None:
+    backend_dir = Path(__file__).resolve().parents[3]
+    repo_dir = backend_dir.parent
+    for path in (repo_dir / ".env", backend_dir / ".env"):
+        if not path.is_file():
+            continue
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                parts = shlex.split(raw_line, comments=True, posix=True)
+            except ValueError:
+                continue
+            if len(parts) != 1 or "=" not in parts[0]:
+                continue
+            key, value = parts[0].split("=", 1)
+            key = key.strip()
+            if key and not os.environ.get(key):
+                os.environ[key] = value
+
+
+def _default_extraction_llm_from_generation() -> None:
+    if "LLM_EXTRACTION_PROVIDER" not in os.environ:
+        provider = os.getenv("LLM_QUESTION_GENERATION_PROVIDER")
+        if provider:
+            os.environ["LLM_EXTRACTION_PROVIDER"] = provider
+    if "LLM_EXTRACTION_MODEL" not in os.environ:
+        model = os.getenv("LLM_QUESTION_GENERATION_MODEL")
+        if model:
+            os.environ["LLM_EXTRACTION_MODEL"] = model
 
 
 class Command(BaseCommand):
@@ -45,6 +94,9 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
+        _load_dotenv()
+        _default_extraction_llm_from_generation()
+
         parser.add_argument(
             "--limit",
             type=int,
@@ -56,8 +108,34 @@ class Command(BaseCommand):
             action="store_true",
             help="List resumable jobs and exit WITHOUT calling Gemini (no cost).",
         )
+        parser.add_argument(
+            "--extractor",
+            choices=(
+                "gemini-native-pdf",
+                "mistral-ocr-markdown",
+                "mistral-ocr-batch",
+            ),
+            default=os.getenv("EXTRACTION_PIPELINE", "gemini-native-pdf"),
+            help=(
+                "Experimental extraction backend. Defaults to gemini-native-pdf; "
+                "can also be set with EXTRACTION_PIPELINE=mistral-ocr-batch."
+            ),
+        )
+        parser.add_argument(
+            "--batch-pages",
+            type=int,
+            default=int(os.getenv("OCR_BATCH_PAGES") or "999"),
+            help=(
+                "OCR markdown pages per structuring LLM call for "
+                "mistral-ocr-batch. Defaults to one-shot extraction so long "
+                "questions are not split across page-count batches."
+            ),
+        )
 
     def handle(self, *args, **options):
+        _load_dotenv()
+        _default_extraction_llm_from_generation()
+
         queued = IngestionJob.objects.filter(status__in=_RESUMABLE).order_by(
             "created_at"
         )
@@ -82,25 +160,43 @@ class Command(BaseCommand):
             return
 
         for job in jobs:
-            self._process(job)
+            self._process(
+                job,
+                extractor=options["extractor"],
+                batch_pages=options["batch_pages"],
+            )
 
-    def _process(self, job: IngestionJob) -> None:
+    def _process(
+        self, job: IngestionJob, *, extractor: str, batch_pages: int
+    ) -> None:
         """Run or resume one job's graph thread; record status + counts.
 
         Marks ``running`` first (a crashed run stays visible — and resumable —
         as running), then ``done`` with the counts the graph reported or
         ``failed`` with the error. Any extraction error is caught and recorded
         — one bad PDF must not abort the rest of the drain."""
+        if job.thread_id and ":" in job.thread_id:
+            stored_extractor, _ = job.thread_id.split(":", 1)
+            if stored_extractor in {
+                "gemini-native-pdf",
+                "mistral-ocr-markdown",
+                "mistral-ocr-batch",
+            }:
+                extractor = stored_extractor
         if not job.thread_id:
-            job.thread_id = uuid4().hex
+            job.thread_id = f"{extractor}:{uuid4().hex}"
         job.status = IngestionJobStatus.RUNNING
         job.save(update_fields=["status", "thread_id", "updated_at"])
 
         try:
-            final = self._run_graph(job)
+            final = self._run_graph(
+                job,
+                extractor=extractor,
+                batch_pages=batch_pages,
+            )
         except Exception as exc:  # noqa: BLE001 — record failure, keep draining
             job.status = IngestionJobStatus.FAILED
-            job.error = f"{type(exc).__name__}: {exc}"
+            job.error = _format_extraction_error(exc)
             job.save(update_fields=["status", "error", "updated_at"])
             self.stderr.write(f"Job #{job.pk} failed: {job.error}")
             return
@@ -124,7 +220,12 @@ class Command(BaseCommand):
         )
 
     @staticmethod
-    def _run_graph(job: IngestionJob) -> dict:
+    def _run_graph(
+        job: IngestionJob,
+        *,
+        extractor: str = "gemini-native-pdf",
+        batch_pages: int = 999,
+    ) -> dict:
         """Invoke the job's thread fresh, resume it, or just read it back.
 
         The checkpoint — not the ledger — is the truth about how far the
@@ -136,8 +237,24 @@ class Command(BaseCommand):
         makes each page's checkpoint a synchronous write, so a kill can never
         lose a page that was already paid for.
         """
+        make_extractor = None
+        if extractor == "mistral-ocr-markdown":
+            from bank.ocr_extractor import MistralOcrMarkdownExtractor
+
+            make_extractor = MistralOcrMarkdownExtractor
+
         with get_checkpointer() as checkpointer:
-            graph = build_extraction_graph(checkpointer, make_model=make_chat_model)
+            if extractor == "mistral-ocr-batch":
+                graph = build_ocr_batch_extraction_graph(
+                    checkpointer,
+                    batch_pages=batch_pages,
+                )
+            else:
+                graph = build_extraction_graph(
+                    checkpointer,
+                    make_model=make_chat_model,
+                    make_extractor=make_extractor,
+                )
             config = {"configurable": {"thread_id": job.thread_id}}
             snapshot = graph.get_state(config)
             if snapshot.values and not snapshot.next:

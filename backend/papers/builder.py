@@ -7,10 +7,14 @@ maps the result to PaperDocumentV1, and returns both as an AssemblyResult.
 Callers (view, tests) pick `.paper` or `.document` as needed.
 """
 
+import base64
 import logging
 from dataclasses import dataclass
 
 from django.db import transaction
+from django.db.models import Q
+
+from bank.models import GeneratedQuestionCandidate, IngestionJob, Question
 
 from .answer_document import build_answer_document
 from .document import PaperDocumentBuilder
@@ -26,6 +30,15 @@ class AssemblyResult:
     document: dict  # PaperDocumentV1
 
 
+def _decode_source_file_key(value: str) -> str:
+    """Decode the URL-safe source_file token emitted by bank.sources."""
+    try:
+        padded = value + "=" * (-len(value) % 4)
+        return base64.urlsafe_b64decode(padded.encode()).decode()
+    except Exception:  # noqa: BLE001 - stale/hand-edited browser state is ignored.
+        return ""
+
+
 class PaperBuilder:
     def assemble(
         self,
@@ -37,6 +50,7 @@ class PaperBuilder:
         difficulty: str = DEFAULT_DIFFICULTY,
         reuse_question_ids: list[int] | None = None,
         format_id: str | None = None,
+        preferred_source_keys: list[str] | None = None,
     ) -> AssemblyResult:
         paper_format: PaperFormat | None = None
         if format_id:
@@ -53,6 +67,9 @@ class PaperBuilder:
             requesting_user=user,
             reuse_question_ids=set(reuse_question_ids or []),
             format_id=format_id,
+            preferred_question_ids=self._preferred_question_ids(
+                user, preferred_source_keys or []
+            ),
         )
         result = QuestionPicker().select(opts)
         paper = self._persist(user, title, result)
@@ -64,6 +81,64 @@ class PaperBuilder:
         paper.answer_document = build_answer_document(paper)
         paper.save(update_fields=["document", "answer_document"])
         return AssemblyResult(paper=paper, document=document)
+
+    @staticmethod
+    def _preferred_question_ids(user, source_keys: list[str]) -> set[int]:
+        """Resolve generate-page source selections into bank Question ids.
+
+        Source keys are intentionally opaque to the frontend: ``upload:<id>``
+        means questions created by one teacher PDF upload, ``ai_batch:<id>``
+        means accepted questions imported from one AI generation session, and
+        ``source_file:<token>`` means tagged bank rows from one committed source
+        file (for example a 2026 CBSE paper). Unknown or cross-school keys are
+        ignored so stale browser state never breaks paper assembly.
+        """
+        upload_ids: list[int] = []
+        ai_batch_ids: list[int] = []
+        source_file_names: list[str] = []
+        for key in source_keys:
+            prefix, _, raw_value = key.partition(":")
+            if prefix == "source_file":
+                source_file_name = _decode_source_file_key(raw_value)
+                if source_file_name:
+                    source_file_names.append(source_file_name)
+                continue
+            if not raw_value.isdigit():
+                continue
+            if prefix == "upload":
+                upload_ids.append(int(raw_value))
+            elif prefix == "ai_batch":
+                ai_batch_ids.append(int(raw_value))
+
+        question_ids: set[int] = set()
+        if upload_ids:
+            valid_job_ids = IngestionJob.objects.filter(
+                pk__in=upload_ids,
+                school=getattr(user, "school", None),
+            ).values_list("pk", flat=True)
+            question_ids.update(
+                Question.objects.filter(ingestion_job_id__in=valid_job_ids).values_list(
+                    "pk", flat=True
+                )
+            )
+        if ai_batch_ids:
+            question_ids.update(
+                GeneratedQuestionCandidate.objects.filter(
+                    batch_id__in=ai_batch_ids,
+                    batch__created_by=user,
+                    batch__school=getattr(user, "school", None),
+                    question_id__isnull=False,
+                ).values_list("question_id", flat=True)
+            )
+        if source_file_names:
+            question_ids.update(
+                Question.objects.filter(
+                    Q(school__isnull=True) | Q(school=getattr(user, "school", None)),
+                    source_file_name__in=source_file_names,
+                    parse_quality__in=["clean", "partial"],
+                ).values_list("pk", flat=True)
+            )
+        return question_ids
 
     @staticmethod
     def _guard_contract(paper: Paper, document: dict) -> None:

@@ -33,6 +33,101 @@
 }
 
 @layer components {
+  .qpg-welcome-note,
+  .qpg-flow-stage {
+    border-color: rgb(148 163 184 / 0.28);
+  }
+
+  .qpg-flow-stage {
+    isolation: isolate;
+  }
+
+  .qpg-flow-line {
+    background-color: rgb(100 116 139 / 0.28);
+    overflow: hidden;
+  }
+
+  .qpg-flow-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(15 23 42 / 0) 28%,
+      rgb(15 23 42 / 0.42) 50%,
+      rgb(15 23 42 / 0) 72%,
+      transparent 100%
+    );
+    background-size: 240% 100%;
+    animation: qpg-flow-east 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .qpg-flow-line-south::after {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgb(15 23 42 / 0) 28%,
+      rgb(15 23 42 / 0.38) 50%,
+      rgb(15 23 42 / 0) 72%,
+      transparent 100%
+    );
+    background-size: 100% 240%;
+    animation-name: qpg-flow-south;
+    animation-delay: 0.35s;
+  }
+
+  .qpg-flow-line-final::after {
+    animation-delay: 0.7s;
+  }
+
+  .qpg-flow-card,
+  .qpg-flow-bridge-label {
+    border-color: rgb(148 163 184 / 0.34);
+  }
+
+  .qpg-flow-node {
+    --qpg-flow-order: 0;
+    animation: qpg-flow-node-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--qpg-flow-order) * 70ms);
+  }
+
+  @keyframes qpg-flow-node-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes qpg-flow-east {
+    from {
+      background-position: 140% 0;
+    }
+    to {
+      background-position: -140% 0;
+    }
+  }
+
+  @keyframes qpg-flow-south {
+    from {
+      background-position: 0 -140%;
+    }
+    to {
+      background-position: 0 140%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .qpg-flow-node,
+    .qpg-flow-line::after {
+      animation: none;
+    }
+  }
+
   .paper-canvas {
     min-height: 70rem;
     border: 1px solid hsl(var(--border));

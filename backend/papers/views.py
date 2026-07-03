@@ -244,18 +244,19 @@ class PaperEditorDraftView(APIView):
                 {"error": "answer_document.answersBySlotId must be an object."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        # The frontend cannot know the bank answer for a newly-swapped question.
-        # Reconcile before validation so matching teacher-edited answers survive,
-        # while changed/missing slot entries are rebuilt from the bank instead of
-        # persisting empty placeholders into the answer key.
-        answer_document = build_answer_document(
-            SimpleNamespace(
-                pk=paper.pk,
-                document=document,
-                answer_document=answer_document,
-            )
-        )
         errors = validate_answer_document(document, answer_document)
+        # The frontend cannot know the bank answer for a newly-swapped question.
+        # Reconcile only missing slot entries from the bank; mismatched/stale or
+        # malformed entries are rejected loudly by the consistency gate.
+        if errors and all("has no answer entry" in error for error in errors):
+            answer_document = build_answer_document(
+                SimpleNamespace(
+                    pk=paper.pk,
+                    document=document,
+                    answer_document=answer_document,
+                )
+            )
+            errors = validate_answer_document(document, answer_document)
         if errors:
             return Response(
                 {

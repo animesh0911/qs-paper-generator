@@ -36,6 +36,7 @@ describe('buildGenerationBatchPayload', () => {
       chapter_slugs: ['life-processes'],
       chapter_map_node_ids: ['life-processes:5.1', 'life-processes:activity-5.1'],
       difficulty_preset: 'hard',
+      count: 30,
     });
   });
 });

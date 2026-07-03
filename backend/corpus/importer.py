@@ -16,7 +16,7 @@ from bank.models import Chapter
 
 from .chapter_map import ChapterMapBuilder
 from .models import TextbookDocument, TextbookElement
-from .retrieval import RetrievalChunkBuilder
+from .chunks import RetrievalChunkBuilder
 from .textbook import DoclingNormalizer, canonical_json_hash, load_docling_json
 
 

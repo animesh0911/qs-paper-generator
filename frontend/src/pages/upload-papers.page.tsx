@@ -29,7 +29,7 @@ export default function UploadPapersPage() {
     <div className="min-h-screen bg-secondary">
       <AppHeader />
 
-      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-10">
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-10">
         <Card className="overflow-hidden rounded-lg border-white/70 bg-white/80 shadow-none backdrop-blur-2xl">
           <CardHeader className="border-b border-white/70 bg-white/60 px-5 py-5 sm:px-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

@@ -57,6 +57,18 @@ export interface AssembleRequest {
   format_id?: string;
   chapter_slugs?: string[];
   difficulty?: 'easy' | 'standard' | 'hard';
+  preferred_source_keys?: string[];
+}
+
+export interface PaperSourceSummary {
+  key: string;
+  kind: 'bank_source' | 'upload' | 'ai_session';
+  title: string;
+  detail: string;
+  question_count: number;
+  matching_question_count?: number;
+  created_at: string;
+  status: string;
 }
 
 export interface PaperFormatSummary {
@@ -131,6 +143,7 @@ export interface GenerationBatchCreateRequest {
   chapter_map_node_ids?: string[];
   topic_names?: string[];
   difficulty_preset: string;
+  count?: number;
 }
 
 export interface GenerationBatch {
@@ -203,7 +216,8 @@ export interface GeneratedQuestionCandidate {
 export type SourceType =
   | 'previous_year_paper'
   | 'sample_paper'
-  | 'question_bank';
+  | 'question_bank'
+  | 'ai_generated';
 
 /**
  * Lifecycle of an out-of-request PDF ingestion. `pending`/`running` are polled;
@@ -250,7 +264,9 @@ export interface BankQuestion {
   content: { stem?: ContentItem[]; [key: string]: unknown };
   options: { label: string; text: string }[];
   primary_form: string;
+  topic_names: string[];
   parse_quality: string;
+  review_flags: string[];
   verified: boolean;
   source_type: SourceType | '';
   source_name: string;

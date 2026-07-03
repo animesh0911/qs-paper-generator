@@ -56,6 +56,13 @@ class AssembleRequestSerializer(serializers.Serializer):
         default=list,
     )
     format_id = serializers.CharField(required=False, allow_null=True, default=None)
+    preferred_source_keys = serializers.ListField(
+        child=serializers.RegexField(
+            r"^((upload|ai_batch):\d+|source_file:[A-Za-z0-9_-]+)$"
+        ),
+        required=False,
+        default=list,
+    )
 
     def validate_title(self, value: str) -> str:
         # Empty title means "use the assembler's default" — strip and let the

@@ -308,6 +308,22 @@ def test_assemble_rejects_unknown_difficulty(api_client, seeded_bank):
 # ---------------------------------------------------------------------------
 
 
+def test_pure_allocator_prefers_teacher_selected_source_when_quotas_tie():
+    """Selected source questions are prioritised for the first draft only."""
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
+    pool: QuestionPool = {bucket: [(1, "electricity", "R"), (2, "electricity", "R")]}
+    opts = PaperOptions(
+        template=_spec(1),
+        chapter_slugs=["electricity"],
+        preferred_question_ids={2},
+    )
+
+    result = QuestionPicker._select_from_pool(opts, pool, usage={})
+
+    assert result.question_ids == [2]
+    assert result.alternate_ids == [[1]]
+
+
 def test_pure_allocator_prefers_fresher_question_when_quotas_tie():
     """With chapter/cog quotas tied, the less-used question wins over lower id.
 
