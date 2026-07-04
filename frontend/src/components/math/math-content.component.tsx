@@ -16,6 +16,8 @@
 import { Fragment, type ReactNode } from 'react';
 import type { ContentItem } from '@/types';
 import { MathExpression } from './math-expression.component';
+import { LatexText } from './latex-text.component';
+import { latexHasMath } from './latex';
 
 function inlineItemToText(item: ContentItem): string {
   if (item.text) return item.text;
@@ -50,8 +52,12 @@ function isEscaped(text: string, index: number): boolean {
 }
 
 function findDelimiter(text: string, from: number) {
-  let best: { index: number; open: string; close: string; display: boolean } | null =
-    null;
+  let best: {
+    index: number;
+    open: string;
+    close: string;
+    display: boolean;
+  } | null = null;
   for (const delimiter of MATH_DELIMITERS) {
     let index = text.indexOf(delimiter.open, from);
     while (index !== -1 && isEscaped(text, index)) {
@@ -75,7 +81,11 @@ function splitMathText(text: string): MathSegment[] {
     const contentEnd = text.indexOf(delimiter.close, contentStart);
     if (contentEnd === -1) break;
     if (delimiter.index > cursor) {
-      segments.push({ text: text.slice(cursor, delimiter.index), math: false, display: false });
+      segments.push({
+        text: text.slice(cursor, delimiter.index),
+        math: false,
+        display: false,
+      });
     }
     segments.push({
       text: text.slice(contentStart, contentEnd),
@@ -115,11 +125,12 @@ export function MathContent({ items }: { items: ContentItem[] }) {
   return (
     <>
       {items.map((item, index) => {
-        // `text` wins so labelled prose stays plain, mirroring contentItemToText.
-        if (!item.text && item.latex) {
-          return (
-            <MathExpression key={index} latex={item.latex} display={false} />
-          );
+        // Prefer the `latex` field when it carries real math: either the item
+        // has no plain text, or its latex still holds math once `\text{…}` prose
+        // is stripped (e.g. a sentence ending in `\sqrt{3}`). Plain-prose latex
+        // wrappers fall through to text so labelled prose stays plain.
+        if (item.latex && (!item.text || latexHasMath(item.latex))) {
+          return <LatexText key={index} latex={item.latex} />;
         }
         const text = inlineItemToText(item);
         return text ? <MathText key={index} text={text} /> : null;

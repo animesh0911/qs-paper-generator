@@ -316,6 +316,71 @@
     height: 0;
   }
 
+  /*
+   * Read-only question rendering outside the editor paper sheet (e.g. the
+   * Question Bank). Reproduces the editor's serif paper typography and region
+   * spacing so a question reads identically to its locked editor view.
+   */
+  .qpg-question-readonly {
+    color: #050505;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    line-height: 1.34;
+  }
+
+  .qpg-question-readonly .qpg-question-region {
+    gap: 6pt;
+  }
+
+  /*
+   * Bank row gutter: the stable question index and the marks label. Both use
+   * the paper serif at the question's own size so they align to its first line
+   * and read as part of the exam-paper surface, not app chrome.
+   */
+  .qpg-bank-index,
+  .qpg-bank-marks {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    line-height: 1.34;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .qpg-bank-index {
+    color: hsl(var(--muted-foreground));
+    font-weight: 600;
+  }
+
+  /* Dropdown menu entrance for the custom Select; suppressed under reduced motion. */
+  @keyframes qpg-select-pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(-2px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .qpg-select-menu {
+    transform-origin: top;
+    animation: qpg-select-pop-in 120ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .qpg-select-menu {
+      animation: none;
+    }
+  }
+
+  .qpg-bank-marks {
+    color: #333;
+    font-size: 11pt;
+    font-style: italic;
+    font-weight: 600;
+  }
+
   .qpg-paper-chrome-hit {
     padding: 1px 2px;
   }

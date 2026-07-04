@@ -309,9 +309,18 @@ export interface BankQuestionFilters {
   section?: string;
   qtype?: string;
   source_type?: SourceType;
+  /** A specific paper's `source_name` (see `GET /api/bank/question-sources/`). */
+  source?: string;
   search?: string;
   limit?: number;
   offset?: number;
+}
+
+/** One selectable source paper, from `GET /api/bank/question-sources/`. */
+export interface BankQuestionSource {
+  value: string;
+  label: string;
+  count: number;
 }
 
 /** Paginated response shape from `GET /api/bank/questions/`. */

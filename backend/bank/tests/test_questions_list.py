@@ -94,6 +94,38 @@ def test_filters_by_section_qtype_and_source(api_client):
     assert {q["text"] for q in by_source.data["results"]} == {"C3"}
 
 
+def test_filters_by_source_paper(api_client):
+    """The ``source`` filter narrows to one paper's ``source_name``."""
+    _question(text="From Delhi", source_name="2024 Delhi Set 1")
+    _question(text="From AI", source_name="2024 AI Set 2")
+
+    resp = api_client.get("/api/bank/questions/", {"source": "2024 Delhi Set 1"})
+
+    assert {q["text"] for q in resp.data["results"]} == {"From Delhi"}
+
+
+def test_question_sources_lists_distinct_papers_by_count(api_client, user):
+    """``question-sources`` returns distinct papers, most-populated first."""
+    _question(text="d1", source_name="Delhi")
+    _question(text="d2", source_name="Delhi")
+    _question(text="a1", source_name="AI")
+    _question(text="blank", source_name="")  # excluded: no paper label
+
+    resp = api_client.get("/api/bank/question-sources/")
+
+    assert resp.status_code == 200
+    assert resp.data == [
+        {"value": "Delhi", "label": "Delhi", "count": 2},
+        {"value": "AI", "label": "AI", "count": 1},
+    ]
+
+
+def test_question_sources_requires_teacher(client):
+    """The source list is gated behind ``IsTeacher`` like the bank itself."""
+    resp = client.get("/api/bank/question-sources/")
+    assert resp.status_code in (401, 403)
+
+
 def test_filters_by_chapter_slug(api_client):
     chapter = Chapter.objects.first()
     _question(text="In chapter", chapter=chapter)

@@ -84,6 +84,35 @@ def metadata(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsTeacher])
+def question_sources(request):
+    """Distinct source papers in the visible bank, for the bank's source filter.
+
+    Same tenancy + usable-quality scope as ``questions``: the global/seeded bank
+    plus the teacher's school, clean+partial only. Returns one entry per
+    ``source_name`` (the human-readable paper label, populated for every row)
+    with its question ``count``, most-populated first, so the filter lists the
+    papers a teacher is most likely to browse at the top.
+    """
+    rows = (
+        Question.objects.filter(
+            Q(school__isnull=True) | Q(school=request.user.school),
+            parse_quality__in=["clean", "partial"],
+        )
+        .exclude(source_name="")
+        .values("source_name")
+        .annotate(count=Count("id"))
+        .order_by("-count", "source_name")
+    )
+    return Response(
+        [
+            {"value": r["source_name"], "label": r["source_name"], "count": r["count"]}
+            for r in rows
+        ]
+    )
+
+
+@api_view(["GET"])
 def chapters(request):
     return Response(ChapterTaxonomySerializer(Chapter.objects.all(), many=True).data)
 
@@ -320,9 +349,11 @@ def ingest_answers(request, job_id):
     answer_job, answered_questions = state
     return Response(
         {
-            "job": AnswerGenerationJobSerializer(answer_job).data
-            if answer_job is not None
-            else None,
+            "job": (
+                AnswerGenerationJobSerializer(answer_job).data
+                if answer_job is not None
+                else None
+            ),
             "answers": GeneratedAnswerSerializer(answered_questions, many=True).data,
         }
     )
@@ -348,7 +379,8 @@ def questions(request):
 
     Tenancy: the global/seeded bank (``school IS NULL``) plus the teacher's own
     school. Optional filters: ``chapter`` (slug), ``section``, ``qtype``,
-    ``source_type``, and ``search`` (case-insensitive substring of the question
+    ``source_type``, ``source`` (a specific paper's ``source_name``), and
+    ``search`` (case-insensitive substring of the question
     text). Paginated with ``limit``/``offset``; the response carries ``count``
     so the client can page. Answers are never serialized (see serializers).
     """
@@ -373,6 +405,9 @@ def questions(request):
     source_type = request.query_params.get("source_type")
     if source_type:
         qs = qs.filter(source_type=source_type)
+    source = request.query_params.get("source")
+    if source:
+        qs = qs.filter(source_name=source)
     search = (request.query_params.get("search") or "").strip()
     if search:
         qs = qs.filter(text__icontains=search)

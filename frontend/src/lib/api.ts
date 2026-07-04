@@ -17,6 +17,7 @@ import type {
   AssembleRequest,
   BankQuestion,
   BankQuestionFilters,
+  BankQuestionSource,
   BankQuestionsResponse,
   Chapter,
   ChapterTopicsResponse,
@@ -253,6 +254,14 @@ export async function fetchMetadata(): Promise<Metadata> {
 
 export async function fetchChapters(): Promise<Chapter[]> {
   const res = await request('/bank/chapters/');
+  return res.json();
+}
+
+/** Distinct source papers for the Question Bank's source filter. */
+export async function fetchBankQuestionSources(): Promise<
+  BankQuestionSource[]
+> {
+  const res = await request('/bank/question-sources/');
   return res.json();
 }
 
