@@ -345,18 +345,32 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
             "Marks are fixed by QuestionType: mcq=1, very_short_answer=2, "
             "short_answer=3, long_answer=5.",
             "raw_text must be a non-empty plain-text copy of the full Question "
-            "stem; do not leave it blank when content.stem is present.",
+            "stem and must match content.stem text exactly after joining "
+            "paragraphs with spaces. Do not translate, mix scripts, or leave it "
+            "blank when content.stem is present.",
+            "All learner-facing text (raw_text, content.stem, options, answer) "
+            "must use the requested language only. For Language: en, write only "
+            "English words/symbols; do not include Hindi/Sanskrit terms unless "
+            "the scientific term itself requires them.",
             "Use content.stem as an array of paragraph blocks. For MCQ only, "
             "include content.options as four objects with label A-D and "
             "paragraph content; non-MCQ content must still include content.stem.",
+            "Every question must be self-contained for a student who cannot see "
+            "the NCERT excerpt. Do not write phrases like 'as recorded in Section', "
+            "'according to the excerpt', 'based on the given data/table/figure', "
+            "or 'above process' unless the needed data/process/table is explicitly "
+            "reproduced in content.stem/options.",
+            "For MCQ, create exactly one unambiguously correct option. Distractors "
+            "must be plausible but clearly wrong from the cited NCERT text, and "
+            "answer should be only the correct option label (A, B, C, or D).",
             "Use only canonical chapter slugs and these QuestionType values: "
             "mcq, very_short_answer, short_answer, long_answer.",
             "Return the structured response schema exactly. Put answer inside "
             "each Question payload. Do not include candidate id, batch id, "
             "validation status, modified state, or discarded state.",
             "Hand-reviewed examples:",
-            "- mcq/1: stem asks one concept, four options A-D, answer names "
-            "the correct option and term.",
+            "- mcq/1: stem asks one concept, four options A-D, answer is "
+            "the correct option label only.",
             "- very_short_answer/2: stem asks for a definition or reason, "
             "answer is one or two precise sentences.",
             "- short_answer/3: stem asks for explanation, answer gives two or "
@@ -402,6 +416,11 @@ def _grounding_prompt_lines(grounding_manifest: dict[str, Any] | None) -> list[s
         "Use only the NCERT excerpts supplied below for factual claims.",
         "Use NCERT-faithful terminology and refuse unsupported requests by "
         "returning no candidate for that unsupported idea.",
+        "Use headings only as topic guidance; do not expose section numbers, "
+        "citation ids, chunk ids, or retrieval/excerpt wording in the question.",
+        "If an excerpt contains a table, list, equation, or process needed to "
+        "answer, include the relevant values/statements in the stem; otherwise "
+        "do not ask a question that depends on that hidden structure.",
         "For every candidate, include non-empty question_citation_ids and "
         "answer_citation_ids chosen from the supplied citation_id values.",
         "Do not generate diagram-image questions. Caption-aware text questions "
