@@ -111,7 +111,7 @@ describe('BulkQuestionGenerationSetup', () => {
       />,
     );
 
-    expect(html).toContain('Select Chapter 4 to show topics.');
+    expect(html).toContain('Select a chapter to show topics.');
     expect(html).not.toContain('5.1 Life Processes');
     expect(html).toContain('type="radio"');
   });

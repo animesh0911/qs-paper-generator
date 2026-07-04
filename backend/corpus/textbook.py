@@ -172,6 +172,205 @@ class DoclingNormalizer:
         return Path(uri).name if uri else ""
 
 
+class MistralOcrMarkdownNormalizer:
+    """Convert Mistral OCR page markdown into stable textbook element values.
+
+    Mistral OCR is page-oriented markdown, not a structural document graph. This
+    normalizer intentionally keeps a conservative, auditable mapping: headings,
+    captions, image placeholders, markdown tables, and paragraph blocks are
+    preserved in source order without inventing missing diagram/table content.
+    """
+
+    _MARKDOWN_HEADING = re.compile(r"^#{1,6}\s+")
+    _NUMBERED_SECTION = re.compile(r"^(\d+(?:\.\d+)+)\s+\S")
+    _LANDMARK_HEADING = re.compile(
+        r"^(?:Activity\s+\d+\.\d+|Questions?|"
+        r"Q\s*U\s*E\s*S\s*T\s*I\s*O\s*N\s*S|Exercises?)\b",
+        re.IGNORECASE,
+    )
+    _FIGURE_CAPTION = re.compile(r"^(?:Fig(?:ure)?\.?)\s+\d+\.\d+\b", re.IGNORECASE)
+    _TABLE_CAPTION = re.compile(r"^Table\s+\d+\.\d+\b", re.IGNORECASE)
+    _IMAGE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
+    _PAGE_NOISE = re.compile(
+        r"^(?:SCIENCE|Chapter\s+\d+|\d+|\d{3,}\w+|"
+        r"Reprint\s+\d{4}-\d{2}|Rationalised\s+\d{4}-\d{2}|"
+        r"The Human Eye and the Colourful World)$",
+        re.IGNORECASE,
+    )
+
+    def __init__(self, source_hash: str):
+        self.source_hash = source_hash
+
+    def normalize(self, ocr: dict[str, Any]) -> list[NormalizedTextbookElement]:
+        pages = self._drop_think_it_over_sidebar(pages_from_mistral_ocr(ocr))
+        blocks: list[tuple[int, str, str, dict[str, Any]]] = []
+        for page in pages:
+            blocks.extend(self._page_blocks(page["page_number"], page["markdown"]))
+
+        heading_stack: list[tuple[int, str, bool]] = []
+        result: list[NormalizedTextbookElement] = []
+        for page_number, element_type, text, structured_data in blocks:
+            cleaned = self._clean_block_text(text)
+            if not cleaned and element_type not in {"table", "picture"}:
+                continue
+            if element_type == "text" and self._PAGE_NOISE.fullmatch(cleaned):
+                continue
+
+            heading_path = [heading for _, heading, _ in heading_stack]
+            if element_type == "section_header":
+                numbered = bool(_NUMBERED_HEADING.match(cleaned))
+                level = DoclingNormalizer._heading_level(heading_stack, cleaned)
+                while heading_stack and (
+                    heading_stack[-1][0] >= level
+                    or (numbered and not heading_stack[-1][2])
+                ):
+                    heading_stack.pop()
+                heading_stack.append((level, cleaned, numbered))
+                heading_path = [heading for _, heading, _ in heading_stack]
+
+            source_order = len(result)
+            stable_ref = f"mistral://page/{page_number}/block/{source_order}"
+            result.append(
+                NormalizedTextbookElement(
+                    stable_element_id=self._stable_id(stable_ref, cleaned),
+                    element_type=element_type,
+                    source_order=source_order,
+                    page_number=page_number,
+                    bbox={},
+                    heading_path=heading_path,
+                    text=cleaned,
+                    structured_data=structured_data,
+                    asset_path=self._asset_path(structured_data),
+                )
+            )
+        return result
+
+    def _drop_think_it_over_sidebar(
+        self, pages: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        cleaned_pages: list[dict[str, Any]] = []
+        skipping = False
+        for page in pages:
+            kept_lines: list[str] = []
+            for line in str(page["markdown"]).splitlines():
+                stripped = self._strip_markdown(line.strip())
+                if re.fullmatch(r"Think it over", stripped, re.IGNORECASE):
+                    skipping = True
+                    continue
+                if skipping and self._NUMBERED_SECTION.match(stripped):
+                    skipping = False
+                if not skipping:
+                    kept_lines.append(line)
+            cleaned_pages.append(
+                {**page, "markdown": "\n".join(kept_lines).strip()}
+            )
+        return cleaned_pages
+
+    def _page_blocks(
+        self, page_number: int, markdown: str
+    ) -> list[tuple[int, str, str, dict[str, Any]]]:
+        blocks: list[tuple[int, str, str, dict[str, Any]]] = []
+        paragraph: list[str] = []
+        table: list[str] = []
+
+        def flush_paragraph() -> None:
+            nonlocal paragraph
+            text = " ".join(part.strip() for part in paragraph if part.strip())
+            if text:
+                blocks.append((page_number, self._classify_text(text), text, {}))
+            paragraph = []
+
+        def flush_table() -> None:
+            nonlocal table
+            if table:
+                text = "\n".join(table)
+                blocks.append((page_number, "table", text, {"markdown": text}))
+            table = []
+
+        for raw_line in markdown.splitlines():
+            line = raw_line.strip()
+            if not line:
+                flush_paragraph()
+                flush_table()
+                continue
+            if self._is_markdown_table_line(line):
+                flush_paragraph()
+                table.append(line)
+                continue
+            flush_table()
+            text = self._strip_markdown(line)
+            if not text or self._PAGE_NOISE.fullmatch(text):
+                continue
+            if self._IMAGE.search(text):
+                flush_paragraph()
+                blocks.append(
+                    (page_number, "picture", "", {"markdown": text, "image": text})
+                )
+                continue
+            kind = self._classify_text(text)
+            if kind in {"section_header", "caption"}:
+                flush_paragraph()
+                blocks.append((page_number, kind, text, {}))
+                continue
+            paragraph.append(text)
+        flush_paragraph()
+        flush_table()
+        return blocks
+
+    def _classify_text(self, text: str) -> str:
+        clean = self._clean_block_text(text)
+        if self._NUMBERED_SECTION.match(clean) or self._LANDMARK_HEADING.match(clean):
+            return "section_header"
+        if self._FIGURE_CAPTION.match(clean) or self._TABLE_CAPTION.match(clean):
+            return "caption"
+        return "text"
+
+    @classmethod
+    def _strip_markdown(cls, line: str) -> str:
+        line = cls._MARKDOWN_HEADING.sub("", line).strip()
+        line = re.sub(r"^[-*+]\s+", "", line).strip()
+        line = re.sub(r"\*\*([^*]+)\*\*", r"\1", line)
+        line = re.sub(r"__([^_]+)__", r"\1", line)
+        return line.strip()
+
+    @staticmethod
+    def _is_markdown_table_line(line: str) -> bool:
+        return line.startswith("|") and line.endswith("|") and line.count("|") >= 2
+
+    @staticmethod
+    def _clean_block_text(value: str) -> str:
+        lines = [" ".join(line.split()) for line in value.splitlines()]
+        return "\n".join(line for line in lines if line).strip()
+
+    def _stable_id(self, stable_ref: str, text: str) -> str:
+        evidence = f"{self.source_hash}:{stable_ref}:{text[:120]}"
+        return hashlib.sha256(evidence.encode()).hexdigest()
+
+    @staticmethod
+    def _asset_path(structured_data: dict[str, Any]) -> str:
+        image = str(structured_data.get("image", ""))
+        match = re.search(r"\(([^)]+)\)", image)
+        return Path(match.group(1)).name if match else ""
+
+
+def pages_from_mistral_ocr(ocr: dict[str, Any]) -> list[dict[str, Any]]:
+    pages = ocr.get("pages")
+    if not isinstance(pages, list):
+        return [{"page_number": 1, "markdown": json.dumps(ocr, ensure_ascii=False)}]
+    result: list[dict[str, Any]] = []
+    for index, page in enumerate(pages):
+        if not isinstance(page, dict):
+            continue
+        markdown = page.get("markdown") or page.get("text") or ""
+        result.append(
+            {
+                "page_number": int(page.get("index", index)) + 1,
+                "markdown": str(markdown),
+            }
+        )
+    return result
+
+
 def canonical_json_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -180,4 +379,11 @@ def load_docling_json(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text())
     if data.get("schema_name") != "DoclingDocument":
         raise ValueError("canonical JSON must use the DoclingDocument schema")
+    return data
+
+
+def load_mistral_ocr_json(path: Path) -> dict[str, Any]:
+    data = json.loads(path.read_text())
+    if not isinstance(data, dict):
+        raise ValueError("Mistral OCR artifact must be a JSON object")
     return data

@@ -15,9 +15,17 @@ from django.db import transaction
 from bank.models import Chapter
 
 from .chapter_map import ChapterMapBuilder
-from .models import TextbookDocument, TextbookElement
 from .chunks import RetrievalChunkBuilder
-from .textbook import DoclingNormalizer, canonical_json_hash, load_docling_json
+from .models import TextbookDocument, TextbookElement
+from .textbook import (
+    DoclingNormalizer,
+    MistralOcrMarkdownNormalizer,
+    NormalizedTextbookElement,
+    canonical_json_hash,
+    load_docling_json,
+    load_mistral_ocr_json,
+    pages_from_mistral_ocr,
+)
 
 
 @dataclass(frozen=True)
@@ -43,11 +51,36 @@ class CorpusImporter:
     def import_document(self, request: CorpusImportRequest) -> CorpusImportResult:
         payload = load_docling_json(request.canonical_json_path)
         normalized = DoclingNormalizer(request.source_hash).normalize(payload)
+        return self._persist_normalized(
+            request=request,
+            normalized=normalized,
+            page_count=len(payload.get("pages", {})),
+        )
+
+    @transaction.atomic
+    def import_mistral_ocr(self, request: CorpusImportRequest) -> CorpusImportResult:
+        payload = load_mistral_ocr_json(request.canonical_json_path)
+        normalized = MistralOcrMarkdownNormalizer(request.source_hash).normalize(
+            payload
+        )
+        return self._persist_normalized(
+            request=request,
+            normalized=normalized,
+            page_count=len(pages_from_mistral_ocr(payload)),
+        )
+
+    def _persist_normalized(
+        self,
+        *,
+        request: CorpusImportRequest,
+        normalized: list[NormalizedTextbookElement],
+        page_count: int,
+    ) -> CorpusImportResult:
         artifact_hash = canonical_json_hash(request.canonical_json_path)
         document_defaults = {
             "source_file_name": request.source_file_name,
             "canonical_json_path": str(request.canonical_json_path),
-            "page_count": len(payload.get("pages", {})),
+            "page_count": page_count,
         }
         document, created = TextbookDocument.objects.get_or_create(
             chapter=request.chapter,
