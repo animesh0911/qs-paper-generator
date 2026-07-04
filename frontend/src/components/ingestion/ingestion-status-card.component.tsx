@@ -144,10 +144,10 @@ function ExtractedQuestionsPanel({
       <div className="flex flex-col gap-2 border-b border-input bg-secondary/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 id="extracted-questions-heading" className="text-sm font-medium">
-            Extracted question review
+            Extracted questions
           </h3>
-          <p className="text-xs text-muted-foreground">
-            Grouped by chapter using the backend’s canonical CBSE tags.
+          <p className="text-xs leading-5 text-muted-foreground">
+            Grouped by chapter with canonical CBSE tags.
           </p>
         </div>
         <span className="w-fit rounded-md border border-input bg-background px-2 py-1 text-xs font-medium text-foreground">
@@ -271,9 +271,14 @@ function ExtractedQuestionsSummary({
     <div className="rounded-lg border border-input bg-background px-4 py-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-2 pt-0.5">
-          <p className="text-sm font-medium leading-5 text-foreground">
-            Review extracted questions
-          </p>
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium leading-5 text-foreground">
+              Extracted questions
+            </p>
+            <p className="text-xs leading-5 text-muted-foreground">
+              Review the parsed set before generating a paper.
+            </p>
+          </div>
           <div className="flex flex-wrap gap-1.5">
             {firstGroups.map((group) => (
               <span
@@ -290,12 +295,12 @@ function ExtractedQuestionsSummary({
             )}
           </div>
         </div>
-        <div className="flex w-full shrink-0 flex-col gap-2 sm:w-44">
+        <div className="flex w-full shrink-0 flex-col gap-1.5 sm:w-40">
           <Button
             type="button"
             variant="outline"
             onClick={onOpen}
-            className="h-10 w-full bg-background"
+            className="h-9 w-full bg-background"
             aria-label="Review extracted questions"
           >
             Open review
@@ -371,7 +376,7 @@ function ExtractedQuestionsDialog({
         <div className="flex items-center justify-between gap-4 border-b border-input px-4 py-3.5 sm:px-5">
           <div className="min-w-0">
             <h2 id={titleId} className="text-base font-semibold leading-6">
-              Extracted question review
+              Extracted questions
             </h2>
           </div>
           <button
@@ -420,43 +425,14 @@ function AnswerGenerationPanel({
   const totalCount = answerJob?.total_count ?? questionCount;
 
   return (
-    <div className="rounded-md border border-input bg-secondary/30 p-2.5">
-      <p className="text-xs font-medium leading-4 text-foreground">
-        Draft answers
-      </p>
-      <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
-        Auto-save AI answers for this upload.
-      </p>
-      {loadingAnswers && (
-        <p className="mt-1 text-xs text-muted-foreground">Checking status…</p>
-      )}
-      {inProgress && (
-        <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-          {generatedCount} of {totalCount} saved.
-        </p>
-      )}
-      {done && (
-        <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-          {generatedCount} saved.
-        </p>
-      )}
-      {failed && (
-        <p className="mt-1 text-xs text-destructive" role="alert">
-          {answerJob?.error || 'Answer generation failed.'}
-        </p>
-      )}
-      {answerGenerationError && (
-        <p className="mt-1 text-xs text-destructive" role="alert">
-          {answerGenerationError}
-        </p>
-      )}
+    <div className="space-y-1">
       <Button
         type="button"
         size="sm"
         variant="outline"
         onClick={onGenerateAnswers}
         disabled={generatingAnswers || inProgress || done || questionCount === 0}
-        className="mt-2 w-full bg-background"
+        className="h-9 w-full bg-background"
       >
         {generatingAnswers
           ? 'Queuing…'
@@ -466,6 +442,29 @@ function AnswerGenerationPanel({
               ? 'Try again'
               : 'Generate answers'}
       </Button>
+      {loadingAnswers && (
+        <p className="text-xs text-muted-foreground">Checking status…</p>
+      )}
+      {inProgress && (
+        <p className="text-xs text-muted-foreground" aria-live="polite">
+          Saving {generatedCount} of {totalCount}.
+        </p>
+      )}
+      {done && (
+        <p className="text-xs text-muted-foreground" aria-live="polite">
+          {generatedCount} saved.
+        </p>
+      )}
+      {failed && (
+        <p className="text-xs text-destructive" role="alert">
+          {answerJob?.error || 'Answer generation failed.'}
+        </p>
+      )}
+      {answerGenerationError && (
+        <p className="text-xs text-destructive" role="alert">
+          {answerGenerationError}
+        </p>
+      )}
     </div>
   );
 }
@@ -590,7 +589,7 @@ export function IngestionStatusCard({
             <div className="space-y-2">
               {loadingQuestions ? (
                 <p className="rounded-lg border border-input bg-background px-4 py-3 text-sm text-muted-foreground">
-                  Loading the extracted question review…
+                  Loading extracted questions…
                 </p>
               ) : parsedQuestions.length > 0 ? (
                 <>

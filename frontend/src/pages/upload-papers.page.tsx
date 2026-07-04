@@ -30,17 +30,14 @@ export default function UploadPapersPage() {
           <CardHeader className="border-b border-input bg-background px-5 py-5 sm:px-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-1.5">
-                <CardTitle className="text-xl leading-7">
-                  Upload a PDF
-                </CardTitle>
+                <CardTitle className="text-xl leading-7">Upload PDF</CardTitle>
                 <p className="max-w-xl text-sm leading-5 text-muted-foreground">
-                  AI extracts the questions from your PDF and adds them to your
-                  question bank.
+                  Extract questions from a paper and add them to the question bank.
                 </p>
               </div>
               <span className="inline-flex w-fit items-center gap-1.5 rounded-md border border-input bg-secondary px-2.5 py-1.5 text-xs font-medium text-secondary-foreground">
                 <FileSearch className="size-3.5" aria-hidden="true" />
-                Question-bank ingestion
+                Question bank
               </span>
             </div>
           </CardHeader>
@@ -67,9 +64,7 @@ export default function UploadPapersPage() {
               <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <div className="text-sm font-medium leading-5">
-                      Select a PDF
-                    </div>
+                    <div className="text-sm font-medium leading-5">PDF file</div>
                     <PdfDropzone
                       file={upload.file}
                       onSelect={upload.selectFile}
@@ -87,7 +82,7 @@ export default function UploadPapersPage() {
                   )}
                   <div className="flex flex-col gap-2 border-t border-input pt-5 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xs leading-5 text-muted-foreground">
-                      Extraction continues in the background after upload.
+                      Extraction runs in the background.
                     </p>
                     <Button
                       onClick={upload.upload}
@@ -107,15 +102,15 @@ export default function UploadPapersPage() {
                     <div className="space-y-3">
                       <div>
                         <h2 className="text-sm font-medium leading-5">
-                          What gets saved
+                          Saved to the bank
                         </h2>
                         <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
-                          Questions, marks, chapters, and the PDF name.
+                          Questions, marks, chapter tags, and source file.
                         </p>
                       </div>
                       <ul className="space-y-1.5 text-xs leading-5 text-muted-foreground">
                         <li>• Duplicates are skipped.</li>
-                        <li>• You can review extracted questions.</li>
+                        <li>• Review the extracted set after upload.</li>
                       </ul>
                     </div>
                   </div>
