@@ -6,7 +6,7 @@
  *
  * @module IngestionStatusCard
  */
-import { useEffect, useId, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -257,23 +257,20 @@ function ExtractedQuestionsPanel({
 function ExtractedQuestionsSummary({
   questions,
   onOpen,
+  action,
 }: {
   questions: BankQuestion[];
   onOpen: () => void;
+  action?: ReactNode;
 }) {
   const groups = groupByChapter(questions);
   const firstGroups = groups.slice(0, 3);
   const remainingGroups = groups.length - firstGroups.length;
 
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="group w-full rounded-lg border border-input bg-background px-4 py-3 text-left transition-colors hover:bg-secondary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      aria-label="Review extracted questions"
-    >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 space-y-2">
+    <div className="rounded-lg border border-input bg-background px-4 py-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-2 pt-0.5">
           <p className="text-sm font-medium leading-5 text-foreground">
             Review extracted questions
           </p>
@@ -293,11 +290,20 @@ function ExtractedQuestionsSummary({
             )}
           </div>
         </div>
-        <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground group-hover:bg-background">
-          Open review
-        </span>
+        <div className="flex w-full shrink-0 flex-col gap-2 sm:w-44">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onOpen}
+            className="h-10 w-full bg-background"
+            aria-label="Review extracted questions"
+          >
+            Open review
+          </Button>
+          {action}
+        </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -414,58 +420,53 @@ function AnswerGenerationPanel({
   const totalCount = answerJob?.total_count ?? questionCount;
 
   return (
-    <section className="rounded-lg border border-input bg-background px-4 py-3">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-foreground">
-            Generate answers for extracted questions
-          </p>
-          <p className="text-xs leading-5 text-muted-foreground">
-            Optional AI pass. Answers are auto-saved to these questions and shown
-            here as AI drafts.
-          </p>
-          {loadingAnswers && (
-            <p className="text-xs text-muted-foreground">Loading answer state…</p>
-          )}
-          {inProgress && (
-            <p className="text-xs text-muted-foreground" aria-live="polite">
-              Generating answers… {generatedCount} of {totalCount} saved.
-            </p>
-          )}
-          {done && (
-            <p className="text-xs text-muted-foreground" aria-live="polite">
-              Generated {generatedCount}{' '}
-              {generatedCount === 1 ? 'answer' : 'answers'} and saved them.
-            </p>
-          )}
-          {failed && (
-            <p className="text-xs text-destructive" role="alert">
-              {answerJob?.error || 'Answer generation failed.'}
-            </p>
-          )}
-          {answerGenerationError && (
-            <p className="text-xs text-destructive" role="alert">
-              {answerGenerationError}
-            </p>
-          )}
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onGenerateAnswers}
-          disabled={generatingAnswers || inProgress || done || questionCount === 0}
-          className="shrink-0"
-        >
-          {generatingAnswers
-            ? 'Queuing…'
-            : done
-              ? 'Answers saved'
-              : failed
-                ? 'Try again'
-                : 'Generate answers'}
-        </Button>
-      </div>
-    </section>
+    <div className="rounded-md border border-input bg-secondary/30 p-2.5">
+      <p className="text-xs font-medium leading-4 text-foreground">
+        Draft answers
+      </p>
+      <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
+        Auto-save AI answers for this upload.
+      </p>
+      {loadingAnswers && (
+        <p className="mt-1 text-xs text-muted-foreground">Checking status…</p>
+      )}
+      {inProgress && (
+        <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
+          {generatedCount} of {totalCount} saved.
+        </p>
+      )}
+      {done && (
+        <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
+          {generatedCount} saved.
+        </p>
+      )}
+      {failed && (
+        <p className="mt-1 text-xs text-destructive" role="alert">
+          {answerJob?.error || 'Answer generation failed.'}
+        </p>
+      )}
+      {answerGenerationError && (
+        <p className="mt-1 text-xs text-destructive" role="alert">
+          {answerGenerationError}
+        </p>
+      )}
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        onClick={onGenerateAnswers}
+        disabled={generatingAnswers || inProgress || done || questionCount === 0}
+        className="mt-2 w-full bg-background"
+      >
+        {generatingAnswers
+          ? 'Queuing…'
+          : done
+            ? 'Answers saved'
+            : failed
+              ? 'Try again'
+              : 'Generate answers'}
+      </Button>
+    </div>
   );
 }
 
@@ -596,21 +597,23 @@ export function IngestionStatusCard({
                   <ExtractedQuestionsSummary
                     questions={parsedQuestions}
                     onOpen={openReview}
+                    action={
+                      <AnswerGenerationPanel
+                        answerJob={answerJob}
+                        generatedAnswers={generatedAnswers}
+                        loadingAnswers={loadingAnswers}
+                        generatingAnswers={generatingAnswers}
+                        answerGenerationError={answerGenerationError}
+                        questionCount={parsedQuestions.length}
+                        onGenerateAnswers={onGenerateAnswers}
+                      />
+                    }
                   />
                   <ExtractedQuestionsDialog
                     questions={parsedQuestions}
                     answersByQuestionId={answersByQuestionId}
                     open={reviewOpen}
                     onClose={closeReview}
-                  />
-                  <AnswerGenerationPanel
-                    answerJob={answerJob}
-                    generatedAnswers={generatedAnswers}
-                    loadingAnswers={loadingAnswers}
-                    generatingAnswers={generatingAnswers}
-                    answerGenerationError={answerGenerationError}
-                    questionCount={parsedQuestions.length}
-                    onGenerateAnswers={onGenerateAnswers}
                   />
                 </>
               ) : (
