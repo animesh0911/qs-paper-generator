@@ -324,6 +324,60 @@ def test_pure_allocator_prefers_teacher_selected_source_when_quotas_tie():
     assert result.alternate_ids == [[1]]
 
 
+def test_pure_allocator_uses_wider_bank_when_selected_sources_are_insufficient():
+    """Source selection is a soft first-draft priority, not a hard filter.
+
+    A teacher may generate from selected sources without chapters, but if those
+    sources do not fill every compatible slot, the first draft can still use the
+    wider bank instead of leaving fillable slots blank.
+    """
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
+    pool: QuestionPool = {
+        bucket: [(1, "electricity", "R"), (2, "life-processes", "R")]
+    }
+    opts = PaperOptions(
+        template=_spec(2),
+        preferred_question_ids={2},
+    )
+
+    result = QuestionPicker._select_from_pool(opts, pool, usage={})
+
+    assert result.question_ids == [2, 1]
+    assert result.unfilled == []
+
+
+def test_pure_allocator_keeps_alternatives_source_unfiltered():
+    """Alternatives expose compatible bank rows even outside selected sources."""
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
+    pool: QuestionPool = {bucket: [(1, "electricity", "R"), (2, "electricity", "R")]}
+    opts = PaperOptions(
+        template=_spec(1),
+        chapter_slugs=["electricity"],
+        preferred_question_ids={2},
+    )
+
+    result = QuestionPicker._select_from_pool(opts, pool, usage={})
+
+    assert result.question_ids == [2]
+    assert result.alternate_ids == [[1]]
+
+
+def test_pure_allocator_keeps_chapters_strict_for_alternatives():
+    """Chapter selection limits both first picks and swap alternatives."""
+    bucket = (Section.A, QuestionType.MCQ, 1, None)
+    pool: QuestionPool = {bucket: [(1, "electricity", "R"), (2, "life-processes", "R")]}
+    opts = PaperOptions(
+        template=_spec(1),
+        chapter_slugs=["electricity"],
+        preferred_question_ids={2},
+    )
+
+    result = QuestionPicker._select_from_pool(opts, pool, usage={})
+
+    assert result.question_ids == [1]
+    assert result.alternate_ids == [[]]
+
+
 def test_pure_allocator_prefers_fresher_question_when_quotas_tie():
     """With chapter/cog quotas tied, the less-used question wins over lower id.
 

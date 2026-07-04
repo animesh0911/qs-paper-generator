@@ -114,31 +114,41 @@ function makeForm(overrides: Partial<CoverageForm> = {}): CoverageForm {
   };
 }
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  document.body.style.overflow = '';
+});
 
 describe('CoverageFormView', () => {
-  it('shows fixed context and one PaperFormat selector populated from backend formats', () => {
+  it('shows fixed context and one paper format selector populated from backend formats', () => {
     const html = renderToStaticMarkup(
       <CoverageFormView form={makeForm()} busy={false} onGenerate={vi.fn()} />,
     );
 
     expect(html.match(/<select/g)).toHaveLength(1);
     expect(html).toContain('Class 10 · Science');
-    expect(html).toContain('PaperFormat');
+    expect(html).toContain('Paper format');
     expect(html).toContain('CBSE End Term Exam');
     expect(html).not.toContain('Preset');
   });
 
-  it('groups chapters by subject area and exposes select controls', () => {
+  it('shows chapters and sources as compact dropdowns with a live scope panel', () => {
     const html = renderToStaticMarkup(
-      <CoverageFormView form={makeForm()} busy={false} onGenerate={vi.fn()} />,
+      <CoverageFormView
+        form={makeForm({ selectedSourceKeys: new Set(['upload:new']) })}
+        busy={false}
+        onGenerate={vi.fn()}
+      />,
     );
 
-    expect(html).toContain('Chemistry');
-    expect(html).toContain('Biology');
-    expect(html).toContain('Physics');
-    expect(html).toContain('Select all Chapters');
-    expect(html).toContain('Select group');
+    expect(html).not.toContain('Select paper filters');
+    expect(html).toContain('Choose chapters');
+    expect(html).toContain('Choose sources');
+    expect(html).toContain('Open choose chapters');
+    expect(html).toContain('Open choose sources');
+    expect(html).toContain('Paper scope');
+    expect(html).toContain('Strict filter');
+    expect(html).toContain('First draft only');
   });
 
   it('shows total marks and live paper structure summary', () => {
@@ -147,9 +157,9 @@ describe('CoverageFormView', () => {
     );
 
     expect(html).toContain('Total marks');
-    expect(html).toContain('readOnly=""');
+    expect(html).toContain('<output');
     expect(html).toContain('Paper structure');
-    expect(html).toContain('Marks by QuestionType');
+    expect(html).toContain('Marks by question type');
     expect(html).toContain('≈ 39');
   });
 
@@ -162,8 +172,53 @@ describe('CoverageFormView', () => {
     expect(html).not.toContain('Difficulty');
   });
 
-  it('disables chapter bulk controls while chapters are loading', () => {
-    const html = renderToStaticMarkup(
+  it('shows chapter subject groups inside the focused chapter screen', async () => {
+    const user = userEvent.setup();
+    render(
+      <CoverageFormView form={makeForm()} busy={false} onGenerate={vi.fn()} />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Open choose chapters' }),
+    );
+
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(screen.getByText('Chemistry')).toBeTruthy();
+    expect(screen.getByText('Biology')).toBeTruthy();
+    expect(screen.getByText('Physics')).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'Select all chapters' }),
+    ).toBeTruthy();
+  });
+
+  it('hardens the focused selection screen as an accessible modal', async () => {
+    const user = userEvent.setup();
+    render(
+      <CoverageFormView form={makeForm()} busy={false} onGenerate={vi.fn()} />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Open choose chapters' }),
+    );
+
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Open choose chapters' }),
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Close selection dialog' }),
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('disables chapter bulk controls while chapters are loading', async () => {
+    const user = userEvent.setup();
+    render(
       <CoverageFormView
         form={makeForm({ chaptersLoading: true })}
         busy={false}
@@ -171,43 +226,91 @@ describe('CoverageFormView', () => {
       />,
     );
 
-    expect(html).toContain('Select all Chapters');
-    expect(html).toContain('disabled=""');
+    await user.click(
+      screen.getByRole('button', { name: 'Open choose chapters' }),
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Select all chapters' }),
+    ).toHaveProperty('disabled', true);
+  });
+
+  it('shows source choices directly after chapters in the same list', async () => {
+    const user = userEvent.setup();
+    const toggleSource = vi.fn();
+
+    render(
+      <CoverageFormView
+        form={makeForm({
+          toggleSource,
+          sources: [
+            {
+              key: 'upload:new',
+              kind: 'upload',
+              title: 'Newest uploaded paper',
+              detail: 'Previous year paper',
+              question_count: 12,
+              matching_question_count: 5,
+              created_at: '2026-06-22T10:00:00Z',
+              status: 'ready',
+            },
+          ],
+        })}
+        busy={false}
+        onGenerate={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Choose sources' }),
+    ).toBeTruthy();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Open choose sources' }),
+    );
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(screen.getByText('Newest uploaded paper')).toBeTruthy();
+
+    await user.click(screen.getByLabelText(/Newest uploaded paper/));
+    await user.click(screen.getByRole('button', { name: 'Approve selection' }));
+    expect(toggleSource).toHaveBeenCalledWith('upload:new');
   });
 
   it('wires chapter group and generate controls to the parent state owner', async () => {
     const user = userEvent.setup();
-    const toggleChapterGroup = vi.fn();
-    const selectAllChapters = vi.fn();
+    const toggleChapter = vi.fn();
     const onGenerate = vi.fn();
 
     render(
       <CoverageFormView
-        form={makeForm({ toggleChapterGroup, selectAllChapters })}
+        form={makeForm({ toggleChapter })}
         busy={false}
         onGenerate={onGenerate}
       />,
     );
 
     await user.click(
-      screen.getByRole('button', { name: 'Select all Chapters' }),
+      screen.getByRole('button', { name: 'Open choose chapters' }),
     );
-    expect(selectAllChapters).toHaveBeenCalledTimes(1);
-
     await user.click(
-      screen.getAllByRole('button', { name: 'Select group' })[0],
+      screen.getByRole('button', { name: 'Select all chapters' }),
     );
-    expect(toggleChapterGroup).toHaveBeenCalledWith('Biology');
+    await user.click(screen.getByRole('button', { name: 'Approve selection' }));
+    expect(toggleChapter).toHaveBeenCalledWith('life-processes');
+    expect(toggleChapter).toHaveBeenCalledWith(
+      'light-reflection-and-refraction',
+    );
 
     await user.click(screen.getByRole('button', { name: 'Generate paper' }));
     expect(onGenerate).toHaveBeenCalledTimes(1);
   });
 
-  it('blocks generation when no chapter is selected', () => {
+  it('blocks generation when neither chapters nor sources are selected', () => {
     const html = renderToStaticMarkup(
       <CoverageFormView
         form={makeForm({
           selectedSlugs: new Set(),
+          selectedSourceKeys: new Set(),
           hasSelectedChapters: false,
         })}
         busy={false}
@@ -215,8 +318,57 @@ describe('CoverageFormView', () => {
       />,
     );
 
-    expect(html).toContain('Chapter selection required');
-    expect(html).toContain('Select at least one Chapter');
+    expect(html).toContain('Choose chapters or sources to generate');
     expect(html).toContain('disabled=""');
+  });
+
+  it('allows generation from selected sources without selecting chapters', async () => {
+    const user = userEvent.setup();
+    const onGenerate = vi.fn();
+
+    render(
+      <CoverageFormView
+        form={makeForm({
+          selectedSlugs: new Set(),
+          selectedSourceKeys: new Set(['upload:new']),
+          hasSelectedChapters: false,
+        })}
+        busy={false}
+        onGenerate={onGenerate}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Generate paper' }));
+
+    expect(onGenerate).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows source selection before choosing chapters', () => {
+    render(
+      <CoverageFormView
+        form={makeForm({
+          selectedSlugs: new Set(),
+          hasSelectedChapters: false,
+          sources: [
+            {
+              key: 'upload:new',
+              kind: 'upload',
+              title: 'Newest uploaded paper',
+              detail: 'Previous year paper',
+              question_count: 12,
+              matching_question_count: 5,
+              created_at: '2026-06-22T10:00:00Z',
+              status: 'ready',
+            },
+          ],
+        })}
+        busy={false}
+        onGenerate={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Choose sources' }),
+    ).toBeTruthy();
   });
 });

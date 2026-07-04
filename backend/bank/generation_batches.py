@@ -8,6 +8,7 @@ persistence, and GeneratedQuestionCandidate import into the Question bank.
 
 from __future__ import annotations
 
+import copy
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
@@ -21,6 +22,7 @@ from django.utils import timezone
 from corpus.retrieval import ChapterMapContextAssembler, TextbookRetrievalRequest
 from workflows.checkpointer import get_checkpointer
 
+from .extraction import _fingerprint
 from .generation import (
     DIFFICULTY_TARGETS_BY_PRESET,
     LangChainQuestionGenerator,
@@ -379,7 +381,7 @@ def question_from_candidate(candidate, batch):
         cognitive_level=payload["cognitive_level"],
         text=payload["raw_text"],
         options=options_from_generated_content(payload),
-        content=payload["content"],
+        content=content_from_generated_candidate(candidate, batch),
         topic_names=list(payload["topic_names"]),
         answer=payload["answer"],
         answer_source=AnswerSource.GENERATED_UNVERIFIED,
@@ -387,7 +389,50 @@ def question_from_candidate(candidate, batch):
         parse_quality=ParseQuality.CLEAN,
         source_type=SourceType.AI_GENERATED,
         source_name=payload.get("source", {}).get("name", ""),
+        source_hash=_fingerprint(payload["raw_text"]),
     )
+
+
+def content_from_generated_candidate(candidate, batch) -> dict:
+    """Preserve generated-question grounding/audit data with the bank row."""
+    content = copy.deepcopy(candidate.payload["content"])
+    if not isinstance(content, dict):
+        return {}
+
+    provenance = generated_candidate_provenance(candidate, batch)
+    if provenance:
+        content["__provenance"] = provenance
+    return content
+
+
+def generated_candidate_provenance(candidate, batch) -> dict:
+    """Return serializable provenance for an accepted AI candidate."""
+    payload = candidate.payload
+    manifest = candidate.grounding_manifest or {}
+    question_citation_ids = [
+        item
+        for item in payload.get("question_citation_ids", [])
+        if isinstance(item, str)
+    ]
+    answer_citation_ids = [
+        item for item in payload.get("answer_citation_ids", []) if isinstance(item, str)
+    ]
+    citation_ids = set(question_citation_ids) | set(answer_citation_ids)
+    excerpts = [
+        excerpt
+        for excerpt in manifest.get("excerpts", [])
+        if isinstance(excerpt, dict) and excerpt.get("citation_id") in citation_ids
+    ]
+    provenance = {
+        "kind": "ai_generated",
+        "batchId": batch.pk,
+        "candidateId": candidate.pk,
+        "questionCitationIds": question_citation_ids,
+        "answerCitationIds": answer_citation_ids,
+    }
+    if excerpts:
+        provenance["groundingExcerpts"] = excerpts
+    return provenance
 
 
 def section_for_generated_qtype(qtype):
@@ -407,7 +452,9 @@ def options_from_generated_content(payload):
     for option in options:
         if not isinstance(option, dict):
             continue
-        content = option.get("content", [])
+        content = option.get("content") or []
+        if not isinstance(content, list):
+            content = []
         text = " ".join(
             item.get("text", "")
             for item in content

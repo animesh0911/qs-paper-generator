@@ -20,6 +20,7 @@ Where it fits:
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 
 from langchain_core.language_models import BaseChatModel
@@ -27,6 +28,8 @@ from langchain_core.output_parsers import PydanticOutputParser, StrOutputParser
 from pydantic import BaseModel, Field
 
 from ai_services.llm import ModelPurpose, make_chat_model
+
+logger = logging.getLogger(__name__)
 
 # Routes the classifier may emit. ``off_topic`` is the polite refusal for
 # requests that are not about the paper or the editor.
@@ -75,9 +78,16 @@ def classify_intent(text: str, *, paper_title: str) -> dict:
         f"{parser.get_format_instructions()}\n\n"
         f"Request: {text}"
     )
-    result: IntentResult = (make_model(ModelPurpose.EDITOR_ASSISTANT) | parser).invoke(
-        prompt
-    )
+    try:
+        result: IntentResult = (
+            make_model(ModelPurpose.EDITOR_ASSISTANT) | parser
+        ).invoke(prompt)
+    except Exception as exc:  # noqa: BLE001 - provider/parser failures need safe UX
+        logger.exception("Assistant intent classification failed: %s", exc)
+        return {
+            "route": "off_topic",
+            "reason": "Fell back because the request could not be classified.",
+        }
     route = result.route if result.route in INTENT_ROUTES else "off_topic"
     return {"route": route, "reason": result.reason}
 

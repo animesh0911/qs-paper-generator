@@ -17,13 +17,18 @@ import {
   Upload,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { fetchIngestionJobs } from '@/lib/api';
+import { fetchGenerationBatches, fetchIngestionJobs } from '@/lib/api';
 import { isIngestionJobRecent, isIngestionTerminal } from '@/lib/ingestion';
 import { useAuth } from '@/hooks/useAuth.hook';
 import { Button } from '@/components/ui/button';
-import type { IngestionJob } from '@/types';
+import type { GenerationBatch, IngestionJob } from '@/types';
 
 const TERMINAL_HEADER_VISIBLE_MS = 30 * 60 * 1000;
+const ACTIVE_GENERATION_STATUSES: GenerationBatch['status'][] = [
+  'queued',
+  'generating_questions',
+  'validating',
+];
 
 function shouldShowHeaderJob(job: IngestionJob): boolean {
   return (
@@ -67,6 +72,9 @@ export function AppHeader() {
   const { logout } = useAuth();
   const location = useLocation();
   const showIngestionPill = location.pathname !== '/upload';
+  const showGenerationPill =
+    location.pathname !== '/ai-qa' &&
+    !location.pathname.startsWith('/generation-batches/');
 
   return (
     <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
@@ -86,8 +94,9 @@ export function AppHeader() {
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
           {showIngestionPill && <IngestionActivityPill />}
+          {showGenerationPill && <GenerationActivityPill />}
           <Button
             variant="ghost"
             size="sm"
@@ -100,6 +109,45 @@ export function AppHeader() {
       </div>
     </header>
   );
+}
+
+function isGenerationActive(status: GenerationBatch['status']): boolean {
+  return ACTIVE_GENERATION_STATUSES.includes(status);
+}
+
+function isGenerationRecentlyUpdated(batch: GenerationBatch): boolean {
+  const updatedAt = Date.parse(batch.updated_at);
+  return (
+    Number.isFinite(updatedAt) &&
+    Date.now() - updatedAt <= TERMINAL_HEADER_VISIBLE_MS
+  );
+}
+
+function shouldShowHeaderBatch(batch: GenerationBatch): boolean {
+  return (
+    isGenerationActive(batch.status) ||
+    (['ready_for_review', 'failed', 'accepted'].includes(batch.status) &&
+      isGenerationRecentlyUpdated(batch))
+  );
+}
+
+function generationActivityLabel(batch: GenerationBatch): string {
+  switch (batch.status) {
+    case 'queued':
+      return 'Q&A queued';
+    case 'generating_questions':
+      return 'Q&A drafting';
+    case 'validating':
+      return 'Q&A checking';
+    case 'ready_for_review':
+      return `${batch.candidate_count} Q&A ready`;
+    case 'accepted':
+      return 'Q&A imported';
+    case 'failed':
+      return 'Q&A failed';
+    default:
+      return 'Q&A updated';
+  }
 }
 
 function IngestionActivityPill() {
@@ -144,11 +192,11 @@ function IngestionActivityPill() {
     : '';
   const label = inProgress
     ? job.status === 'pending'
-      ? 'Extraction queued'
-      : `Extraction running${progress}`
+      ? 'Upload queued'
+      : `Upload running${progress}`
     : job.status === 'done'
       ? `${job.created_count} extracted`
-      : 'Extraction failed';
+      : 'Upload failed';
 
   return (
     <Link
@@ -168,6 +216,71 @@ function IngestionActivityPill() {
           aria-hidden="true"
         />
       ) : job.status === 'failed' ? (
+        <AlertTriangle className="size-3.5" aria-hidden="true" />
+      ) : (
+        <CheckCircle2 className="size-3.5" aria-hidden="true" />
+      )}
+      <span className="truncate">{label}</span>
+    </Link>
+  );
+}
+
+function GenerationActivityPill() {
+  const [batches, setBatches] = useState<GenerationBatch[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    async function refresh() {
+      try {
+        const next = await fetchGenerationBatches();
+        if (cancelled) return;
+        setBatches(next);
+        const hasActive = next.some((batch) => isGenerationActive(batch.status));
+        timer = setTimeout(refresh, hasActive ? 3000 : 15000);
+      } catch {
+        if (!cancelled) timer = setTimeout(refresh, 15000);
+      }
+    }
+
+    refresh();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
+
+  const batch = useMemo(
+    () =>
+      batches.find((item) => isGenerationActive(item.status)) ??
+      batches.find(shouldShowHeaderBatch),
+    [batches],
+  );
+
+  if (!batch) return null;
+
+  const inProgress = isGenerationActive(batch.status);
+  const label = generationActivityLabel(batch);
+
+  return (
+    <Link
+      to={`/generation-batches/${batch.id}`}
+      className={cn(
+        'inline-flex h-8 max-w-[10rem] items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        inProgress
+          ? 'border-input bg-secondary text-foreground hover:bg-secondary/80'
+          : 'border-input bg-background text-muted-foreground hover:bg-secondary',
+      )}
+      aria-label={`${label}. Open generation progress.`}
+      aria-live="polite"
+    >
+      {inProgress ? (
+        <LoaderCircle
+          className="size-3.5 motion-safe:animate-spin"
+          aria-hidden="true"
+        />
+      ) : batch.status === 'failed' ? (
         <AlertTriangle className="size-3.5" aria-hidden="true" />
       ) : (
         <CheckCircle2 className="size-3.5" aria-hidden="true" />

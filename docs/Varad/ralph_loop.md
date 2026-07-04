@@ -9,6 +9,7 @@ Use this loop for each `V` issue.
    Continue all issue work from the clean worktree printed by the script.
 1.1 You don't have to read all relevant skills. We are token budget mode.
 2. Use /implement skill to implement the issue. This skill is there in pi.
+2.5 use this reference for when you are making lot of changes in the code .claude/skills/tdd
 3. Use the codex-agy-bridge MCP for code review.
 4. Rectify the findings. You can also reject findings.
 10. Re-read the GitHub issue for obvious scope misses.

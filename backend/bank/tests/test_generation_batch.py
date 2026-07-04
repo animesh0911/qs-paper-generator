@@ -15,6 +15,8 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from accounts.models import School
+from bank.extraction import _fingerprint
+from bank.generation_batches import options_from_generated_content
 from bank.management.commands import drain_generation_batches as drain_mod
 from bank.models import (
     AnswerSource,
@@ -455,6 +457,17 @@ def test_grounded_batch_rejects_unknown_citations(db, user, monkeypatch):
     assert GeneratedQuestionCandidate.objects.count() == 0
 
 
+def test_options_from_generated_content_handles_null_option_content():
+    """Accept conversion is defensive even if legacy bad candidate JSON exists."""
+    payload = _payload()
+    payload["content"]["options"][0]["content"] = None
+
+    options = options_from_generated_content(payload)
+
+    assert options[0] == {"label": "A", "text": ""}
+    assert options[1] == {"label": "B", "text": "Osmosis"}
+
+
 def test_accept_ready_batch_inserts_selected_questions_and_rejects_rest(
     api_client, user
 ):
@@ -493,9 +506,52 @@ def test_accept_ready_batch_inserts_selected_questions_and_rejects_rest(
     assert question.text == "Accepted generated Question?"
     assert question.school == user.school
     assert question.source_type == SourceType.AI_GENERATED
+    assert question.source_hash == _fingerprint("Accepted generated Question?")
     assert question.answer_source == AnswerSource.GENERATED_UNVERIFIED
     assert question.verified is False
     assert question.chapter.slug == "life-processes"
+
+
+def test_accept_ready_batch_preserves_grounding_provenance(api_client, user):
+    """Accepted AI questions keep audit citations from the reviewed candidate."""
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.READY_FOR_REVIEW,
+        ready_at=timezone.now(),
+    )
+    candidate = GeneratedQuestionCandidate.objects.create(
+        batch=batch,
+        payload=_payload(),
+        grounding_manifest={
+            "excerpts": [
+                {
+                    "citation_id": "chunk-respiration",
+                    "text": "Respiration releases energy from glucose.",
+                },
+                {"citation_id": "unused", "text": "Not cited."},
+            ]
+        },
+    )
+
+    resp = api_client.post(
+        f"/api/bank/generation-batches/{batch.pk}/accept/",
+        {"accepted_candidate_ids": [candidate.pk]},
+        format="json",
+    )
+
+    assert resp.status_code == 200
+    provenance = Question.objects.get().content["__provenance"]
+    assert provenance["batchId"] == batch.pk
+    assert provenance["candidateId"] == candidate.pk
+    assert provenance["questionCitationIds"] == ["chunk-respiration"]
+    assert provenance["answerCitationIds"] == ["chunk-respiration"]
+    assert provenance["groundingExcerpts"] == [
+        {
+            "citation_id": "chunk-respiration",
+            "text": "Respiration releases energy from glucose.",
+        }
+    ]
 
 
 def test_accept_ready_batch_rejects_empty_selection_without_side_effects(

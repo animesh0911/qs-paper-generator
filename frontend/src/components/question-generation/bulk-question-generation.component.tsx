@@ -4,14 +4,10 @@ import type {
   GenerationBatch,
   GenerationBatchStatus,
   GeneratedQuestionCandidate,
-  GenerationDifficultyLabel,
 } from '@/types';
 import { Check, Layers, LoaderCircle, MousePointer2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  GENERATION_DIFFICULTIES,
-  shouldShowNoValidQuestionsMessage,
-} from '@/lib/question-generation';
+import { shouldShowNoValidQuestionsMessage } from '@/lib/question-generation';
 import { CandidateReviewPanel } from './candidate-review-panel.component';
 
 const ACTIVE_GENERATION_STATUSES: GenerationBatch['status'][] = [
@@ -50,14 +46,12 @@ export interface BulkQuestionGenerationSetupProps {
   topicsLoading: boolean;
   topicsError: string;
   selectedTopicIds: Set<string>;
-  difficulty: GenerationDifficultyLabel;
   busy: boolean;
   error: string;
   activeBatchId?: number | null;
   onSelectChapter: (slug: string) => void;
   onToggleTopic: (nodeId: string) => void;
   onClearTopics: () => void;
-  onDifficultyChange: (difficulty: GenerationDifficultyLabel) => void;
   onStart: () => void;
   onOpenActiveBatch?: () => void;
   onOpenBatch?: (batchId: number) => void;
@@ -112,14 +106,12 @@ export function BulkQuestionGenerationSetup({
   topicsLoading,
   topicsError,
   selectedTopicIds,
-  difficulty,
   busy,
   error,
   activeBatchId = null,
   onSelectChapter,
   onToggleTopic,
   onClearTopics,
-  onDifficultyChange,
   onStart,
   onOpenActiveBatch,
   onOpenBatch,
@@ -190,33 +182,6 @@ export function BulkQuestionGenerationSetup({
           )}
         </section>
       )}
-      <fieldset className="space-y-2">
-        <legend className="text-[0.8125rem] font-medium leading-5">
-          Difficulty
-        </legend>
-        <div
-          className="inline-flex flex-wrap gap-1 rounded-lg border border-white/70 bg-white/55 p-1"
-          role="group"
-          aria-label="Difficulty"
-        >
-          {GENERATION_DIFFICULTIES.map((label) => (
-            <button
-              key={label}
-              type="button"
-              className={
-                difficulty === label
-                  ? 'rounded-md bg-primary px-3 py-1.5 text-[0.8125rem] font-medium leading-5 text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-                  : 'rounded-md px-3 py-1.5 text-[0.8125rem] font-medium leading-5 text-muted-foreground transition-colors hover:bg-white/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-              }
-              aria-pressed={difficulty === label}
-              onClick={() => onDifficultyChange(label)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </fieldset>
-
       <section
         className="space-y-3"
         aria-labelledby="generation-chapter-heading"

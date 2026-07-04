@@ -559,12 +559,41 @@ def test_editor_draft_patch_does_not_mutate_bank_answer(api_client, user):
 
 
 @pytest.mark.django_db
-def test_editor_draft_patch_rejects_inconsistent_documents(api_client, user):
-    """A stale answer (wrong questionId after a swap) is rejected with details
-    so the frontend bug surfaces instead of a wrong answer being saved."""
-    document = _document(_slot("slot_A_01", "q_2"))
+def test_editor_draft_patch_rebuilds_stale_answer_after_swap(api_client, user):
+    """A frontend swap may submit the old slot answer. The backend heals that
+    reconcilable mismatch from the bank instead of rejecting the draft save."""
+    old = QuestionFactory(answer="Old", answer_source=AnswerSource.HUMAN)
+    new = QuestionFactory(answer="New", answer_source=AnswerSource.HUMAN)
+    document = _document(_slot("slot_A_01", f"q_{new.pk}"))
     paper = Paper.objects.create(created_by=user, document=document)
-    answer_document = _answer_doc(_entry("slot_A_01", "q_1"))
+    answer_document = _answer_doc(_entry("slot_A_01", f"q_{old.pk}"))
+
+    resp = api_client.patch(
+        f"/api/papers/{paper.pk}/editor-draft/",
+        {"document": document, "answer_document": answer_document},
+        format="json",
+    )
+
+    assert resp.status_code == 200
+    paper.refresh_from_db()
+    entry = paper.answer_document["answersBySlotId"]["slot_A_01"]
+    assert entry["questionId"] == f"q_{new.pk}"
+    assert entry["content"] == [{"type": "paragraph", "text": "New"}]
+
+
+@pytest.mark.django_db
+def test_editor_draft_patch_still_rejects_malformed_answer_content(api_client, user):
+    q = QuestionFactory(answer="Real", answer_source=AnswerSource.HUMAN)
+    document = _document(_slot("slot_A_01", f"q_{q.pk}"))
+    paper = Paper.objects.create(created_by=user, document=document)
+    answer_document = _answer_doc(
+        {
+            "slotId": "slot_A_01",
+            "questionId": f"q_{q.pk}",
+            "content": "oops",
+            "source": "source",
+        }
+    )
 
     resp = api_client.patch(
         f"/api/papers/{paper.pk}/editor-draft/",
@@ -573,7 +602,7 @@ def test_editor_draft_patch_rejects_inconsistent_documents(api_client, user):
     )
 
     assert resp.status_code == 400
-    assert resp.data["details"]
+    assert any("content must be a list" in error for error in resp.data["details"])
 
 
 @pytest.mark.django_db

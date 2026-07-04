@@ -256,10 +256,31 @@ def _validate_content(
             errors.append(
                 CandidateValidationError(index, "bad_mcq_options", "content.options")
             )
-        elif not _answer_matches_option(question.get("answer"), options):
-            errors.append(
-                CandidateValidationError(index, "mcq_answer_mismatch", "answer")
-            )
+        else:
+            option_errors: list[CandidateValidationError] = []
+            for option in options:
+                if not isinstance(option, dict):
+                    option_errors.append(
+                        CandidateValidationError(
+                            index, "bad_option_format", "Option must be an object"
+                        )
+                    )
+                    continue
+                if not isinstance(option.get("content"), list):
+                    option_errors.append(
+                        CandidateValidationError(
+                            index,
+                            "bad_option_content",
+                            "Option content must be a list",
+                        )
+                    )
+            errors.extend(option_errors)
+            if not option_errors and not _answer_matches_option(
+                question.get("answer"), options
+            ):
+                errors.append(
+                    CandidateValidationError(index, "mcq_answer_mismatch", "answer")
+                )
 
 
 def _non_empty_string(value: Any) -> bool:

@@ -51,6 +51,25 @@ def test_intent_classifies_typed_text_via_the_model(monkeypatch, api_client, pap
     assert response.data["route"] == "review"
 
 
+def test_intent_falls_back_when_model_output_is_malformed(
+    monkeypatch, api_client, paper
+):
+    monkeypatch.setattr(
+        assistant,
+        "make_model",
+        _fake_model_returning("not valid structured output"),
+    )
+
+    response = api_client.post(
+        "/api/ai/intent/",
+        {"text": "check this paper", "paperId": paper.pk},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data["route"] == "off_topic"
+
+
 def test_intent_coerces_an_unknown_route_to_off_topic(monkeypatch, api_client, paper):
     # A misbehaving model must never widen the routing surface beyond the
     # allowed set — an unknown route is a refusal, not a new capability.
