@@ -6,14 +6,18 @@
  * that string verbatim leaks raw LaTeX into the paper; this component turns it
  * into typeset math instead.
  *
- * `throwOnError: false` keeps malformed source from blanking the page — KaTeX
- * falls back to showing the offending source in red, which is still more useful
- * than a crash and signals bad data to reviewers.
+ * Source is normalised first (see `normalizeLatex` — collapses JSON/Markdown
+ * double-escaped commands). Malformed source (e.g. an OCR-mangled equation)
+ * must not render as KaTeX's red error text in a teacher-facing paper, so we
+ * parse with `throwOnError: true` and, on failure, fall back to showing the
+ * source as plain text — readable and unobtrusive, still signalling bad data
+ * without shouting in red.
  *
  * @module MathExpression
  */
 import { useMemo } from 'react';
 import katex from 'katex';
+import { normalizeLatex } from './latex';
 
 export interface MathExpressionProps {
   latex: string;
@@ -22,28 +26,27 @@ export interface MathExpressionProps {
   className?: string;
 }
 
-function normalizeLatex(latex: string): string {
-  // Some ingestion payloads carry JSON/Markdown-escaped commands (e.g.
-  // `\\text{CuSO}` as two literal backslashes). KaTeX reads `\\` as a line
-  // break, which turns otherwise valid chemistry into red error output. Collapse
-  // doubled command escapes back to normal LaTeX commands before rendering.
-  return latex.replace(/\\\\(?=[A-Za-z])/g, '\\');
-}
-
 export function MathExpression({
   latex,
   display = true,
   className,
 }: MathExpressionProps) {
   const normalizedLatex = normalizeLatex(latex);
-  const html = useMemo(
-    () =>
-      katex.renderToString(normalizedLatex, {
+  const html = useMemo(() => {
+    try {
+      return katex.renderToString(normalizedLatex, {
         displayMode: display,
-        throwOnError: false,
-      }),
-    [normalizedLatex, display],
-  );
+        throwOnError: true,
+      });
+    } catch {
+      return null;
+    }
+  }, [normalizedLatex, display]);
+
+  if (html === null) {
+    // Unparseable LaTeX: show the source as plain text, not KaTeX red.
+    return <span className={className}>{normalizedLatex}</span>;
+  }
 
   return (
     <span

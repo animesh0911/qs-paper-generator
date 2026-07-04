@@ -34,7 +34,9 @@ describe('MathText', () => {
 
   it('normalizes double-escaped extracted LaTeX commands before KaTeX render', () => {
     const html = renderToStaticMarkup(
-      <MathText text={String.raw`Study $\\text{CuSO}_4 + \\text{Mg} \\longrightarrow$ products.`} />,
+      <MathText
+        text={String.raw`Study $\\text{CuSO}_4 + \\text{Mg} \\longrightarrow$ products.`}
+      />,
     );
 
     expect(html).toContain('class="katex"');
@@ -58,6 +60,92 @@ describe('MathContent', () => {
     expect(html).toContain('class="katex"');
     // Inline math, not block: no centred display wrapper.
     expect(html).not.toContain('class="katex-display"');
+  });
+
+  it('typesets a paragraph that carries both text and math-bearing latex', () => {
+    const items: ContentItem[] = [
+      {
+        type: 'paragraph',
+        text: 'the refractive index is \\sqrt{3}.',
+        latex: '\\text{the refractive index is } \\sqrt{3}.',
+      },
+    ];
+
+    const html = renderToStaticMarkup(<MathContent items={items} />);
+
+    // Typeset via KaTeX (the square root becomes an <msqrt>) rather than
+    // dumping the sentence as a plain text node with the raw `\sqrt{3}` source.
+    expect(html).toContain('class="katex"');
+    expect(html).toContain('<msqrt>');
+  });
+
+  it('keeps prose plain when latex is only a \\text wrapper', () => {
+    const items: ContentItem[] = [
+      {
+        type: 'paragraph',
+        text: 'By eating the bread on which it is growing.',
+        latex: '\\text{By eating the bread on which it is growing.}',
+      },
+    ];
+
+    const html = renderToStaticMarkup(<MathContent items={items} />);
+
+    expect(html).toContain('By eating the bread on which it is growing.');
+    expect(html).not.toContain('class="katex"');
+  });
+
+  it('typesets a chemistry equation without shattering \\text symbols', () => {
+    // `\text{}` here marks upright element symbols, not prose — and `\xrightarrow`
+    // carries a nested `\text{}`. None of it must be split into KaTeX errors.
+    const items: ContentItem[] = [
+      {
+        type: 'paragraph',
+        text: 'CO2 + O2 + H2O -> C6H12O6 + H2O',
+        latex:
+          '\\text{CO}_2 + \\text{O}_2 + \\text{H}_2\\text{O} ' +
+          '\\xrightarrow{\\text{Chlorophyll}} ' +
+          '\\text{C}_6\\text{H}_{12}\\text{O}_6 + \\text{H}_2\\text{O}',
+      },
+    ];
+
+    const html = renderToStaticMarkup(<MathContent items={items} />);
+
+    expect(html).toContain('class="katex"');
+    // KaTeX only emits this class when it renders its red parse-error fallback.
+    expect(html).not.toContain('katex-error');
+  });
+
+  it('renders an equation with a labelled arrow whole, not as literal command text', () => {
+    // `\xrightarrow[…]{…}` hides `\text{}` inside a macro arg the splitter can't
+    // see through; the whole latex must render, never leaking `\xrightarrow`.
+    const items: ContentItem[] = [
+      {
+        type: 'equation',
+        latex:
+          '6\\text{CO}_2 + 6\\text{H}_2\\text{O} ' +
+          '\\xrightarrow[\\text{Sunlight}]{\\text{Chlorophyll}} ' +
+          '\\text{C}_6\\text{H}_{12}\\text{O}_6 + \\text{O}_2',
+      },
+    ];
+
+    const html = renderToStaticMarkup(<MathContent items={items} />);
+
+    expect(html).toContain('class="katex"');
+    expect(html).not.toContain('katex-error');
+    // KaTeX renders `\xrightarrow` as an `x-arrow` span; if the split had leaked
+    // the raw command as text, this class would be absent.
+    expect(html).toContain('x-arrow');
+  });
+
+  it('renders unparseable latex as plain text, never a red katex error', () => {
+    const items: ContentItem[] = [
+      { type: 'equation', latex: '\\xrightarrow{' },
+    ];
+
+    const html = renderToStaticMarkup(<MathContent items={items} />);
+
+    expect(html).not.toContain('katex-error');
+    expect(html).toContain('\\xrightarrow{');
   });
 
   it('renders plain text and falls back for non-math items', () => {
