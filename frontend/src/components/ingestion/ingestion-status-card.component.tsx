@@ -14,15 +14,26 @@ import {
   LoaderCircle,
   X,
 } from 'lucide-react';
-import type { BankQuestion, IngestionJob } from '@/types';
+import type {
+  AnswerGenerationJob,
+  BankQuestion,
+  GeneratedAnswer,
+  IngestionJob,
+} from '@/types';
 import { Button } from '@/components/ui/button';
-import { MathContent } from '@/components/math/math-content.component';
+import { MathContent, MathText } from '@/components/math/math-content.component';
 
 interface IngestionStatusCardProps {
   job: IngestionJob;
   pollError?: string;
   parsedQuestions: BankQuestion[];
   loadingQuestions: boolean;
+  answerJob: AnswerGenerationJob | null;
+  generatedAnswers: GeneratedAnswer[];
+  loadingAnswers: boolean;
+  generatingAnswers: boolean;
+  answerGenerationError: string;
+  onGenerateAnswers: () => void;
   onUploadAnother: () => void;
   onGeneratePaper: () => void;
 }
@@ -89,7 +100,7 @@ function QuestionText({ question }: { question: BankQuestion }) {
   if (Array.isArray(stem) && stem.length > 0) {
     return <MathContent items={stem} />;
   }
-  return <>{question.text}</>;
+  return <MathText text={question.text} />;
 }
 
 function questionCountLabel(count: number): string {
@@ -116,7 +127,13 @@ function FeedingToBankIndicator() {
   );
 }
 
-function ExtractedQuestionsPanel({ questions }: { questions: BankQuestion[] }) {
+function ExtractedQuestionsPanel({
+  questions,
+  answersByQuestionId = new Map(),
+}: {
+  questions: BankQuestion[];
+  answersByQuestionId?: Map<number, GeneratedAnswer>;
+}) {
   const groups = groupByChapter(questions);
 
   return (
@@ -180,6 +197,29 @@ function ExtractedQuestionsPanel({ questions }: { questions: BankQuestion[] }) {
                       <div className="break-words text-sm leading-6 text-foreground">
                         <QuestionText question={question} />
                       </div>
+                      {(question.options?.length ?? 0) > 0 && (
+                        <ol className="grid gap-1.5 text-sm leading-6 sm:grid-cols-2">
+                          {question.options.map((option) => (
+                            <li
+                              key={`${question.id}-${option.label}`}
+                              className="rounded-md border border-input bg-secondary/30 px-2.5 py-1.5"
+                            >
+                              <span className="font-medium">{option.label}.</span>{' '}
+                              <MathText text={option.text} />
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                      {answersByQuestionId.has(question.id) && (
+                        <div className="rounded-md border border-input bg-secondary/50 px-3 py-2 text-sm leading-6">
+                          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            AI draft answer · auto-saved
+                          </p>
+                          <p className="whitespace-pre-wrap text-foreground">
+                            {answersByQuestionId.get(question.id)?.answer}
+                          </p>
+                        </div>
+                      )}
                       <div className="flex flex-wrap gap-1.5 text-xs leading-5">
                         <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
                           Section {question.section}
@@ -263,10 +303,12 @@ function ExtractedQuestionsSummary({
 
 function ExtractedQuestionsDialog({
   questions,
+  answersByQuestionId,
   open,
   onClose,
 }: {
   questions: BankQuestion[];
+  answersByQuestionId: Map<number, GeneratedAnswer>;
   open: boolean;
   onClose: () => void;
 }) {
@@ -337,10 +379,93 @@ function ExtractedQuestionsDialog({
           </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
-          <ExtractedQuestionsPanel questions={questions} />
+          <ExtractedQuestionsPanel
+            questions={questions}
+            answersByQuestionId={answersByQuestionId}
+          />
         </div>
       </div>
     </div>
+  );
+}
+
+function AnswerGenerationPanel({
+  answerJob,
+  generatedAnswers,
+  loadingAnswers,
+  generatingAnswers,
+  answerGenerationError,
+  questionCount,
+  onGenerateAnswers,
+}: {
+  answerJob: AnswerGenerationJob | null;
+  generatedAnswers: GeneratedAnswer[];
+  loadingAnswers: boolean;
+  generatingAnswers: boolean;
+  answerGenerationError: string;
+  questionCount: number;
+  onGenerateAnswers: () => void;
+}) {
+  const inProgress =
+    answerJob?.status === 'pending' || answerJob?.status === 'running';
+  const failed = answerJob?.status === 'failed';
+  const done = answerJob?.status === 'done';
+  const generatedCount = answerJob?.generated_count ?? generatedAnswers.length;
+  const totalCount = answerJob?.total_count ?? questionCount;
+
+  return (
+    <section className="rounded-lg border border-input bg-background px-4 py-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-foreground">
+            Generate answers for extracted questions
+          </p>
+          <p className="text-xs leading-5 text-muted-foreground">
+            Optional AI pass. Answers are auto-saved to these questions and shown
+            here as AI drafts.
+          </p>
+          {loadingAnswers && (
+            <p className="text-xs text-muted-foreground">Loading answer state…</p>
+          )}
+          {inProgress && (
+            <p className="text-xs text-muted-foreground" aria-live="polite">
+              Generating answers… {generatedCount} of {totalCount} saved.
+            </p>
+          )}
+          {done && (
+            <p className="text-xs text-muted-foreground" aria-live="polite">
+              Generated {generatedCount}{' '}
+              {generatedCount === 1 ? 'answer' : 'answers'} and saved them.
+            </p>
+          )}
+          {failed && (
+            <p className="text-xs text-destructive" role="alert">
+              {answerJob?.error || 'Answer generation failed.'}
+            </p>
+          )}
+          {answerGenerationError && (
+            <p className="text-xs text-destructive" role="alert">
+              {answerGenerationError}
+            </p>
+          )}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onGenerateAnswers}
+          disabled={generatingAnswers || inProgress || done || questionCount === 0}
+          className="shrink-0"
+        >
+          {generatingAnswers
+            ? 'Queuing…'
+            : done
+              ? 'Answers saved'
+              : failed
+                ? 'Try again'
+                : 'Generate answers'}
+        </Button>
+      </div>
+    </section>
   );
 }
 
@@ -349,6 +474,12 @@ export function IngestionStatusCard({
   pollError,
   parsedQuestions,
   loadingQuestions,
+  answerJob,
+  generatedAnswers,
+  loadingAnswers,
+  generatingAnswers,
+  answerGenerationError,
+  onGenerateAnswers,
   onUploadAnother,
   onGeneratePaper,
 }: IngestionStatusCardProps) {
@@ -361,6 +492,9 @@ export function IngestionStatusCard({
     : 0;
   const [reviewOpen, setReviewOpen] = useState(false);
   const reviewTriggerRef = useRef<HTMLElement | null>(null);
+  const answersByQuestionId = new Map(
+    generatedAnswers.map((answer) => [answer.question_id, answer]),
+  );
 
   function openReview() {
     reviewTriggerRef.current = document.activeElement as HTMLElement | null;
@@ -465,8 +599,18 @@ export function IngestionStatusCard({
                   />
                   <ExtractedQuestionsDialog
                     questions={parsedQuestions}
+                    answersByQuestionId={answersByQuestionId}
                     open={reviewOpen}
                     onClose={closeReview}
+                  />
+                  <AnswerGenerationPanel
+                    answerJob={answerJob}
+                    generatedAnswers={generatedAnswers}
+                    loadingAnswers={loadingAnswers}
+                    generatingAnswers={generatingAnswers}
+                    answerGenerationError={answerGenerationError}
+                    questionCount={parsedQuestions.length}
+                    onGenerateAnswers={onGenerateAnswers}
                   />
                 </>
               ) : (

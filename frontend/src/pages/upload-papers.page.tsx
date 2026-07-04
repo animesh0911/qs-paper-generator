@@ -53,6 +53,12 @@ export default function UploadPapersPage() {
                   pollError={upload.pollError}
                   parsedQuestions={upload.parsedQuestions}
                   loadingQuestions={upload.loadingQuestions}
+                  answerJob={upload.answerJob}
+                  generatedAnswers={upload.generatedAnswers}
+                  loadingAnswers={upload.loadingAnswers}
+                  generatingAnswers={upload.generatingAnswers}
+                  answerGenerationError={upload.answerGenerationError}
+                  onGenerateAnswers={upload.generateAnswers}
                   onUploadAnother={upload.reset}
                   onGeneratePaper={() => navigate('/generate')}
                 />

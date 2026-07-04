@@ -575,6 +575,20 @@ def test_question_generation_route_supports_openrouter_key(monkeypatch):
     assert config.init_kwargs["base_url"] == "https://openrouter.ai/api/v1"
 
 
+def test_answer_generation_route_supports_openrouter_key(monkeypatch):
+    """Upload-answer generation can reuse the OpenRouter key without Gemini env."""
+    monkeypatch.setenv("LLM_ANSWER_GENERATION_PROVIDER", "openrouter")
+    monkeypatch.setenv("LLM_ANSWER_GENERATION_MODEL", "google/gemini-3.5-flash")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    config = resolve_chat_model_config(ModelPurpose.ANSWER_GENERATION)
+
+    assert config.provider == "openai"
+    assert config.model == "google/gemini-3.5-flash"
+    assert config.init_kwargs["api_key"] == "test-key"
+    assert config.init_kwargs["base_url"] == "https://openrouter.ai/api/v1"
+
+
 def test_response_schema_is_openai_compatible_json_schema():
     """OpenAI-compatible gateways require a named JSON schema, not raw enums."""
     assert QUESTION_GENERATION_RESPONSE_SCHEMA["title"] == "QuestionGenerationResponse"

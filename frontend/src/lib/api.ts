@@ -24,6 +24,8 @@ import type {
   GenerationBatch,
   GenerationBatchCreateRequest,
   GeneratedQuestionCandidate,
+  IngestionAnswersResponse,
+  AnswerGenerationJob,
   IngestionJob,
   PaperAnswerDocument,
   PaperDocument,
@@ -357,6 +359,24 @@ export async function fetchIngestionJobQuestions(
 ): Promise<BankQuestion[]> {
   const res = await request(`/bank/ingest/${jobId}/questions/`, {
     method: 'GET',
+  });
+  return res.json();
+}
+
+export async function fetchIngestionJobAnswers(
+  jobId: number | string,
+): Promise<IngestionAnswersResponse> {
+  const res = await request(`/bank/ingest/${jobId}/answers/`, {
+    method: 'GET',
+  });
+  return res.json();
+}
+
+export async function generateIngestionJobAnswers(
+  jobId: number | string,
+): Promise<AnswerGenerationJob> {
+  const res = await request(`/bank/ingest/${jobId}/answers/`, {
+    method: 'POST',
   });
   return res.json();
 }

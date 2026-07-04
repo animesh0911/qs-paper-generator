@@ -37,6 +37,12 @@ function baseState(
     pollError: '',
     parsedQuestions: [],
     loadingQuestions: false,
+    answerJob: null,
+    generatedAnswers: [],
+    loadingAnswers: false,
+    generatingAnswers: false,
+    answerGenerationError: '',
+    generateAnswers: vi.fn(),
     selectFile: vi.fn(),
     upload: vi.fn(),
     reset: vi.fn(),
@@ -200,6 +206,86 @@ describe('UploadPapersPage', () => {
       expect(screen.queryByRole('dialog')).toBeNull();
       expect(document.activeElement).toBe(reviewButton);
     });
+  });
+
+  it('typesets raw extracted LaTeX and shows MCQ options in the review dialog', async () => {
+    const user = userEvent.setup();
+    mockState = baseState({
+      job: job({ status: 'done', created_count: 1 }),
+      parsedQuestions: [
+        question({
+          text: 'Consider $$p\\,\\text{Al} + q\\,\\text{H}_2\\text{O} \\longrightarrow r\\,\\text{Al}_2\\text{O}_3 + s\\,\\text{H}_2$$',
+          options: [
+            { label: 'A', text: '$p=2$' },
+            { label: 'B', text: '$p=4$' },
+          ],
+        }),
+      ],
+    });
+
+    render(<UploadPapersPage />);
+    await user.click(
+      screen.getByRole('button', { name: /review extracted questions/i }),
+    );
+
+    expect(document.querySelector('.katex-display')).toBeTruthy();
+    expect(screen.getByText('A.')).toBeTruthy();
+    expect(screen.getByText('B.')).toBeTruthy();
+    expect(document.body.textContent).not.toContain('$$p\\,\\text{Al}');
+  });
+
+  it('offers optional answer generation after extracted questions are shown', async () => {
+    const user = userEvent.setup();
+    const generateAnswers = vi.fn();
+    mockState = baseState({
+      job: job({ status: 'done', created_count: 1 }),
+      parsedQuestions: [question({})],
+      generateAnswers,
+    });
+
+    render(<UploadPapersPage />);
+
+    const button = screen.getByRole('button', { name: /generate answers/i });
+    expect(screen.getByText(/optional ai pass/i)).toBeTruthy();
+    await user.click(button);
+
+    expect(generateAnswers).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows generated answers inside the extracted question review', async () => {
+    const user = userEvent.setup();
+    mockState = baseState({
+      job: job({ status: 'done', created_count: 1 }),
+      parsedQuestions: [question({ id: 7 })],
+      answerJob: {
+        id: 3,
+        ingestion_job_id: 1,
+        status: 'done',
+        total_count: 1,
+        generated_count: 1,
+        skipped_count: 0,
+        error: '',
+        created_at: '',
+        updated_at: '',
+      },
+      generatedAnswers: [
+        {
+          question_id: 7,
+          answer: 'Litmus turns red in an acidic solution.',
+          answer_source: 'generated_unverified',
+        },
+      ],
+    });
+
+    render(<UploadPapersPage />);
+    await user.click(
+      screen.getByRole('button', { name: /review extracted questions/i }),
+    );
+
+    expect(screen.getByText('AI draft answer · auto-saved')).toBeTruthy();
+    expect(
+      screen.getByText('Litmus turns red in an acidic solution.'),
+    ).toBeTruthy();
   });
 
   it('surfaces the error when a job fails', () => {

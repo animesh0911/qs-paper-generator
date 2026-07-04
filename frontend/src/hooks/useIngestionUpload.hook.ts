@@ -10,11 +10,18 @@
  * @module useIngestionUpload.hook
  */
 import { useEffect, useRef, useState } from 'react';
-import type { BankQuestion, IngestionJob } from '@/types';
+import type {
+  AnswerGenerationJob,
+  BankQuestion,
+  GeneratedAnswer,
+  IngestionJob,
+} from '@/types';
 import {
   fetchIngestionJob,
+  fetchIngestionJobAnswers,
   fetchIngestionJobQuestions,
   fetchIngestionJobs,
+  generateIngestionJobAnswers,
   uploadIngestionPdf,
 } from '@/lib/api';
 import { isIngestionTerminal, validatePdfFile } from '@/lib/ingestion';
@@ -32,6 +39,12 @@ export interface IngestionUploadState {
   parsedQuestions: BankQuestion[];
   /** True while the parsed-questions list is loading after the job settles. */
   loadingQuestions: boolean;
+  answerJob: AnswerGenerationJob | null;
+  generatedAnswers: GeneratedAnswer[];
+  loadingAnswers: boolean;
+  generatingAnswers: boolean;
+  answerGenerationError: string;
+  generateAnswers: () => Promise<void>;
   selectFile: (file: File | null) => void;
   upload: () => Promise<void>;
   reset: () => void;
@@ -48,6 +61,11 @@ export function useIngestionUpload(
   const [pollError, setPollError] = useState('');
   const [parsedQuestions, setParsedQuestions] = useState<BankQuestion[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [answerJob, setAnswerJob] = useState<AnswerGenerationJob | null>(null);
+  const [generatedAnswers, setGeneratedAnswers] = useState<GeneratedAnswer[]>([]);
+  const [loadingAnswers, setLoadingAnswers] = useState(false);
+  const [generatingAnswers, setGeneratingAnswers] = useState(false);
+  const [answerGenerationError, setAnswerGenerationError] = useState('');
   const jobId = job?.id;
   const settled = job ? isIngestionTerminal(job.status) : false;
   const polling = job != null && !settled;
@@ -115,10 +133,13 @@ export function useIngestionUpload(
   // Once a job lands `done`, fetch the questions it added so the status card
   // can show exactly what was parsed (after extraction + validation finished).
   const isDone = job?.status === 'done';
+  const answerJobStatus = answerJob?.status;
   useEffect(() => {
     if (jobId == null || !isDone) return;
     let cancelled = false;
     setLoadingQuestions(true);
+    setLoadingAnswers(true);
+
     fetchIngestionJobQuestions(jobId)
       .then((questions) => {
         if (!cancelled) setParsedQuestions(questions);
@@ -130,10 +151,61 @@ export function useIngestionUpload(
       .finally(() => {
         if (!cancelled) setLoadingQuestions(false);
       });
+
+    fetchIngestionJobAnswers(jobId)
+      .then((answerState) => {
+        if (cancelled) return;
+        setAnswerJob(answerState.job);
+        setGeneratedAnswers(answerState.answers);
+        setAnswerGenerationError('');
+      })
+      .catch((err) => {
+        // Answers are optional; a failure here must not hide the extracted list
+        // or the "Generate answers" action.
+        if (!cancelled) {
+          setGeneratedAnswers([]);
+          setAnswerGenerationError((err as Error).message);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingAnswers(false);
+      });
+
     return () => {
       cancelled = true;
     };
   }, [jobId, isDone]);
+
+  useEffect(() => {
+    if (jobId == null || !answerJobStatus) return;
+    if (answerJobStatus !== 'pending' && answerJobStatus !== 'running') return;
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    async function pollAnswers() {
+      try {
+        const next = await fetchIngestionJobAnswers(jobId as number);
+        if (cancelled) return;
+        setAnswerJob(next.job);
+        setGeneratedAnswers(next.answers);
+        setAnswerGenerationError('');
+        if (next.job?.status === 'pending' || next.job?.status === 'running') {
+          timer = setTimeout(pollAnswers, pollIntervalMs);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        setAnswerGenerationError((err as Error).message);
+        timer = setTimeout(pollAnswers, pollIntervalMs);
+      }
+    }
+
+    timer = setTimeout(pollAnswers, pollIntervalMs);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [answerJobStatus, jobId, pollIntervalMs]);
 
   function selectFile(next: File | null) {
     setUploadError('');
@@ -150,6 +222,23 @@ export function useIngestionUpload(
     }
     setValidationError('');
     setFile(next);
+  }
+
+  async function generateAnswers() {
+    if (jobId == null || generatingAnswers) return;
+    setGeneratingAnswers(true);
+    setAnswerGenerationError('');
+    try {
+      const queued = await generateIngestionJobAnswers(jobId);
+      setAnswerJob(queued);
+      const answerState = await fetchIngestionJobAnswers(jobId);
+      setAnswerJob(answerState.job);
+      setGeneratedAnswers(answerState.answers);
+    } catch (err) {
+      setAnswerGenerationError((err as Error).message);
+    } finally {
+      setGeneratingAnswers(false);
+    }
   }
 
   async function upload() {
@@ -176,6 +265,11 @@ export function useIngestionUpload(
     setJob(null);
     setParsedQuestions([]);
     setLoadingQuestions(false);
+    setAnswerJob(null);
+    setGeneratedAnswers([]);
+    setLoadingAnswers(false);
+    setGeneratingAnswers(false);
+    setAnswerGenerationError('');
   }
 
   return {
@@ -188,6 +282,12 @@ export function useIngestionUpload(
     pollError,
     parsedQuestions,
     loadingQuestions,
+    answerJob,
+    generatedAnswers,
+    loadingAnswers,
+    generatingAnswers,
+    answerGenerationError,
+    generateAnswers,
     selectFile,
     upload,
     reset,
