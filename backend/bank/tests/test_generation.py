@@ -197,6 +197,9 @@ def test_prompt_keeps_workflow_fields_out_of_model_payload():
     assert "approximately equally across selected Chapters" in prompt
     assert "Requested counts by QuestionType" in prompt
     assert "raw_text must be a non-empty plain-text copy" in prompt
+    assert "must match content.stem text exactly" in prompt
+    assert "Every question must be self-contained" in prompt
+    assert "one unambiguously correct option" in prompt
     assert "QuestionType/marks distribution" not in prompt
     assert "mcq/1" in prompt
     assert "long_answer/5" in prompt
@@ -226,6 +229,8 @@ def test_grounded_prompt_supplies_excerpts_and_requires_citations():
     prompt = build_question_generation_prompt(request)
 
     assert "Use only the NCERT excerpts supplied below" in prompt
+    assert "Use headings only as topic guidance" in prompt
+    assert "do not ask a question that depends on that hidden structure" in prompt
     assert "question_citation_ids" in prompt
     assert "answer_citation_ids" in prompt
     assert "[citation_id: chunk-respiration]" in prompt
