@@ -43,14 +43,20 @@ kill <PID>
 Start the app stack:
 
 ```bash
-docker compose up -d --build db web frontend
+docker compose up -d db web frontend
 ```
 
-For background AI generation / ingestion processing, also start the workers:
+For background AI generation / ingestion / upload-answer processing, also start
+workers:
 
 ```bash
-docker compose up -d --build generation-worker ingestion-worker
+docker compose up -d generation-worker ingestion-worker answer-generation-worker
 ```
+
+Use `--build` only after Dockerfile/dependency changes. The backend image runs
+`playwright install --with-deps chromium`, so a cache-missing rebuild can download
+large Debian browser packages, Chromium, FFmpeg, and fonts. For ordinary code/env
+changes prefer `docker compose up -d <service>` or `docker compose restart <service>`.
 
 Check it:
 
@@ -61,11 +67,12 @@ docker compose ps
 Expected services:
 
 ```text
-db                  Up healthy
-web                 Up, 0.0.0.0:8000->8000
-frontend            Up, 0.0.0.0:5173->5173
-generation-worker   Up
-ingestion-worker    Up
+db                         Up healthy
+web                        Up, 0.0.0.0:8000->8000
+frontend                   Up, 0.0.0.0:5173->5173
+generation-worker          Up
+ingestion-worker           Up
+answer-generation-worker   Up
 ```
 
 Open:
@@ -174,6 +181,12 @@ Run one ingestion drain manually:
 docker compose exec web python manage.py drain_ingestion_jobs --limit 1
 ```
 
+Run one optional upload-answer drain manually:
+
+```bash
+docker compose exec web python manage.py drain_answer_generation_jobs --limit 1
+```
+
 View logs:
 
 ```bash
@@ -181,6 +194,7 @@ docker compose logs -f web
 docker compose logs -f frontend
 docker compose logs -f generation-worker
 docker compose logs -f ingestion-worker
+docker compose logs -f answer-generation-worker
 ```
 
 ## Stop / Clean Up

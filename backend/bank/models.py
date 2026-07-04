@@ -230,6 +230,15 @@ class Question(models.Model):
         return f"[{self.section}/{self.marks}m] {self.text[:60]}"
 
 
+class AnswerGenerationJobStatus(models.TextChoices):
+    """Lifecycle of optional AI answer generation for an uploaded paper."""
+
+    PENDING = "pending", "Pending"
+    RUNNING = "running", "Running"
+    DONE = "done", "Done"
+    FAILED = "failed", "Failed"
+
+
 class IngestionJobStatus(models.TextChoices):
     """Lifecycle of an out-of-request PDF ingestion (no upfront review, V1).
 
@@ -316,6 +325,58 @@ class IngestionJob(models.Model):
 
     def __str__(self):
         return f"IngestionJob #{self.pk} [{self.status}] {self.source_file_name}"
+
+
+class AnswerGenerationJob(models.Model):
+    """Optional LLM answer pass for one completed ``IngestionJob``.
+
+    Created only after a teacher clicks "Generate answers" on the upload review.
+    The HTTP endpoint queues this row and a cron drainer runs the paid LangGraph
+    workflow, persisting results to ``Question.answer`` with
+    ``generated_unverified`` provenance.
+    """
+
+    ingestion_job = models.OneToOneField(
+        "bank.IngestionJob",
+        on_delete=models.CASCADE,
+        related_name="answer_generation_job",
+    )
+    school = models.ForeignKey(
+        School,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="answer_generation_jobs",
+    )
+    created_by = models.ForeignKey(
+        "accounts.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="answer_generation_jobs",
+    )
+    status = models.CharField(
+        max_length=8,
+        choices=AnswerGenerationJobStatus.choices,
+        default=AnswerGenerationJobStatus.PENDING,
+        db_index=True,
+    )
+    thread_id = models.CharField(max_length=64, blank=True, default="")
+    total_count = models.PositiveIntegerField(default=0)
+    generated_count = models.PositiveIntegerField(default=0)
+    skipped_count = models.PositiveIntegerField(default=0)
+    error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return (
+            f"AnswerGenerationJob #{self.pk} "
+            f"[{self.status}] upload={self.ingestion_job_id}"
+        )
 
 
 class GenerationBatchStatus(models.TextChoices):

@@ -19,6 +19,7 @@ from corpus.models import ChapterMapNode
 
 from .generation import DIFFICULTY_TARGETS_BY_PRESET
 from .models import (
+    AnswerGenerationJob,
     Chapter,
     GeneratedQuestionCandidate,
     GenerationBatch,
@@ -132,6 +133,34 @@ class IngestionJobSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class AnswerGenerationJobSerializer(serializers.ModelSerializer):
+    """Poll shape for optional answer generation from one upload."""
+
+    class Meta:
+        model = AnswerGenerationJob
+        fields = [
+            "id",
+            "ingestion_job_id",
+            "status",
+            "total_count",
+            "generated_count",
+            "skipped_count",
+            "error",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class GeneratedAnswerSerializer(serializers.ModelSerializer):
+    """Generated answer shape keyed to an extracted question."""
+
+    question_id = serializers.IntegerField(source="id")
+
+    class Meta:
+        model = Question
+        fields = ["question_id", "answer", "answer_source"]
 
 
 class GenerationBatchCreateSerializer(serializers.Serializer):

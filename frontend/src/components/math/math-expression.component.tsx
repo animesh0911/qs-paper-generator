@@ -22,18 +22,27 @@ export interface MathExpressionProps {
   className?: string;
 }
 
+function normalizeLatex(latex: string): string {
+  // Some ingestion payloads carry JSON/Markdown-escaped commands (e.g.
+  // `\\text{CuSO}` as two literal backslashes). KaTeX reads `\\` as a line
+  // break, which turns otherwise valid chemistry into red error output. Collapse
+  // doubled command escapes back to normal LaTeX commands before rendering.
+  return latex.replace(/\\\\(?=[A-Za-z])/g, '\\');
+}
+
 export function MathExpression({
   latex,
   display = true,
   className,
 }: MathExpressionProps) {
+  const normalizedLatex = normalizeLatex(latex);
   const html = useMemo(
     () =>
-      katex.renderToString(latex, {
+      katex.renderToString(normalizedLatex, {
         displayMode: display,
         throwOnError: false,
       }),
-    [latex, display],
+    [normalizedLatex, display],
   );
 
   return (

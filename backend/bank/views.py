@@ -28,6 +28,11 @@ from rest_framework.decorators import api_view, parser_classes, permission_class
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
+from .answer_generation import (
+    AnswerGenerationConflict,
+    answer_generation_state,
+    queue_ingestion_answer_generation,
+)
 from .generation_batches import (
     GenerationBatchBadSelection,
     GenerationBatchConflict,
@@ -49,8 +54,10 @@ from .models import (
 )
 from .permissions import IsTeacher
 from .serializers import (
+    AnswerGenerationJobSerializer,
     BankQuestionSerializer,
     ChapterTaxonomySerializer,
+    GeneratedAnswerSerializer,
     GeneratedQuestionCandidateSerializer,
     GenerationBatchAcceptSerializer,
     GenerationBatchCreateSerializer,
@@ -120,7 +127,9 @@ def sources(request):
     for row in bank_sources:
         source_key = (row["source_type"], row["source_name"], row["source_file_name"])
         matching_question_count = (
-            matching_counts.get(source_key, 0) if chapter_slugs else row["question_count"]
+            matching_counts.get(source_key, 0)
+            if chapter_slugs
+            else row["question_count"]
         )
         if chapter_slugs and matching_question_count == 0:
             continue
@@ -290,6 +299,33 @@ def ingest_questions(request, job_id):
         .order_by("section", "id")
     )
     return Response(BankQuestionSerializer(questions_qs, many=True).data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsTeacher])
+def ingest_answers(request, job_id):
+    """Queue or read optional generated answers for one completed upload."""
+    if request.method == "POST":
+        try:
+            answer_job = queue_ingestion_answer_generation(request.user, job_id)
+        except AnswerGenerationConflict as exc:
+            return Response({"detail": exc.detail}, status=409)
+        if answer_job is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(AnswerGenerationJobSerializer(answer_job).data, status=202)
+
+    state = answer_generation_state(request.user, job_id)
+    if state is None:
+        return Response({"detail": "Not found."}, status=404)
+    answer_job, answered_questions = state
+    return Response(
+        {
+            "job": AnswerGenerationJobSerializer(answer_job).data
+            if answer_job is not None
+            else None,
+            "answers": GeneratedAnswerSerializer(answered_questions, many=True).data,
+        }
+    )
 
 
 QUESTIONS_PAGE_SIZE = 50

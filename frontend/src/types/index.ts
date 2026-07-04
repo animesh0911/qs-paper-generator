@@ -244,6 +244,35 @@ export interface IngestionJob {
   updated_at: string;
 }
 
+export type AnswerGenerationJobStatus =
+  | 'pending'
+  | 'running'
+  | 'done'
+  | 'failed';
+
+export interface AnswerGenerationJob {
+  id: number;
+  ingestion_job_id: number;
+  status: AnswerGenerationJobStatus;
+  total_count: number;
+  generated_count: number;
+  skipped_count: number;
+  error: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GeneratedAnswer {
+  question_id: number;
+  answer: string;
+  answer_source: string;
+}
+
+export interface IngestionAnswersResponse {
+  job: AnswerGenerationJob | null;
+  answers: GeneratedAnswer[];
+}
+
 /**
  * A bank question as surfaced by the browsable Question Bank view. Mirrors
  * `bank.serializers.BankQuestionSerializer`. The `answer` is never exposed.
