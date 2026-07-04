@@ -172,6 +172,36 @@ def test_upload_requires_authentication(db):
 
 
 # ---------------------------------------------------------------------------
+# Recent jobs endpoint — GET /api/bank/ingest/
+
+
+def test_recent_ingestion_jobs_returns_latest_school_jobs(api_client, user):
+    """The header/upload page uses this to keep background extraction visible."""
+    older = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        source_file_name="old.pdf",
+        status=IngestionJobStatus.DONE,
+    )
+    newer = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        source_file_name="new.pdf",
+        status=IngestionJobStatus.RUNNING,
+        total_pages=10,
+        pages_done=4,
+    )
+
+    resp = api_client.get("/api/bank/ingest/")
+
+    assert resp.status_code == 200
+    assert [job["id"] for job in resp.data[:2]] == [newer.pk, older.pk]
+    assert resp.data[0]["source_file_name"] == "new.pdf"
+    assert resp.data[0]["pages_done"] == 4
+
+
 # Status endpoint — GET /api/bank/ingest/{id}/
 # ---------------------------------------------------------------------------
 

@@ -219,19 +219,28 @@ def _source_file_key(source_file_name: str) -> str:
     return encoded.rstrip("=")
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @parser_classes([MultiPartParser])
 @permission_classes([IsTeacher])
 def ingest(request):
-    """Queue a teacher's PDF for out-of-request extraction.
+    """List recent ingestion jobs or queue a teacher PDF for extraction.
 
-    Request: multipart/form-data with field ``pdf`` (file) plus optional
+    ``GET`` returns the school's recent jobs so the frontend can keep showing
+    background extraction progress after the teacher leaves the upload screen.
+
+    ``POST`` accepts multipart/form-data with field ``pdf`` (file) plus optional
     ``source_type`` (one of ``SourceType``; defaults to ``previous_year_paper``).
-    Persists the PDF and creates a pending ``IngestionJob`` scoped to the
+    It persists the PDF and creates a pending ``IngestionJob`` scoped to the
     teacher's school — **no Gemini call here**. The ``drain_ingestion_jobs`` cron
     command does the extraction later.
     Response: **202** with the serialised job (``id``, ``status`` …) to poll.
     """
+    if request.method == "GET":
+        jobs = IngestionJob.objects.filter(school=request.user.school).order_by(
+            "-created_at"
+        )[:20]
+        return Response(IngestionJobSerializer(jobs, many=True).data)
+
     serializer = IngestionUploadSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     pdf_file = serializer.validated_data["pdf"]
