@@ -27,7 +27,7 @@ export function SourceTypeField({
 
   return (
     <fieldset disabled={disabled} className="space-y-2">
-      <legend className="text-sm font-medium">Source type</legend>
+      <legend className="text-sm font-medium leading-5">Source type</legend>
       <div
         role="radiogroup"
         aria-label="Source type"
@@ -43,7 +43,7 @@ export function SourceTypeField({
               aria-checked={selected}
               onClick={() => onChange(option.value)}
               className={cn(
-                'flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+                'flex min-h-11 items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
                 selected
                   ? 'border-primary bg-secondary text-foreground'
                   : 'border-input bg-background text-muted-foreground hover:bg-secondary/70 hover:text-foreground',
@@ -61,7 +61,9 @@ export function SourceTypeField({
         })}
       </div>
       {activeHint && (
-        <p className="text-xs text-muted-foreground">{activeHint}</p>
+        <p className="text-[0.8125rem] leading-5 text-muted-foreground">
+          {activeHint}
+        </p>
       )}
     </fieldset>
   );

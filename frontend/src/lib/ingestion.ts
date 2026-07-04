@@ -5,7 +5,7 @@
  *
  * @module ingestion
  */
-import type { IngestionJobStatus, SourceType } from '@/types';
+import type { IngestionJob, IngestionJobStatus, SourceType } from '@/types';
 
 export interface SourceTypeOption {
   value: SourceType;
@@ -75,6 +75,16 @@ const TERMINAL_INGESTION_STATUSES = new Set<IngestionJobStatus>([
 
 export function isIngestionTerminal(status: IngestionJobStatus): boolean {
   return TERMINAL_INGESTION_STATUSES.has(status);
+}
+
+/** True when the job's latest timestamp is inside the supplied recency window. */
+export function isIngestionJobRecent(
+  job: IngestionJob,
+  maxAgeMs: number,
+  now = Date.now(),
+): boolean {
+  const timestamp = Date.parse(job.updated_at || job.created_at);
+  return Number.isFinite(timestamp) && now - timestamp <= maxAgeMs;
 }
 
 /** Format a byte count as a compact, human-readable size. */

@@ -29,7 +29,6 @@ import type {
   PaperDocument,
   PaperFormatSummary,
   PaperSourceSummary,
-  SourceType,
 } from '@/types';
 import { paperDocumentSchema } from '@/types/paper-document.schema';
 
@@ -328,14 +327,16 @@ export async function downloadPaperPdfPackage(paper: PaperDocument) {
  * Upload a teacher's PDF for out-of-request extraction. Returns 202 + the
  * queued `IngestionJob` to poll; the Gemini extraction runs later via cron.
  */
-export async function uploadIngestionPdf(
-  pdf: File,
-  sourceType: SourceType,
-): Promise<IngestionJob> {
+export async function uploadIngestionPdf(pdf: File): Promise<IngestionJob> {
   const body = new FormData();
   body.append('pdf', pdf);
-  body.append('source_type', sourceType);
   const res = await request('/bank/ingest/', { method: 'POST', body });
+  return res.json();
+}
+
+/** List recent ingestion jobs (scoped to the teacher's school). */
+export async function fetchIngestionJobs(): Promise<IngestionJob[]> {
+  const res = await request('/bank/ingest/', { method: 'GET' });
   return res.json();
 }
 

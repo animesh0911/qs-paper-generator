@@ -46,6 +46,7 @@ export function PdfDropzone({
         ref={inputRef}
         type="file"
         accept="application/pdf,.pdf"
+        aria-label="Choose PDF to extract"
         className="sr-only"
         disabled={disabled}
         onChange={(event) => {
@@ -72,7 +73,7 @@ export function PdfDropzone({
             type="button"
             onClick={() => onSelect(null)}
             disabled={disabled}
-            className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 sm:size-10"
             aria-label={`Remove ${file.name}`}
           >
             <X className="size-4" aria-hidden="true" />
@@ -84,6 +85,7 @@ export function PdfDropzone({
           onClick={openPicker}
           disabled={disabled}
           aria-describedby={validationError ? describedById : undefined}
+          aria-invalid={Boolean(validationError)}
           onDragOver={(event) => {
             event.preventDefault();
             if (!disabled) setDragging(true);
@@ -91,7 +93,7 @@ export function PdfDropzone({
           onDragLeave={() => setDragging(false)}
           onDrop={handleDrop}
           className={cn(
-            'flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-6 py-10 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+            'flex min-h-40 w-full flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
             dragging
               ? 'border-primary bg-secondary'
               : 'border-input bg-background hover:bg-secondary/60',
@@ -100,14 +102,14 @@ export function PdfDropzone({
           <span className="flex size-11 items-center justify-center rounded-full bg-secondary text-foreground">
             <UploadCloud className="size-5" aria-hidden="true" />
           </span>
-          <span className="text-sm font-medium">
+          <span className="text-sm font-medium leading-5">
             Drop a PDF here, or{' '}
             <span className="text-primary underline underline-offset-2">
               browse
             </span>
           </span>
-          <span className="text-xs text-muted-foreground">
-            A previous-year paper, sample paper, or question bank · up to 25 MB
+          <span className="text-xs leading-5 text-muted-foreground">
+            PDF only · up to 25 MB
           </span>
         </button>
       )}

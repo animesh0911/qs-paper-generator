@@ -1,8 +1,8 @@
 /**
  * Owns the PDF upload + extraction lifecycle for the Upload Papers page.
  *
- * Flow: a teacher picks a PDF (validated client-side) and a source type, then
- * `upload()` POSTs it and receives a queued `IngestionJob` (HTTP 202). The
+ * Flow: a teacher picks a PDF (validated client-side), then `upload()` POSTs it
+ * and receives a queued `IngestionJob` (HTTP 202). The
  * extraction runs out-of-request (cron), so the hook polls the job until it
  * settles `done` / `failed`. `reset()` returns to the idle picker so the
  * teacher can upload another.
@@ -10,21 +10,17 @@
  * @module useIngestionUpload.hook
  */
 import { useEffect, useRef, useState } from 'react';
-import type { BankQuestion, IngestionJob, SourceType } from '@/types';
+import type { BankQuestion, IngestionJob } from '@/types';
 import {
   fetchIngestionJob,
   fetchIngestionJobQuestions,
+  fetchIngestionJobs,
   uploadIngestionPdf,
 } from '@/lib/api';
-import {
-  DEFAULT_SOURCE_TYPE,
-  isIngestionTerminal,
-  validatePdfFile,
-} from '@/lib/ingestion';
+import { isIngestionTerminal, validatePdfFile } from '@/lib/ingestion';
 
 export interface IngestionUploadState {
   file: File | null;
-  sourceType: SourceType;
   validationError: string;
   uploading: boolean;
   uploadError: string;
@@ -37,7 +33,6 @@ export interface IngestionUploadState {
   /** True while the parsed-questions list is loading after the job settles. */
   loadingQuestions: boolean;
   selectFile: (file: File | null) => void;
-  setSourceType: (sourceType: SourceType) => void;
   upload: () => Promise<void>;
   reset: () => void;
 }
@@ -46,7 +41,6 @@ export function useIngestionUpload(
   pollIntervalMs = 3000,
 ): IngestionUploadState {
   const [file, setFile] = useState<File | null>(null);
-  const [sourceType, setSourceType] = useState<SourceType>(DEFAULT_SOURCE_TYPE);
   const [validationError, setValidationError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
@@ -57,6 +51,28 @@ export function useIngestionUpload(
   const jobId = job?.id;
   const settled = job ? isIngestionTerminal(job.status) : false;
   const polling = job != null && !settled;
+
+  // Restore the latest upload when the teacher returns to this page. Ingestion is
+  // single-flight, so the latest job is the one whose progress or extracted list
+  // the teacher expects to see after navigating away. Do not guard this with a
+  // one-shot ref: React StrictMode intentionally replays mount effects in dev,
+  // and a premature guard can cancel the only fetch that would hydrate the card.
+  const suppressRestoreRef = useRef(false);
+  useEffect(() => {
+    if (job || suppressRestoreRef.current) return;
+    let cancelled = false;
+    fetchIngestionJobs()
+      .then((jobs) => {
+        if (!cancelled && jobs[0]) setJob(jobs[0]);
+      })
+      .catch(() => {
+        // Non-fatal: the empty upload form still works if the recent-job list
+        // cannot be loaded.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [job]);
 
   // Poll the queued job until it settles. Keyed on the job id so a fresh upload
   // restarts the loop; the loop reschedules itself off each fetched status.
@@ -142,7 +158,7 @@ export function useIngestionUpload(
     setUploadError('');
     setPollError('');
     try {
-      const queued = await uploadIngestionPdf(file, sourceType);
+      const queued = await uploadIngestionPdf(file);
       setJob(queued);
     } catch (err) {
       setUploadError((err as Error).message);
@@ -152,6 +168,7 @@ export function useIngestionUpload(
   }
 
   function reset() {
+    suppressRestoreRef.current = true;
     setFile(null);
     setValidationError('');
     setUploadError('');
@@ -163,7 +180,6 @@ export function useIngestionUpload(
 
   return {
     file,
-    sourceType,
     validationError,
     uploading,
     uploadError,
@@ -173,7 +189,6 @@ export function useIngestionUpload(
     parsedQuestions,
     loadingQuestions,
     selectFile,
-    setSourceType,
     upload,
     reset,
   };
