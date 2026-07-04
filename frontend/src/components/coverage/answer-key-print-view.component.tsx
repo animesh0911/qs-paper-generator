@@ -8,6 +8,8 @@
  * @module AnswerKeyPrintView
  */
 import { MathExpression } from '@/components/math/math-expression.component';
+import { LatexText } from '@/components/math/latex-text.component';
+import { latexHasMath } from '@/components/math/latex';
 import type { ContentItem, PaperAnswerDocument, PaperDocument } from '@/types';
 
 export interface AnswerKeyPrintViewProps {
@@ -97,10 +99,22 @@ function AnswerContentItem({ item }: { item: ContentItem }) {
     );
   }
 
-  if (!item.text && item.latex) {
+  // Prefer the `latex` field when it carries real math (no plain text, or math
+  // survives once `\text{…}` prose is stripped); plain-prose latex falls
+  // through to text. Mirrors the question paper renderer.
+  if (item.latex && !item.text) {
     return (
       <p>
         <MathExpression latex={item.latex} />
+      </p>
+    );
+  }
+  // A paragraph carrying both text and math-bearing latex: render the prose
+  // wrappable and typeset only the math fragments.
+  if (item.latex && latexHasMath(item.latex)) {
+    return (
+      <p>
+        <LatexText latex={item.latex} />
       </p>
     );
   }

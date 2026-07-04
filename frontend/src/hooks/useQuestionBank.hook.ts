@@ -11,10 +11,16 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import type { Metadata } from '@/lib/api';
-import { fetchBankQuestions, fetchChapters, fetchMetadata } from '@/lib/api';
+import {
+  fetchBankQuestions,
+  fetchBankQuestionSources,
+  fetchChapters,
+  fetchMetadata,
+} from '@/lib/api';
 import type {
   BankQuestion,
   BankQuestionFilters,
+  BankQuestionSource,
   Chapter,
   SourceType,
 } from '@/types';
@@ -26,6 +32,7 @@ export interface QuestionBankFilterState {
   section: string;
   qtype: string;
   source_type: SourceType | '';
+  source: string;
   search: string;
 }
 
@@ -34,6 +41,7 @@ const EMPTY_FILTERS: QuestionBankFilterState = {
   section: '',
   qtype: '',
   source_type: '',
+  source: '',
   search: '',
 };
 
@@ -45,6 +53,7 @@ export interface QuestionBank {
   loading: boolean;
   error: string;
   chapters: Chapter[];
+  sources: BankQuestionSource[];
   metadata: Metadata | null;
   filters: QuestionBankFilterState;
   setFilter: <K extends keyof QuestionBankFilterState>(
@@ -63,6 +72,7 @@ export function useQuestionBank(): QuestionBank {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [sources, setSources] = useState<BankQuestionSource[]>([]);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
   const [filters, setFilters] =
     useState<QuestionBankFilterState>(EMPTY_FILTERS);
@@ -75,6 +85,9 @@ export function useQuestionBank(): QuestionBank {
     fetchMetadata()
       .then(setMetadata)
       .catch(() => setMetadata(null));
+    fetchBankQuestionSources()
+      .then(setSources)
+      .catch(() => setSources([]));
   }, []);
 
   const hasActiveFilters = useMemo(
@@ -95,6 +108,7 @@ export function useQuestionBank(): QuestionBank {
     if (filters.section) payload.section = filters.section;
     if (filters.qtype) payload.qtype = filters.qtype;
     if (filters.source_type) payload.source_type = filters.source_type;
+    if (filters.source) payload.source = filters.source;
     if (filters.search) payload.search = filters.search;
 
     const timer = setTimeout(
@@ -146,6 +160,7 @@ export function useQuestionBank(): QuestionBank {
     loading,
     error,
     chapters,
+    sources,
     metadata,
     filters,
     setFilter,
