@@ -26,7 +26,10 @@ import type {
   GenerationBatch,
 } from '@/types';
 
-const MVP_GENERATION_CHAPTER_SLUG = 'carbon-and-its-compounds';
+const ENABLED_GENERATION_CHAPTER_SLUGS = [
+  'carbon-and-its-compounds',
+  'human-eye-and-the-colourful-world',
+];
 
 interface GenerationPrefill {
   chapterSlug: string;
@@ -77,9 +80,11 @@ export default function AiQaPage() {
     fetchChapters()
       .then((all) => {
         if (cancelled) return;
-        // MVP: AI generation is wired to Chapter 4 only; the rest of the
-        // syllabus is shown as upcoming (disabled) inside the setup component.
-        setChapters(all.filter((c) => c.slug === MVP_GENERATION_CHAPTER_SLUG));
+        // AI generation is enabled only for chapters with populated corpus
+        // retrieval data; the rest of the syllabus is shown as upcoming.
+        setChapters(
+          all.filter((c) => ENABLED_GENERATION_CHAPTER_SLUGS.includes(c.slug)),
+        );
         setChaptersError('');
       })
       .catch((err) => {

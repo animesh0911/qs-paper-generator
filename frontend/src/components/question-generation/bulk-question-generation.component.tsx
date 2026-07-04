@@ -28,7 +28,6 @@ const UPCOMING_CHAPTERS: { order: number; name: string }[] = [
   { order: 7, name: 'How do Organisms Reproduce?' },
   { order: 8, name: 'Heredity' },
   { order: 9, name: 'Light – Reflection and Refraction' },
-  { order: 10, name: 'The Human Eye and the Colourful World' },
   { order: 11, name: 'Electricity' },
   { order: 12, name: 'Magnetic Effects of Electric Current' },
   { order: 13, name: 'Our Environment' },
@@ -404,7 +403,7 @@ export function BulkQuestionGenerationSetup({
       {!selectedChapterSlug && (
         <div className="flex items-center gap-2 rounded-lg border border-white/70 bg-white/50 px-3 py-2 text-sm leading-5 text-muted-foreground">
           <MousePointer2 className="size-4 flex-none" aria-hidden="true" />
-          Select Chapter 4 to show topics.
+          Select a chapter to show topics.
         </div>
       )}
 
@@ -436,7 +435,7 @@ export function BulkQuestionGenerationSetup({
         </Button>
         {!canStart && !busy && (
           <p className="text-sm leading-5 text-muted-foreground">
-            Select Chapter 4 and at least one topic.
+            Select a chapter and at least one topic.
           </p>
         )}
       </div>

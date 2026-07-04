@@ -18,7 +18,11 @@ from corpus.models import (
     TextbookDocument,
     TextbookElement,
 )
-from corpus.textbook import DoclingNormalizer, load_docling_json
+from corpus.textbook import (
+    DoclingNormalizer,
+    MistralOcrMarkdownNormalizer,
+    load_docling_json,
+)
 
 FIXTURE = Path(__file__).parent / "fixtures" / "jesc104_pages_1_8_16.json"
 SOURCE_HASH = "efbb053ea8cedf29bc6891834613fdbcc17772e369f6b35405f3bb4701c41abe"
@@ -74,6 +78,55 @@ def test_stable_ids_depend_on_source_and_docling_reference():
         element.stable_element_id for element in repeated
     ]
     assert first[0].stable_element_id != other_source[0].stable_element_id
+
+
+def test_mistral_ocr_normalizer_preserves_textbook_structure_without_sidebar_noise():
+    """OCR markdown becomes section-owned source elements, not one flat blob."""
+    payload = {
+        "pages": [
+            {
+                "index": 0,
+                "markdown": """
+## CHAPTER 10
+# The Human Eye and the Colourful World
+1064CH11
+### 10.1 THE HUMAN EYE
+The human eye is like a camera.
+![img-1.jpeg](img-1.jpeg)
+Figure 10.1 The human eye
+Reprint 2026-27
+""",
+            },
+            {
+                "index": 1,
+                "markdown": """
+# Q U E S T I O N S
+1. What is meant by power of accommodation?
+# Think it over
+This sidebar should not ground generation.
+### 10.3 REFRACTION OF LIGHT THROUGH A PRISM
+Activity 10.1
+- Place a glass prism on paper.
+""",
+            },
+        ]
+    }
+
+    elements = MistralOcrMarkdownNormalizer(SOURCE_HASH).normalize(payload)
+    texts = [element.text for element in elements]
+
+    assert "10.1 THE HUMAN EYE" in texts
+    assert "Figure 10.1 The human eye" in texts
+    assert "Q U E S T I O N S" in texts
+    assert "10.3 REFRACTION OF LIGHT THROUGH A PRISM" in texts
+    assert "Activity 10.1" in texts
+    assert "1064CH11" not in texts
+    assert "Reprint 2026-27" not in texts
+    assert not any("sidebar" in text for text in texts)
+    assert [element.source_order for element in elements] == list(range(len(elements)))
+    assert next(
+        element for element in elements if element.text == "Figure 10.1 The human eye"
+    ).element_type == "caption"
 
 
 def test_heading_paths_replace_siblings_and_keep_unnumbered_context():

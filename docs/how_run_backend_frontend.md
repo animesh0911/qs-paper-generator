@@ -1,70 +1,53 @@
-# Run The App With Docker
+# Run the App with Docker
 
-Use Docker for this project. The browser opens the frontend on the host, but the
-frontend container proxies API calls to the backend container, and the backend
-uses the Postgres/pgvector container.
+Docker Compose is the supported way to run this project. Do not rely on host
+Python/Node dependencies for normal app runtime or tests.
+
+## Required services
+
+| Service | Purpose |
+|---|---|
+| `db` | PostgreSQL 16 + pgvector. Required by backend. |
+| `web` | Django API, migrations, management commands. |
+| `frontend` | Vite frontend at `http://localhost:5173`. |
+| `generation-worker` | Background AI Q&A generation batches. |
+| `ingestion-worker` | Background paper ingestion jobs. |
+| `answer-generation-worker` | Optional upload-answer generation jobs. |
+
+Request path:
 
 ```text
-browser -> http://localhost:5173 -> frontend -> web:8000 -> db:5432
+browser -> localhost:5173 -> frontend -> web:8000 -> db:5432
 ```
 
-## Why Docker Is The Source Of Truth
+## Start everything
 
-Do **not** rely on host Python/Node dependencies for normal development checks.
-All app/runtime/test dependencies are installed inside containers:
-
-- `db`: `pgvector/pgvector:0.8.2-pg16-bookworm`
-  - PostgreSQL 16 with pgvector extension support.
-- `web`, `generation-worker`, `ingestion-worker`: built from `backend/Dockerfile`
-  - Python `3.12-slim`
-  - Installs `backend/requirements.txt` and `backend/requirements-dev.txt`
-  - Includes Django, DRF, psycopg, pgvector, LangChain/LangGraph, provider SDKs,
-    PyMuPDF, ReportLab, Playwright, pytest, ruff, black, etc.
-  - Runs `playwright install --with-deps chromium`, so browser/PDF test deps live
-    in the backend image too.
-- `frontend`: built from `frontend/Dockerfile`
-  - Node `22-slim`
-  - pnpm `9.15.4` via corepack
-  - Installs all dependencies from `frontend/package.json`
-  - The compose volume keeps `/app/node_modules` inside the container, not on the host.
-
-If a command fails on the host because `python`, `black`, `pytest`, `node`, or a
-DB host is missing, run it through `docker compose exec ...` instead.
-
-## Start
-
-Stop any host Vite server first if it owns port 5173:
+If a host Vite process already owns port `5173`, stop it first:
 
 ```bash
 lsof -nP -iTCP:5173 -sTCP:LISTEN
 kill <PID>
 ```
 
-Start the app stack:
+Start the full app stack:
 
 ```bash
-docker compose up -d db web frontend
+docker compose up -d db web frontend generation-worker ingestion-worker answer-generation-worker
 ```
 
-For background AI generation / ingestion / upload-answer processing, also start
-workers:
+Use `--build` only after Dockerfile or dependency changes:
 
 ```bash
-docker compose up -d generation-worker ingestion-worker answer-generation-worker
+docker compose up -d --build db web frontend generation-worker ingestion-worker answer-generation-worker
 ```
 
-Use `--build` only after Dockerfile/dependency changes. The backend image runs
-`playwright install --with-deps chromium`, so a cache-missing rebuild can download
-large Debian browser packages, Chromium, FFmpeg, and fonts. For ordinary code/env
-changes prefer `docker compose up -d <service>` or `docker compose restart <service>`.
-
-Check it:
+Check status:
 
 ```bash
 docker compose ps
 ```
 
-Expected services:
+Expected running services:
 
 ```text
 db                         Up healthy
@@ -88,41 +71,44 @@ teacher@example.com
 teacher123
 ```
 
-## Load Questions And Answers
+## Seed a fresh database
 
-The backend auto-runs migrations and seed questions on startup. To load the full
-committed bank and generated answers into the Docker DB, run:
+The backend container runs migrations and base seed data on startup. For a fresh
+DB, run these idempotent commands after the stack is up.
+
+### 1. Seed textbook corpus for AI Q&A
+
+```bash
+docker compose exec web python manage.py seed_textbook_corpus
+```
+
+This populates `TextbookDocument`, `TextbookElement`, `ChapterMapNode`, and
+`RetrievalChunk` rows used by grounded AI Q&A topic retrieval.
+
+Currently supported corpus artifacts:
+
+| Chapter | Slug | Artifact |
+|---|---|---|
+| 4 | `carbon-and-its-compounds` | `content/ncert/jesc104/jesc104.json` |
+| 10 | `human-eye-and-the-colourful-world` | `content/ncert/jesc110/jesc110.json` |
+
+Chapter 10 is seeded only if `content/ncert/jesc110/jesc110.json` is present in
+the container, or mounted at `/content/ncert/jesc110/jesc110.json`. Do **not** run
+Mistral OCR during deploy; OCR is an offline/manual artifact-generation step.
+A fresh deploy should only run `seed_textbook_corpus` against reviewed artifacts.
+
+### 2. Load committed question bank and answer overrides
 
 ```bash
 docker compose exec web python manage.py load_questions /content/parsed
 docker compose exec web python manage.py load_question_overrides /content/bank-overrides/question_overrides.json
 ```
 
-`load_questions` is idempotent; duplicates are skipped. `load_question_overrides`
-applies committed AI-generated answers and disables diagram-required questions.
+Both commands are idempotent.
 
-Verify the loaded bank:
+## Common commands
 
-```bash
-docker compose exec web python manage.py shell -c '
-from bank.models import Question
-print("eligible", Question.objects.filter(parse_quality__in=["clean","partial"]).count())
-print("answered eligible", Question.objects.filter(parse_quality__in=["clean","partial"]).exclude(answer="").count())
-print("disabled diagrams", Question.objects.filter(review_flags__contains=["disabled_diagram_required"]).count())
-'
-```
-
-Current expected result:
-
-```text
-eligible 344
-answered eligible 344
-disabled diagrams 34
-```
-
-## Backend Commands
-
-Run backend commands inside the `web` container:
+Backend checks/tests:
 
 ```bash
 docker compose exec web python manage.py check
@@ -131,30 +117,13 @@ docker compose exec web ruff check .
 docker compose exec web black --check .
 ```
 
-### Full Backend Test Suite
-
-Use the Docker DB, not host pytest. The backend settings default to `POSTGRES_HOST=db`
-inside compose; on the host that name does not resolve.
-
-For the full suite, pin the extractor to the deterministic test path so ambient
-OCR config does not route tests through Mistral OCR:
+Full backend test suite should pin the deterministic extractor path:
 
 ```bash
 docker compose exec -T -e EXTRACTION_PIPELINE=gemini-native-pdf web pytest
 ```
 
-Last known result:
-
-```text
-527 passed, 1 warning
-```
-
-If you run without that env override and `EXTRACTION_PIPELINE=mistral-ocr-batch`
-is present, ingestion tests may call the Mistral OCR path and fail on dummy PDFs.
-
-## Frontend Commands
-
-Run frontend commands inside the `frontend` container:
+Frontend checks/tests:
 
 ```bash
 docker compose exec frontend npm test
@@ -163,31 +132,15 @@ docker compose exec frontend npm run type-check
 docker compose exec frontend npm run build
 ```
 
-The frontend container command runs `pnpm install && pnpm dev --host 0.0.0.0`.
-Using `npm ...` for scripts is okay inside the container because dependencies are
-already installed in `/app/node_modules`.
-
-## Useful Runtime Commands
-
-Run one generation drain manually:
+Drain one queued job manually:
 
 ```bash
 docker compose exec web python manage.py drain_generation_batches --limit 1
-```
-
-Run one ingestion drain manually:
-
-```bash
 docker compose exec web python manage.py drain_ingestion_jobs --limit 1
-```
-
-Run one optional upload-answer drain manually:
-
-```bash
 docker compose exec web python manage.py drain_answer_generation_jobs --limit 1
 ```
 
-View logs:
+Logs:
 
 ```bash
 docker compose logs -f web
@@ -197,21 +150,15 @@ docker compose logs -f ingestion-worker
 docker compose logs -f answer-generation-worker
 ```
 
-## Stop / Clean Up
+## Stop / reset
 
-Stop the stack:
+Stop containers:
 
 ```bash
 docker compose down
 ```
 
-Remove stopped containers:
-
-```bash
-docker container prune -f
-```
-
-Remove the Postgres volume too (destructive; wipes local Docker DB):
+Destroy the local Postgres volume too, wiping the local DB:
 
 ```bash
 docker compose down -v
