@@ -107,9 +107,9 @@ describe('UploadPapersPage', () => {
     mockState = baseState({});
     const html = renderToStaticMarkup(<UploadPapersPage />);
 
-    expect(html).toContain('Upload a PDF');
+    expect(html).toContain('Upload PDF');
     expect(html).toContain(
-      'AI extracts the questions from your PDF and adds them to your',
+      'Extract questions from a paper and add them to the question bank.',
     );
     expect(html).toContain('Drop a PDF here');
     expect(html).not.toContain('Source type');
@@ -138,7 +138,7 @@ describe('UploadPapersPage', () => {
 
     expect(html).toContain('Added 12 questions to your bank');
     expect(html).toContain('3 questions were skipped');
-    expect(html).toContain('Review extracted questions');
+    expect(html).toContain('Extracted questions');
     expect(html).not.toContain('2 questions grouped across 1 chapter');
     expect(html).not.toContain('They’re ready to use when you generate a paper.');
     expect(html).not.toContain('What is the colour of litmus in acid?');
@@ -189,7 +189,7 @@ describe('UploadPapersPage', () => {
     await user.click(reviewButton);
 
     expect(
-      screen.getByRole('dialog', { name: /extracted question review/i }),
+      screen.getByRole('dialog', { name: /extracted questions/i }),
     ).toBeTruthy();
     expect(screen.getByText('Acids, Bases and Salts')).toBeTruthy();
     expect(screen.getByText('Electricity')).toBeTruthy();
@@ -246,8 +246,8 @@ describe('UploadPapersPage', () => {
     render(<UploadPapersPage />);
 
     const button = screen.getByRole('button', { name: /generate answers/i });
-    expect(screen.getByText(/draft answers/i)).toBeTruthy();
-    expect(screen.getByText(/auto-save ai answers/i)).toBeTruthy();
+    expect(screen.queryByText(/draft answers/i)).toBeNull();
+    expect(screen.queryByText(/auto-save ai answers/i)).toBeNull();
     await user.click(button);
 
     expect(generateAnswers).toHaveBeenCalledTimes(1);
