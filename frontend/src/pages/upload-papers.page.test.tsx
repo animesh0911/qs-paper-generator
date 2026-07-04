@@ -246,7 +246,8 @@ describe('UploadPapersPage', () => {
     render(<UploadPapersPage />);
 
     const button = screen.getByRole('button', { name: /generate answers/i });
-    expect(screen.getByText(/optional ai pass/i)).toBeTruthy();
+    expect(screen.getByText(/draft answers/i)).toBeTruthy();
+    expect(screen.getByText(/auto-save ai answers/i)).toBeTruthy();
     await user.click(button);
 
     expect(generateAnswers).toHaveBeenCalledTimes(1);
