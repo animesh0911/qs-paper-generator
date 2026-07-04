@@ -8,6 +8,7 @@ import {
   buildChapterGroups,
   buildCoverageAssemblePayload,
   buildPaperStructureSummary,
+  sortPaperSourcesByUploadTime,
 } from './useCoverageForm.hook';
 
 describe('buildCoverageAssemblePayload', () => {
@@ -23,6 +24,22 @@ describe('buildCoverageAssemblePayload', () => {
       format_id: 'cbse_science_class_10_board_compact_2026_v1',
       difficulty: 'standard',
       chapter_slugs: ['life-processes'],
+      preferred_source_keys: ['upload:7'],
+    });
+  });
+
+  it('supports source-only generation when no chapters are selected', () => {
+    expect(
+      buildCoverageAssemblePayload({
+        selectedFormatId: 'cbse_science_class_10_board_compact_2026_v1',
+        difficulty: 'standard',
+        selectedSlugs: new Set(),
+        selectedSourceKeys: new Set(['upload:7']),
+      }),
+    ).toEqual({
+      format_id: 'cbse_science_class_10_board_compact_2026_v1',
+      difficulty: 'standard',
+      chapter_slugs: [],
       preferred_source_keys: ['upload:7'],
     });
   });
@@ -75,6 +92,46 @@ describe('buildChapterGroups', () => {
     expect(groups[0].chapters.map((chapter) => chapter.slug)).toEqual([
       'life-processes',
       'our-environment',
+    ]);
+  });
+});
+
+describe('sortPaperSourcesByUploadTime', () => {
+  it('orders selectable sources newest upload first', () => {
+    const ordered = sortPaperSourcesByUploadTime([
+      {
+        key: 'upload:old',
+        kind: 'upload',
+        title: 'Old upload',
+        detail: '',
+        question_count: 3,
+        created_at: '2026-06-20T10:00:00Z',
+        status: 'ready',
+      },
+      {
+        key: 'upload:new',
+        kind: 'upload',
+        title: 'Newest upload',
+        detail: '',
+        question_count: 4,
+        created_at: '2026-06-22T10:00:00Z',
+        status: 'ready',
+      },
+      {
+        key: 'upload:middle',
+        kind: 'upload',
+        title: 'Middle upload',
+        detail: '',
+        question_count: 5,
+        created_at: '2026-06-21T10:00:00Z',
+        status: 'ready',
+      },
+    ]);
+
+    expect(ordered.map((source) => source.key)).toEqual([
+      'upload:new',
+      'upload:middle',
+      'upload:old',
     ]);
   });
 });

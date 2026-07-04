@@ -18,7 +18,7 @@ Where it fits:
 
 from datetime import timedelta
 
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 
 from accounts.models import School
@@ -409,23 +409,29 @@ class GenerationBatch(models.Model):
         """Expire review-ready batches older than the 30-day review window."""
         now = now or timezone.now()
         cutoff = now - GENERATION_BATCH_REVIEW_TTL
-        batches = cls.objects.filter(
-            status=GenerationBatchStatus.READY_FOR_REVIEW,
-            ready_at__lt=cutoff,
-        )
-        batch_ids = list(batches.values_list("pk", flat=True))
-        if not batch_ids:
-            return 0
-
-        cls.objects.filter(pk__in=batch_ids).update(
-            status=GenerationBatchStatus.EXPIRED,
-            expired_at=now,
-            updated_at=now,
-        )
-        GeneratedQuestionCandidate.objects.filter(
-            batch_id__in=batch_ids,
-            status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW,
-        ).update(status=GeneratedQuestionCandidateStatus.EXPIRED, updated_at=now)
+        with transaction.atomic():
+            batch_ids = list(
+                cls.objects.select_for_update()
+                .filter(
+                    status=GenerationBatchStatus.READY_FOR_REVIEW,
+                    ready_at__lt=cutoff,
+                )
+                .values_list("pk", flat=True)
+            )
+            if not batch_ids:
+                return 0
+            cls.objects.filter(
+                pk__in=batch_ids,
+                status=GenerationBatchStatus.READY_FOR_REVIEW,
+            ).update(
+                status=GenerationBatchStatus.EXPIRED,
+                expired_at=now,
+                updated_at=now,
+            )
+            GeneratedQuestionCandidate.objects.filter(
+                batch_id__in=batch_ids,
+                status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW,
+            ).update(status=GeneratedQuestionCandidateStatus.EXPIRED, updated_at=now)
         return len(batch_ids)
 
     def expire_if_stale(self, *, now=None) -> bool:
@@ -437,15 +443,26 @@ class GenerationBatch(models.Model):
             or self.ready_at >= now - GENERATION_BATCH_REVIEW_TTL
         ):
             return False
-        GenerationBatch.objects.filter(pk=self.pk).update(
-            status=GenerationBatchStatus.EXPIRED,
-            expired_at=now,
-            updated_at=now,
-        )
-        GeneratedQuestionCandidate.objects.filter(
-            batch=self,
-            status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW,
-        ).update(status=GeneratedQuestionCandidateStatus.EXPIRED, updated_at=now)
+        with transaction.atomic():
+            locked = type(self).objects.select_for_update().get(pk=self.pk)
+            if (
+                locked.status != GenerationBatchStatus.READY_FOR_REVIEW
+                or locked.ready_at is None
+                or locked.ready_at >= now - GENERATION_BATCH_REVIEW_TTL
+            ):
+                return False
+            GenerationBatch.objects.filter(
+                pk=self.pk,
+                status=GenerationBatchStatus.READY_FOR_REVIEW,
+            ).update(
+                status=GenerationBatchStatus.EXPIRED,
+                expired_at=now,
+                updated_at=now,
+            )
+            GeneratedQuestionCandidate.objects.filter(
+                batch=self,
+                status=GeneratedQuestionCandidateStatus.READY_FOR_REVIEW,
+            ).update(status=GeneratedQuestionCandidateStatus.EXPIRED, updated_at=now)
         self.status = GenerationBatchStatus.EXPIRED
         self.expired_at = now
         self.updated_at = now

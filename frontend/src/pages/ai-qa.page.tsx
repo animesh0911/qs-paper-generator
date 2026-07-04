@@ -24,7 +24,6 @@ import type {
   Chapter,
   ChapterTopicNode,
   GenerationBatch,
-  GenerationDifficultyLabel,
 } from '@/types';
 
 const MVP_GENERATION_CHAPTER_SLUG = 'carbon-and-its-compounds';
@@ -32,7 +31,6 @@ const MVP_GENERATION_CHAPTER_SLUG = 'carbon-and-its-compounds';
 interface GenerationPrefill {
   chapterSlug: string;
   topicIds: string[];
-  difficulty: GenerationDifficultyLabel;
 }
 
 export default function AiQaPage() {
@@ -49,8 +47,6 @@ export default function AiQaPage() {
   const [selectedTopicIds, setSelectedTopicIds] = useState<Set<string>>(
     new Set(),
   );
-  const [difficulty, setDifficulty] =
-    useState<GenerationDifficultyLabel>('Standard');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [batches, setBatches] = useState<GenerationBatch[]>([]);
@@ -137,7 +133,6 @@ export default function AiQaPage() {
     if (!prefill) return;
     setChapterSlug(prefill.chapterSlug);
     setSelectedTopicIds(new Set(prefill.topicIds));
-    setDifficulty(prefill.difficulty);
     navigate('.', { replace: true, state: null });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
@@ -164,7 +159,6 @@ export default function AiQaPage() {
       const payload = buildGenerationBatchPayload({
         chapterSlug,
         chapterMapNodeIds: Array.from(selectedTopicIds),
-        difficulty,
       });
       const batch = await createGenerationBatch(payload);
       navigate(`/generation-batches/${batch.id}`);
@@ -190,9 +184,8 @@ export default function AiQaPage() {
                 Generate AI Q&amp;A
               </CardTitle>
               <p className="max-w-2xl text-[0.9375rem] leading-6 text-muted-foreground">
-                Pick a chapter and its topics, then generate grounded questions
-                for your bank. You’ll review every candidate before any are
-                added.
+                Choose a chapter, select topics, and generate grounded Q&amp;A.
+                Review candidates before they enter your bank.
               </p>
             </div>
           </CardHeader>
@@ -209,14 +202,12 @@ export default function AiQaPage() {
               topicsLoading={topicsLoading}
               topicsError={topicsError}
               selectedTopicIds={selectedTopicIds}
-              difficulty={difficulty}
               busy={busy}
               error={error}
               activeBatchId={null}
               onSelectChapter={selectChapter}
               onToggleTopic={toggleTopic}
               onClearTopics={() => setSelectedTopicIds(new Set())}
-              onDifficultyChange={setDifficulty}
               onStart={start}
               onOpenActiveBatch={() => {}}
               onOpenBatch={(batchId) => navigate(`/generation-batches/${batchId}`)}

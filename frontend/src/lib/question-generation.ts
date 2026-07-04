@@ -34,11 +34,11 @@ export function difficultyLabelFromPreset(
 export function buildGenerationBatchPayload({
   chapterSlug,
   chapterMapNodeIds,
-  difficulty,
+  difficulty = 'Standard',
 }: {
   chapterSlug: string;
   chapterMapNodeIds: string[];
-  difficulty: GenerationDifficultyLabel;
+  difficulty?: GenerationDifficultyLabel;
 }): GenerationBatchCreateRequest {
   if (!chapterSlug) {
     throw new Error('Select one Chapter.');

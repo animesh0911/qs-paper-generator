@@ -150,6 +150,17 @@ def test_validator_rejects_bad_mcq_options():
     assert "bad_mcq_options" in {error.code for error in result.errors}
 
 
+def test_validator_rejects_null_mcq_option_content():
+    """A model-emitted JSON null option body is rejected before acceptance."""
+    question = _question()
+    question["content"]["options"][0]["content"] = None
+
+    result = validate_generated_questions({"questions": [question]}, _request())
+
+    assert result.valid_questions == ()
+    assert "bad_option_content" in {error.code for error in result.errors}
+
+
 def test_validator_rejects_mcq_answer_that_matches_no_option():
     """An MCQ answer must point back to one of the generated options."""
     payload = {"questions": [_question(answer="None of these generated options.")]}
@@ -185,6 +196,22 @@ def test_prompt_scales_default_question_type_distribution_to_requested_count():
         "{'mcq': 1, 'very_short_answer': 1, 'short_answer': 1}"
     )
     assert "long_answer" not in distribution_line
+
+
+def test_prompt_targets_five_long_answers_for_standard_batch():
+    """A 30-question review batch should include meaningful LA coverage."""
+    prompt = build_question_generation_prompt(
+        QuestionGenerationRequest(chapter_slugs=("carbon-and-its-compounds",), count=30)
+    )
+
+    final_distribution_line = prompt.split(
+        "Final reviewed batch target by QuestionType: ", 1
+    )[1].split("\n", 1)[0]
+
+    assert final_distribution_line == (
+        "{'mcq': 10, 'very_short_answer': 10, 'short_answer': 5, " "'long_answer': 5}"
+    )
+    assert "about 5 long_answer items" in prompt
 
 
 def test_prompt_keeps_workflow_fields_out_of_model_payload():
@@ -324,7 +351,9 @@ def test_citation_support_review_handles_numeric_and_unicode_tokens():
     """Citation review must not drop formulas, numerals, or non-English text."""
     candidate = _question(
         raw_text="कार्बन की संयोजकता कितनी है?",
-        content={"stem": [{"type": "paragraph", "text": "कार्बन की संयोजकता कितनी है?"}]},
+        content={
+            "stem": [{"type": "paragraph", "text": "कार्बन की संयोजकता कितनी है?"}]
+        },
         answer="4",
     )
     manifest = {
@@ -387,6 +416,57 @@ def test_select_balanced_questions_backfills_shortfall_from_surplus():
 
     assert len(selected) == 2
     assert {question["raw_text"] for question in selected} == {"N0", "N1"}
+
+
+def test_select_balanced_questions_preserves_late_long_answers():
+    """Type-aware trimming keeps LAs even when the model emits them last."""
+    targets = {"node-nutrition": 4}
+    candidates = [
+        _question(
+            question_citation_ids=["chunk-nutrition"],
+            raw_text="MCQ 1",
+            qtype="mcq",
+            marks=1,
+        ),
+        _question(
+            question_citation_ids=["chunk-nutrition"],
+            raw_text="MCQ 2",
+            qtype="mcq",
+            marks=1,
+        ),
+        _question(
+            question_citation_ids=["chunk-nutrition"],
+            raw_text="VSA",
+            qtype="very_short_answer",
+            marks=2,
+        ),
+        _question(
+            question_citation_ids=["chunk-nutrition"],
+            raw_text="SA",
+            qtype="short_answer",
+            marks=3,
+        ),
+        _question(
+            question_citation_ids=["chunk-nutrition"],
+            raw_text="LA",
+            qtype="long_answer",
+            marks=5,
+        ),
+    ]
+
+    selected = select_balanced_questions(
+        candidates,
+        targets,
+        _two_topic_manifest(),
+        {"mcq": 1, "very_short_answer": 1, "short_answer": 1, "long_answer": 1},
+    )
+
+    assert [question["raw_text"] for question in selected] == [
+        "MCQ 1",
+        "VSA",
+        "SA",
+        "LA",
+    ]
 
 
 def test_prompt_breaks_down_targets_per_topic_node_with_headroom():

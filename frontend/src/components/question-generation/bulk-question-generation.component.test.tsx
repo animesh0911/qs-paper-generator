@@ -54,13 +54,11 @@ function setupProps(overrides = {}) {
     topicsLoading: false,
     topicsError: '',
     selectedTopicIds: new Set(['life-processes:5.1']),
-    difficulty: 'Standard' as const,
     busy: false,
     error: '',
     onSelectChapter: vi.fn(),
     onToggleTopic: vi.fn(),
     onClearTopics: vi.fn(),
-    onDifficultyChange: vi.fn(),
     onStart: vi.fn(),
     ...overrides,
   };
@@ -77,9 +75,10 @@ describe('BulkQuestionGenerationSetup', () => {
     expect(html).toContain('Topics');
     expect(html).toContain('5.1 Life Processes');
     expect(html).toContain('pp. 81–83');
-    expect(html).toContain('Easy');
-    expect(html).toContain('Standard');
-    expect(html).toContain('Challenging');
+    expect(html).not.toContain('Difficulty');
+    expect(html).not.toContain('Easy');
+    expect(html).not.toContain('Standard');
+    expect(html).not.toContain('Challenging');
     expect(html).not.toContain(
       'Selected NCERT topics define the generation scope',
     );

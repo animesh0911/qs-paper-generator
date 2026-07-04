@@ -5,7 +5,7 @@ import Dashboard from './dashboard.page';
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
-  useLocation: () => ({ state: null }),
+  useLocation: () => ({ pathname: '/', state: null }),
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
   NavLink: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
@@ -59,6 +59,13 @@ const coverageForm = {
   ],
   chaptersLoading: false,
   chaptersError: '',
+  sources: [],
+  sourcesLoading: false,
+  sourcesError: '',
+  selectedSourceKeys: new Set<string>(),
+  toggleSource: vi.fn(),
+  selectAllSources: vi.fn(),
+  clearAllSources: vi.fn(),
   formats: [
     {
       format_id: 'board',
@@ -133,6 +140,9 @@ describe('Dashboard (Generate paper page)', () => {
     const html = renderToStaticMarkup(<Dashboard />);
 
     expect(html).toContain('Generate paper');
+    expect(html).toContain('open chapters or sources only when you');
+    expect(html).toContain('Choose chapters');
+    expect(html).toContain('Choose sources');
     // The three workflows are reachable from the shared header nav.
     expect(html).toContain('Upload papers');
     expect(html).toContain('AI Q&amp;A');

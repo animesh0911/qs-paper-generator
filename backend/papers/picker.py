@@ -214,7 +214,7 @@ class QuestionPicker:
             n = len(slot_indices)
             chapter_target = cls._allocate(n, chapter_weights)
             cog_target = cls._allocate(n, profile)
-            candidates = pool.get(key, [])
+            candidates = cls._chapter_filtered_candidates(pool.get(key, []), opts)
 
             for slot_idx in slot_indices:
                 pick = cls._pick(
@@ -249,7 +249,7 @@ class QuestionPicker:
 
         alternate_ids: list[list[int]] = [[] for _ in range(len(opts.template.slots))]
         for key, slot_indices in bucket_slot_indices.items():
-            candidates = pool.get(key, [])
+            candidates = cls._chapter_filtered_candidates(pool.get(key, []), opts)
             # Offer every unused compatible candidate so the editor can expose
             # the full selected-chapter bank for MVP review. Freshest rows stay
             # first, mirroring the pick order; selected main-paper questions are
@@ -271,6 +271,15 @@ class QuestionPicker:
                 unfilled=unfilled,
             ),
         )
+
+    @staticmethod
+    def _chapter_filtered_candidates(
+        candidates: list[PoolRow], opts: PaperOptions
+    ) -> list[PoolRow]:
+        if not opts.chapter_slugs:
+            return candidates
+        allowed = set(opts.chapter_slugs)
+        return [row for row in candidates if row[1] in allowed]
 
     @staticmethod
     def _normalise_weights(

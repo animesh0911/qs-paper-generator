@@ -224,24 +224,15 @@ export function useCoverageForm(): CoverageForm {
     () => Array.from(selectedSlugs).sort(),
     [selectedSlugs],
   );
-  const selectedChapterSourceKey = selectedChapterSlugs.join('|');
-
   useEffect(() => {
-    if (selectedChapterSlugs.length === 0) {
-      setSources([]);
-      setSourcesError('');
-      setSourcesLoading(false);
-      setSelectedSourceKeys(new Set());
-      return;
-    }
-
     let cancelled = false;
     setSourcesLoading(true);
     fetchPaperSources(selectedChapterSlugs)
       .then((nextSources) => {
         if (cancelled) return;
-        const validKeys = new Set(nextSources.map((source) => source.key));
-        setSources(nextSources);
+        const orderedSources = sortPaperSourcesByUploadTime(nextSources);
+        const validKeys = new Set(orderedSources.map((source) => source.key));
+        setSources(orderedSources);
         setSelectedSourceKeys(
           (current) =>
             new Set([...current].filter((key) => validKeys.has(key))),
@@ -259,7 +250,7 @@ export function useCoverageForm(): CoverageForm {
     return () => {
       cancelled = true;
     };
-  }, [selectedChapterSourceKey]);
+  }, [selectedChapterSlugs]);
 
   useEffect(() => {
     sessionStorage.setItem(
@@ -272,7 +263,13 @@ export function useCoverageForm(): CoverageForm {
         totalMarks,
       }),
     );
-  }, [selectedFormatId, selectedSlugs, selectedSourceKeys, difficulty, totalMarks]);
+  }, [
+    selectedFormatId,
+    selectedSlugs,
+    selectedSourceKeys,
+    difficulty,
+    totalMarks,
+  ]);
 
   const chapterNameBySlug = useMemo(
     () => Object.fromEntries(chapters.map((c) => [c.slug, c.name])),
@@ -382,6 +379,19 @@ export function useCoverageForm(): CoverageForm {
     setTotalMarks: (marks: number) => setTotalMarks(Math.max(1, marks)),
     toAssemblePayload,
   };
+}
+
+export function sortPaperSourcesByUploadTime(
+  sources: PaperSourceSummary[],
+): PaperSourceSummary[] {
+  return [...sources].sort((a, b) => {
+    const aTime = Date.parse(a.created_at);
+    const bTime = Date.parse(b.created_at);
+    const aRank = Number.isNaN(aTime) ? Number.NEGATIVE_INFINITY : aTime;
+    const bRank = Number.isNaN(bTime) ? Number.NEGATIVE_INFINITY : bTime;
+    if (aRank !== bRank) return bRank - aRank;
+    return a.title.localeCompare(b.title);
+  });
 }
 
 function inferSubjectArea(order: number): string {

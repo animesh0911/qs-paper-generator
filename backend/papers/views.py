@@ -246,9 +246,9 @@ class PaperEditorDraftView(APIView):
             )
         errors = validate_answer_document(document, answer_document)
         # The frontend cannot know the bank answer for a newly-swapped question.
-        # Reconcile only missing slot entries from the bank; mismatched/stale or
-        # malformed entries are rejected loudly by the consistency gate.
-        if errors and all("has no answer entry" in error for error in errors):
+        # Reconcile missing and stale questionId entries from the bank; malformed
+        # content and orphan slot entries are still rejected loudly.
+        if errors and _answer_errors_are_reconcilable(errors):
             answer_document = build_answer_document(
                 SimpleNamespace(
                     pk=paper.pk,
@@ -365,6 +365,7 @@ class PaperPdfPackageView(APIView):
             package.writestr("answer-key.pdf", answer_key_pdf)
         return buffer.getvalue()
 
+
 class PaperAnswerKeyPdfView(APIView):
     """Render the marking-scheme PDF — the one endpoint that reveals answers.
 
@@ -401,6 +402,13 @@ class PaperAnswerKeyPdfView(APIView):
         return response
 
 
+def _answer_errors_are_reconcilable(errors: list[str]) -> bool:
+    return all(
+        "has no answer entry" in error or "does not match selected question" in error
+        for error in errors
+    )
+
+
 def _document_with_format_defaults(paper: Paper) -> dict | None:
     document, changed = reconcile_document_format_defaults(paper.document)
     if changed:
@@ -412,8 +420,10 @@ def _document_with_format_defaults(paper: Paper) -> dict | None:
 def _paper_print_url(user, paper_pk: int) -> str | None:
     return _frontend_print_url(user, paper_pk, "print")
 
+
 def _answer_key_print_url(user, paper_pk: int) -> str | None:
     return _frontend_print_url(user, paper_pk, "answer-key/print")
+
 
 def _frontend_print_url(user, paper_pk: int, route_suffix: str) -> str | None:
     base_url = settings.PAPER_PRINT_BASE_URL.rstrip("/")

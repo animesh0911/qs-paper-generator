@@ -197,13 +197,35 @@ class QuestionGenerator(Protocol):
 
 
 def _default_distribution_for_count(count: int) -> dict[str, int]:
-    """Return a small CBSE-shaped type mix whose values sum to ``count``."""
+    """Return a CBSE-shaped type mix whose values sum to ``count``.
+
+    For normal 30-question review batches this keeps enough long-answer
+    candidates in the final pool (5/30) while preserving plenty of 1m/2m items.
+    Very small batches keep the old round-robin behaviour so callers never get a
+    lone long answer before the shorter forms have appeared.
+    """
     if count < 1:
         return {}
     order = (QuestionType.MCQ, QuestionType.VSA, QuestionType.SA, QuestionType.LA)
-    distribution = {str(qtype): 0 for qtype in order}
-    for index in range(count):
-        distribution[str(order[index % len(order)])] += 1
+    if count < len(order):
+        return {str(qtype): 1 for qtype in order[:count]}
+
+    weights = {
+        str(QuestionType.MCQ): 2,
+        str(QuestionType.VSA): 2,
+        str(QuestionType.SA): 1,
+        str(QuestionType.LA): 1,
+    }
+    total_weight = sum(weights.values())
+    distribution = {
+        qtype: (count * weight) // total_weight for qtype, weight in weights.items()
+    }
+    remainder = count - sum(distribution.values())
+    for qtype in weights:
+        if remainder <= 0:
+            break
+        distribution[qtype] += 1
+        remainder -= 1
     return {qtype: value for qtype, value in distribution.items() if value}
 
 
@@ -269,20 +291,81 @@ def _attribute_node(
     return best_node
 
 
+def _take_with_type_targets(
+    candidates: Sequence[dict[str, Any]],
+    target: int,
+    remaining_type_targets: dict[str, int],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Take up to ``target`` candidates, preferring under-filled qtypes.
+
+    Model output often arrives grouped by qtype (all MCQs, then VSA, then SA,
+    then LA). A pure "first N per topic" trim can therefore drop every long
+    answer even when the model generated them. This helper keeps original order
+    as the fallback, but first reserves slots for the configured final qtype mix.
+    """
+    selected: list[dict[str, Any]] = []
+    used_indexes: set[int] = set()
+
+    def take_index(index: int) -> None:
+        question = candidates[index]
+        selected.append(question)
+        used_indexes.add(index)
+        qtype = question.get("qtype")
+        if isinstance(qtype, str) and remaining_type_targets.get(qtype, 0) > 0:
+            remaining_type_targets[qtype] -= 1
+
+    for qtype in remaining_type_targets:
+        while len(selected) < target and remaining_type_targets.get(qtype, 0) > 0:
+            match = next(
+                (
+                    index
+                    for index, question in enumerate(candidates)
+                    if index not in used_indexes and question.get("qtype") == qtype
+                ),
+                None,
+            )
+            if match is None:
+                break
+            take_index(match)
+
+    for index in range(len(candidates)):
+        if len(selected) >= target:
+            break
+        if index not in used_indexes:
+            take_index(index)
+
+    leftovers = [
+        question
+        for index, question in enumerate(candidates)
+        if index not in used_indexes
+    ]
+    return selected, leftovers
+
+
 def select_balanced_questions(
     questions: Sequence[dict[str, Any]],
     targets: dict[str, int],
     grounding_manifest: dict[str, Any] | None,
+    question_type_distribution: dict[str, int] | None = None,
 ) -> list[dict[str, Any]]:
-    """Trim validated candidates down to an even per-topic-node distribution.
+    """Trim validated candidates down to balanced topic and qtype targets.
 
     Each candidate is attributed to a topic node by its citations; up to that
-    node's target is kept. Any surplus (or candidates that match no node) is
-    used to backfill toward the total only when a node under-delivered, so the
-    result is as even as the model's output allows without a second paid call.
+    node's target is kept. Within those per-node quotas, selection prefers the
+    requested final QuestionType mix so long answers are not lost simply because
+    they appeared late in model output. Any surplus (or candidates that match no
+    node) backfills shortfalls without a second paid call.
     """
     if not targets:
-        return list(questions)
+        questions = list(questions)
+        if not question_type_distribution:
+            return questions
+        selected, _ = _take_with_type_targets(
+            questions,
+            sum(question_type_distribution.values()),
+            dict(question_type_distribution),
+        )
+        return selected
     node_citation_map = _node_citation_ids(grounding_manifest)
     target_nodes = list(targets)
     by_node: dict[str, list[dict[str, Any]]] = {node_id: [] for node_id in target_nodes}
@@ -295,14 +378,21 @@ def select_balanced_questions(
             by_node[node_id].append(question)
 
     selected: list[dict[str, Any]] = []
+    remaining_type_targets = dict(question_type_distribution or {})
     for node_id in target_nodes:
         target = targets[node_id]
-        selected.extend(by_node[node_id][:target])
-        leftovers.extend(by_node[node_id][target:])
+        node_selected, node_leftovers = _take_with_type_targets(
+            by_node[node_id], target, remaining_type_targets
+        )
+        selected.extend(node_selected)
+        leftovers.extend(node_leftovers)
 
     total = sum(targets.values())
     if len(selected) < total:
-        selected.extend(leftovers[: total - len(selected)])
+        backfill, _ = _take_with_type_targets(
+            leftovers, total - len(selected), remaining_type_targets
+        )
+        selected.extend(backfill)
     return selected
 
 
@@ -323,10 +413,11 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
     targets = node_question_targets(request.chapter_map_node_ids, request.count)
     generation_targets = _generation_targets_per_node(targets)
     total_candidates = sum(generation_targets.values()) or request.count
-    distribution = (
+    final_distribution = (
         request.question_type_distribution
-        or _default_distribution_for_count(total_candidates)
+        or _default_distribution_for_count(request.count)
     )
+    distribution = _default_distribution_for_count(total_candidates)
     per_node_lines = _per_node_target_lines(targets, generation_targets)
     grounding_lines = _grounding_prompt_lines(request.grounding_manifest)
     return "\n".join(
@@ -342,6 +433,9 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
             *per_node_lines,
             f"Difficulty targets: {difficulty}",
             f"Requested counts by QuestionType: {distribution}",
+            f"Final reviewed batch target by QuestionType: {final_distribution}",
+            "Meet the final reviewed batch target as closely as possible; for a "
+            "30-question batch this should include about 5 long_answer items.",
             "Marks are fixed by QuestionType: mcq=1, very_short_answer=2, "
             "short_answer=3, long_answer=5.",
             "raw_text must be a non-empty plain-text copy of the full Question "
@@ -453,6 +547,13 @@ class LangChainQuestionGenerator:
         payload = structured.invoke(build_question_generation_prompt(request))
         result = validate_generated_questions(payload, request)
         targets = node_question_targets(request.chapter_map_node_ids, request.count)
+        distribution = (
+            request.question_type_distribution
+            or _default_distribution_for_count(request.count)
+        )
         return select_balanced_questions(
-            result.valid_questions, targets, request.grounding_manifest
+            result.valid_questions,
+            targets,
+            request.grounding_manifest,
+            distribution,
         )
