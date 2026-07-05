@@ -86,14 +86,11 @@ export function useIngestionUpload(
   const settled = job ? isIngestionTerminal(job.status) : false;
   const polling = job != null && !settled;
 
-  // Restore the latest upload when the teacher returns to this page — but only
-  // while it is still running. A settled (done/failed) job would otherwise
-  // replace the picker with a stale results card, leaving no visible way to
-  // start a new upload except the small "Upload another" control. Restoring an
-  // in-flight job preserves the "come back and watch progress" behaviour; once
-  // it has settled we default to a fresh picker. Do not guard this with a
-  // one-shot ref: React StrictMode intentionally replays mount effects in dev,
-  // and a premature guard can cancel the only fetch that would hydrate the card.
+  // Restore the latest upload when the teacher returns to this page, including
+  // completed jobs. The header activity pill links back here after extraction;
+  // if we discard `done` jobs on mount, the teacher loses the extracted-question
+  // review and answer-generation actions. `reset()` suppresses this restore for
+  // the explicit "Upload another" escape hatch.
   const suppressRestoreRef = useRef(false);
   useEffect(() => {
     if (job || suppressRestoreRef.current) return;
@@ -103,9 +100,7 @@ export function useIngestionUpload(
         if (cancelled) return;
         setRecentJobs(jobs);
         const latest = jobs[0];
-        if (latest && !isIngestionTerminal(latest.status)) {
-          setJob(latest);
-        }
+        if (latest) setJob(latest);
       })
       .catch(() => {
         // Non-fatal: the empty upload form still works if the recent-job list

@@ -71,18 +71,22 @@ beforeEach(() => {
 });
 
 describe('useIngestionUpload', () => {
-  it('does not restore a settled job, so the teacher lands on a fresh picker', async () => {
+  it('restores a completed upload and loads its extracted questions when returning to upload', async () => {
     fetchIngestionJobsMock.mockResolvedValue([job({ status: 'done' })]);
+    fetchIngestionJobQuestionsMock.mockResolvedValue([question()]);
+    fetchIngestionJobAnswersMock.mockResolvedValue({ job: null, answers: [] });
 
     const { result } = renderHook(() => useIngestionUpload(10_000));
 
-    // Give the restore effect a chance to (not) hydrate a job.
     await waitFor(() => {
-      expect(fetchIngestionJobsMock).toHaveBeenCalled();
+      expect(result.current.job?.status).toBe('done');
+    });
+    await waitFor(() => {
+      expect(result.current.parsedQuestions).toHaveLength(1);
     });
 
-    expect(result.current.job).toBeNull();
-    expect(result.current.parsedQuestions).toHaveLength(0);
+    expect(fetchIngestionJobQuestionsMock).toHaveBeenCalledWith(11);
+    expect(result.current.parsedQuestions[0].text).toBe('Extracted question?');
   });
 
   it('restores an in-flight job so returning teachers keep watching progress', async () => {
