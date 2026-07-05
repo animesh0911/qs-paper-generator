@@ -33,6 +33,7 @@ function baseState(
     uploading: false,
     uploadError: '',
     job: null,
+    queuedJobs: [],
     polling: false,
     pollError: '',
     parsedQuestions: [],
@@ -45,6 +46,8 @@ function baseState(
     generateAnswers: vi.fn(),
     selectFile: vi.fn(),
     upload: vi.fn(),
+    dismissJob: vi.fn(),
+    retryJob: vi.fn(),
     reset: vi.fn(),
     ...overrides,
   };
@@ -117,6 +120,25 @@ describe('UploadPapersPage', () => {
     expect(html).toContain('Upload &amp; extract');
   });
 
+  it('opens the file picker by overlaying the native input, not a JS click', () => {
+    // Safari and some browsers block programmatic inputRef.click() (and even
+    // label→hidden-input activation), so the picker popup never opens. The real
+    // <input type=file> is laid transparently over the dropzone so a click hits
+    // the native control directly. Guard against regressing to a button/label.
+    mockState = baseState({});
+    render(<UploadPapersPage />);
+
+    const input = document.querySelector<HTMLInputElement>('input[type=file]');
+    expect(input).not.toBeNull();
+    // The input must cover the dropzone (absolute, full size, clickable).
+    expect(input?.className).toContain('absolute');
+    expect(input?.className).toContain('inset-0');
+    // No JS-click affordance: the browse text is not a button.
+    expect(
+      screen.queryByRole('button', { name: /drop a pdf here|browse/i }),
+    ).toBeNull();
+  });
+
   it('reports progress while a queued job extracts', () => {
     mockState = baseState({ job: job({ status: 'running' }) });
     const html = renderToStaticMarkup(<UploadPapersPage />);
@@ -124,6 +146,94 @@ describe('UploadPapersPage', () => {
     expect(html).toContain('Extracting questions');
     expect(html).toContain('CBSE-2023.pdf');
     expect(html).not.toContain('Drop a PDF here');
+  });
+
+  it('shows every other in-flight upload in a queue strip beside the current one', () => {
+    // The drain is serial, so extra uploads sit behind the current one. A
+    // teacher who queued several PDFs must see them all, not just the newest.
+    mockState = baseState({
+      job: job({ id: 1, status: 'running', source_file_name: 'current.pdf' }),
+      queuedJobs: [
+        job({ id: 2, status: 'pending', source_file_name: 'paper_2019.pdf' }),
+        job({
+          id: 3,
+          status: 'running',
+          source_file_name: 'sample_3.pdf',
+          total_pages: 6,
+          pages_done: 1,
+        }),
+      ],
+    });
+    const html = renderToStaticMarkup(<UploadPapersPage />);
+
+    expect(html).toContain('Other uploads');
+    expect(html).toContain('paper_2019.pdf');
+    expect(html).toContain('Queued');
+    expect(html).toContain('sample_3.pdf');
+    expect(html).toContain('page 1 of 6');
+  });
+
+  it('keeps a failed extraction visible in the strip instead of dropping it', () => {
+    // A failed job that isn't the one in the detail card must not silently
+    // vanish — the teacher needs to see it failed (and can hover for the error).
+    mockState = baseState({
+      job: job({ id: 1, status: 'running', source_file_name: 'current.pdf' }),
+      queuedJobs: [
+        job({
+          id: 4,
+          status: 'failed',
+          source_file_name: 'unreadable.pdf',
+          error: 'Unreadable scan',
+        }),
+      ],
+    });
+    const html = renderToStaticMarkup(<UploadPapersPage />);
+
+    expect(html).toContain('unreadable.pdf');
+    expect(html).toContain('Failed');
+    expect(html).toContain('Unreadable scan'); // surfaced via the row title
+  });
+
+  it('retries and removes a failed job from the queue strip', async () => {
+    const user = userEvent.setup();
+    const retryJob = vi.fn();
+    const dismissJob = vi.fn();
+    mockState = baseState({
+      job: job({ id: 1, status: 'running', source_file_name: 'current.pdf' }),
+      queuedJobs: [
+        job({ id: 4, status: 'failed', source_file_name: 'unreadable.pdf' }),
+      ],
+      retryJob,
+      dismissJob,
+    });
+
+    render(<UploadPapersPage />);
+    await user.click(screen.getByRole('button', { name: /retry/i }));
+    await user.click(screen.getByRole('button', { name: /remove/i }));
+
+    expect(retryJob).toHaveBeenCalledWith(4);
+    expect(dismissJob).toHaveBeenCalledWith(4);
+  });
+
+  it('omits the queue strip when nothing else is in flight', () => {
+    mockState = baseState({ job: job({ status: 'running' }), queuedJobs: [] });
+    const html = renderToStaticMarkup(<UploadPapersPage />);
+
+    expect(html).not.toContain('Other uploads');
+  });
+
+  it('lets the teacher start a new upload while a job is still processing', async () => {
+    // Extraction runs out-of-request and can sit in pending/running for a while.
+    // The progress card must not trap the teacher: without an escape hatch there
+    // is no visible upload control at all until the job settles.
+    const user = userEvent.setup();
+    const reset = vi.fn();
+    mockState = baseState({ job: job({ status: 'running' }), reset });
+
+    render(<UploadPapersPage />);
+    await user.click(screen.getByRole('button', { name: /upload another/i }));
+
+    expect(reset).toHaveBeenCalledTimes(1);
   });
 
   it('keeps the upload screen minimal by showing a clickable extracted-question summary when a job is done', () => {
@@ -140,7 +250,9 @@ describe('UploadPapersPage', () => {
     expect(html).toContain('3 questions were skipped');
     expect(html).toContain('Extracted questions');
     expect(html).not.toContain('2 questions grouped across 1 chapter');
-    expect(html).not.toContain('They’re ready to use when you generate a paper.');
+    expect(html).not.toContain(
+      'They’re ready to use when you generate a paper.',
+    );
     expect(html).not.toContain('What is the colour of litmus in acid?');
     expect(html).not.toContain('Name one strong acid.');
     expect(html).toContain('Upload another');

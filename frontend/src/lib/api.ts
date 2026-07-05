@@ -359,6 +359,24 @@ export async function fetchIngestionJob(
   return res.json();
 }
 
+/** Dismiss a failed ingestion job, removing it from the teacher's queue. */
+export async function dismissIngestionJob(
+  jobId: number | string,
+): Promise<void> {
+  await request(`/bank/ingest/${jobId}/`, { method: 'DELETE' });
+}
+
+/**
+ * Re-queue a failed ingestion job so the drainer extracts it again (resuming
+ * from its last per-page checkpoint). Returns the re-queued `pending` job.
+ */
+export async function retryIngestionJob(
+  jobId: number | string,
+): Promise<IngestionJob> {
+  const res = await request(`/bank/ingest/${jobId}/retry/`, { method: 'POST' });
+  return res.json();
+}
+
 /**
  * List the questions a finished ingestion job added to the bank — what the
  * upload status card shows once extraction + validation complete.
@@ -418,6 +436,16 @@ export async function discardGenerationBatch(
   batchId: number | string,
 ): Promise<GenerationBatch> {
   const res = await request(`/bank/generation-batches/${batchId}/discard/`, {
+    method: 'POST',
+  });
+  return res.json();
+}
+
+/** Re-queue a failed generation batch so the drainer runs it again. */
+export async function retryGenerationBatch(
+  batchId: number | string,
+): Promise<GenerationBatch> {
+  const res = await request(`/bank/generation-batches/${batchId}/retry/`, {
     method: 'POST',
   });
   return res.json();

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BANK_SOURCE_TYPE_OPTIONS,
   MAX_PDF_BYTES,
   SOURCE_TYPE_OPTIONS,
   formatFileSize,
@@ -57,6 +58,17 @@ describe('sourceTypeLabel', () => {
 
   it('defaults to previous-year paper as the first option', () => {
     expect(SOURCE_TYPE_OPTIONS[0].value).toBe('previous_year_paper');
+  });
+
+  it('labels ai_generated questions, which the upload picker never offers', () => {
+    // ai_generated is a browse/filter-only provenance: teachers never upload a
+    // paper with it, so it must stay out of the upload picker vocabulary but be
+    // labelled wherever bank questions are shown.
+    expect(sourceTypeLabel('ai_generated')).toBe('AI-generated');
+    const uploadValues = SOURCE_TYPE_OPTIONS.map((o) => o.value);
+    expect(uploadValues).not.toContain('ai_generated');
+    const bankValues = BANK_SOURCE_TYPE_OPTIONS.map((o) => o.value);
+    expect(bankValues).toContain('ai_generated');
   });
 });
 

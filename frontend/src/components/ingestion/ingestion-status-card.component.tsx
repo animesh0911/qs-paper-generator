@@ -21,7 +21,10 @@ import type {
   IngestionJob,
 } from '@/types';
 import { Button } from '@/components/ui/button';
-import { MathContent, MathText } from '@/components/math/math-content.component';
+import {
+  MathContent,
+  MathText,
+} from '@/components/math/math-content.component';
 
 interface IngestionStatusCardProps {
   job: IngestionJob;
@@ -204,7 +207,9 @@ function ExtractedQuestionsPanel({
                               key={`${question.id}-${option.label}`}
                               className="rounded-md border border-input bg-secondary/30 px-2.5 py-1.5"
                             >
-                              <span className="font-medium">{option.label}.</span>{' '}
+                              <span className="font-medium">
+                                {option.label}.
+                              </span>{' '}
                               <MathText text={option.text} />
                             </li>
                           ))}
@@ -431,7 +436,9 @@ function AnswerGenerationPanel({
         size="sm"
         variant="outline"
         onClick={onGenerateAnswers}
-        disabled={generatingAnswers || inProgress || done || questionCount === 0}
+        disabled={
+          generatingAnswers || inProgress || done || questionCount === 0
+        }
         className="h-9 w-full bg-background"
       >
         {generatingAnswers
@@ -560,6 +567,21 @@ export function IngestionStatusCard({
         </div>
       )}
 
+      {inProgress && (
+        // Extraction runs out-of-request, so a teacher shouldn't have to wait for
+        // it to finish before queuing the next PDF. Without this the progress
+        // card is a dead end — the only way back to the picker — leaving no
+        // visible upload control while a job is pending/running.
+        <Button
+          size="lg"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={onUploadAnother}
+        >
+          Upload another
+        </Button>
+      )}
+
       {job.status === 'done' && (
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-lg border border-input bg-secondary/50 px-4 py-4">
@@ -576,9 +598,7 @@ export function IngestionStatusCard({
               {job.skipped_count > 0 && (
                 <p className="text-sm text-muted-foreground">
                   {job.skipped_count}{' '}
-                  {job.skipped_count === 1
-                    ? 'question was'
-                    : 'questions were'}{' '}
+                  {job.skipped_count === 1 ? 'question was' : 'questions were'}{' '}
                   skipped as duplicates or unparseable.
                 </p>
               )}

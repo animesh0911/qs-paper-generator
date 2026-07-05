@@ -122,9 +122,17 @@ function FlowBridge({ variant }: { variant: 'desktop' | 'mobile' }) {
       style={{ '--qpg-flow-order': 3 } as CSSProperties}
     >
       <ArrowDown className="size-4 lg:hidden" aria-hidden="true" />
-      <span className="qpg-flow-bridge-label rounded-md border bg-background px-2.5 py-1 text-[0.6875rem] font-medium leading-4 text-foreground/70">
+      <Link
+        to="/question-bank"
+        className="qpg-flow-bridge-label group/bank inline-flex items-center gap-1 rounded-md border bg-background px-2.5 py-1 text-[0.6875rem] font-medium leading-4 text-foreground/70 transition-colors duration-200 ease-out hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label="Question bank"
+      >
         Question bank
-      </span>
+        <ArrowUpRight
+          className="size-3 shrink-0 text-foreground/45 transition-transform duration-200 group-hover/bank:-translate-y-0.5 group-hover/bank:translate-x-0.5"
+          aria-hidden="true"
+        />
+      </Link>
       <ArrowDown className="size-4 lg:hidden" aria-hidden="true" />
     </div>
   );
@@ -197,7 +205,9 @@ function WorkflowNode({
           isPrimary ? 'text-foreground' : 'text-foreground',
         )}
       >
-        <span className="text-foreground/70">{isPrimary ? 'Generate' : 'Open'}</span>
+        <span className="text-foreground/70">
+          {isPrimary ? 'Generate' : 'Open'}
+        </span>
         <ArrowUpRight
           className="size-3 shrink-0 text-foreground/55 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
           aria-hidden="true"

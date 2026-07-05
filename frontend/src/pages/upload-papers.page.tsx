@@ -15,7 +15,11 @@ import { useIngestionUpload } from '@/hooks/useIngestionUpload.hook';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppHeader } from '@/components/app-nav';
-import { IngestionStatusCard, PdfDropzone } from '@/components/ingestion';
+import {
+  IngestionQueueStrip,
+  IngestionStatusCard,
+  PdfDropzone,
+} from '@/components/ingestion';
 
 export default function UploadPapersPage() {
   const navigate = useNavigate();
@@ -115,6 +119,16 @@ export default function UploadPapersPage() {
                     </div>
                   </div>
                 </aside>
+              </div>
+            )}
+
+            {upload.queuedJobs.length > 0 && (
+              <div className="mx-auto max-w-5xl">
+                <IngestionQueueStrip
+                  jobs={upload.queuedJobs}
+                  onRetry={upload.retryJob}
+                  onDismiss={upload.dismissJob}
+                />
               </div>
             )}
           </CardContent>
