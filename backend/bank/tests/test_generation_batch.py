@@ -254,6 +254,43 @@ def test_discard_rejects_in_flight_batch(api_client, user):
     assert batch.status == GenerationBatchStatus.GENERATING_QUESTIONS
 
 
+def test_retry_requeues_a_failed_batch(api_client, user):
+    """Retry flips a failed batch back to queued (keeping its checkpoint pointer)
+    so the drainer runs it again."""
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.FAILED,
+        error="Model returned no valid candidates.",
+        thread_id="gen:abc123",
+    )
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
+
+    resp = api_client.post(f"/api/bank/generation-batches/{batch.pk}/retry/")
+
+    assert resp.status_code == 202
+    batch.refresh_from_db()
+    assert batch.status == GenerationBatchStatus.QUEUED
+    assert batch.error == ""
+    assert batch.thread_id == "gen:abc123"  # resume, not restart
+
+
+def test_retry_rejects_a_non_failed_batch(api_client, user):
+    """Only a failed batch is retryable — no accidental re-bill of live work."""
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.GENERATING_QUESTIONS,
+    )
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
+
+    resp = api_client.post(f"/api/bank/generation-batches/{batch.pk}/retry/")
+
+    assert resp.status_code == 409
+    batch.refresh_from_db()
+    assert batch.status == GenerationBatchStatus.GENERATING_QUESTIONS
+
+
 def test_create_batch_rejects_unknown_difficulty_preset(api_client):
     """Unknown difficulty presets fail early instead of silently reshaping intent."""
     resp = api_client.post(
@@ -377,6 +414,26 @@ def test_drain_records_failure_without_exposing_candidates(db, user, monkeypatch
     assert batch.status == GenerationBatchStatus.FAILED
     assert "model unavailable" in batch.error
     assert GeneratedQuestionCandidate.objects.count() == 0
+
+
+def test_drain_sanitises_raw_provider_error_on_the_batch(db, user, monkeypatch):
+    """A raw provider 402 dump must never land on the teacher-visible batch —
+    it carries account ids and billing URLs. Only actionable copy is stored."""
+    raw = (
+        "Error code: 402 - {'error': {'message': 'This request requires more "
+        "credits'}, 'user_id': 'user_SECRET'}"
+    )
+    _install_fake_generator(monkeypatch, boom=RuntimeError(raw))
+    batch = GenerationBatch.objects.create(school=user.school, created_by=user)
+    batch.chapters.set([Chapter.objects.get(slug="life-processes")])
+
+    call_command("drain_generation_batches")
+
+    batch.refresh_from_db()
+    assert batch.status == GenerationBatchStatus.FAILED
+    assert "credits" in batch.error.lower()
+    assert "user_SECRET" not in batch.error
+    assert "{" not in batch.error
 
 
 def test_grounded_batch_persists_manifest_and_sends_one_grounded_request(

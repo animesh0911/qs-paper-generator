@@ -16,6 +16,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 
+from ai_services.errors import friendly_llm_error
 from ai_services.llm import ModelPurpose, make_chat_model
 from bank.models import (
     AnswerGenerationJob,
@@ -259,7 +260,8 @@ def process_answer_generation_job(
                 final = graph.invoke(state, config, durability="sync")
     except Exception as exc:  # noqa: BLE001
         job.status = AnswerGenerationJobStatus.FAILED
-        job.error = f"{type(exc).__name__}: {exc}"
+        # Sanitise raw provider errors before they reach the teacher-visible job.
+        job.error = friendly_llm_error(exc)
         job.save(update_fields=["status", "error", "updated_at"])
         raise
 

@@ -19,6 +19,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
+from ai_services.errors import friendly_llm_error
 from corpus.retrieval import ChapterMapContextAssembler, TextbookRetrievalRequest
 from workflows.checkpointer import get_checkpointer
 
@@ -187,7 +188,9 @@ def process_generation_batch(
         )
     except Exception as exc:
         batch.status = GenerationBatchStatus.FAILED
-        batch.error = f"{type(exc).__name__}: {exc}"
+        # Sanitise: a raw provider error (e.g. a 402 credits JSON dump) must not
+        # be persisted onto the teacher-visible batch — see ai_services.errors.
+        batch.error = friendly_llm_error(exc)
         batch.save(update_fields=["status", "error", "updated_at"])
         raise GenerationBatchConflict(batch.error) from exc
 
@@ -356,6 +359,30 @@ def discard_generation_batch(user, batch_id) -> GenerationBatch | None:
         batch.discarded_at = now
         batch.error = ""
         batch.save(update_fields=["status", "discarded_at", "error", "updated_at"])
+        return batch
+
+
+def requeue_generation_batch(user, batch_id) -> GenerationBatch | None:
+    """Re-queue a failed teacher-owned batch so the drainer runs it again.
+
+    Only a ``FAILED`` batch is retryable: an in-flight or ready batch has no
+    business being reset, and re-queueing a successful one would re-bill for no
+    reason (Rule 13). The graph ``thread_id`` is preserved, so a batch that
+    failed *after* the model already produced candidates resumes from that
+    checkpoint instead of paying for a second generation. The paid work happens
+    out-of-request in ``drain_generation_batches`` — this only flips the row.
+    """
+    with transaction.atomic():
+        batch = get_owned_generation_batch(user, batch_id, lock=True)
+        if batch is None:
+            return None
+        if batch.status != GenerationBatchStatus.FAILED:
+            raise GenerationBatchConflict(
+                "Only a failed generation batch can be retried."
+            )
+        batch.status = GenerationBatchStatus.QUEUED
+        batch.error = ""
+        batch.save(update_fields=["status", "error", "updated_at"])
         return batch
 
 
