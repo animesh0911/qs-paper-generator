@@ -53,7 +53,7 @@ class ChapterMapBuilder:
         sections_by_number: dict[str, ChapterMapNode] = {}
         for index, heading in enumerate(headings):
             number = _NUMBERED_HEADING.match(heading.text).group(1)
-            start = 0 if index == 0 else heading.source_order
+            start = heading.source_order
             end = (
                 headings[index + 1].source_order - 1
                 if index + 1 < len(headings)

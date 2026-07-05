@@ -73,8 +73,8 @@ def document(db):
 
 
 @pytest.mark.django_db
-def test_numbered_sections_partition_every_element_once(document):
-    """Every element needs one nearest topic for gap-free RetrievalChunk scope."""
+def test_numbered_sections_start_at_their_heading(document):
+    """Selectable topics must not absorb chapter preface text before the heading."""
     ChapterMapBuilder().rebuild(document)
 
     root = ChapterMapNode.objects.get(document=document, node_type="document")
@@ -89,7 +89,7 @@ def test_numbered_sections_partition_every_element_once(document):
         (node.title, node.source_start, node.source_end, node.element_count)
         for node in sections
     ] == [
-        ("4.1 Bonding in Carbon", 0, 2, 3),
+        ("4.1 Bonding in Carbon", 1, 2, 2),
         ("4.2 Versatile Nature of Carbon", 3, 4, 2),
         ("4.2.1 Saturated Compounds", 5, 18, 14),
     ]
@@ -99,7 +99,8 @@ def test_numbered_sections_partition_every_element_once(document):
         for node in sections
         for source_order in range(node.source_start, node.source_end + 1)
     ]
-    assert owned_orders == list(range(19))
+    assert owned_orders == list(range(1, 19))
+    assert sections[0].preview == "4.1 Bonding in Carbon"
     assert sections[0].parent == root
     assert sections[1].parent == root
     assert sections[2].parent == sections[1]

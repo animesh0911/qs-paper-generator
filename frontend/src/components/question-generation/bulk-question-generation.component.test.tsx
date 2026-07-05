@@ -74,7 +74,7 @@ describe('BulkQuestionGenerationSetup', () => {
     expect(html).toContain('NCERT Chapter');
     expect(html).toContain('Topics');
     expect(html).toContain('5.1 Life Processes');
-    expect(html).toContain('pp. 81–83');
+    expect(html).not.toContain('pp. 81–83');
     expect(html).not.toContain('Difficulty');
     expect(html).not.toContain('Easy');
     expect(html).not.toContain('Standard');
@@ -88,6 +88,25 @@ describe('BulkQuestionGenerationSetup', () => {
     expect(html).not.toMatch(
       /batch size|provider|model|fallback|cost|marks distribution|prompt|instructions|topic hints/i,
     );
+  });
+
+  it('does not show topic preview descriptions', () => {
+    const html = renderToStaticMarkup(
+      <BulkQuestionGenerationSetup
+        {...setupProps({
+          topics: [
+            {
+              ...topics[0],
+              title: '10.1 THE HUMAN EYE',
+              preview: '10.1 THE HUMAN EYE',
+            },
+          ],
+        })}
+      />,
+    );
+
+    expect(html.match(/10.1 The Human Eye/g)).toHaveLength(1);
+    expect(html).not.toContain('Nutrition and respiration in living organisms.');
   });
 
   it('prevents generation until at least one topic is selected', () => {

@@ -417,6 +417,59 @@ def test_choice_group_missing_display_style_defaults_to_or():
     assert "displayStyle" not in content["choices"][0]
 
 
+def test_nested_subpart_choice_is_lifted_to_contract_valid_top_level_choices():
+    """Case-based OR alternatives inside a subpart must not break assembly.
+
+    Some bank rows store ``subparts[n].content`` as ``{"choices": [...]}``.
+    The PaperDocument contract requires subpart content to be an array, so the
+    builder lifts those alternatives to top-level choices while preserving the
+    subpart label in each option label.
+    """
+    content = {
+        "passage": [{"type": "paragraph", "text": "Read the passage."}],
+        "subparts": [
+            {"label": "a", "content": [{"type": "paragraph", "text": "First."}]},
+            {
+                "label": "c",
+                "marks": 2,
+                "content": {
+                    "choices": [
+                        {
+                            "options": [
+                                {
+                                    "label": "i",
+                                    "content": [
+                                        {"type": "paragraph", "text": "Earth wire?"}
+                                    ],
+                                },
+                                {
+                                    "label": "ii",
+                                    "content": [
+                                        {"type": "paragraph", "text": "Precautions?"}
+                                    ],
+                                },
+                            ]
+                        }
+                    ]
+                },
+            },
+        ],
+    }
+    q = _question(qtype="case_based", content=content)
+
+    result = PaperDocumentBuilder()._build_content(q)
+
+    assert result["subparts"] == [
+        {"label": "a", "content": [{"type": "paragraph", "text": "First."}]}
+    ]
+    group = result["choices"][0]
+    assert group["displayStyle"] == "or"
+    assert group["chooseCount"] == 1
+    assert [option["label"] for option in group["options"]] == ["c(i)", "c(ii)"]
+    assert [option["marks"] for option in group["options"]] == [2, 2]
+    assert isinstance(content["subparts"][1]["content"], dict)
+
+
 def test_internal_choice_fallback_has_only_stem():
     """internal_choice without structured content falls back to stem only."""
     q = _question(qtype="internal_choice", content={}, text="Answer any one.")

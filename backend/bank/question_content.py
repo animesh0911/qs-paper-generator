@@ -62,19 +62,59 @@ def repair_stem(content: dict, fallback_text: str) -> dict:
 
 
 def normalise_question_content(content: dict) -> dict:
-    """Return ``content`` with contract-required ChoiceGroup fields filled.
+    """Return ``content`` repaired to the PaperDocumentV1 content contract.
 
-    A group with N options where the teacher answers ``chooseCount`` of them is
-    an "or" choice, so a missing ``displayStyle`` defaults to "or" and a missing
-    ``chooseCount`` to 1. The input dict is never mutated; an already-valid
-    ``content`` is returned unchanged (same object) so callers can cheaply tell
-    nothing was repaired.
+    Ingested rows occasionally carry two cheap shape defects:
+
+    * a ChoiceGroup missing ``displayStyle``/``chooseCount``;
+    * a case-based subpart whose ``content`` is itself ``{"choices": [...]}``,
+      even though contract §9 requires each subpart ``content`` to be a
+      ContentItem[] and only top-level ``content.choices`` may hold ChoiceGroups.
+
+    The latter appears when a paper has an OR choice inside one sub-question. We
+    preserve the alternatives by lifting that nested group into top-level
+    ``choices`` and prefixing option labels with the subpart label (for example
+    ``c(i)`` / ``c(ii)``). The original dict is never mutated.
     """
     if not isinstance(content, dict):
         return content
-    groups = content.get("choices")
+
+    changed = False
+    result = content
+    top_level_choices, choices_changed = _normalise_choice_groups(
+        content.get("choices")
+    )
+    if choices_changed:
+        result = {**result, "choices": top_level_choices}
+        changed = True
+
+    subparts = content.get("subparts")
+    if isinstance(subparts, list):
+        repaired_subparts = []
+        lifted_choices = []
+        for subpart in subparts:
+            repaired_subpart, nested_choices = _repair_subpart_choices(subpart)
+            if repaired_subpart is not None:
+                repaired_subparts.append(repaired_subpart)
+            lifted_choices.extend(nested_choices)
+            changed = changed or repaired_subpart is not subpart or bool(nested_choices)
+        if lifted_choices:
+            existing = result.get("choices") if isinstance(result, dict) else None
+            existing_choices = existing if isinstance(existing, list) else []
+            result = {
+                **result,
+                "subparts": repaired_subparts,
+                "choices": [*existing_choices, *lifted_choices],
+            }
+        elif changed:
+            result = {**result, "subparts": repaired_subparts}
+
+    return result if changed else content
+
+
+def _normalise_choice_groups(groups) -> tuple[list, bool]:
     if not isinstance(groups, list):
-        return content
+        return [], False
 
     normalised = []
     changed = False
@@ -89,6 +129,56 @@ def normalise_question_content(content: dict) -> dict:
             }
             changed = True
         normalised.append(group)
-    if not changed:
-        return content
-    return {**content, "choices": normalised}
+    return normalised, changed
+
+
+def _repair_subpart_choices(subpart) -> tuple[object | None, list[dict]]:
+    if not isinstance(subpart, dict):
+        return subpart, []
+    nested_content = subpart.get("content")
+    if not isinstance(nested_content, dict):
+        return subpart, []
+    nested_groups, groups_changed = _normalise_choice_groups(
+        nested_content.get("choices")
+    )
+    if not nested_groups:
+        return subpart, []
+
+    subpart_label = str(subpart.get("label") or "").strip()
+    lifted_groups = []
+    for group in nested_groups:
+        if not isinstance(group, dict):
+            lifted_groups.append(group)
+            continue
+        options = []
+        for option in group.get("options") or []:
+            if not isinstance(option, dict):
+                options.append(option)
+                continue
+            option_label = str(option.get("label") or "").strip()
+            prefixed_label = (
+                f"{subpart_label}({option_label})"
+                if subpart_label and option_label
+                else subpart_label or option_label
+            )
+            option = {**option, "label": prefixed_label}
+            if "marks" not in option and subpart.get("marks") is not None:
+                option["marks"] = subpart["marks"]
+            options.append(option)
+        lifted_groups.append({**group, "options": options})
+
+    repaired_content = _content_items_from_nested_subpart_content(nested_content)
+    repaired_subpart = (
+        {**subpart, "content": repaired_content} if repaired_content else None
+    )
+    return repaired_subpart, lifted_groups
+
+
+def _content_items_from_nested_subpart_content(content: dict) -> list[dict]:
+    """Best-effort salvage of real content from an invalid nested region map."""
+    items = []
+    for region in content_mod.ITEM_REGIONS:
+        region_items = content.get(region)
+        if isinstance(region_items, list):
+            items.extend(item for item in region_items if isinstance(item, dict))
+    return items

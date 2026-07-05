@@ -5,7 +5,7 @@ import type {
   GenerationBatchStatus,
   GeneratedQuestionCandidate,
 } from '@/types';
-import { Check, Layers, LoaderCircle, MousePointer2, X } from 'lucide-react';
+import { Check, LoaderCircle, MousePointer2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { shouldShowNoValidQuestionsMessage } from '@/lib/question-generation';
@@ -57,13 +57,6 @@ export interface BulkQuestionGenerationSetupProps {
   onOpenBatch?: (batchId: number) => void;
   onRetryBatch?: (batchId: number) => void;
   onDiscardBatch?: (batchId: number) => void;
-}
-
-function formatPageRange(topic: ChapterTopicNode): string {
-  if (topic.page_range.start === topic.page_range.end) {
-    return `p. ${topic.page_range.start}`;
-  }
-  return `pp. ${topic.page_range.start}–${topic.page_range.end}`;
 }
 
 function formatTopicTitle(title: string): string {
@@ -430,21 +423,8 @@ export function BulkQuestionGenerationSetup({
                       >
                         <Check className="size-3.5" />
                       </span>
-                      <span className="min-w-0 space-y-1">
-                        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                          <span className="font-medium leading-snug">
-                            {formatTopicTitle(topic.title)}
-                          </span>
-                          <span className="inline-flex items-center gap-1 rounded-sm bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                            <Layers className="size-3" aria-hidden="true" />
-                            {formatPageRange(topic)}
-                          </span>
-                        </span>
-                        {topic.preview && (
-                          <span className="line-clamp-2 block text-xs leading-5 text-muted-foreground">
-                            {topic.preview}
-                          </span>
-                        )}
+                      <span className="min-w-0 font-medium leading-snug">
+                        {formatTopicTitle(topic.title)}
                       </span>
                     </label>
                   </li>
