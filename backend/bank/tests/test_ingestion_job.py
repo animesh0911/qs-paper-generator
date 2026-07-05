@@ -253,6 +253,84 @@ def test_status_hides_other_schools_jobs_as_404(api_client):
     assert resp.status_code == 404
 
 
+def test_dismiss_removes_a_failed_job(api_client, user):
+    """A teacher can clear a failed upload from their queue."""
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        source_file_name="bad.pdf",
+        status=IngestionJobStatus.FAILED,
+        error="Unreadable scan",
+    )
+    resp = api_client.delete(f"/api/bank/ingest/{job.pk}/")
+    assert resp.status_code == 204
+    assert not IngestionJob.objects.filter(pk=job.pk).exists()
+
+
+def test_dismiss_rejects_a_non_failed_job(api_client, user):
+    """Only failed jobs are dismissable — an in-flight/done row is protected."""
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        source_file_name="ok.pdf",
+        status=IngestionJobStatus.RUNNING,
+    )
+    resp = api_client.delete(f"/api/bank/ingest/{job.pk}/")
+    assert resp.status_code == 409
+    assert IngestionJob.objects.filter(pk=job.pk).exists()
+
+
+def test_dismiss_hides_other_schools_jobs_as_404(api_client):
+    """Tenancy: dismissing across schools is a 404, and leaves the row intact."""
+    from accounts.models import School
+
+    other = School.objects.create(name="Other School")
+    job = IngestionJob.objects.create(
+        school=other,
+        pdf=_pdf_upload(),
+        source_file_name="x.pdf",
+        status=IngestionJobStatus.FAILED,
+    )
+    resp = api_client.delete(f"/api/bank/ingest/{job.pk}/")
+    assert resp.status_code == 404
+    assert IngestionJob.objects.filter(pk=job.pk).exists()
+
+
+def test_retry_requeues_a_failed_job(api_client, user):
+    """Retry flips a failed job back to pending (keeping its checkpoint pointer)
+    so the drainer resumes it — without re-billing already-parsed pages."""
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        source_file_name="bad.pdf",
+        status=IngestionJobStatus.FAILED,
+        error="Unreadable scan",
+        thread_id="gemini-native-pdf:abc123",
+    )
+    resp = api_client.post(f"/api/bank/ingest/{job.pk}/retry/")
+    assert resp.status_code == 202
+    job.refresh_from_db()
+    assert job.status == IngestionJobStatus.PENDING
+    assert job.error == ""
+    assert job.thread_id == "gemini-native-pdf:abc123"  # resume, not restart
+
+
+def test_retry_rejects_a_non_failed_job(api_client, user):
+    """A pending/running/done job is not retryable — no accidental re-bill."""
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        pdf=_pdf_upload(),
+        source_file_name="ok.pdf",
+        status=IngestionJobStatus.DONE,
+    )
+    resp = api_client.post(f"/api/bank/ingest/{job.pk}/retry/")
+    assert resp.status_code == 409
+
+
 # ---------------------------------------------------------------------------
 # Parsed-questions endpoint — GET /api/bank/ingest/{id}/questions/
 # ---------------------------------------------------------------------------
@@ -400,6 +478,33 @@ def test_drain_rewrites_google_adc_failure_to_actionable_setup_message(
     assert "GEMINI_API_KEY" in job.error
     assert "EXTRACTION_PIPELINE=mistral-ocr-batch" in job.error
     assert "DefaultCredentialsError" not in job.error
+
+
+def test_drain_skips_when_another_drain_holds_the_lock(db, user, monkeypatch):
+    """Overlapping drains must not both process — a tick that cannot take the
+    advisory lock leaves the job untouched (no double Gemini bill) instead of
+    racing the holder. Simulates a second drainer already holding the lock."""
+    from contextlib import contextmanager
+
+    @contextmanager
+    def _lock_unavailable():
+        yield False
+
+    monkeypatch.setattr(drain_mod, "_drain_advisory_lock", _lock_unavailable)
+
+    def _boom(*args, **kwargs):
+        raise AssertionError("must not process while the lock is held elsewhere")
+
+    monkeypatch.setattr(drain_mod, "make_chat_model", _boom)
+    job = IngestionJob.objects.create(
+        school=user.school, pdf=_pdf_upload(), source_file_name="held.pdf"
+    )
+
+    call_command("drain_ingestion_jobs")
+
+    job.refresh_from_db()
+    assert job.status == IngestionJobStatus.PENDING
+    assert Question.objects.count() == 0
 
 
 def test_drain_dry_run_makes_no_changes(db, user, monkeypatch):

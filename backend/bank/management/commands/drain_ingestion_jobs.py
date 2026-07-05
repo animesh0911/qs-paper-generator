@@ -12,9 +12,14 @@ thread from the last checkpoint instead of restarting it. A ``failed`` row is
 terminal until manually re-queued (flip it back to ``pending``) — the resume
 then still starts from the last checkpoint, not page 1.
 
-~1-minute pickup latency is irrelevant: extraction itself takes minutes. The
-drain assumes the platform schedules non-overlapping runs (it always has —
-status flips alone never guarded against two simultaneous drains).
+~1-minute pickup latency is irrelevant: extraction itself takes minutes.
+Overlapping drains are made safe by a Postgres session **advisory lock**: a
+tick that cannot acquire the lock exits immediately, so only one drainer ever
+processes jobs at a time (status flips alone never guarded against two
+simultaneous drains — two passes could both grab the same ``running`` row and
+double-bill it). This keeps the drain safe under multiple worker replicas or an
+accidental manual run alongside the cron, while preserving the serial,
+one-job-at-a-time behaviour.
 
 COST (Rule 13): each drained job is a PAID Gemini call per *unextracted* PDF
 page — per-page checkpointing is exactly what stops a resumed job re-billing
@@ -28,11 +33,14 @@ from __future__ import annotations
 
 import os
 import shlex
+from contextlib import contextmanager
 from pathlib import Path
 from uuid import uuid4
 
 from django.core.management.base import BaseCommand
+from django.db import connection
 
+from ai_services.errors import friendly_llm_error
 from ai_services.llm import make_chat_model
 from bank.models import IngestionJob, IngestionJobStatus
 from workflows.checkpointer import get_checkpointer
@@ -42,6 +50,35 @@ from workflows.extraction import (
 )
 
 _RESUMABLE = (IngestionJobStatus.PENDING, IngestionJobStatus.RUNNING)
+
+# Stable, arbitrary key identifying the ingestion-drain advisory lock. Any other
+# drainer on the same database calls pg_try_advisory_lock with this same key, so
+# only one holds it at a time. Session-scoped: released explicitly (and by the
+# backend on disconnect), never blocking other tables.
+_ADVISORY_LOCK_KEY = 0x1_9E57_10B5  # "INGEST 10BS" mnemonic; value is immaterial
+
+
+@contextmanager
+def _drain_advisory_lock():
+    """Yield ``True`` iff this process acquired the ingestion-drain lock.
+
+    Non-blocking: ``pg_try_advisory_lock`` returns immediately so an overlapping
+    tick can bail instead of piling up. SQLite (tests without Postgres) has no
+    advisory locks; there we degrade to always-acquired since those runs are
+    single-process anyway.
+    """
+    if connection.vendor != "postgresql":
+        yield True
+        return
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT pg_try_advisory_lock(%s)", [_ADVISORY_LOCK_KEY])
+        acquired = bool(cursor.fetchone()[0])
+    try:
+        yield acquired
+    finally:
+        if acquired:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT pg_advisory_unlock(%s)", [_ADVISORY_LOCK_KEY])
 
 
 def _format_extraction_error(exc: Exception) -> str:
@@ -54,7 +91,9 @@ def _format_extraction_error(exc: Exception) -> str:
             "run the drainer with EXTRACTION_PIPELINE=mistral-ocr-batch if you "
             "intend to use Mistral OCR credentials."
         )
-    return f"{type(exc).__name__}: {message}"
+    # Sanitise raw provider errors (e.g. a 402 credits JSON dump) before they
+    # land on the teacher-visible job.error — see ai_services.errors.
+    return friendly_llm_error(exc)
 
 
 def _load_dotenv() -> None:
@@ -132,22 +171,25 @@ class Command(BaseCommand):
             ),
         )
 
+    def _resumable_jobs(self, limit: int | None) -> list[IngestionJob]:
+        queued = IngestionJob.objects.filter(status__in=_RESUMABLE).order_by(
+            "created_at"
+        )
+        if limit:
+            queued = queued[:limit]
+        return list(queued)
+
     def handle(self, *args, **options):
         _load_dotenv()
         _default_extraction_llm_from_generation()
 
-        queued = IngestionJob.objects.filter(status__in=_RESUMABLE).order_by(
-            "created_at"
-        )
-        if options["limit"]:
-            queued = queued[: options["limit"]]
-        jobs = list(queued)
-
-        if not jobs:
-            self.stdout.write("No resumable ingestion jobs.")
-            return
-
+        # --dry-run only reads, and never bills Gemini, so it skips the lock —
+        # inspecting the queue must not be blocked by a real drain in flight.
         if options["dry_run"]:
+            jobs = self._resumable_jobs(options["limit"])
+            if not jobs:
+                self.stdout.write("No resumable ingestion jobs.")
+                return
             self.stdout.write(
                 f"[dry-run] {len(jobs)} resumable job(s) — each is a PAID Gemini "
                 f"call per unextracted PDF page. Not processing:"
@@ -159,16 +201,28 @@ class Command(BaseCommand):
                 )
             return
 
-        for job in jobs:
-            self._process(
-                job,
-                extractor=options["extractor"],
-                batch_pages=options["batch_pages"],
-            )
+        with _drain_advisory_lock() as acquired:
+            if not acquired:
+                self.stdout.write(
+                    "Another ingestion drain holds the lock; skipping this tick."
+                )
+                return
 
-    def _process(
-        self, job: IngestionJob, *, extractor: str, batch_pages: int
-    ) -> None:
+            # Query *inside* the lock: a drain that just finished may have
+            # settled the jobs a stale pre-lock snapshot would have re-run.
+            jobs = self._resumable_jobs(options["limit"])
+            if not jobs:
+                self.stdout.write("No resumable ingestion jobs.")
+                return
+
+            for job in jobs:
+                self._process(
+                    job,
+                    extractor=options["extractor"],
+                    batch_pages=options["batch_pages"],
+                )
+
+    def _process(self, job: IngestionJob, *, extractor: str, batch_pages: int) -> None:
         """Run or resume one job's graph thread; record status + counts.
 
         Marks ``running`` first (a crashed run stays visible — and resumable —

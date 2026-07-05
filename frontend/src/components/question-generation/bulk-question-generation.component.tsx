@@ -7,6 +7,7 @@ import type {
 } from '@/types';
 import { Check, Layers, LoaderCircle, MousePointer2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { shouldShowNoValidQuestionsMessage } from '@/lib/question-generation';
 import { CandidateReviewPanel } from './candidate-review-panel.component';
 
@@ -54,6 +55,8 @@ export interface BulkQuestionGenerationSetupProps {
   onStart: () => void;
   onOpenActiveBatch?: () => void;
   onOpenBatch?: (batchId: number) => void;
+  onRetryBatch?: (batchId: number) => void;
+  onDiscardBatch?: (batchId: number) => void;
 }
 
 function formatPageRange(topic: ChapterTopicNode): string {
@@ -114,6 +117,8 @@ export function BulkQuestionGenerationSetup({
   onStart,
   onOpenActiveBatch,
   onOpenBatch,
+  onRetryBatch,
+  onDiscardBatch,
 }: BulkQuestionGenerationSetupProps) {
   const selectedTopicCount = selectedTopicIds.size;
   const selectedChapter = chapters.find(
@@ -122,9 +127,16 @@ export function BulkQuestionGenerationSetup({
   const canStart =
     Boolean(selectedChapterSlug) && selectedTopicCount > 0 && !busy;
   const reviewableBatches = batches.filter((batch) =>
-    ['queued', 'generating_questions', 'validating', 'ready_for_review'].includes(
-      batch.status,
-    ),
+    [
+      'queued',
+      'generating_questions',
+      'validating',
+      'ready_for_review',
+      // Keep failures visible: a batch that died mid-generation must not
+      // silently vanish from the list — the teacher needs to see it failed and
+      // open the reason, not wonder where their generation went.
+      'failed',
+    ].includes(batch.status),
   );
 
   return (
@@ -134,11 +146,14 @@ export function BulkQuestionGenerationSetup({
           <div>
             <p className="text-sm font-medium">Generation drafts</p>
             <p className="mt-1 text-sm leading-5 text-muted-foreground">
-              Return to an in-progress batch or review generated Q&amp;A that is ready.
+              Return to an in-progress batch or review generated Q&amp;A that is
+              ready.
             </p>
           </div>
           {batchesLoading && (
-            <p className="text-sm text-muted-foreground">Checking for drafts…</p>
+            <p className="text-sm text-muted-foreground">
+              Checking for drafts…
+            </p>
           )}
           {batchesError && (
             <p className="text-sm text-muted-foreground" role="alert">
@@ -149,6 +164,18 @@ export function BulkQuestionGenerationSetup({
             <ul className="space-y-2">
               {reviewableBatches.map((batch) => {
                 const ready = batch.status === 'ready_for_review';
+                const failed = batch.status === 'failed';
+                const statusLabel = ready
+                  ? 'Ready for review'
+                  : failed
+                    ? 'Failed'
+                    : 'Generating';
+                const detail = ready
+                  ? `${batch.candidate_count} candidate${batch.candidate_count === 1 ? '' : 's'} ready`
+                  : failed
+                    ? batch.error ||
+                      'Generation failed. Open for details, or start a new batch.'
+                    : 'We’ll update this when candidates are ready.';
                 return (
                   <li
                     key={batch.id}
@@ -156,23 +183,51 @@ export function BulkQuestionGenerationSetup({
                   >
                     <span className="text-sm leading-5">
                       <span className="font-medium">
-                        Batch #{batch.id} · {ready ? 'Ready for review' : 'Generating'}
+                        Batch #{batch.id} · {statusLabel}
                       </span>
-                      <span className="block text-muted-foreground">
-                        {ready
-                          ? `${batch.candidate_count} candidate${batch.candidate_count === 1 ? '' : 's'} ready`
-                          : 'We’ll update this when candidates are ready.'}
+                      <span
+                        className={cn(
+                          'block',
+                          failed ? 'text-destructive' : 'text-muted-foreground',
+                        )}
+                      >
+                        {detail}
                       </span>
                     </span>
-                    {onOpenBatch && (
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={ready ? 'default' : 'outline'}
-                        onClick={() => onOpenBatch(batch.id)}
-                      >
-                        {ready ? 'Review draft' : 'View progress'}
-                      </Button>
+                    {failed ? (
+                      <span className="flex shrink-0 items-center gap-2">
+                        {onRetryBatch && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => onRetryBatch(batch.id)}
+                          >
+                            Retry
+                          </Button>
+                        )}
+                        {onDiscardBatch && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => onDiscardBatch(batch.id)}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </span>
+                    ) : (
+                      onOpenBatch && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={ready ? 'default' : 'outline'}
+                          onClick={() => onOpenBatch(batch.id)}
+                        >
+                          {ready ? 'Review draft' : 'View progress'}
+                        </Button>
+                      )
                     )}
                   </li>
                 );

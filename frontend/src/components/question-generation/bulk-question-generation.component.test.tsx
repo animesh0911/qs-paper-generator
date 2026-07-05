@@ -195,6 +195,42 @@ describe('BulkQuestionGenerationSetup', () => {
     expect(html).toContain('Review draft');
   });
 
+  it('keeps a failed batch visible with its reason so it does not silently vanish', () => {
+    const html = renderToStaticMarkup(
+      <BulkQuestionGenerationSetup
+        {...setupProps({
+          batches: [
+            {
+              id: 43,
+              status: 'failed',
+              chapter_slugs: ['carbon-and-its-compounds'],
+              chapter_map_node_ids: ['carbon:4.3'],
+              topic_names: [],
+              difficulty_preset: 'balanced',
+              requested_count: 10,
+              candidate_count: 0,
+              error: 'Model returned no valid candidates.',
+              ready_at: null,
+              accepted_at: null,
+              expired_at: null,
+              discarded_at: null,
+              created_at: '2026-06-21T00:00:00Z',
+              updated_at: '2026-06-21T00:00:05Z',
+            },
+          ],
+          onOpenBatch: vi.fn(),
+          onRetryBatch: vi.fn(),
+          onDiscardBatch: vi.fn(),
+        })}
+      />,
+    );
+
+    expect(html).toContain('Batch #43 · Failed');
+    expect(html).toContain('Model returned no valid candidates.');
+    expect(html).toContain('Retry');
+    expect(html).toContain('Remove');
+  });
+
   it('shows a friendly active-batch message when Q&A is already generating', () => {
     const html = renderToStaticMarkup(
       <BulkQuestionGenerationSetup

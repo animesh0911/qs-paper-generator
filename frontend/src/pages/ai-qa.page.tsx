@@ -12,19 +12,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   createGenerationBatch,
+  discardGenerationBatch,
   fetchChapters,
   fetchChapterTopics,
   fetchGenerationBatches,
+  retryGenerationBatch,
 } from '@/lib/api';
 import { buildGenerationBatchPayload } from '@/lib/question-generation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppHeader } from '@/components/app-nav';
 import { BulkQuestionGenerationSetup } from '@/components/question-generation';
-import type {
-  Chapter,
-  ChapterTopicNode,
-  GenerationBatch,
-} from '@/types';
+import type { Chapter, ChapterTopicNode, GenerationBatch } from '@/types';
 
 const ENABLED_GENERATION_CHAPTER_SLUGS = [
   'carbon-and-its-compounds',
@@ -74,6 +72,30 @@ export default function AiQaPage() {
     const timer = window.setInterval(() => void loadBatches(), 5000);
     return () => window.clearInterval(timer);
   }, [loadBatches]);
+
+  const retryBatch = useCallback(
+    async (batchId: number) => {
+      try {
+        await retryGenerationBatch(batchId);
+        await loadBatches();
+      } catch (err) {
+        setBatchesError((err as Error).message);
+      }
+    },
+    [loadBatches],
+  );
+
+  const discardBatch = useCallback(
+    async (batchId: number) => {
+      try {
+        await discardGenerationBatch(batchId);
+        await loadBatches();
+      } catch (err) {
+        setBatchesError((err as Error).message);
+      }
+    },
+    [loadBatches],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -215,7 +237,11 @@ export default function AiQaPage() {
               onClearTopics={() => setSelectedTopicIds(new Set())}
               onStart={start}
               onOpenActiveBatch={() => {}}
-              onOpenBatch={(batchId) => navigate(`/generation-batches/${batchId}`)}
+              onOpenBatch={(batchId) =>
+                navigate(`/generation-batches/${batchId}`)
+              }
+              onRetryBatch={retryBatch}
+              onDiscardBatch={discardBatch}
             />
           </CardContent>
         </Card>

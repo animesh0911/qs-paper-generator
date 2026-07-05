@@ -41,6 +41,7 @@ from .generation_batches import (
     get_owned_generation_batch,
     list_generation_batches,
     queue_generation_batch,
+    requeue_generation_batch,
 )
 from .models import (
     Chapter,
@@ -48,6 +49,7 @@ from .models import (
     GeneratedQuestionCandidate,
     GenerationBatch,
     IngestionJob,
+    IngestionJobStatus,
     Question,
     QuestionType,
     Section,
@@ -293,19 +295,57 @@ def ingest(request):
     return Response(IngestionJobSerializer(job).data, status=202)
 
 
-@api_view(["GET"])
+@api_view(["GET", "DELETE"])
 @permission_classes([IsTeacher])
 def ingest_status(request, job_id):
-    """Return one ingestion job's status, scoped to the teacher's school.
+    """Poll or dismiss one ingestion job, scoped to the teacher's school.
 
-    A teacher may only see jobs from their own school — a cross-school id is a
+    A teacher may only touch jobs from their own school — a cross-school id is a
     404 (not 403), so the endpoint never confirms another school's job exists.
+
+    ``DELETE`` dismisses a **failed** job (removes it from the queue). Only
+    ``failed`` jobs are dismissable: a pending/running row is mid-drain, and a
+    ``done`` row's extracted questions stay in the bank regardless (the FK is
+    SET_NULL), so deleting it would only orphan provenance.
     """
     try:
         job = IngestionJob.objects.get(pk=job_id, school=request.user.school)
     except IngestionJob.DoesNotExist:
         return Response({"detail": "Not found."}, status=404)
+
+    if request.method == "DELETE":
+        if job.status != IngestionJobStatus.FAILED:
+            return Response(
+                {"detail": "Only a failed upload can be dismissed."},
+                status=409,
+            )
+        job.delete()
+        return Response(status=204)
+
     return Response(IngestionJobSerializer(job).data)
+
+
+@api_view(["POST"])
+@permission_classes([IsTeacher])
+def ingest_retry(request, job_id):
+    """Re-queue a failed ingestion job so the drainer extracts it again.
+
+    Only a ``failed`` job is retryable. The ``thread_id`` is preserved, so
+    extraction resumes from the last per-page checkpoint (ADR-0006) instead of
+    re-billing pages already parsed (Rule 13). The paid work runs later in
+    ``drain_ingestion_jobs`` — this view only flips the row to ``pending``.
+    """
+    try:
+        job = IngestionJob.objects.get(pk=job_id, school=request.user.school)
+    except IngestionJob.DoesNotExist:
+        return Response({"detail": "Not found."}, status=404)
+
+    if job.status != IngestionJobStatus.FAILED:
+        return Response({"detail": "Only a failed upload can be retried."}, status=409)
+    job.status = IngestionJobStatus.PENDING
+    job.error = ""
+    job.save(update_fields=["status", "error", "updated_at"])
+    return Response(IngestionJobSerializer(job).data, status=202)
 
 
 @api_view(["GET"])
@@ -460,6 +500,20 @@ def generation_batch_discard(request, batch_id):
     if batch is None:
         return Response({"detail": "Not found."}, status=404)
     return Response(GenerationBatchSerializer(batch).data)
+
+
+@api_view(["POST"])
+@permission_classes([IsTeacher])
+def generation_batch_retry(request, batch_id):
+    """Re-queue a failed owned batch so the drainer generates it again."""
+    try:
+        batch = requeue_generation_batch(request.user, batch_id)
+    except GenerationBatchConflict as exc:
+        return Response({"detail": exc.detail}, status=409)
+
+    if batch is None:
+        return Response({"detail": "Not found."}, status=404)
+    return Response(GenerationBatchSerializer(batch).data, status=202)
 
 
 @api_view(["GET"])

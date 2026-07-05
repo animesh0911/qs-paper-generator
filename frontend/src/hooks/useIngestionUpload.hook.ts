@@ -17,11 +17,13 @@ import type {
   IngestionJob,
 } from '@/types';
 import {
+  dismissIngestionJob,
   fetchIngestionJob,
   fetchIngestionJobAnswers,
   fetchIngestionJobQuestions,
   fetchIngestionJobs,
   generateIngestionJobAnswers,
+  retryIngestionJob,
   uploadIngestionPdf,
 } from '@/lib/api';
 import { isIngestionTerminal, validatePdfFile } from '@/lib/ingestion';
@@ -32,6 +34,13 @@ export interface IngestionUploadState {
   uploading: boolean;
   uploadError: string;
   job: IngestionJob | null;
+  /**
+   * Other uploads worth surfacing beside the detail card: in-flight
+   * (pending/running) jobs queued behind the current one, plus `failed` ones so
+   * a failed extraction doesn't silently disappear. Excludes the card's own job
+   * and successful `done` jobs (those already landed in the bank).
+   */
+  queuedJobs: IngestionJob[];
   /** True while a non-terminal job is being polled. */
   polling: boolean;
   pollError: string;
@@ -47,6 +56,10 @@ export interface IngestionUploadState {
   generateAnswers: () => Promise<void>;
   selectFile: (file: File | null) => void;
   upload: () => Promise<void>;
+  /** Remove a failed job from the queue strip. */
+  dismissJob: (jobId: number) => Promise<void>;
+  /** Re-queue a failed job so extraction runs again. */
+  retryJob: (jobId: number) => Promise<void>;
   reset: () => void;
 }
 
@@ -58,11 +71,14 @@ export function useIngestionUpload(
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [job, setJob] = useState<IngestionJob | null>(null);
+  const [recentJobs, setRecentJobs] = useState<IngestionJob[]>([]);
   const [pollError, setPollError] = useState('');
   const [parsedQuestions, setParsedQuestions] = useState<BankQuestion[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [answerJob, setAnswerJob] = useState<AnswerGenerationJob | null>(null);
-  const [generatedAnswers, setGeneratedAnswers] = useState<GeneratedAnswer[]>([]);
+  const [generatedAnswers, setGeneratedAnswers] = useState<GeneratedAnswer[]>(
+    [],
+  );
   const [loadingAnswers, setLoadingAnswers] = useState(false);
   const [generatingAnswers, setGeneratingAnswers] = useState(false);
   const [answerGenerationError, setAnswerGenerationError] = useState('');
@@ -70,9 +86,12 @@ export function useIngestionUpload(
   const settled = job ? isIngestionTerminal(job.status) : false;
   const polling = job != null && !settled;
 
-  // Restore the latest upload when the teacher returns to this page. Ingestion is
-  // single-flight, so the latest job is the one whose progress or extracted list
-  // the teacher expects to see after navigating away. Do not guard this with a
+  // Restore the latest upload when the teacher returns to this page — but only
+  // while it is still running. A settled (done/failed) job would otherwise
+  // replace the picker with a stale results card, leaving no visible way to
+  // start a new upload except the small "Upload another" control. Restoring an
+  // in-flight job preserves the "come back and watch progress" behaviour; once
+  // it has settled we default to a fresh picker. Do not guard this with a
   // one-shot ref: React StrictMode intentionally replays mount effects in dev,
   // and a premature guard can cancel the only fetch that would hydrate the card.
   const suppressRestoreRef = useRef(false);
@@ -81,7 +100,12 @@ export function useIngestionUpload(
     let cancelled = false;
     fetchIngestionJobs()
       .then((jobs) => {
-        if (!cancelled && jobs[0]) setJob(jobs[0]);
+        if (cancelled) return;
+        setRecentJobs(jobs);
+        const latest = jobs[0];
+        if (latest && !isIngestionTerminal(latest.status)) {
+          setJob(latest);
+        }
       })
       .catch(() => {
         // Non-fatal: the empty upload form still works if the recent-job list
@@ -129,6 +153,39 @@ export function useIngestionUpload(
       if (timer) clearTimeout(timer);
     };
   }, [jobId, pollIntervalMs]);
+
+  // Keep the recent-jobs list fresh while anything is still in flight, so the
+  // queue strip reflects every pending/running upload — not just the one in the
+  // detail card. Independent of the single-job poll above: that drives the card;
+  // this drives the "also in queue" list. Stops once nothing is in flight.
+  const hasInflightInList = recentJobs.some(
+    (candidate) => !isIngestionTerminal(candidate.status),
+  );
+  useEffect(() => {
+    if (!hasInflightInList) return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    async function poll() {
+      try {
+        const jobs = await fetchIngestionJobs();
+        if (cancelled) return;
+        setRecentJobs(jobs);
+        if (jobs.some((candidate) => !isIngestionTerminal(candidate.status))) {
+          timer = setTimeout(poll, pollIntervalMs);
+        }
+      } catch {
+        // Non-fatal: the strip keeps its last-known statuses and retries.
+        if (!cancelled) timer = setTimeout(poll, pollIntervalMs);
+      }
+    }
+
+    timer = setTimeout(poll, pollIntervalMs);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [hasInflightInList, pollIntervalMs]);
 
   // Once a job lands `done`, fetch the questions it added so the status card
   // can show exactly what was parsed (after extraction + validation finished).
@@ -249,10 +306,45 @@ export function useIngestionUpload(
     try {
       const queued = await uploadIngestionPdf(file);
       setJob(queued);
+      // Refresh the list so any earlier upload still draining shows in the queue
+      // strip (and the list poller restarts on the new in-flight job).
+      fetchIngestionJobs()
+        .then(setRecentJobs)
+        .catch(() => {
+          /* strip is best-effort; the detail card still works */
+        });
     } catch (err) {
       setUploadError((err as Error).message);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function dismissJob(targetId: number) {
+    // Optimistic: drop it from the strip immediately, then persist. The list
+    // poller re-syncs on its next tick regardless.
+    setRecentJobs((current) => current.filter((j) => j.id !== targetId));
+    try {
+      await dismissIngestionJob(targetId);
+    } catch {
+      // Restore truth on failure so the row doesn't vanish on a no-op.
+      fetchIngestionJobs()
+        .then(setRecentJobs)
+        .catch(() => {});
+    }
+  }
+
+  async function retryJob(targetId: number) {
+    try {
+      const requeued = await retryIngestionJob(targetId);
+      // Reflect the pending status at once; the list poller restarts on it.
+      setRecentJobs((current) =>
+        current.map((j) => (j.id === targetId ? requeued : j)),
+      );
+    } catch {
+      fetchIngestionJobs()
+        .then(setRecentJobs)
+        .catch(() => {});
     }
   }
 
@@ -272,12 +364,23 @@ export function useIngestionUpload(
     setAnswerGenerationError('');
   }
 
+  // Everything still in flight except the job already shown in the detail card.
+  const queuedJobs = recentJobs.filter(
+    (candidate) =>
+      candidate.id !== job?.id &&
+      // In-flight jobs queue behind the current one; `failed` ones stay listed
+      // so a failed extraction doesn't silently vanish (the teacher sees it
+      // failed + why). `done` jobs already landed in the bank — no need to nag.
+      (!isIngestionTerminal(candidate.status) || candidate.status === 'failed'),
+  );
+
   return {
     file,
     validationError,
     uploading,
     uploadError,
     job,
+    queuedJobs,
     polling,
     pollError,
     parsedQuestions,
@@ -290,6 +393,8 @@ export function useIngestionUpload(
     generateAnswers,
     selectFile,
     upload,
+    dismissJob,
+    retryJob,
     reset,
   };
 }

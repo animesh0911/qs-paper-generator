@@ -37,9 +37,32 @@ export const SOURCE_TYPE_OPTIONS: SourceTypeOption[] = [
 
 export const DEFAULT_SOURCE_TYPE: SourceType = 'previous_year_paper';
 
+/**
+ * The AI Q&A workflow tags its questions `ai_generated`. Teachers never *upload*
+ * a paper with this provenance, so it is deliberately excluded from
+ * `SOURCE_TYPE_OPTIONS` (the upload picker). It belongs only where existing bank
+ * questions are browsed or filtered.
+ */
+export const AI_GENERATED_SOURCE_OPTION: SourceTypeOption = {
+  value: 'ai_generated',
+  label: 'AI-generated',
+  hint: 'A question drafted by the AI Q&A workflow.',
+};
+
+/**
+ * Every source type that can appear on a question already in the bank — the
+ * upload provenance choices plus `ai_generated`. Use this for browse/filter
+ * surfaces; use `SOURCE_TYPE_OPTIONS` for the upload picker.
+ */
+export const BANK_SOURCE_TYPE_OPTIONS: SourceTypeOption[] = [
+  ...SOURCE_TYPE_OPTIONS,
+  AI_GENERATED_SOURCE_OPTION,
+];
+
 export function sourceTypeLabel(value: SourceType): string {
   return (
-    SOURCE_TYPE_OPTIONS.find((option) => option.value === value)?.label ?? value
+    BANK_SOURCE_TYPE_OPTIONS.find((option) => option.value === value)?.label ??
+    value
   );
 }
 

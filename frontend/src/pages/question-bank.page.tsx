@@ -16,7 +16,7 @@ import { useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Library, Search, Upload } from 'lucide-react';
 import { useQuestionBank } from '@/hooks/useQuestionBank.hook';
-import { SOURCE_TYPE_OPTIONS, sourceTypeLabel } from '@/lib/ingestion';
+import { BANK_SOURCE_TYPE_OPTIONS, sourceTypeLabel } from '@/lib/ingestion';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, type SelectOption } from '@/components/ui/select';
@@ -174,7 +174,10 @@ export default function QuestionBankPage() {
   const sourceTypeOptions = useMemo<SelectOption[]>(
     () => [
       { value: '', label: 'All sources' },
-      ...SOURCE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+      ...BANK_SOURCE_TYPE_OPTIONS.map((o) => ({
+        value: o.value,
+        label: o.label,
+      })),
     ],
     [],
   );
