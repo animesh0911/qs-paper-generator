@@ -224,15 +224,30 @@ export async function persistDraft(paper: PaperDocument): Promise<void> {
 export async function persistEditorDraft(
   paper: PaperDocument,
   answerDocument: PaperAnswerDocument,
-): Promise<void> {
+): Promise<EditorDraftResponse> {
   const id = paper.paper.id.replace(/^paper_/, '');
-  await request(`/papers/${id}/editor-draft/`, {
+  const res = await request(`/papers/${id}/editor-draft/`, {
     method: 'PATCH',
     body: JSON.stringify({
       document: paper,
       answer_document: answerDocument,
     }),
   });
+  const data = await res.json();
+  const parsed = paperDocumentSchema.safeParse(data.document);
+  if (!parsed.success) {
+    throw new Error(
+      `Backend returned an unexpected PaperDocument shape: ${parsed.error.message}`,
+    );
+  }
+  if (!isPaperAnswerDocument(data.answer_document)) {
+    throw new Error('Backend returned an unexpected answer document shape.');
+  }
+  return {
+    document: parsed.data as PaperDocument,
+    answer_document: data.answer_document,
+    status: typeof data.status === 'string' ? data.status : '',
+  };
 }
 
 export async function approvePaper(paper: PaperDocument): Promise<void> {
@@ -306,12 +321,36 @@ export async function fetchPaperSources(
 
 const DOWNLOAD_OBJECT_URL_REVOKE_DELAY_MS = 60_000;
 
+export interface ReservedPaperPrintPreview {
+  show: (paper: PaperDocument) => void;
+  close: () => void;
+}
+
 export function openPaperPrintPreview(paper: PaperDocument) {
   globalThis.open?.(
     `/editor/${paper.paper.id}/print`,
     '_blank',
     'noopener,noreferrer',
   );
+}
+
+export function reservePaperPrintPreview(): ReservedPaperPrintPreview {
+  // Must keep the Window handle so dirty-save downloads can reserve the tab
+  // synchronously with the click and navigate it after the async save. Do not
+  // use noopener here: several browsers return null or sever script access,
+  // leaving the reserved tab stuck on about:blank.
+  const tab = globalThis.open?.('about:blank', '_blank');
+  return {
+    show: (paper: PaperDocument) => {
+      const href = `/editor/${paper.paper.id}/print`;
+      if (tab) {
+        tab.location.href = href;
+      } else {
+        globalThis.open?.(href, '_blank', 'noopener,noreferrer');
+      }
+    },
+    close: () => tab?.close(),
+  };
 }
 
 export async function downloadPaperPdfPackage(paper: PaperDocument) {

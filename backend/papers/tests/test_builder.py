@@ -233,7 +233,10 @@ def test_approve_marks_referenced_questions_verified(api_client, seeded_bank):
 
 
 @pytest.mark.django_db
-def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
+def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, monkeypatch, seeded_bank):
+    monkeypatch.setattr(
+        "papers.views.render_paper_pdf", lambda *args, **kwargs: b"%PDF ok"
+    )
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
@@ -244,10 +247,16 @@ def test_paper_pdf_endpoint_returns_pdf_bytes(api_client, seeded_bank):
 
 @pytest.mark.django_db
 def test_paper_pdf_endpoint_uses_saved_document_edits(
-    api_client, seeded_bank, settings
+    api_client, monkeypatch, seeded_bank
 ):
     """PDF download must render the edited PaperDocumentV1, not bank text."""
-    settings.PAPER_PRINT_BASE_URL = ""
+    rendered_documents = []
+
+    def fake_render(document, print_url=None):
+        rendered_documents.append(document)
+        return b"%PDF edited"
+
+    monkeypatch.setattr("papers.views.render_paper_pdf", fake_render)
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["id"].removeprefix("paper_")
     edited_doc = dict(create.data)
@@ -267,9 +276,11 @@ def test_paper_pdf_endpoint_uses_saved_document_edits(
 
     pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
 
-    with fitz.open(stream=pdf.content, filetype="pdf") as rendered:
-        text = "\n".join(page.get_text() for page in rendered)
-    assert "Edited slot text for the saved draft" in text
+    assert pdf.status_code == status.HTTP_200_OK
+    assert (
+        rendered_documents[0]["questions"][0]["content"]["stem"][0]["text"]
+        == "Edited slot text for the saved draft"
+    )
 
 
 @pytest.mark.django_db
@@ -337,12 +348,21 @@ def test_answer_key_pdf_endpoint_targets_answer_key_print_route_with_auth_token(
 
 @pytest.mark.django_db
 def test_pdf_package_endpoint_contains_question_paper_and_answer_key(
-    api_client, seeded_bank, settings
+    api_client, monkeypatch, seeded_bank
 ):
     """One download returns both saved final PDFs with teacher-readable names."""
     from papers.models import Paper
 
-    settings.PAPER_PRINT_BASE_URL = ""
+    answer_calls = []
+    monkeypatch.setattr(
+        "papers.views.render_paper_pdf", lambda *args, **kwargs: b"%PDF question"
+    )
+
+    def fake_answer_key(document, answers_by_slot, print_url=None):
+        answer_calls.append(answers_by_slot)
+        return b"%PDF answer"
+
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_answer_key)
     create = api_client.post("/api/papers/assemble", {}, format="json")
     document = create.data
     paper_pk = int(document["paper"]["id"].removeprefix("paper_"))
@@ -367,7 +387,7 @@ def test_pdf_package_endpoint_contains_question_paper_and_answer_key(
         answer_pdf = package.read("answer-key.pdf")
     assert question_pdf[:4] == b"%PDF"
     assert answer_pdf[:4] == b"%PDF"
-    assert "PACKAGE_ANSWER_42" in _pdf_text(answer_pdf)
+    assert answer_calls[0][slot_id] == "PACKAGE_ANSWER_42"
 
 @pytest.mark.django_db
 def test_pdf_package_endpoint_uses_browser_print_urls_when_configured(
@@ -450,11 +470,22 @@ def test_pdf_package_endpoint_is_owner_scoped(api_client, seeded_bank):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 @pytest.mark.django_db
-def test_pdf_package_renders_missing_answers_loudly(api_client, seeded_bank, settings):
-    """Packaged answer keys preserve the missing-answer fallback."""
+def test_pdf_package_renders_missing_answers_loudly(
+    api_client, monkeypatch, seeded_bank
+):
+    """Packaged answer keys pass missing answers through as absent entries."""
     from papers.models import Paper
 
-    settings.PAPER_PRINT_BASE_URL = ""
+    answer_calls = []
+    monkeypatch.setattr(
+        "papers.views.render_paper_pdf", lambda *args, **kwargs: b"%PDF question"
+    )
+
+    def fake_answer_key(document, answers_by_slot, print_url=None):
+        answer_calls.append(answers_by_slot)
+        return b"%PDF answer"
+
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_answer_key)
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = int(create.data["paper"]["id"].removeprefix("paper_"))
     paper = Paper.objects.get(pk=paper_pk)
@@ -466,8 +497,8 @@ def test_pdf_package_renders_missing_answers_loudly(api_client, seeded_bank, set
 
     assert resp.status_code == status.HTTP_200_OK
     with zipfile.ZipFile(io.BytesIO(resp.content)) as package:
-        answer_pdf = package.read("answer-key.pdf")
-    assert "Answer not available" in _pdf_text(answer_pdf)
+        assert package.read("answer-key.pdf")[:4] == b"%PDF"
+    assert slot_id not in answer_calls[0]
 
 @pytest.mark.django_db
 def test_pdf_package_endpoint_fails_without_partial_zip(
@@ -477,8 +508,10 @@ def test_pdf_package_endpoint_fails_without_partial_zip(
     create = api_client.post("/api/papers/assemble", {}, format="json")
     paper_pk = create.data["paper"]["id"].removeprefix("paper_")
 
+    from papers.pdf import PdfRenderError
+
     def fail_answer_key(*args, **kwargs):
-        raise RuntimeError("answer key render failed")
+        raise PdfRenderError("answer key render failed")
 
     monkeypatch.setattr("papers.views.render_answer_key_pdf", fail_answer_key)
 
@@ -488,7 +521,9 @@ def test_pdf_package_endpoint_fails_without_partial_zip(
     assert resp["Content-Type"] != "application/zip"
 
 @pytest.mark.django_db
-def test_answer_key_pdf_endpoint_renders_saved_answers(api_client, seeded_bank):
+def test_answer_key_pdf_endpoint_renders_saved_answers(
+    api_client, monkeypatch, seeded_bank
+):
     """The marking-scheme endpoint renders the saved paper-local answer document.
 
     Since #122 the answer is a paper-local snapshot (``Paper.answer_document``)
@@ -496,6 +531,14 @@ def test_answer_key_pdf_endpoint_renders_saved_answers(api_client, seeded_bank):
     prints. This proves the saved document reaches the PDF.
     """
     from papers.models import Paper
+
+    answer_calls = []
+
+    def fake_answer_key(document, answers_by_slot, print_url=None):
+        answer_calls.append(answers_by_slot)
+        return b"%PDF answer"
+
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_answer_key)
 
     create = api_client.post("/api/papers/assemble", {}, format="json")
     document = create.data
@@ -515,7 +558,7 @@ def test_answer_key_pdf_endpoint_renders_saved_answers(api_client, seeded_bank):
     assert resp.status_code == status.HTTP_200_OK
     assert resp["Content-Type"] == "application/pdf"
     assert resp.content[:4] == b"%PDF"
-    assert "UNIQUE_MARKING_ANSWER_42" in _pdf_text(resp.content)
+    assert answer_calls[0][slot_id] == "UNIQUE_MARKING_ANSWER_42"
 
 
 @pytest.mark.django_db
@@ -587,15 +630,20 @@ def test_answer_key_pdf_endpoint_is_owner_scoped(api_client, seeded_bank):
 
 @pytest.mark.django_db
 def test_branding_flows_from_school_settings_to_document_and_pdf(
-    api_client, user, seeded_bank, settings
+    api_client, user, monkeypatch, seeded_bank
 ):
-    """A school's branding reaches both the contract and the rendered PDF.
+    """A school's branding reaches both the contract and the rendered PDF input.
 
     Branding is configured on the School row (no code change). This asserts the
-    end-to-end path: settings -> document.paper.branding -> PDF header. Forces
-    the ReportLab path so the assertion does not depend on a running browser.
+    end-to-end path: settings -> document.paper.branding -> PDF renderer input.
     """
-    settings.PAPER_PRINT_BASE_URL = ""
+    rendered_documents = []
+
+    def fake_render(document, print_url=None):
+        rendered_documents.append(document)
+        return b"%PDF branding"
+
+    monkeypatch.setattr("papers.views.render_paper_pdf", fake_render)
     user.school.settings = {
         "branding": {
             "schoolName": "Greenwood High School",
@@ -614,9 +662,11 @@ def test_branding_flows_from_school_settings_to_document_and_pdf(
     }
 
     pdf = api_client.get(f"/api/papers/{paper_pk}/pdf/")
-    text = _pdf_text(pdf.content)
-    assert "Greenwood High School" in text
-    assert "Half-Yearly Examination 2026" in text
+    assert pdf.status_code == status.HTTP_200_OK
+    assert rendered_documents[0]["paper"]["branding"] == {
+        "schoolName": "Greenwood High School",
+        "examHeader": "Half-Yearly Examination 2026",
+    }
 
 
 @pytest.mark.django_db

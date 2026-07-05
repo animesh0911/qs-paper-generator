@@ -49,7 +49,7 @@ describe('editor final download flow', () => {
   }
 
   it('opens the print preview and downloads immediately when the draft is clean', async () => {
-    const persist = vi.fn(async () => undefined);
+    const persist = vi.fn(async (_paper, answers) => answers);
     const download = vi.fn(async () => undefined);
     const preview = vi.fn();
 
@@ -68,10 +68,11 @@ describe('editor final download flow', () => {
     expect(download).toHaveBeenCalledWith(mockPaperDocumentV1);
   });
 
-  it('saves a dirty draft before previewing and downloading the package', async () => {
-    const persist = vi.fn(async () => undefined);
+  it('reserves a preview tab before saving dirty drafts, then shows it after save', async () => {
+    const persist = vi.fn(async (_paper, answers) => answers);
     const download = vi.fn(async () => undefined);
-    const preview = vi.fn();
+    const reservedPreview = { show: vi.fn(), close: vi.fn() };
+    const reservePreview = vi.fn(() => reservedPreview);
 
     await saveThenDownloadPdfPackage({
       documentSnapshot: mockPaperDocumentV1,
@@ -79,11 +80,14 @@ describe('editor final download flow', () => {
       dirty: true,
       persist,
       download,
-      preview,
+      reservePreview,
     });
 
-    expect(persist).toHaveBeenCalledBefore(preview);
-    expect(preview).toHaveBeenCalledBefore(download);
+    expect(reservePreview).toHaveBeenCalledBefore(persist);
+    expect(persist).toHaveBeenCalledBefore(reservedPreview.show);
+    expect(reservedPreview.show).toHaveBeenCalledWith(mockPaperDocumentV1);
+    expect(reservedPreview.show).toHaveBeenCalledBefore(download);
+    expect(reservedPreview.close).not.toHaveBeenCalled();
     expect(download).toHaveBeenCalledWith(mockPaperDocumentV1);
   });
 
@@ -92,7 +96,8 @@ describe('editor final download flow', () => {
       throw new Error('save failed');
     });
     const download = vi.fn(async () => undefined);
-    const preview = vi.fn();
+    const reservedPreview = { show: vi.fn(), close: vi.fn() };
+    const reservePreview = vi.fn(() => reservedPreview);
 
     await expect(
       saveThenDownloadPdfPackage({
@@ -101,20 +106,23 @@ describe('editor final download flow', () => {
         dirty: true,
         persist,
         download,
-        preview,
+        reservePreview,
       }),
     ).rejects.toThrow('save failed');
 
-    expect(preview).not.toHaveBeenCalled();
+    expect(reservedPreview.show).not.toHaveBeenCalled();
+    expect(reservedPreview.close).toHaveBeenCalledOnce();
     expect(download).not.toHaveBeenCalled();
   });
 
   it('marks the dirty draft saved before surfacing a download failure', async () => {
-    const persist = vi.fn(async () => undefined);
+    const persist = vi.fn(async (_paper, answers) => answers);
     const download = vi.fn(async () => {
       throw new Error('download failed');
     });
     const onSaved = vi.fn();
+    const reservedPreview = { show: vi.fn(), close: vi.fn() };
+    const reservePreview = vi.fn(() => reservedPreview);
     const answers = answerDocument();
 
     await expect(
@@ -124,12 +132,15 @@ describe('editor final download flow', () => {
         dirty: true,
         persist,
         download,
+        reservePreview,
         onSaved,
       }),
     ).rejects.toThrow('download failed');
 
     expect(onSaved).toHaveBeenCalledWith(answers);
     expect(persist).toHaveBeenCalledBefore(download);
+    expect(reservedPreview.show).toHaveBeenCalledBefore(download);
+    expect(reservedPreview.close).not.toHaveBeenCalled();
   });
 
   it('omits swapped-slot answer entries so the backend can rebuild bank answers', () => {

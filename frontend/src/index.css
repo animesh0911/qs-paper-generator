@@ -747,6 +747,32 @@
     margin-top: 4pt;
   }
 
+  .paper-question-body p,
+  .paper-option-body,
+  .paper-subquestion-body,
+  .paper-choice-group {
+    overflow-wrap: anywhere;
+  }
+
+  .paper-question-body .katex,
+  .paper-option-body .katex,
+  .paper-subquestion-body .katex,
+  .paper-choice-group .katex {
+    max-width: 100%;
+  }
+
+  .paper-question-body .katex-display,
+  .paper-option-body .katex-display,
+  .paper-subquestion-body .katex-display,
+  .paper-choice-group .katex-display {
+    max-width: 100%;
+    margin: 2pt 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 1pt;
+    white-space: nowrap;
+  }
+
   .paper-content-table {
     width: 100%;
     margin: 5pt 0;
@@ -836,6 +862,10 @@
     font-size: 12.5pt;
     font-style: italic;
     font-weight: 700;
+  }
+
+  .paper-page-number::after {
+    content: 'Page';
   }
 
   .answer-key-paper {
@@ -930,6 +960,10 @@
 
   .paper-footer {
     position: fixed;
+  }
+
+  .paper-page-number::after {
+    content: 'Page ' counter(page);
   }
 
   .editor-shell {

@@ -39,6 +39,7 @@ import {
   fetchEditorDraft,
   openPaperPrintPreview,
   persistEditorDraft,
+  reservePaperPrintPreview,
 } from '@/lib/api';
 import {
   getPaperFormatRendererResult,
@@ -322,8 +323,11 @@ function EditorPageWorkspace({
       documentSnapshot,
       currentAnswerDocument,
     );
-    await persistEditorDraft(documentSnapshot, reconciledAnswerDocument);
-    setCurrentAnswerDocument(reconciledAnswerDocument);
+    const savedDraft = await persistEditorDraft(
+      documentSnapshot,
+      reconciledAnswerDocument,
+    );
+    setCurrentAnswerDocument(savedDraft.answer_document);
     setLastSavedDocument(documentSnapshot);
   }
 
@@ -338,9 +342,13 @@ function EditorPageWorkspace({
           documentSnapshot,
           answerDocument: currentAnswerDocument,
           dirty,
-          persist: persistEditorDraft,
+          persist: async (paper, answerDocument) => {
+            const savedDraft = await persistEditorDraft(paper, answerDocument);
+            return savedDraft.answer_document;
+          },
           download: downloadPaperPdfPackage,
           preview: openPaperPrintPreview,
+          reservePreview: reservePaperPrintPreview,
           onSaved: (savedAnswerDocument) => {
             setCurrentAnswerDocument(savedAnswerDocument);
             setLastSavedDocument(documentSnapshot);

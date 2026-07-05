@@ -192,6 +192,17 @@ describe('PaperDocumentView', () => {
     expect(html).toContain('<td>2.4</td>');
   });
 
+  it('prints a generated page-number placeholder instead of hardcoding Page 1', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('class="paper-page-number"');
+    expect(html).not.toContain('>Page 1<');
+  });
+
   it('typesets latex content items with KaTeX instead of leaking raw source', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const slot = document.paper.sections[0].slots[0];

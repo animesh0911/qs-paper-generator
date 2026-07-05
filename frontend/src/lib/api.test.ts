@@ -26,6 +26,7 @@ import {
   persistEditorDraft,
   downloadPaperPdfPackage,
   openPaperPrintPreview,
+  reservePaperPrintPreview,
 } from './api';
 
 const storage = new Map<string, string>();
@@ -358,11 +359,21 @@ describe('paper persistence', () => {
       paperId: 'paper_123',
       answersBySlotId: {},
     };
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({})));
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            document: persistedDocument,
+            answer_document: answerDocument,
+            status: 'draft',
+          }),
+        ),
+    );
     vi.stubGlobal('fetch', fetchMock);
 
-    await persistEditorDraft(persistedDocument, answerDocument);
+    const saved = await persistEditorDraft(persistedDocument, answerDocument);
 
+    expect(saved.answer_document).toEqual(answerDocument);
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/papers/123/editor-draft/',
       expect.objectContaining({
@@ -426,6 +437,23 @@ describe('paper persistence', () => {
       '_blank',
       'noopener,noreferrer',
     );
+  });
+
+  it('reserves a preview tab synchronously and navigates it later', () => {
+    const persistedDocument = structuredClone(mockPaperDocumentV1);
+    persistedDocument.paper.id = 'paper_123';
+    const tab = {
+      location: { href: '' },
+      close: vi.fn(),
+    };
+    const open = vi.fn(() => tab);
+    vi.stubGlobal('open', open);
+
+    const reserved = reservePaperPrintPreview();
+    reserved.show(persistedDocument);
+
+    expect(open).toHaveBeenCalledWith('about:blank', '_blank');
+    expect(tab.location.href).toBe('/editor/paper_123/print');
   });
 
   it('saves the canonical draft before approving the backend paper', async () => {

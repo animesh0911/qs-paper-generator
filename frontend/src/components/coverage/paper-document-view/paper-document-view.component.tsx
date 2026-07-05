@@ -104,7 +104,7 @@ export function PaperDocumentView({
 
         <footer className="paper-footer">
           <span>{chromeBlock(paper, 'footer_left')?.text}</span>
-          <span>Page 1</span>
+          <span className="paper-page-number" aria-label="Page number" />
           <span>{chromeBlock(paper, 'footer_right')?.text}</span>
         </footer>
       </article>

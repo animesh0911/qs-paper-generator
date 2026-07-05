@@ -37,7 +37,12 @@ from .builder import PaperBuilder
 from .document import reconcile_document_format_defaults
 from .document_contract import PaperDocumentContractError
 from .models import Paper, PaperFormat, PaperStatus
-from .pdf import render_answer_key_pdf, render_paper_pdf
+from .pdf import (
+    PdfRenderBusyError,
+    PdfRenderError,
+    render_answer_key_pdf,
+    render_paper_pdf,
+)
 from .serializers import AssembleRequestSerializer, PaperSerializer
 from .template import TemplateBuilder
 
@@ -273,7 +278,14 @@ class PaperEditorDraftView(APIView):
         paper.revision = F("revision") + 1
         paper.save(update_fields=["document", "answer_document", "revision"])
         paper.refresh_from_db(fields=["revision"])
-        return Response({"paperId": f"paper_{paper.pk}", "status": paper.status})
+        return Response(
+            {
+                "paperId": f"paper_{paper.pk}",
+                "status": paper.status,
+                "document": paper.document,
+                "answer_document": paper.answer_document,
+            }
+        )
 
 
 class PaperApproveView(APIView):
@@ -301,10 +313,16 @@ class PaperPdfView(APIView):
             cache_key = f"paper-pdf:{paper.pk}"
             pdf = cache.get(cache_key)
             if pdf is None:
-                pdf = render_paper_pdf(document, print_url=print_url)
+                try:
+                    pdf = render_paper_pdf(document, print_url=print_url)
+                except PdfRenderError as exc:
+                    return _pdf_render_error_response(exc)
                 cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
         else:
-            pdf = render_paper_pdf(document, print_url=print_url)
+            try:
+                pdf = render_paper_pdf(document, print_url=print_url)
+            except PdfRenderError as exc:
+                return _pdf_render_error_response(exc)
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = f'inline; filename="paper-{paper.pk}.pdf"'
         return response
@@ -350,12 +368,9 @@ class PaperPdfPackageView(APIView):
                 answers,
                 print_url=_answer_key_print_url(request.user, paper.pk),
             )
-        except Exception:
+        except PdfRenderError as exc:
             logger.exception("PDF package render failed for paper %s", paper.pk)
-            return Response(
-                {"error": "Unable to render the PDF package."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return _pdf_render_error_response(exc)
 
         buffer = io.BytesIO()
         with zipfile.ZipFile(
@@ -381,7 +396,7 @@ class PaperAnswerKeyPdfView(APIView):
 
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
-        document = paper.document or {}
+        document = _document_with_format_defaults(paper) or {}
         # Reconcile against the current document so a question swapped through the
         # legacy paper PATCH prints its current answer, never a stale one — the
         # join the old live-bank path gave for free, restored at the snapshot.
@@ -391,15 +406,36 @@ class PaperAnswerKeyPdfView(APIView):
             cache_key = f"paper-answer-key-pdf:{paper.pk}"
             pdf = cache.get(cache_key)
             if pdf is None:
-                pdf = render_answer_key_pdf(document, answers, print_url=print_url)
+                try:
+                    pdf = render_answer_key_pdf(document, answers, print_url=print_url)
+                except PdfRenderError as exc:
+                    return _pdf_render_error_response(exc)
                 cache.set(cache_key, pdf, timeout=_PDF_CACHE_TTL)
         else:
-            pdf = render_answer_key_pdf(document, answers, print_url=print_url)
+            try:
+                pdf = render_answer_key_pdf(document, answers, print_url=print_url)
+            except PdfRenderError as exc:
+                return _pdf_render_error_response(exc)
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = (
             f'inline; filename="paper-{paper.pk}-answer-key.pdf"'
         )
         return response
+
+
+def _pdf_render_error_response(exc: PdfRenderError) -> Response:
+    status_code = (
+        status.HTTP_503_SERVICE_UNAVAILABLE
+        if isinstance(exc, PdfRenderBusyError)
+        else status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
+    return Response(
+        {
+            "error": "Unable to render the PDF. Please try again shortly.",
+            "details": str(exc),
+        },
+        status=status_code,
+    )
 
 
 def _answer_errors_are_reconcilable(errors: list[str]) -> bool:

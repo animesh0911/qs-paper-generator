@@ -146,8 +146,13 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", DEBUG)
 
 # Browser PDF renderer. In Docker this points at the Vite service; local
-# non-Docker runs can override to http://localhost:5173.
+# non-Docker runs can override to http://localhost:5173. Downloads fail hard
+# when this route or Chromium is unavailable; no low-fidelity fallback is served.
 PAPER_PRINT_BASE_URL = env("PAPER_PRINT_BASE_URL", "http://frontend:5173")
+PDF_RENDER_MAX_CONCURRENCY = int(env("PDF_RENDER_MAX_CONCURRENCY", "1"))
+PDF_RENDER_ACQUIRE_TIMEOUT_SECONDS = float(
+    env("PDF_RENDER_ACQUIRE_TIMEOUT_SECONDS", "5")
+)
 
 # Cache — Postgres-backed (Django DatabaseCache) so PDF bytes survive
 # restarts and are shared across processes. The ``qpg_cache`` table is created

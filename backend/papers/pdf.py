@@ -3,14 +3,13 @@
 Consumes `PaperDocumentV1` (the same dict shape the frontend reads) and
 emits PDF bytes. No model imports — tests construct a document dict directly.
 
-The primary path prints the React print route through Chromium so the
-downloaded PDF follows the same renderer as the editor. The ReportLab path is
-kept as a fallback for tests and environments without Playwright installed.
+The public renderers print the React print routes through Chromium so the
+downloaded PDFs follow the same renderer as the editor. They fail hard when the
+browser route is unavailable; the old low-fidelity ReportLab fallback is kept
+only as private unit-test seams and is not used by downloads.
 
-``render_answer_key_pdf`` produces the separate marking-scheme PDF. Its primary
-path prints the React answer-key route through Chromium, with ReportLab kept as
-the fallback, joining the canonical document's slot order with the answers
-passed in.
+``render_answer_key_pdf`` produces the separate marking-scheme PDF by joining
+the canonical document's slot order with the answers passed in.
 
 School branding (``paper.branding``: schoolName/examHeader/logoUrl) is emitted
 into the contract by ``papers.document`` and rendered as a header here. The
@@ -20,7 +19,9 @@ ReportLab paths render the school name and exam header text only.
 
 import io
 import logging
+import threading
 
+from django.conf import settings
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -37,41 +38,70 @@ from bank.content import flatten_text
 
 logger = logging.getLogger(__name__)
 
+_RENDER_SEMAPHORE = threading.BoundedSemaphore(
+    getattr(settings, "PDF_RENDER_MAX_CONCURRENCY", 1)
+)
+
+
+class PdfRenderError(RuntimeError):
+    """Base class for hard PDF rendering failures."""
+
+
+class PdfRenderConfigurationError(PdfRenderError):
+    """Raised when browser PDF rendering is not configured."""
+
+
+class PdfRenderBusyError(PdfRenderError):
+    """Raised when the bounded browser renderer is saturated."""
+
 
 def render_paper_pdf(document: dict, print_url: str | None = None) -> bytes:
-    """Render a PaperDocumentV1 dict as PDF bytes."""
-    if print_url:
-        try:
-            return _render_browser_pdf(print_url)
-        except Exception:
-            logger.warning("Browser PDF renderer failed; falling back.", exc_info=True)
-            return _render_reportlab_pdf(document)
-    return _render_reportlab_pdf(document)
+    """Render a PaperDocumentV1 dict as PDF bytes via the React print route.
+
+    Downloads must be high-fidelity. The old ReportLab fallback silently omitted
+    rich regions/math/tables when Chromium failed, so public rendering now fails
+    hard instead of returning an incomplete exam paper.
+    """
+    if not print_url:
+        raise PdfRenderConfigurationError("Paper print route is not configured.")
+    return _render_browser_pdf(print_url)
 
 
 def _render_browser_pdf(print_url: str) -> bytes:
-    """Print the React paper route with Chromium."""
+    """Print the React paper route with bounded Chromium concurrency."""
     from playwright.sync_api import sync_playwright
 
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page()
-            # Wait on the explicit readiness marker the print route sets once its
-            # document has loaded — not on "networkidle". networkidle never
-            # settles while a persistent connection stays open (the dev server's
-            # HMR websocket, font/CDN keep-alives), so it would block for the
-            # full default timeout on every render before the marker is checked.
-            page.goto(print_url, wait_until="domcontentloaded")
-            page.wait_for_selector("[data-print-ready='true']", timeout=15000)
-            page.emulate_media(media="print")
-            return page.pdf(format="A4", print_background=True)
-        finally:
-            browser.close()
+    acquire_timeout = getattr(settings, "PDF_RENDER_ACQUIRE_TIMEOUT_SECONDS", 5)
+    acquired = _RENDER_SEMAPHORE.acquire(timeout=acquire_timeout)
+    if not acquired:
+        raise PdfRenderBusyError("PDF renderer is busy; try again shortly.")
+
+    try:
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch()
+            try:
+                page = browser.new_page()
+                # Wait on the explicit readiness marker the print route sets once its
+                # document has loaded — not on "networkidle". networkidle never
+                # settles while a persistent connection stays open (the dev server's
+                # HMR websocket, font/CDN keep-alives), so it would block for the
+                # full default timeout on every render before the marker is checked.
+                page.goto(print_url, wait_until="domcontentloaded")
+                page.wait_for_selector("[data-print-ready='true']", timeout=15000)
+                page.emulate_media(media="print")
+                return page.pdf(format="A4", print_background=True)
+            finally:
+                browser.close()
+    except PdfRenderError:
+        raise
+    except Exception as exc:
+        raise PdfRenderError("Browser PDF renderer failed.") from exc
+    finally:
+        _RENDER_SEMAPHORE.release()
 
 
 def _render_reportlab_pdf(document: dict) -> bytes:
-    """Fallback PDF renderer for non-browser environments."""
+    """Legacy low-fidelity renderer kept only for focused unit tests."""
     paper = document["paper"]
     title = paper["title"]
     total_marks = paper["totalMarks"]
@@ -182,18 +212,19 @@ def render_answer_key_pdf(
     slot id means a swapped question prints its current answer in current order.
     Walks the canonical slot order so the key numbering matches the question
     paper exactly. A filled slot with no printable answer renders
-    ``Answer not available``. When ``print_url`` is configured, the frontend
-    answer-key print route is the primary renderer; ReportLab remains the
-    fallback for tests and environments without a browser.
+    ``Answer not available``. Downloads must use the frontend print route and
+    fail hard if Chromium is unavailable; returning a degraded marking scheme is
+    unsafe for teachers.
     """
-    if print_url:
-        try:
-            return _render_browser_pdf(print_url)
-        except Exception:
-            logger.warning(
-                "Browser answer-key PDF renderer failed; falling back.", exc_info=True
-            )
+    if not print_url:
+        raise PdfRenderConfigurationError("Answer-key print route is not configured.")
+    return _render_browser_pdf(print_url)
 
+
+def _render_reportlab_answer_key_pdf(
+    document: dict, answers_by_slot: dict[str, str]
+) -> bytes:
+    """Legacy low-fidelity answer-key renderer kept only for focused unit tests."""
     paper = document["paper"]
     title = paper["title"]
 

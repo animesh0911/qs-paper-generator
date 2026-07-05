@@ -12,7 +12,6 @@ directly and through the owner-scoped PDF endpoint.
 
 from __future__ import annotations
 
-import fitz
 import pytest
 
 from bank.models import AnswerSource
@@ -23,11 +22,6 @@ from papers.answer_document import (
     printable_answers_by_slot,
 )
 from papers.models import Paper, PaperStatus
-
-
-def _pdf_text(pdf_bytes: bytes) -> str:
-    with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
-        return "\n".join(page.get_text() for page in doc)
 
 
 def _answer_document(*entries: dict) -> dict:
@@ -73,7 +67,9 @@ def test_saved_answers_pass_through_by_slot():
 
 
 @pytest.mark.django_db
-def test_answer_key_pdf_renders_from_saved_answer_document(api_client, user):
+def test_answer_key_pdf_renders_from_saved_answer_document(
+    api_client, user, monkeypatch
+):
     """End-to-end: the owner's answer-key endpoint renders a PDF from the saved
     answer document (the document itself still carries no answers)."""
     document = {
@@ -97,6 +93,14 @@ def test_answer_key_pdf_renders_from_saved_answer_document(api_client, user):
             ],
         },
     }
+    render_calls = []
+
+    def fake_render(document, answers_by_slot, print_url=None):
+        render_calls.append(answers_by_slot)
+        return b"%PDF answer"
+
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_render)
+
     paper = Paper.objects.create(
         created_by=user,
         status=PaperStatus.DRAFT,
@@ -109,6 +113,7 @@ def test_answer_key_pdf_renders_from_saved_answer_document(api_client, user):
     assert resp.status_code == 200
     assert resp["Content-Type"] == "application/pdf"
     assert resp.content[:4] == b"%PDF"
+    assert render_calls == [{"slot_A_01": "Real"}]
 
 
 @pytest.mark.django_db
@@ -205,6 +210,12 @@ def test_editor_draft_patch_rebuilds_swapped_answer_from_bank(api_client, user):
     )
 
     assert resp.status_code == 200
+    assert resp.data["document"] == swapped_document
+    response_entry = resp.data["answer_document"]["answersBySlotId"]["slot_A_01"]
+    assert response_entry["questionId"] == f"q_{new.pk}"
+    assert response_entry["content"] == [
+        {"type": "paragraph", "text": "FRESH_NEW_ANSWER"}
+    ]
     paper.refresh_from_db()
     entry = paper.answer_document["answersBySlotId"]["slot_A_01"]
     assert entry["questionId"] == f"q_{new.pk}"
@@ -212,7 +223,9 @@ def test_editor_draft_patch_rebuilds_swapped_answer_from_bank(api_client, user):
 
 
 @pytest.mark.django_db
-def test_answer_key_pdf_never_prints_stale_answer_after_legacy_swap(api_client, user):
+def test_answer_key_pdf_never_prints_stale_answer_after_legacy_swap(
+    api_client, user, monkeypatch
+):
     """Regression: before #122 the PDF joined live bank answers by the slot's
     current question, so a swap printed the new answer. The saved snapshot must
     not reintroduce stale answers when a question is swapped through the legacy
@@ -253,7 +266,16 @@ def test_answer_key_pdf_never_prints_stale_answer_after_legacy_swap(api_client, 
     paper.document = _doc(f"q_{new.pk}")
     paper.save(update_fields=["document"])
 
-    text = _pdf_text(api_client.get(f"/api/papers/{paper.pk}/answer-key/pdf/").content)
+    render_calls = []
 
-    assert "FRESH_NEW_ANSWER" in text
-    assert "STALE_OLD_ANSWER" not in text
+    def fake_render(document, answers_by_slot, print_url=None):
+        render_calls.append(answers_by_slot)
+        return b"%PDF answer"
+
+    monkeypatch.setattr("papers.views.render_answer_key_pdf", fake_render)
+
+    resp = api_client.get(f"/api/papers/{paper.pk}/answer-key/pdf/")
+
+    assert resp.status_code == 200
+    assert render_calls[0]["slot_A_01"] == "FRESH_NEW_ANSWER"
+    assert "STALE_OLD_ANSWER" not in render_calls[0].values()

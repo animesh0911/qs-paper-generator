@@ -7,6 +7,7 @@ export async function saveThenDownloadPdfPackage({
   persist,
   download,
   preview,
+  reservePreview,
   onSaved,
 }: {
   documentSnapshot: PaperDocument;
@@ -15,9 +16,13 @@ export async function saveThenDownloadPdfPackage({
   persist: (
     paper: PaperDocument,
     answerDocument: PaperAnswerDocument,
-  ) => Promise<void>;
+  ) => Promise<PaperAnswerDocument>;
   download: (paper: PaperDocument) => Promise<void>;
   preview?: (paper: PaperDocument) => void;
+  reservePreview?: () => {
+    show: (paper: PaperDocument) => void;
+    close: () => void;
+  };
   onSaved?: (answerDocument: PaperAnswerDocument) => void;
 }): Promise<PaperAnswerDocument> {
   if (!answerDocument) {
@@ -27,13 +32,27 @@ export async function saveThenDownloadPdfPackage({
     documentSnapshot,
     answerDocument,
   );
+  const reservedPreview = reservePreview?.();
+  let savedAnswerDocument = reconciledAnswerDocument;
   if (dirty) {
-    await persist(documentSnapshot, reconciledAnswerDocument);
-    onSaved?.(reconciledAnswerDocument);
+    try {
+      savedAnswerDocument = await persist(
+        documentSnapshot,
+        reconciledAnswerDocument,
+      );
+    } catch (error) {
+      reservedPreview?.close();
+      throw error;
+    }
+    onSaved?.(savedAnswerDocument);
   }
-  preview?.(documentSnapshot);
+  if (reservedPreview) {
+    reservedPreview.show(documentSnapshot);
+  } else {
+    preview?.(documentSnapshot);
+  }
   await download(documentSnapshot);
-  return reconciledAnswerDocument;
+  return savedAnswerDocument;
 }
 
 export function reconcileAnswerDocumentForPaper(
