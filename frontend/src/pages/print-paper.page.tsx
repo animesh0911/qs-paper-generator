@@ -20,7 +20,10 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { PaperDocumentView } from '@/components/coverage/paper-document-view';
 import { fetchPaperDocument } from '@/lib/api';
 import { loadMockPrintDocument } from '@/lib/mock-paper-document-storage';
-import { scheduleMockPrintDialog } from '@/lib/print-paper';
+import {
+  scheduleMockPrintDialog,
+  waitForDocumentImages,
+} from '@/lib/print-paper';
 import { mockPaperDocumentV1 } from '@/mocks';
 import type { PaperDocument } from '@/types';
 
@@ -28,6 +31,7 @@ export default function PrintPaperPage() {
   const { paperId } = useParams();
   const [searchParams] = useSearchParams();
   const [paper, setPaper] = useState<PaperDocument | null>(null);
+  const [assetsReady, setAssetsReady] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -40,6 +44,19 @@ export default function PrintPaperPage() {
       .then(setPaper)
       .catch((err) => setError((err as Error).message));
   }, [paperId, searchParams]);
+
+  // Signal readiness only after every diagram <img> settles, so the backend's
+  // Chromium never snapshots a paper with half-loaded figures.
+  useEffect(() => {
+    if (!paper) return;
+    let cancelled = false;
+    waitForDocumentImages().then(() => {
+      if (!cancelled) setAssetsReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [paper]);
 
   useEffect(
     () =>
@@ -61,7 +78,7 @@ export default function PrintPaperPage() {
   }
 
   return (
-    <main className="print-page" data-print-ready="true">
+    <main className="print-page" data-print-ready={assetsReady || undefined}>
       <PaperDocumentView paper={paper} mode="print" />
     </main>
   );

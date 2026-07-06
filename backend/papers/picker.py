@@ -18,9 +18,9 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 
-from django.db.models import Count
+from django.db.models import Count, Q
 
-from bank.models import Question
+from bank.models import PrimaryForm, Question
 
 from .models import QuestionUsage
 from .template import PaperTemplate
@@ -168,6 +168,22 @@ class QuestionPicker:
                 qtype=qtype,
                 marks=marks,
                 parse_quality__in=["clean", "partial"],
+            )
+            # Mirror the bank views' tenancy scope: the global/seeded bank plus
+            # the requesting teacher's school. Without this a paper could pull
+            # another school's uploaded questions into the draft.
+            if opts.requesting_user is not None:
+                qs = qs.filter(
+                    Q(school__isnull=True)
+                    | Q(school=getattr(opts.requesting_user, "school", None))
+                )
+            # A question that *depends* on a diagram but has no stored crop
+            # would print "observe the given figure" with nothing to observe.
+            # Keep such rows out of automatic selection; they stay visible in
+            # the bank for manual review.
+            qs = qs.exclude(
+                Q(primary_form=PrimaryForm.DIAGRAM_BASED)
+                & (Q(diagram="") | Q(diagram__isnull=True))
             )
             if subject_area:
                 qs = qs.filter(chapter__subject_area=subject_area)

@@ -30,6 +30,36 @@ function inlineItemToText(item: ContentItem): string {
   return item.caption ?? '';
 }
 
+/** An asset-backed image item, optionally carrying a backend-resolved `url`. */
+type ImageContentItem = ContentItem & { url?: string };
+
+function isImageItem(item: ContentItem): item is ImageContentItem {
+  return item.type === 'image' && Boolean(item.assetId);
+}
+
+/**
+ * Renders a stored diagram inline. Falls back to a visible `[Diagram]` marker
+ * when the backend did not resolve a URL, so a missing asset never disappears
+ * silently — teachers must see that the source question carries a figure.
+ */
+function QuestionImage({ item }: { item: ImageContentItem }) {
+  if (!item.url) {
+    return (
+      <span className="qpg-question-image-missing">
+        {item.caption ? `[Diagram: ${item.caption}]` : '[Diagram]'}
+      </span>
+    );
+  }
+  return (
+    <img
+      className="qpg-question-image"
+      src={item.url}
+      alt={item.caption || 'Question diagram'}
+      loading="lazy"
+    />
+  );
+}
+
 interface MathSegment {
   text: string;
   math: boolean;
@@ -81,7 +111,9 @@ function splitMathText(text: string): MathSegment[] {
     const contentEnd = text.indexOf(delimiter.close, contentStart);
     if (contentEnd === -1) break;
     if (delimiter.index > cursor) {
-      segments.push(...splitPlainFormulaText(text.slice(cursor, delimiter.index)));
+      segments.push(
+        ...splitPlainFormulaText(text.slice(cursor, delimiter.index)),
+      );
     }
     segments.push({
       text: text.slice(contentStart, contentEnd),
@@ -125,7 +157,11 @@ function splitPlainFormulaText(text: string): MathSegment[] {
     const latex = plainFormulaToLatex(value);
     if (!latex) continue;
     if (index > cursor) {
-      segments.push({ text: text.slice(cursor, index), math: false, display: false });
+      segments.push({
+        text: text.slice(cursor, index),
+        math: false,
+        display: false,
+      });
     }
     segments.push({ text: latex, math: true, display: false });
     cursor = index + value.length;
@@ -161,6 +197,9 @@ export function MathContent({ items }: { items: ContentItem[] }) {
   return (
     <>
       {items.map((item, index) => {
+        if (isImageItem(item)) {
+          return <QuestionImage key={index} item={item} />;
+        }
         // Prefer the `latex` field when it carries real math: either the item
         // has no plain text, or its latex still holds math once `\text{…}` prose
         // is stripped (e.g. a sentence ending in `\sqrt{3}`). Plain-prose latex

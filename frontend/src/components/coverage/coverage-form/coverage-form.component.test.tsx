@@ -153,8 +153,8 @@ describe('CoverageFormView', () => {
     expect(html).not.toContain('Select paper filters');
     expect(html).toContain('Choose chapters');
     expect(html).toContain('Choose sources');
-    expect(html).toContain('Open choose chapters');
-    expect(html).toContain('Open choose sources');
+    expect(html).toContain('Choose chapters');
+    expect(html).toContain('Choose sources');
     expect(html).toContain('Paper scope');
     expect(html).toContain('Filter');
     expect(html).toContain('Priority');
@@ -190,9 +190,7 @@ describe('CoverageFormView', () => {
       <CoverageFormView form={makeForm()} busy={false} onGenerate={vi.fn()} />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open choose chapters' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Choose chapters' }));
 
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.getByText('Chemistry')).toBeTruthy();
@@ -209,9 +207,7 @@ describe('CoverageFormView', () => {
       <CoverageFormView form={makeForm()} busy={false} onGenerate={vi.fn()} />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open choose chapters' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Choose chapters' }));
 
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(document.body.style.overflow).toBe('hidden');
@@ -219,9 +215,7 @@ describe('CoverageFormView', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(document.body.style.overflow).toBe('');
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open choose chapters' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Choose chapters' }));
     await user.click(
       screen.getByRole('button', { name: 'Close selection dialog' }),
     );
@@ -238,9 +232,7 @@ describe('CoverageFormView', () => {
       />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open choose chapters' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Choose chapters' }));
 
     expect(
       screen.getByRole('button', { name: 'Select all chapters' }),
@@ -277,13 +269,12 @@ describe('CoverageFormView', () => {
       screen.getByRole('heading', { name: 'Choose sources' }),
     ).toBeTruthy();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open choose sources' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Choose sources' }));
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.getByText('Newest uploaded paper')).toBeTruthy();
-    expect(screen.getByRole('link', { name: /review/i }).getAttribute('href'))
-      .toBe('/extractions/new');
+    expect(
+      screen.getByRole('link', { name: /review/i }).getAttribute('href'),
+    ).toBe('/extractions/new');
 
     await user.click(screen.getByLabelText(/Newest uploaded paper/));
     await user.click(screen.getByRole('button', { name: 'Approve selection' }));
@@ -297,7 +288,8 @@ describe('CoverageFormView', () => {
     render(
       <CoverageFormView
         form={makeForm({
-          sourcesError: 'Request was throttled. Expected available in 1 second.',
+          sourcesError:
+            'Request was throttled. Expected available in 1 second.',
           sources: [
             {
               key: 'upload:new',
@@ -317,9 +309,7 @@ describe('CoverageFormView', () => {
       />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open choose sources' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Choose sources' }));
 
     expect(screen.getByText('Showing last loaded sources.')).toBeTruthy();
     await user.click(screen.getByLabelText(/Newest uploaded paper/));
@@ -340,9 +330,7 @@ describe('CoverageFormView', () => {
       />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open choose chapters' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Choose chapters' }));
     await user.click(
       screen.getByRole('button', { name: 'Select all chapters' }),
     );

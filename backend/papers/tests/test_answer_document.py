@@ -23,29 +23,21 @@ from papers.answer_document import (
     validate_answer_document,
 )
 from papers.models import Paper, PaperStatus
+from papers.tests.contract_documents import (
+    contract_document,
+    contract_slot,
+)
+from papers.tests.contract_documents import (
+    contract_question as _contract_question,
+)
 
 PAPER_SCHEMA = "paper_document.v1"
 
-
-def _document(*slots: dict) -> dict:
-    """A minimal paper document with one section holding the given slots."""
-    return {
-        "schemaVersion": PAPER_SCHEMA,
-        "paper": {
-            "title": "Science — Practice Paper",
-            "sections": [{"id": "A", "title": "Section A", "slots": list(slots)}],
-        },
-    }
-
-
-def _slot(slot_id: str, qid: str | None, *, number="1", marks=1) -> dict:
-    return {
-        "id": slot_id,
-        "number": number,
-        "marks": marks,
-        "type": "mcq",
-        "selectedQuestionId": qid,
-    }
+# The draft PATCH endpoints validate against the v1 contract, so the shared
+# fixture builds fully contract-valid documents (questions synthesised from the
+# slots' references). Alias the old local names to keep the tests readable.
+_document = contract_document
+_slot = contract_slot
 
 
 # --- build_answer_document ------------------------------------------------
@@ -440,9 +432,17 @@ def test_editor_draft_get_resolves_asset_urls(api_client, user):
     item = resp.data["document"]["questions"][0]["content"]["stem"][0]
     assert item["assetId"] == "diagrams/x.png"
     assert item["url"].endswith("/media/diagrams/x.png")
-    # Base paper detail stays canonical (assetId-only, no resolved url).
+    # The URL is root-relative so the browser (and the print route's Chromium)
+    # resolve it against the page origin — never a Docker-internal host.
+    assert item["url"].startswith("/")
+    # Base paper detail resolves the url too (the print route renders diagrams
+    # from it); the stored document itself stays canonical.
     detail = api_client.get(f"/api/papers/{paper.pk}/")
-    assert "url" not in detail.data["questions"][0]["content"]["stem"][0]
+    assert detail.data["questions"][0]["content"]["stem"][0]["url"].endswith(
+        "/media/diagrams/x.png"
+    )
+    paper.refresh_from_db()
+    assert "url" not in paper.document["questions"][0]["content"]["stem"][0]
 
 
 @pytest.mark.django_db
@@ -490,26 +490,23 @@ def test_editor_draft_patch_strips_resolved_asset_urls(api_client, user):
     """The editor round-trips the url the GET added; PATCH must strip it before
     persisting, or the raw assetId-only paper endpoints would leak host-absolute
     (or expiring) URLs from the stored document."""
-    document = {
-        "schemaVersion": PAPER_SCHEMA,
-        "paper": {"sections": []},
-        "questions": [
-            {
-                "id": "q_1",
-                "content": {
-                    "stem": [
-                        {
-                            "type": "image",
-                            "assetId": "diagrams/x.png",
-                            "url": "http://testserver/media/diagrams/x.png",
-                        }
-                    ]
-                },
-            }
-        ],
-    }
+    document = _document(_slot("slot_A_01", None))
+    document["questions"] = [
+        {
+            **_contract_question("q_1"),
+            "content": {
+                "stem": [
+                    {
+                        "type": "image",
+                        "assetId": "diagrams/x.png",
+                        "url": "http://testserver/media/diagrams/x.png",
+                    }
+                ]
+            },
+        }
+    ]
     paper = Paper.objects.create(
-        created_by=user, document={"schemaVersion": PAPER_SCHEMA, "paper": {}}
+        created_by=user, document=_document(_slot("slot_A_01", None))
     )
     answer_document = {
         "schemaVersion": ANSWER_SCHEMA_VERSION,

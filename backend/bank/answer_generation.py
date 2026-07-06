@@ -153,7 +153,13 @@ def _build_prompt(questions: list[Question], format_instructions: str) -> str:
     return (
         "Generate CBSE Class 10 Science model answers for the extracted "
         "questions below. Return an answer for each id. Persistable answer text "
-        "only: no preamble and no restatement of the question.\n\n"
+        "only: no preamble and no restatement of the question.\n"
+        "Match answer depth to the marks: roughly one key point per mark, in "
+        "CBSE marking-scheme style. For numerical questions, show the formula, "
+        "the substitution, and the final value with its SI unit. If a question "
+        "depends on a diagram or data you cannot see, answer only what the "
+        "text supports and note the dependency briefly — never invent labels "
+        "or values.\n\n"
         f"{blocks}\n\n{format_instructions}"
     )
 

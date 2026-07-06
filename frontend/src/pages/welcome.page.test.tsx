@@ -22,8 +22,10 @@ describe('WelcomePage', () => {
     const html = renderToStaticMarkup(<WelcomePage />);
 
     expect(html).toContain('Welcome, Varad.');
-    expect(html).toContain('Exam desk');
-    expect(html).toContain('Upload and AI Q&amp;A feed the bank. Generate uses it.');
+    expect(html).toContain('Exam Desk');
+    expect(html).toContain(
+      'Grow the question bank by upload or AI, then generate a paper',
+    );
     expect(html).toContain('Generate');
     expect(html).toContain('Upload');
     expect(html).toContain('AI Q&amp;A');

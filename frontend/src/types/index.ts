@@ -197,11 +197,30 @@ export interface GeneratedQuestionContentItem {
   [key: string]: unknown;
 }
 
+export interface CandidateSupportIssue {
+  field: string;
+  code: string;
+  detail: string;
+}
+
+/**
+ * Deterministic citation-support screen computed by the backend for grounded
+ * candidates (`bank.citation_support`). `null` for ungrounded batches. A
+ * failed screen is a review aid ("check against NCERT"), never auto-rejection.
+ */
+export interface CandidateSupportReview {
+  supported: boolean;
+  question_supported: boolean;
+  answer_supported: boolean;
+  issues: CandidateSupportIssue[];
+}
+
 export interface GeneratedQuestionCandidate {
   id: number;
   status: string;
   payload: GeneratedQuestionPayload;
   grounding_manifest?: unknown;
+  support_review?: CandidateSupportReview | null;
   question_id: number | null;
   accepted_at: string | null;
   rejected_at?: string | null;

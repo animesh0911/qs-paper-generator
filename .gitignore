@@ -8,6 +8,10 @@ science_2025/
 science_2026/
 content/ncert/*/
 
+# Local parse scratch/baselines — regenerated, not versioned
+content/.parsed_backup_predfix/
+content/parsed/baseline/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -27,6 +31,7 @@ backend/staticfiles/
 node_modules/
 dist/
 .vite/
+frontend/.pnpm-store/
 
 # Env / secrets
 .env
@@ -39,6 +44,7 @@ dist/
 
 # Claude Code — machine-local settings & playwright session artifacts
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 .playwright-mcp/
 frontend/tsconfig.tsbuildinfo
 

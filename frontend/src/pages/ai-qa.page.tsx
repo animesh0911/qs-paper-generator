@@ -204,19 +204,20 @@ export default function AiQaPage() {
       <AppHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-10">
-        <Card className="overflow-hidden rounded-lg border-white/70 bg-white/80 shadow-none backdrop-blur-2xl">
-          <CardHeader className="border-b border-white/70 bg-white/60 px-5 py-5 sm:px-6">
+        <Card className="overflow-hidden rounded-lg border-input bg-background shadow-none">
+          <CardHeader className="border-b border-input bg-background px-5 py-5 sm:px-6">
             <div className="space-y-1.5">
               <CardTitle className="text-xl leading-7">
                 Generate AI Q&amp;A
               </CardTitle>
               <p className="max-w-2xl text-[0.9375rem] leading-6 text-muted-foreground">
-                Choose a chapter, select topics, and generate grounded Q&amp;A.
-                Review candidates before they enter your bank.
+                Choose a chapter, pick topics, and generate NCERT-grounded
+                questions with answers. Review each draft before it enters your
+                bank.
               </p>
             </div>
           </CardHeader>
-          <CardContent className="bg-white/45 px-5 py-6 sm:px-6">
+          <CardContent className="px-5 py-6 sm:px-6">
             <BulkQuestionGenerationSetup
               batches={batches}
               batchesLoading={batchesLoading}

@@ -22,6 +22,7 @@ from papers.answer_document import (
     printable_answers_by_slot,
 )
 from papers.models import Paper, PaperStatus
+from papers.tests.contract_documents import contract_document, contract_slot
 
 
 def _answer_document(*entries: dict) -> dict:
@@ -118,14 +119,7 @@ def test_answer_key_pdf_renders_from_saved_answer_document(
 
 @pytest.mark.django_db
 def test_editor_draft_patch_rejects_malformed_answer_document(api_client, user):
-    document = {
-        "schemaVersion": "paper_document.v1",
-        "paper": {
-            "id": "paper_1",
-            "title": "Science",
-            "sections": [],
-        },
-    }
+    document = contract_document()
     paper = Paper.objects.create(
         created_by=user, status=PaperStatus.DRAFT, document=document
     )
@@ -151,52 +145,15 @@ def test_editor_draft_patch_rebuilds_swapped_answer_from_bank(api_client, user):
     old = QuestionFactory(answer="STALE_OLD_ANSWER", answer_source=AnswerSource.HUMAN)
     new = QuestionFactory(answer="FRESH_NEW_ANSWER", answer_source=AnswerSource.HUMAN)
 
-    document = {
-        "schemaVersion": "paper_document.v1",
-        "paper": {
-            "id": "paper_1",
-            "title": "Science",
-            "sections": [
-                {
-                    "id": "A",
-                    "title": "Section A",
-                    "slots": [
-                        {
-                            "id": "slot_A_01",
-                            "number": "1",
-                            "marks": 1,
-                            "type": "mcq",
-                            "selectedQuestionId": f"q_{old.pk}",
-                        }
-                    ],
-                }
-            ],
-        },
-    }
+    document = contract_document(contract_slot("slot_A_01", f"q_{old.pk}"))
     paper = Paper.objects.create(
         created_by=user, status=PaperStatus.DRAFT, document=document
     )
     paper.answer_document = build_answer_document(paper)
     paper.save(update_fields=["answer_document"])
 
-    swapped_document = {
-        **document,
-        "paper": {
-            **document["paper"],
-            "id": f"paper_{paper.pk}",
-            "sections": [
-                {
-                    **document["paper"]["sections"][0],
-                    "slots": [
-                        {
-                            **document["paper"]["sections"][0]["slots"][0],
-                            "selectedQuestionId": f"q_{new.pk}",
-                        }
-                    ],
-                }
-            ],
-        },
-    }
+    swapped_document = contract_document(contract_slot("slot_A_01", f"q_{new.pk}"))
+    swapped_document["paper"]["id"] = f"paper_{paper.pk}"
     stale_answer_document = {
         **paper.answer_document,
         "paperId": f"paper_{paper.pk}",

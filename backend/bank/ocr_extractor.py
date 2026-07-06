@@ -184,6 +184,10 @@ Rules:
 - Ignore cover-page text, general instructions, headers, footers, page numbers,
   watermarks, and shared direction blocks that are not themselves questions.
 - Copy question text verbatim. Do not paraphrase, complete, or correct the source.
+- Do not include the printed question number or the marks digits in rawText.
+- Never invent option labels, option text, marks, or missing halves of a
+  question. If part of a question is cut off in the OCR text, copy only what
+  is visible.
 - Return JSON only with top-level shape: {{"questions": [...]}}.
 - If OCR has an image placeholder such as `![img-12.jpeg](img-12.jpeg)`, never
   infer labels, values, structures, circuits, pH entries, or diagram details
@@ -230,6 +234,16 @@ def _drop_visual_questions(payload: dict) -> dict:
 
 
 def _is_visual_question(question: dict) -> bool:
+    """True when the question *depends on seeing* a visual the OCR text lacks.
+
+    The patterns are reference-anchored on purpose: a question that merely
+    mentions the word "diagram" ("Draw a labelled diagram of the human heart")
+    is a complete text question a student can answer, so it must NOT be
+    dropped. Only questions that point the student at a figure/table/graph
+    that is not reproduced in the text ("shown in the figure", "the given
+    circuit") are removed — those would otherwise persist as unanswerable
+    rows, the OCR path's main hallucination-shaped failure.
+    """
     primary_form = str(question.get("primary_form") or "").lower()
     if primary_form in {"diagram_based", "table_based"}:
         return True
@@ -241,17 +255,17 @@ def _is_visual_question(question: dict) -> bool:
         r"\[image[^\]]*\]",
         r"\[diagram[^\]]*\]",
         r"\[circuit[^\]]*\]",
-        r"\bdiagrams?\b",
-        r"\bfigures?\b",
-        r"\bgraphs?\b",
-        r"\bcircuit diagrams?\b",
-        r"\bray diagrams?\b",
-        r"\blabelled diagrams?\b",
-        r"\bdraw\b.*\b(?:diagram|diagrams|structure|structures)\b",
+        # References to a visual the student is expected to look at.
+        r"\b(?:shown|given)\s+(?:in|below\s+in)?\s*(?:the\s+)?"
+        r"(?:figure|diagram|graph|circuit|image|table)\b",
+        r"\b(?:figure|diagram|graph|circuit|image)\s+(?:given\s+)?"
+        r"(?:above|below|alongside)\b",
+        r"\bin\s+the\s+(?:following|given|above)\s+"
+        r"(?:figure|diagram|graph|circuit)\b",
+        r"\bobserve\s+the\s+(?:figure|diagram|graph|image|table)\b",
+        r"\bon\s+the\s+basis\s+of\s+the\s+(?:figure|diagram|graph)\b",
+        # Organic-structure identification needs the printed structures.
         r"\bname the following compounds\b",
-        r"\bshown in the (?:diagram|figure)\b",
-        r"\bgiven below\b",
-        r"\bfollowing experiment\b",
     )
     return any(re.search(pattern, haystack) for pattern in visual_patterns)
 
