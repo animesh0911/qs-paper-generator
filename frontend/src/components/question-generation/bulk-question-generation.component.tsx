@@ -620,6 +620,10 @@ export function GenerationProgressWorkspace({
     : false;
   const active = batch ? isActiveGenerationStatus(batch.status) : false;
   const step = batch ? progressStep(batch.status) : 0;
+  const visibleCandidates =
+    batch?.status === 'accepted'
+      ? candidates.filter((candidate) => candidate.question_id !== null)
+      : candidates;
   // On a still-active review batch this discards first; on a settled batch it
   // just returns to the (pre-filled) setup. Either way it frees a queue slot,
   // so the teacher never needs the browser back button to generate again.
@@ -755,14 +759,16 @@ export function GenerationProgressWorkspace({
                 </div>
               )}
 
-              {batch.status === 'ready_for_review' && (
+              {(batch.status === 'ready_for_review' ||
+                batch.status === 'accepted') && (
                 <CandidateReviewPanel
-                  candidates={candidates}
+                  candidates={visibleCandidates}
                   candidatesLoading={candidatesLoading}
                   candidatesError={candidatesError}
                   accepting={accepting}
                   acceptError={acceptError}
                   initialRejectedCandidateIds={initialRejectedCandidateIds}
+                  readOnly={batch.status === 'accepted'}
                   onAcceptCandidates={onAcceptCandidates}
                   onRetryCandidates={onRetryCandidates}
                 />

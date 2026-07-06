@@ -356,6 +356,19 @@ describe('GenerationProgressWorkspace', () => {
       updated_at: '2026-06-21T00:00:00Z',
     },
   ];
+  const acceptedCandidates = [
+    { ...candidates[0], status: 'accepted', question_id: 42 },
+    {
+      ...candidates[0],
+      id: 2,
+      status: 'rejected',
+      payload: {
+        ...candidates[0].payload,
+        raw_text: 'Rejected generated question',
+        answer: 'Rejected answer',
+      },
+    },
+  ];
 
   function progressProps(overrides = {}) {
     return {
@@ -494,10 +507,13 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain('Import accepted Q&amp;A');
   });
 
-  it('shows completed state after the batch is accepted', () => {
+  it('shows accepted batch source review with a scrollable generated Q&A list', () => {
     const html = renderToStaticMarkup(
       <GenerationProgressWorkspace
-        {...progressProps({ batch: { ...baseBatch, status: 'accepted' } })}
+        {...progressProps({
+          batch: { ...baseBatch, status: 'accepted' },
+          candidates: acceptedCandidates,
+        })}
       />,
     );
 
@@ -505,8 +521,16 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain(
       'Accepted generated Q&amp;A entered the Question bank',
     );
-    expect(html).toContain('Rejected candidates were not imported');
+    expect(html).toContain('Generated Q&amp;A candidates');
+    expect(html).toContain('1</span> imported');
+    expect(html).not.toContain('0</span> rejected');
+    expect(html).toContain('Which process releases energy from glucose?');
+    expect(html).toContain('A. Respiration');
+    expect(html).not.toContain('Rejected generated question');
+    expect(html).not.toContain('Rejected answer');
     expect(html).toContain('Back to paper setup');
+    expect(html).not.toContain('Undo reject');
+    expect(html).not.toContain('Import accepted Q&amp;A');
   });
 
   it('offers "Discard & generate another" on a review-ready batch', () => {

@@ -15,6 +15,8 @@ const TERMINAL_STATUSES = new Set([
   'discarded',
 ]);
 
+const CANDIDATE_REVIEW_STATUSES = new Set(['ready_for_review', 'accepted']);
+
 export interface GenerationProgressState {
   batch: GenerationBatch | null;
   loading: boolean;
@@ -53,6 +55,7 @@ export function useGenerationProgress(
   const [discarding, setDiscarding] = useState(false);
   const [discardError, setDiscardError] = useState('');
   const hasLoadedBatch = useRef(false);
+  const previousBatchId = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     let cancelled = false;
@@ -82,6 +85,15 @@ export function useGenerationProgress(
       }
     }
 
+    if (previousBatchId.current !== batchId) {
+      previousBatchId.current = batchId;
+      hasLoadedBatch.current = false;
+      setBatch(null);
+      setCandidates([]);
+      setCandidatesError('');
+      setCandidatesLoading(false);
+    }
+
     setLoading(true);
     poll();
     return () => {
@@ -91,7 +103,13 @@ export function useGenerationProgress(
   }, [batchId, pollIntervalMs, retryTick]);
 
   useEffect(() => {
-    if (!batchId || batch?.status !== 'ready_for_review') {
+    const batchStatus = batch?.status;
+    if (
+      !batchId ||
+      !batchStatus ||
+      String(batch?.id) !== batchId ||
+      !CANDIDATE_REVIEW_STATUSES.has(batchStatus)
+    ) {
       setCandidates([]);
       setCandidatesError('');
       setCandidatesLoading(false);
@@ -118,7 +136,7 @@ export function useGenerationProgress(
     return () => {
       cancelled = true;
     };
-  }, [batchId, batch?.status, candidatesRetryTick]);
+  }, [batchId, batch?.id, batch?.status, candidatesRetryTick]);
 
   function tryAgain() {
     setError('');
@@ -140,7 +158,6 @@ export function useGenerationProgress(
         acceptedCandidateIds,
       );
       setBatch(acceptedBatch);
-      setCandidates([]);
     } catch (err) {
       setAcceptError((err as Error).message);
     } finally {

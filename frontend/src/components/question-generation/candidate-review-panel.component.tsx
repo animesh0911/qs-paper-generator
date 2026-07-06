@@ -17,6 +17,7 @@ export interface CandidateReviewPanelProps {
   accepting: boolean;
   acceptError: string;
   initialRejectedCandidateIds?: number[];
+  mode?: 'review' | 'readOnly';
   onAcceptCandidates: (acceptedCandidateIds: number[]) => void;
   onRetryCandidates: () => void;
 }
@@ -39,13 +40,21 @@ export function CandidateReviewPanel({
   accepting,
   acceptError,
   initialRejectedCandidateIds = [],
+  mode = 'review',
   onAcceptCandidates,
   onRetryCandidates,
 }: CandidateReviewPanelProps) {
+  const readOnly = mode === 'readOnly';
+  const visibleCandidates = readOnly
+    ? candidates.filter((candidate) => candidate.status === 'accepted')
+    : candidates;
   const [rejectedCandidateIds, setRejectedCandidateIds] = useState<Set<number>>(
     () => new Set(initialRejectedCandidateIds),
   );
-  const reviewCounts = candidateReviewCounts(candidates, rejectedCandidateIds);
+  const reviewCounts = candidateReviewCounts(
+    visibleCandidates,
+    rejectedCandidateIds,
+  );
 
   function toggleRejected(candidateId: number) {
     setRejectedCandidateIds((current) =>
@@ -54,7 +63,7 @@ export function CandidateReviewPanel({
   }
 
   function acceptedCandidateIds() {
-    return candidates
+    return visibleCandidates
       .filter((candidate) => !rejectedCandidateIds.has(candidate.id))
       .map((candidate) => candidate.id);
   }
@@ -67,14 +76,30 @@ export function CandidateReviewPanel({
     <div className="border-t pt-5 space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h2 className="font-medium">Review generated Q&amp;A</h2>
+          <h2 className="font-medium">
+            {readOnly ? 'Imported Q&A from this session' : 'Review generated Q&A'}
+          </h2>
           <p className="text-sm text-muted-foreground">
-            {candidates.length} candidate{candidates.length === 1 ? '' : 's'} ready
+            {readOnly
+              ? `${visibleCandidates.length} imported Q&A ${
+                  visibleCandidates.length === 1 ? 'item is' : 'items are'
+                } shown with answers from this AI generation session.`
+              : `${visibleCandidates.length} candidate${
+                  visibleCandidates.length === 1 ? '' : 's'
+                } ready`}
           </p>
         </div>
         <div className="inline-flex w-fit rounded-md border bg-background px-3 py-2 text-sm">
-          <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}
-          <span className="font-medium">{reviewCounts.rejected}</span> rejected
+          {readOnly ? (
+            <>
+              <span className="font-medium">{visibleCandidates.length}</span> imported
+            </>
+          ) : (
+            <>
+              <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}
+              <span className="font-medium">{reviewCounts.rejected}</span> rejected
+            </>
+          )}
         </div>
       </div>
 
@@ -92,18 +117,20 @@ export function CandidateReviewPanel({
         </div>
       )}
 
-      {!candidatesLoading && !candidatesError && candidates.length === 0 && (
+      {!candidatesLoading && !candidatesError && visibleCandidates.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          This batch is ready, but no generated candidates were returned.
+          {readOnly
+            ? 'No imported Q&A found for this session.'
+            : 'This batch is ready, but no generated candidates were returned.'}
         </p>
       )}
 
-      {!candidatesLoading && !candidatesError && candidates.length > 0 && (
+      {!candidatesLoading && !candidatesError && visibleCandidates.length > 0 && (
         <ul
           className="max-h-[64vh] overflow-y-auto rounded-md border bg-background"
           aria-label="Generated Q&A candidates"
         >
-          {candidates.map((candidate) => {
+          {visibleCandidates.map((candidate) => {
             const rejected = rejectedCandidateIds.has(candidate.id);
             const topics = candidateTopicLabels(candidate);
             const options = candidateOptionTexts(candidate);
@@ -121,14 +148,16 @@ export function CandidateReviewPanel({
                       {candidateTypeLabel(candidate) || 'Generated candidate'}
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={rejected ? 'outline' : 'ghost'}
-                    onClick={() => toggleRejected(candidate.id)}
-                  >
-                    {rejected ? 'Undo reject' : 'Reject'}
-                  </Button>
+                  {!readOnly && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={rejected ? 'outline' : 'ghost'}
+                      onClick={() => toggleRejected(candidate.id)}
+                    >
+                      {rejected ? 'Undo reject' : 'Reject'}
+                    </Button>
+                  )}
                 </div>
 
                 {options.length > 0 && (
@@ -158,7 +187,7 @@ export function CandidateReviewPanel({
                   </p>
                 )}
 
-                {rejected && (
+                {!readOnly && rejected && (
                   <p className="text-sm font-medium" role="status">
                     Rejected locally. Use Undo to include this candidate again.
                   </p>
@@ -169,7 +198,7 @@ export function CandidateReviewPanel({
         </ul>
       )}
 
-      {acceptError && (
+      {!readOnly && acceptError && (
         <div
           className="rounded-md border border-destructive/40 bg-destructive/5 p-3"
           role="alert"
@@ -179,32 +208,34 @@ export function CandidateReviewPanel({
         </div>
       )}
 
-      <div className="sticky bottom-0 -mx-5 border-t bg-background/95 px-5 py-4 shadow-lg backdrop-blur sm:-mx-6 sm:px-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm">
-            <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}
-            <span className="font-medium">{reviewCounts.rejected}</span> rejected
-          </p>
-          <Button
-            type="button"
-            onClick={importAcceptedCandidates}
-            disabled={
-              accepting ||
-              candidatesLoading ||
-              Boolean(candidatesError) ||
-              candidates.length === 0 ||
-              reviewCounts.accepted === 0
-            }
-          >
-            {accepting ? 'Importing accepted Q&A…' : 'Import accepted Q&A'}
-          </Button>
+      {!readOnly && (
+        <div className="sticky bottom-0 -mx-5 border-t bg-background/95 px-5 py-4 shadow-lg backdrop-blur sm:-mx-6 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm">
+              <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}
+              <span className="font-medium">{reviewCounts.rejected}</span> rejected
+            </p>
+            <Button
+              type="button"
+              onClick={importAcceptedCandidates}
+              disabled={
+                accepting ||
+                candidatesLoading ||
+                Boolean(candidatesError) ||
+                visibleCandidates.length === 0 ||
+                reviewCounts.accepted === 0
+              }
+            >
+              {accepting ? 'Importing accepted Q&A…' : 'Import accepted Q&A'}
+            </Button>
+          </div>
+          {reviewCounts.accepted === 0 && visibleCandidates.length > 0 && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Restore at least one candidate to import into the Question bank.
+            </p>
+          )}
         </div>
-        {reviewCounts.accepted === 0 && candidates.length > 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            Restore at least one candidate to import into the Question bank.
-          </p>
-        )}
-      </div>
+      )}
     </div>
   );
 }
