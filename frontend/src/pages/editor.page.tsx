@@ -32,7 +32,7 @@ import {
   Save,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import '@blocknote/mantine/style.css';
+import '@blocknote/react/style.css';
 import {
   downloadPaperPdfPackage,
   fetchEditorDraft,

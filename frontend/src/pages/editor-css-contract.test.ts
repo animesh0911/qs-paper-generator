@@ -76,6 +76,16 @@ describe('editor CSS contracts', () => {
     expect(inQuestionChoiceRule).toMatch(/\bmargin\s*:\s*5pt 0 4pt\b/);
     expect(paragraphSpacingRule).toMatch(/\bmargin-top\s*:\s*4pt\b/);
   });
+
+  it('contains editor math without breaking KaTeX internal equation layout', () => {
+    const regionTextRule = cssRule('.qpg-question-region-text');
+
+    expect(regionTextRule).toMatch(/\boverflow-wrap\s*:\s*anywhere\b/);
+    expect(css).toContain('.qpg-question-region-text .katex-display');
+    expect(css).toMatch(/\.qpg-question-region-text \.katex-display[\s\S]*?overflow-x\s*:\s*auto/);
+    expect(css).not.toContain('.qpg-question-region-text .katex .base');
+    expect(css).not.toContain('.qpg-question-blocknote .katex .base');
+  });
 });
 
 function cssRule(selector: string) {

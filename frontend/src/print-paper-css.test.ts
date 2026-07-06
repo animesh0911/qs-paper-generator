@@ -25,6 +25,13 @@ describe('print paper CSS', () => {
     expect(css).toMatch(/overflow-x:\s*auto/);
   });
 
+  it('does not override KaTeX internals when containing PDF overflow', () => {
+    expect(css).toContain('.paper-question-body .katex-display');
+    expect(css).toMatch(/overflow-x:\s*auto/);
+    expect(css).not.toContain('.paper-question-body .katex .base');
+    expect(css).not.toContain('.paper-subquestion-body .katex .base');
+  });
+
   it('keeps printed OR and internal-choice spacing under contract', () => {
     expect(css).toContain('.paper-or-divider');
     expect(css).toContain('.paper-choice-group');

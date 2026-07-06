@@ -126,7 +126,9 @@ export function useGenerationProgress(
       })
       .catch((err) => {
         if (cancelled) return;
-        setCandidates([]);
+        if (batchStatus !== 'accepted') {
+          setCandidates([]);
+        }
         setCandidatesError((err as Error).message);
       })
       .finally(() => {
@@ -156,6 +158,12 @@ export function useGenerationProgress(
       const acceptedBatch = await acceptGenerationCandidates(
         batchId,
         acceptedCandidateIds,
+      );
+      const acceptedIdSet = new Set(acceptedCandidateIds);
+      setCandidates((current) =>
+        current
+          .filter((candidate) => acceptedIdSet.has(candidate.id))
+          .map((candidate) => ({ ...candidate, status: 'accepted' })),
       );
       setBatch(acceptedBatch);
     } catch (err) {

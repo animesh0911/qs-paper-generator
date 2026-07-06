@@ -15,6 +15,7 @@ import { useEffect, useRef } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
 import { MathContent } from '@/components/math/math-content.component';
+import { latexHasMath } from '@/components/math/latex';
 import { blockNoteBlocksToContentItems } from '@/lib/editor-paper';
 import { shouldCommitQuestionRegionDraft } from '@/lib/question-region-commit';
 import type { EditorQuestionRegionBlock } from '@/lib/editor-paper';
@@ -29,11 +30,23 @@ export function QuestionRegionEditor({
   editable: boolean;
   onCommit: (content: ContentItem[]) => void;
 }) {
-  if (!editable) {
+  if (!editable || shouldUseTypesetQuestionRegionPreview(region.content)) {
     return <ReadonlyQuestionRegionContent items={region.content} />;
   }
 
   return <ActiveQuestionRegionEditor region={region} onCommit={onCommit} />;
+}
+
+function shouldUseTypesetQuestionRegionPreview(items: ContentItem[]) {
+  return items.some(
+    (item) =>
+      Boolean(item.latex && latexHasMath(item.latex)) ||
+      Boolean(item.text && textContainsMathDelimiter(item.text)),
+  );
+}
+
+function textContainsMathDelimiter(text: string) {
+  return /(^|[^\\])(?:\$\$|\$|\\\[|\\\()/.test(text);
 }
 
 function ReadonlyQuestionRegionContent({ items }: { items: ContentItem[] }) {

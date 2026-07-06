@@ -108,6 +108,61 @@ def test_generation_polling_does_not_throttle_generate_sources(api_client, user,
     assert resp.status_code == 200
 
 
+def test_sources_lists_accepted_ai_sessions_with_imported_question_count(
+    api_client, user
+):
+    """Accepted generation sessions are named receipts for imported Q&A only."""
+    chapter = Chapter.objects.get(slug="life-processes")
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.ACCEPTED,
+        accepted_at=timezone.now(),
+        difficulty_preset="balanced",
+        requested_count=3,
+        candidate_count=3,
+    )
+    batch.chapters.set([chapter])
+    imported_question = Question.objects.create(
+        school=user.school,
+        chapter=chapter,
+        section="A",
+        qtype="mcq",
+        marks=1,
+        text="Imported generated Question?",
+        answer="A",
+    )
+    GeneratedQuestionCandidate.objects.create(
+        batch=batch,
+        status=GeneratedQuestionCandidateStatus.ACCEPTED,
+        question=imported_question,
+        payload=_payload(raw_text="Imported generated Question?"),
+        accepted_at=timezone.now(),
+    )
+    GeneratedQuestionCandidate.objects.create(
+        batch=batch,
+        status=GeneratedQuestionCandidateStatus.REJECTED,
+        payload=_payload(raw_text="Rejected generated Question?"),
+        rejected_at=timezone.now(),
+    )
+    GeneratedQuestionCandidate.objects.create(
+        batch=batch,
+        status=GeneratedQuestionCandidateStatus.ACCEPTED,
+        question=None,
+        payload=_payload(raw_text="Deleted imported Question?"),
+        accepted_at=timezone.now(),
+    )
+
+    resp = api_client.get("/api/bank/sources/")
+
+    assert resp.status_code == 200
+    item = next(row for row in resp.data if row["key"] == f"ai_batch:{batch.pk}")
+    assert item["title"] == f"AI Q&A session #{batch.pk}"
+    assert item["detail"] == "Life Processes · 1 imported"
+    assert item["question_count"] == 1
+    assert item["matching_question_count"] == 1
+
+
 def _create_grounded_topic(*, empty=False):
     chapter = Chapter.objects.get(slug="life-processes")
     document = TextbookDocument.objects.create(

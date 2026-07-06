@@ -47,6 +47,7 @@ from .models import (
     Chapter,
     CognitiveLevel,
     GeneratedQuestionCandidate,
+    GeneratedQuestionCandidateStatus,
     GenerationBatch,
     IngestionJob,
     IngestionJobStatus,
@@ -216,28 +217,35 @@ def sources(request):
     counts = dict(
         GeneratedQuestionCandidate.objects.filter(
             batch_id__in=batch_ids,
+            status=GeneratedQuestionCandidateStatus.ACCEPTED,
             question_id__isnull=False,
         )
         .values("batch_id")
         .annotate(n=Count("question_id"))
         .values_list("batch_id", "n")
     )
-    batch_items = [
-        {
-            "key": f"ai_batch:{batch.pk}",
-            "kind": "ai_session",
-            "title": "AI Q&A session",
-            "detail": ", ".join(
-                batch.chapters.order_by("order").values_list("name", flat=True)[:3]
-            )
-            or batch.difficulty_preset,
-            "question_count": counts.get(batch.pk, 0),
-            "matching_question_count": counts.get(batch.pk, 0),
-            "created_at": batch.accepted_at or batch.created_at,
-            "status": batch.status,
-        }
-        for batch in batches
-    ]
+    batch_items = []
+    for batch in batches:
+        imported_count = counts.get(batch.pk, 0)
+        chapter_detail = ", ".join(
+            batch.chapters.order_by("order").values_list("name", flat=True)[:3]
+        )
+        detail_prefix = chapter_detail or batch.difficulty_preset
+        imported_label = f"{imported_count} imported"
+        batch_items.append(
+            {
+                "key": f"ai_batch:{batch.pk}",
+                "kind": "ai_session",
+                "title": f"AI Q&A session #{batch.pk}",
+                "detail": f"{detail_prefix} · {imported_label}"
+                if detail_prefix
+                else imported_label,
+                "question_count": imported_count,
+                "matching_question_count": imported_count,
+                "created_at": batch.accepted_at or batch.created_at,
+                "status": batch.status,
+            }
+        )
 
     kind_rank = {"bank_source": 2, "upload": 1, "ai_session": 0}
     items = sorted(

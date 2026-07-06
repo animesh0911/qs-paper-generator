@@ -369,6 +369,21 @@ describe('GenerationProgressWorkspace', () => {
       },
     },
   ];
+  const acceptedCandidatesWithDeletedQuestion = [
+    ...acceptedCandidates,
+    {
+      ...candidates[0],
+      id: 3,
+      status: 'accepted',
+      question_id: null,
+      accepted_at: '2026-06-21T00:00:00Z',
+      payload: {
+        ...candidates[0].payload,
+        raw_text: 'Deleted imported question',
+        answer: 'Deleted answer',
+      },
+    },
+  ];
 
   function progressProps(overrides = {}) {
     return {
@@ -531,6 +546,78 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain('Back to paper setup');
     expect(html).not.toContain('Undo reject');
     expect(html).not.toContain('Import accepted Q&amp;A');
+  });
+
+  it('keeps accepted source review counts aligned to imported questions', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'accepted', candidate_count: 3 },
+          candidates: acceptedCandidatesWithDeletedQuestion,
+        })}
+      />,
+    );
+
+    expect(html).toContain('1 imported');
+    expect(html).toContain('1</span> imported');
+    expect(html).toContain('Which process releases energy from glucose?');
+    expect(html).not.toContain('Deleted imported question');
+    expect(html).not.toContain('Deleted answer');
+    expect(html).not.toContain('Rejected generated question');
+  });
+
+  it('does not show total generated candidates as imported while accepted Q&A loads', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'accepted', candidate_count: 3 },
+          candidatesLoading: true,
+        })}
+      />,
+    );
+
+    expect(html).toContain('Loading imported Q&amp;A…');
+    expect(html).not.toContain('3 imported');
+  });
+
+  it('keeps just-imported Q&A visible while the accepted receipt refreshes', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'accepted', candidate_count: 1 },
+          candidates: [
+            {
+              ...candidates[0],
+              status: 'accepted',
+              question_id: null,
+              accepted_at: null,
+            },
+          ],
+          candidatesLoading: true,
+        })}
+      />,
+    );
+
+    expect(html).toContain('Loading imported Q&amp;A…');
+    expect(html).toContain('Which process releases energy from glucose?');
+    expect(html).toContain('A. Respiration');
+  });
+
+  it('keeps cached imported Q&A visible when accepted receipt reload fails', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'accepted', candidate_count: 1 },
+          candidates: acceptedCandidates,
+          candidatesError: 'Request failed (500)',
+        })}
+      />,
+    );
+
+    expect(html).toContain('Candidates could not be loaded.');
+    expect(html).toContain('Try loading candidates again');
+    expect(html).toContain('Which process releases energy from glucose?');
+    expect(html).toContain('A. Respiration');
   });
 
   it('offers "Discard & generate another" on a review-ready batch', () => {

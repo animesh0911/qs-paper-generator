@@ -622,8 +622,13 @@ export function GenerationProgressWorkspace({
   const step = batch ? progressStep(batch.status) : 0;
   const visibleCandidates =
     batch?.status === 'accepted'
-      ? candidates.filter((candidate) => candidate.question_id !== null)
+      ? candidates.filter(
+          (candidate) =>
+            candidate.status === 'accepted' &&
+            (candidate.question_id !== null || candidate.accepted_at === null),
+        )
       : candidates;
+  const importedCandidateCount = visibleCandidates.length;
   // On a still-active review batch this discards first; on a settled batch it
   // just returns to the (pre-filled) setup. Either way it frees a queue slot,
   // so the teacher never needs the browser back button to generate again.
@@ -759,8 +764,7 @@ export function GenerationProgressWorkspace({
                 </div>
               )}
 
-              {(batch.status === 'ready_for_review' ||
-                batch.status === 'accepted') && (
+              {batch.status === 'ready_for_review' && (
                 <CandidateReviewPanel
                   candidates={visibleCandidates}
                   candidatesLoading={candidatesLoading}
@@ -768,7 +772,7 @@ export function GenerationProgressWorkspace({
                   accepting={accepting}
                   acceptError={acceptError}
                   initialRejectedCandidateIds={initialRejectedCandidateIds}
-                  readOnly={batch.status === 'accepted'}
+                  mode="review"
                   onAcceptCandidates={onAcceptCandidates}
                   onRetryCandidates={onRetryCandidates}
                 />
@@ -790,22 +794,46 @@ export function GenerationProgressWorkspace({
               )}
 
               {batch.status === 'accepted' && (
-                <div className="border-t pt-4 space-y-3">
-                  <div>
-                    <h2 className="font-medium">Generation batch accepted</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Accepted generated Q&amp;A entered the Question bank.
-                      Rejected candidates were not imported.
-                    </p>
+                <>
+                  <div className="border-t pt-4 space-y-3">
+                    <div>
+                      <h2 className="font-medium">Generation batch accepted</h2>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Accepted generated Q&amp;A entered the Question bank.
+                        Rejected candidates were not imported.
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                        Batch #{batch.id} · {batch.status} ·{' '}
+                        {candidatesLoading
+                          ? 'Loading imported Q&A…'
+                          : `${importedCandidateCount} imported`}
+                        {batch.topic_names.length > 0
+                          ? ` · ${batch.topic_names.slice(0, 3).join(', ')}`
+                          : batch.chapter_slugs.length > 0
+                            ? ` · ${batch.chapter_slugs.join(', ')}`
+                            : ''}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={onBackToPaperSetup}
+                    >
+                      Back to paper setup
+                    </Button>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onBackToPaperSetup}
-                  >
-                    Back to paper setup
-                  </Button>
-                </div>
+                  <CandidateReviewPanel
+                    candidates={visibleCandidates}
+                    candidatesLoading={candidatesLoading}
+                    candidatesError={candidatesError}
+                    accepting={accepting}
+                    acceptError={acceptError}
+                    initialRejectedCandidateIds={initialRejectedCandidateIds}
+                    mode="readOnly"
+                    onAcceptCandidates={onAcceptCandidates}
+                    onRetryCandidates={onRetryCandidates}
+                  />
+                </>
               )}
 
               {batch.status === 'expired' && (

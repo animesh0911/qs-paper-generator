@@ -228,6 +228,31 @@ describe('PaperDocumentView', () => {
     expect(html).not.toContain('<p>$$');
   });
 
+  it('renders latex-only prose as readable text instead of leaking wrappers', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const slot = document.paper.sections[0].slots[0];
+    const question = document.questions.find(
+      (candidate) => candidate.id === slot.selectedQuestionId,
+    );
+
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    question.content.stem = [
+      {
+        type: 'paragraph',
+        latex: '\\text{Read the following question carefully.}',
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('Read the following question carefully.');
+    expect(html).not.toContain('\\text{Read');
+  });
+
   it('typesets latex content items with KaTeX instead of leaking raw source', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const slot = document.paper.sections[0].slots[0];

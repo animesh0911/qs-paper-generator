@@ -103,7 +103,11 @@ export function CandidateReviewPanel({
         </div>
       </div>
 
-      {candidatesLoading && <p className="text-sm">Loading generated candidates…</p>}
+      {candidatesLoading && (
+        <p className="text-sm">
+          {readOnly ? 'Loading imported Q&A…' : 'Loading generated candidates…'}
+        </p>
+      )}
 
       {!candidatesLoading && candidatesError && (
         <div role="alert" className="space-y-2">
@@ -125,7 +129,9 @@ export function CandidateReviewPanel({
         </p>
       )}
 
-      {!candidatesLoading && !candidatesError && visibleCandidates.length > 0 && (
+      {(!candidatesLoading || readOnly) &&
+        (!candidatesError || readOnly) &&
+        visibleCandidates.length > 0 && (
         <ul
           className="max-h-[64vh] overflow-y-auto rounded-md border bg-background"
           aria-label="Generated Q&A candidates"

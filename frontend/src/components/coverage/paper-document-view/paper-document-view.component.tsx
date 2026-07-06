@@ -16,7 +16,6 @@
  */
 import { Fragment, useMemo } from 'react';
 import { MathText } from '@/components/math/math-content.component';
-import { MathExpression } from '@/components/math/math-expression.component';
 import { LatexText } from '@/components/math/latex-text.component';
 import { latexHasMath } from '@/components/math/latex';
 import { contentItemsToPlainText } from '@/lib/content-items';
@@ -625,19 +624,10 @@ function PaperContentItem({ item }: { item: ContentItem }) {
   }
 
   // Math lives in a dedicated `latex` field — typeset it rather than dumping
-  // the raw source. Prefer it when the item has no plain text, or when its
-  // latex still carries math after `\text{…}` prose is stripped (e.g. a
-  // sentence ending in `\sqrt{3}`); plain-prose latex falls through to text.
-  if (item.latex && !item.text) {
-    return (
-      <p>
-        <MathExpression latex={item.latex} />
-      </p>
-    );
-  }
-  // A paragraph carrying both text and math-bearing latex: render the prose
-  // wrappable and typeset only the math fragments.
-  if (item.latex && latexHasMath(item.latex)) {
+  // the raw source. Use the same mixed prose + math renderer as the editor info
+  // drawer: plain `\text{…}` wrappers become readable text, while genuine math
+  // fragments stay typeset.
+  if (item.latex && (!item.text || latexHasMath(item.latex))) {
     return (
       <p>
         <LatexText latex={item.latex} />
