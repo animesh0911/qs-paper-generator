@@ -255,6 +255,36 @@ describe('editor paper view model', () => {
     );
   });
 
+  it('marks in-question OR alternatives without showing artificial option labels', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const view = buildEditorPaperView(document);
+
+    const internalChoiceRegions = view.sections.flatMap((section) =>
+      section.slots.flatMap((slot) =>
+        slot.questionBlockTree.children.filter(
+          (region) => region.blockType === 'internalChoiceBlock',
+        ),
+      ),
+    );
+
+    expect(internalChoiceRegions.length).toBeGreaterThanOrEqual(2);
+    expect(internalChoiceRegions.map((region) => region.displayPrefix)).toEqual(
+      internalChoiceRegions.map(() => ''),
+    );
+    expect(internalChoiceRegions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          internalChoiceGroupIndex: 0,
+          internalChoiceOptionIndex: 0,
+        }),
+        expect.objectContaining({
+          internalChoiceGroupIndex: 0,
+          internalChoiceOptionIndex: 1,
+        }),
+      ]),
+    );
+  });
+
   it('renders slot-level region overrides without mutating source questions', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const state = normalizePaperDocument(document);
@@ -496,7 +526,7 @@ describe('editor paper view model', () => {
   });
 
   it('warns when inline mark edits make paper totals mathematically inconsistent', () => {
-    const document = assertPaperDocument(mockPaperDocumentV1);
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const section = document.paper.sections[0];
 
     document.paper.totalMarks = 30;
@@ -514,7 +544,7 @@ describe('editor paper view model', () => {
   });
 
   it('counts internal-choice pairs as one CBSE question in outline and validation totals', () => {
-    const document = assertPaperDocument(mockPaperDocumentV1);
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const [firstSlot, secondSlot] = document.paper.sections[0].slots;
     firstSlot.number = '16';
     secondSlot.number = '16';
@@ -534,7 +564,7 @@ describe('editor paper view model', () => {
   });
 
   it('disambiguates unfilled internal-choice slots in validation warnings', () => {
-    const document = assertPaperDocument(mockPaperDocumentV1);
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const [firstSlot, secondSlot] = document.paper.sections[0].slots;
     firstSlot.number = '16';
     secondSlot.number = '16';
@@ -767,6 +797,20 @@ describe('editor paper view model', () => {
     );
     expect(clipboardText).not.toContain(firstSlot.marksLabel);
     expect(clipboardText).not.toContain(firstSlot.questionType);
+  });
+
+  it('preserves OR separators when copying internal-choice question text', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const view = buildEditorPaperView(document);
+    const internalChoiceSlot = findSlot(view, 'slot_C_02');
+
+    expect(editorSlotClipboardText(internalChoiceSlot)).toBe(
+      [
+        'Explain the mechanism of breathing in human beings.',
+        'OR',
+        'Explain the process of nutrition in amoeba.',
+      ].join('\n'),
+    );
   });
 });
 

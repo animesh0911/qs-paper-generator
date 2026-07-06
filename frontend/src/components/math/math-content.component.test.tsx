@@ -75,6 +75,23 @@ describe('MathContent', () => {
     expect(html).not.toContain('class="katex-display"');
   });
 
+  it('keeps spaces around inline math in prose latex paragraphs', () => {
+    const items: ContentItem[] = [
+      {
+        type: 'paragraph',
+        latex:
+          '\\text{Deduce the }F_2\\text{ phenotypic ratio / }F_2\\text{ ratio showing external look.}',
+      },
+    ];
+
+    const html = renderToStaticMarkup(<MathContent items={items} />);
+
+    expect(html).toContain('Deduce the ');
+    expect(html).toContain(' phenotypic ratio / ');
+    expect(html).toContain(' ratio showing external look.');
+    expect(html).not.toContain('Deducethe');
+  });
+
   it('typesets a paragraph that carries both text and math-bearing latex', () => {
     const items: ContentItem[] = [
       {

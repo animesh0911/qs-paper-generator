@@ -24,4 +24,32 @@ describe('print paper CSS', () => {
     expect(css).toMatch(/max-width:\s*100%/);
     expect(css).toMatch(/overflow-x:\s*auto/);
   });
+
+  it('keeps printed OR and internal-choice spacing under contract', () => {
+    expect(css).toContain('.paper-or-divider');
+    expect(css).toContain('.paper-choice-group');
+    expect(cssRules('.paper-choice-group')).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/\bgap\s*:\s*8pt\b/),
+        expect.stringMatching(/\bmargin-top\s*:\s*7pt\b/),
+      ]),
+    );
+    expect(cssRule('.paper-choice-group strong')).toMatch(
+      /\btext-align\s*:\s*center\b/,
+    );
+  });
 });
+
+function cssRule(selector: string) {
+  const rules = cssRules(selector);
+
+  expect(rules, `Missing CSS rule for ${selector}`).not.toHaveLength(0);
+  return rules[0] ?? '';
+}
+
+function cssRules(selector: string) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return Array.from(
+    css.matchAll(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`, 'g')),
+  ).map((match) => match[1]);
+}

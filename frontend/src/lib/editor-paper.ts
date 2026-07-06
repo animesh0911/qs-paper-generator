@@ -59,6 +59,8 @@ export interface EditorQuestionRegionBlock {
   text: string;
   displayPrefix: string;
   displaySuffix: string;
+  internalChoiceGroupIndex?: number;
+  internalChoiceOptionIndex?: number;
   content: ContentItem[];
   blockNoteBlocks: PartialBlock[];
   editable: boolean;
@@ -589,7 +591,10 @@ function questionToBlockTree(
     children,
     'questionStemBlock',
     'stem',
-    question.content.stem,
+    trimRegionBeforeStructuredSubparts(
+      question.content.stem,
+      question.content.subparts,
+    ),
     overrides,
   );
   pushOptionRegions(children, question.content.options, overrides);
@@ -638,6 +643,43 @@ function pushRegionBlocks(
 ) {
   if (!items?.length) return;
   blocks.push(regionBlock(blockType, regionKey, items, overrides, prefix));
+}
+
+function trimRegionBeforeStructuredSubparts(
+  items: ContentItem[] | undefined,
+  subparts: SubQuestion[] | undefined,
+): ContentItem[] | undefined {
+  const firstLabel = subparts?.[0]?.label;
+  if (!firstLabel || !items?.length) return items;
+
+  const markerPattern = new RegExp(
+    String.raw`(?:^|\s)(?:\(${escapeRegExp(firstLabel)}\)|${escapeRegExp(firstLabel)}\.)\s+`,
+    'i',
+  );
+  const nextItems: ContentItem[] = [];
+
+  for (const item of items) {
+    if (!item.text) {
+      nextItems.push(item);
+      continue;
+    }
+
+    const marker = item.text.search(markerPattern);
+    if (marker === -1) {
+      nextItems.push(item);
+      continue;
+    }
+
+    const text = item.text.slice(0, marker).trim();
+    if (text) nextItems.push({ ...item, text });
+    break;
+  }
+
+  return nextItems.length > 0 ? nextItems : items;
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function pushOptionRegions(
@@ -696,7 +738,12 @@ function pushInternalChoiceRegions(
           `choice:${groupIndex}:${optionIndex}:${option.label}`,
           option.content,
           overrides,
-          `${option.label}. `,
+          '',
+          '',
+          {
+            internalChoiceGroupIndex: groupIndex,
+            internalChoiceOptionIndex: optionIndex,
+          },
         ),
       );
     });
@@ -710,6 +757,10 @@ function regionBlock(
   overrides: SlotOverrides | undefined,
   prefix = '',
   suffix = '',
+  metadata: Pick<
+    EditorQuestionRegionBlock,
+    'internalChoiceGroupIndex' | 'internalChoiceOptionIndex'
+  > = {},
 ): EditorQuestionRegionBlock {
   const overrideContent = overrides?.regions[regionKey];
   const content = overrideContent ?? sourceContent;
@@ -721,6 +772,7 @@ function regionBlock(
     text,
     displayPrefix: prefix,
     displaySuffix: suffix,
+    ...metadata,
     content,
     blockNoteBlocks: contentItemsToBlockNoteBlocks(content),
     editable: true,
@@ -826,16 +878,30 @@ export function contentItemsToText(items: ContentItem[]): string {
  * editor's metadata.
  */
 export function editorSlotClipboardText(slot: EditorPaperSlotView): string {
-  return slot.questionBlockTree.children
-    .map((region) =>
-      [region.displayPrefix, region.text]
-        .map((part) => part.trim())
-        .filter(Boolean)
-        .join(' '),
-    )
-    .filter(Boolean)
-    .join('\n')
-    .trim();
+  const lines: string[] = [];
+
+  for (const region of slot.questionBlockTree.children) {
+    if (
+      region.blockType === 'internalChoiceBlock' &&
+      (region.internalChoiceOptionIndex ?? 0) > 0
+    ) {
+      lines.push('OR');
+    } else if (
+      region.blockType === 'internalChoiceBlock' &&
+      (region.internalChoiceGroupIndex ?? 0) > 0 &&
+      (region.internalChoiceOptionIndex ?? 0) === 0
+    ) {
+      lines.push('');
+    }
+
+    const line = [region.displayPrefix, region.text]
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .join(' ');
+    if (line) lines.push(line);
+  }
+
+  return lines.join('\n').trim();
 }
 
 export function contentItemToText(item: ContentItem): string {

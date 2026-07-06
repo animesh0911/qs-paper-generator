@@ -195,8 +195,8 @@
   }
 
   .editor-paper-section [data-question-slot] {
-    grid-template-columns: 24pt minmax(0, 1fr) 42pt;
-    gap: 9pt;
+    grid-template-columns: 28pt minmax(0, 1fr) 44pt;
+    gap: 10pt;
     padding: 8pt 8pt;
     font-size: 12pt;
     line-height: 1.34;
@@ -219,6 +219,10 @@
     font-style: italic;
     font-weight: 700;
     letter-spacing: 0.08em;
+  }
+
+  .qpg-in-question-choice-divider {
+    margin: 5pt 0 4pt;
   }
 
   .editor-paper-section .qpg-question-mark-cell {
@@ -247,6 +251,19 @@
 
   .editor-paper-section .qpg-question-region {
     gap: 6pt;
+  }
+
+  .editor-paper-section .qpg-question-region-option,
+  .editor-paper-section .qpg-question-region-subquestion {
+    margin-top: 3pt;
+  }
+
+  .editor-paper-section .qpg-question-region-internal-choice {
+    margin-top: 2pt;
+  }
+
+  .editor-paper-section .qpg-question-choice-group-start {
+    margin-top: 7pt;
   }
 
   .qpg-question-region-prefix {
@@ -304,11 +321,35 @@
     font-size: inherit;
     line-height: inherit;
     min-height: 1.22em;
+    overflow-wrap: anywhere;
     white-space: pre-wrap;
+  }
+
+  .qpg-question-region-text .katex,
+  .qpg-question-blocknote .katex {
+    max-width: 100%;
+  }
+
+  .qpg-question-region-text .katex-display,
+  .qpg-question-blocknote .katex-display {
+    max-width: 100%;
+    margin: 2pt 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 1pt;
+    white-space: nowrap;
+  }
+
+  .qpg-question-region-paragraph + .qpg-question-region-paragraph {
+    margin-top: 4pt;
   }
 
   .qpg-question-blocknote .bn-block-outer {
     margin: 0;
+  }
+
+  .qpg-question-blocknote .bn-block-outer + .bn-block-outer {
+    margin-top: 4pt;
   }
 
   .qpg-question-blocknote .bn-trailing-block {

@@ -63,6 +63,19 @@ describe('editor CSS contracts', () => {
     expect(activeQuestionRule).toMatch(/\bfont-size\s*:\s*inherit\b/);
     expect(activeQuestionRule).toMatch(/\bline-height\s*:\s*inherit\b/);
   });
+
+  it('formats in-question OR dividers and paragraphs on the editor paper surface', () => {
+    const inQuestionChoiceRule = cssRule('.qpg-in-question-choice-divider');
+    const paragraphSpacingRule = cssRule(
+      '.qpg-question-region-paragraph + .qpg-question-region-paragraph',
+    );
+
+    expect(editorPageSource).toContain('qpg-in-question-choice-divider');
+    expect(editorPageSource).toContain('qpg-question-region-internal-choice');
+    expect(editorPageSource).toContain('qpg-question-choice-group-start');
+    expect(inQuestionChoiceRule).toMatch(/\bmargin\s*:\s*5pt 0 4pt\b/);
+    expect(paragraphSpacingRule).toMatch(/\bmargin-top\s*:\s*4pt\b/);
+  });
 });
 
 function cssRule(selector: string) {

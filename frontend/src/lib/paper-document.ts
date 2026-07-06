@@ -457,6 +457,8 @@ function updateSectionChromeText(
 
 export function renumberPaperSlots(document: PaperDocument): PaperDocument {
   let index = 1;
+  const numberByOrGroup = new Map<number, string>();
+
   return {
     ...document,
     paper: {
@@ -464,12 +466,20 @@ export function renumberPaperSlots(document: PaperDocument): PaperDocument {
       sections: document.paper.sections.map((section) => ({
         ...section,
         slots: section.slots.map((slot) => {
-          const nextSlot = {
+          const existingOrNumber =
+            slot.orGroup === undefined
+              ? undefined
+              : numberByOrGroup.get(slot.orGroup);
+          const number = existingOrNumber ?? String(index);
+          if (slot.orGroup === undefined || !existingOrNumber) index += 1;
+          if (slot.orGroup !== undefined) {
+            numberByOrGroup.set(slot.orGroup, number);
+          }
+
+          return {
             ...slot,
-            number: String(index),
+            number,
           };
-          index += 1;
-          return nextSlot;
         }),
       })),
     },
@@ -573,17 +583,18 @@ export function reorderSlotWithinOrderZone(
     return { success: false, state, error: 'Target index is outside the zone' };
   }
 
-  const reorderedItemIds = [...sourceZone.orderedItemIds];
-  const fromIndex = reorderedItemIds.indexOf(params.slotId);
-  if (fromIndex === -1) {
+  const reorderedItemIds = reorderAtomicSlotGroup(
+    sourceZone.orderedItemIds,
+    state,
+    params.slotId,
+    params.toIndex,
+  );
+  if (!reorderedItemIds) {
     return { success: false, state, error: 'Slot not found in source zone' };
   }
-  if (fromIndex === params.toIndex) {
+  if (arraysEqual(reorderedItemIds, sourceZone.orderedItemIds)) {
     return { success: true, state };
   }
-
-  reorderedItemIds.splice(fromIndex, 1);
-  reorderedItemIds.splice(params.toIndex, 0, params.slotId);
 
   const nextSections = state.document.paper.sections.map((section) => {
     if (`section:${section.id}` === sourceZone.zoneId) {
@@ -612,6 +623,41 @@ export function reorderSlotWithinOrderZone(
   const nextState = normalizePaperDocument(nextDocument);
 
   return { success: true, state: nextState };
+}
+
+function reorderAtomicSlotGroup(
+  orderedItemIds: string[],
+  state: NormalizedPaperDocument,
+  slotId: string,
+  toIndex: number,
+): string[] | null {
+  const sourceSlot = getSlot(state, slotId);
+  if (!sourceSlot) return null;
+  const movingIds =
+    sourceSlot.orGroup === undefined
+      ? [slotId]
+      : orderedItemIds.filter(
+          (candidateId) =>
+            getSlot(state, candidateId)?.orGroup === sourceSlot.orGroup,
+        );
+  if (movingIds.length === 0 || !movingIds.includes(slotId)) return null;
+
+  const movingIdSet = new Set(movingIds);
+  const stationaryIds = orderedItemIds.filter((id) => !movingIdSet.has(id));
+  const insertionIndex = Math.min(toIndex, stationaryIds.length);
+
+  return [
+    ...stationaryIds.slice(0, insertionIndex),
+    ...movingIds,
+    ...stationaryIds.slice(insertionIndex),
+  ];
+}
+
+function arraysEqual(left: string[], right: string[]) {
+  return (
+    left.length === right.length &&
+    left.every((value, index) => value === right[index])
+  );
 }
 
 export function commitStructuredPaperAction(

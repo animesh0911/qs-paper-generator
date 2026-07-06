@@ -512,6 +512,47 @@ describe('PaperDocumentV1 ordering', () => {
     });
   });
 
+  it('moves an internal-choice OR group as one ordered unit', () => {
+    const document = assertPaperDocument(mockPaperDocumentV1);
+    const [firstSlot, secondSlot] = document.paper.sections[0].slots;
+    firstSlot.number = '15';
+    secondSlot.number = '15';
+    firstSlot.orGroup = 7;
+    secondSlot.orGroup = 7;
+    const state = normalizePaperDocument(document);
+
+    const result = reorderSlotWithinOrderZone(state, {
+      slotId: secondSlot.id,
+      fromZoneId: 'section:A',
+      toZoneId: 'section:A',
+      toIndex: 4,
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    expect(result.state.slotOrderBySection.A).toEqual([
+      'slot_B_01',
+      'slot_C_01',
+      'slot_D_01',
+      'slot_A_01',
+      'slot_A_02',
+    ]);
+    expect(
+      result.state.document.paper.sections[0].slots.map((slot) => ({
+        id: slot.id,
+        number: slot.number,
+        orGroup: slot.orGroup,
+      })),
+    ).toEqual([
+      { id: 'slot_B_01', number: '1', orGroup: undefined },
+      { id: 'slot_C_01', number: '2', orGroup: undefined },
+      { id: 'slot_D_01', number: '3', orGroup: undefined },
+      { id: 'slot_A_01', number: '4', orGroup: 7 },
+      { id: 'slot_A_02', number: '4', orGroup: 7 },
+    ]);
+  });
+
   it('rejects moves into a different order zone', () => {
     const document = assertPaperDocument(mockPaperDocumentV1);
     const state = normalizePaperDocument(document);

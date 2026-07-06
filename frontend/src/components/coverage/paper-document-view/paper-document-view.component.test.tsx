@@ -203,6 +203,31 @@ describe('PaperDocumentView', () => {
     expect(html).not.toContain('>Page 1<');
   });
 
+  it('typesets raw dollar-delimited math in extracted text instead of leaking source', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const slot = document.paper.sections[0].slots[0];
+    const question = document.questions.find(
+      (candidate) => candidate.id === slot.selectedQuestionId,
+    );
+
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    question.content.stem = [
+      {
+        type: 'paragraph',
+        text: '$$\\text{Mg} \\rightarrow \\ddot{\\text{O}} \\rightarrow \\text{Mg}^{2+}$$',
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('class="katex"');
+    expect(html).not.toContain('<p>$$');
+  });
+
   it('typesets latex content items with KaTeX instead of leaking raw source', () => {
     const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
     const slot = document.paper.sections[0].slots[0];
@@ -231,6 +256,44 @@ describe('PaperDocumentView', () => {
     expect(html).toContain('class="katex"');
     expect(html).toContain('class="katex-html"');
     expect(html).not.toContain('<p>\\text{C}');
+  });
+
+  it('keeps structured subparts without repeating them from a raw imported stem', () => {
+    const document = structuredClone(assertPaperDocument(mockPaperDocumentV1));
+    const slot = document.paper.sections[0].slots[0];
+    const question = document.questions.find(
+      (candidate) => candidate.id === slot.selectedQuestionId,
+    );
+
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    question.content.stem = [
+      {
+        type: 'paragraph',
+        text: 'Read the passage. (a) First repeated task. (b) Second repeated task.',
+      },
+    ];
+    question.content.subparts = [
+      {
+        label: 'a',
+        marks: 1,
+        content: [{ type: 'paragraph', text: 'First repeated task.' }],
+      },
+      {
+        label: 'b',
+        marks: 1,
+        content: [{ type: 'paragraph', text: 'Second repeated task.' }],
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      <PaperDocumentView paper={document} mode="print" />,
+    );
+
+    expect(html).toContain('Read the passage.');
+    expect(html.match(/First repeated task\./g)).toHaveLength(1);
+    expect(html.match(/Second repeated task\./g)).toHaveLength(1);
   });
 
   it('keeps table content inside option and subquestion grid body cells', () => {

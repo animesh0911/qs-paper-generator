@@ -1,8 +1,8 @@
 /**
  * Top-level router for the app shell.
  *
- * `/editor` is the explicit fixture-backed demo workspace. Persisted papers
- * load through authenticated `/editor/:paperId`; `/editor/:paperId/print`
+ * `/editor` returns to paper setup. Persisted papers load through
+ * authenticated `/editor/:paperId`; `/editor/:paperId/print`
  * remains the print-only route used by backend PDF rendering.
  *
  * @module App
@@ -36,20 +36,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/editor"
-        element={
-          <Suspense
-            fallback={
-              <div className="min-h-screen bg-secondary p-6 text-sm">
-                Loading editor...
-              </div>
-            }
-          >
-            <EditorPage />
-          </Suspense>
-        }
-      />
+      <Route path="/editor" element={<Navigate to="/generate" replace />} />
       <Route
         path="/editor/:paperId"
         element={

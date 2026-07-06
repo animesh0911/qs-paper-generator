@@ -1,8 +1,8 @@
 /**
- * PaperDocumentV1 editor shell for persisted papers and explicit demo fixtures.
+ * PaperDocumentV1 editor shell for persisted papers.
  *
  * `/editor/:paperId` fetches and validates the authenticated teacher's saved
- * paper. `/editor` remains the explicit fixture-backed development/demo route.
+ * paper. `/editor` is handled by the app router and returns teachers to setup.
  *
  * Patterns:
  * - The loaded `PaperDocumentV1` is canonical; BlockNote only renders editable
@@ -11,8 +11,8 @@
  *   can remove it without hiding paper content.
  *
  * Where it fits:
- * - Used by: `src/App.tsx` at `/editor` and `/editor/:paperId`.
- * - Uses: `src/lib/api.ts`, `src/lib/editor-paper.ts`, `src/mocks`.
+ * - Used by: `src/App.tsx` at `/editor/:paperId`.
+ * - Uses: `src/lib/api.ts`, `src/lib/editor-paper.ts`.
  *
  * @module EditorPage
  */
@@ -24,16 +24,15 @@ import {
 } from '@dnd-kit/sortable';
 import {
   AlertTriangle,
-  ArrowLeftRight,
+  ArrowLeft,
   Download,
   Eye,
   Lock,
   RotateCcw,
   Save,
 } from 'lucide-react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import '@blocknote/mantine/style.css';
-import { resolveEditorFixture } from '@/mocks';
 import {
   downloadPaperPdfPackage,
   fetchEditorDraft,
@@ -45,8 +44,10 @@ import {
   getPaperFormatRendererResult,
   type PaperFormatRenderer,
 } from '@/lib/paper-format-renderers';
-import { assertPaperDocument } from '@/lib/paper-document';
-import { editorSlotClipboardText } from '@/lib/editor-paper';
+import {
+  editorSlotClipboardText,
+  type EditorQuestionRegionBlock,
+} from '@/lib/editor-paper';
 import {
   reconcileAnswerDocumentForPaper,
   saveThenDownloadPdfPackage,
@@ -85,14 +86,33 @@ function toRoman(value: number) {
   return numerals[value - 1] ?? String(value);
 }
 
+function shouldShowInternalChoiceDivider(region: EditorQuestionRegionBlock) {
+  return (
+    region.blockType === 'internalChoiceBlock' &&
+    (region.internalChoiceOptionIndex ?? 0) > 0
+  );
+}
+
+function startsInternalChoiceGroup(region: EditorQuestionRegionBlock) {
+  return (
+    region.blockType === 'internalChoiceBlock' &&
+    (region.internalChoiceOptionIndex ?? 0) === 0
+  );
+}
+
 export default function EditorPage() {
   const { paperId } = useParams();
 
-  if (paperId) {
-    return <PersistedEditorPage paperId={paperId} />;
+  if (!paperId) {
+    return (
+      <EditorDocumentStatus
+        state="error"
+        message="Choose paper setup first, then open a saved paper in the editor."
+      />
+    );
   }
 
-  return <DemoEditorPage />;
+  return <PersistedEditorPage paperId={paperId} />;
 }
 
 function PersistedEditorPage({ paperId }: { paperId: string }) {
@@ -132,26 +152,6 @@ function PersistedEditorPage({ paperId }: { paperId: string }) {
       key={document.paper.id}
       document={document}
       answerDocument={answerDocument}
-      documentKey={document.paper.id}
-    />
-  );
-}
-
-function DemoEditorPage() {
-  const [searchParams] = useSearchParams();
-  const selectedFixture = useMemo(
-    () => resolveEditorFixture(searchParams.get('fixture')),
-    [searchParams],
-  );
-  const document = useMemo(
-    () => assertPaperDocument(selectedFixture.paper),
-    [selectedFixture],
-  );
-  return (
-    <ResolvedEditorPage
-      key={`fixture:${selectedFixture.id}`}
-      document={document}
-      documentKey={`fixture:${selectedFixture.id}`}
     />
   );
 }
@@ -159,11 +159,9 @@ function DemoEditorPage() {
 function ResolvedEditorPage({
   document,
   answerDocument,
-  documentKey,
 }: {
   document: PaperDocument;
   answerDocument?: PaperAnswerDocument;
-  documentKey: string;
 }) {
   const rendererResult = useMemo(
     () => getPaperFormatRendererResult(document.format.id),
@@ -179,8 +177,8 @@ function ResolvedEditorPage({
       document={document}
       answerDocument={answerDocument}
       renderer={rendererResult.renderer}
-      selectedFixtureId={documentKey}
-      persisted={!documentKey.startsWith('fixture:')}
+      selectedFixtureId={document.paper.id}
+      persisted
     />
   );
 }
@@ -400,20 +398,33 @@ function EditorPageWorkspace({
         data-editor-chrome
         className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-3 border-b bg-background px-4 py-2 max-lg:flex-col max-lg:items-start"
       >
-        <div className="min-w-0">
-          <p className="text-sm font-semibold leading-5">{view.title}</p>
-          <p className="text-xs text-muted-foreground">
-            {view.paperMeta.join(' · ')}
-          </p>
+        <div className="flex min-w-0 items-center gap-3">
+          <Link
+            to="/generate"
+            aria-label="Back to paper setup"
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'sm' }),
+              'h-8 shrink-0 border-slate-300 bg-secondary/50 px-2.5 text-xs text-slate-700 hover:bg-secondary hover:text-foreground focus-visible:ring-offset-2',
+            )}
+          >
+            <ArrowLeft className="mr-1.5 size-3.5" />
+            <span className="max-sm:hidden">Back to setup</span>
+            <span className="sm:hidden">Setup</span>
+          </Link>
+          <div
+            className="h-6 w-px bg-border max-sm:hidden"
+            aria-hidden="true"
+          />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold leading-5">
+              {view.title}
+            </p>
+            <p className="truncate text-xs text-muted-foreground">
+              {view.paperMeta.join(' · ')}
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <Link
-            to={persisted ? '/editor' : '/generate'}
-            className={buttonVariants({ variant: 'outline', size: 'sm' })}
-          >
-            <ArrowLeftRight className="mr-2 size-4" />
-            {persisted ? 'Current demo' : 'Generate live paper'}
-          </Link>
           <EditorActionBar
             persisted={persisted}
             dirty={dirty}
@@ -896,36 +907,63 @@ function EditorPageWorkspace({
                                     (region) => (
                                       <div
                                         key={`${slot.slotId}:${region.regionKey}:${slot.questionBlockTree.questionId}:${slot.modifiedFromSource}`}
-                                        className="qpg-question-region flex items-start gap-1"
                                       >
-                                        {region.displayPrefix && (
-                                          <span className="qpg-question-region-prefix select-none font-medium">
-                                            {region.displayPrefix}
-                                          </span>
+                                        {shouldShowInternalChoiceDivider(
+                                          region,
+                                        ) && (
+                                          <div
+                                            data-editor-chrome
+                                            className="qpg-internal-choice-divider qpg-in-question-choice-divider"
+                                          >
+                                            OR
+                                          </div>
                                         )}
-                                        <div className="min-w-0 flex-1">
-                                          <QuestionRegionEditor
-                                            region={region}
-                                            editable={
-                                              selectedSlotId === slot.slotId &&
-                                              region.editable &&
-                                              slot.editCapabilities.editText
-                                            }
-                                            onCommit={(content) =>
-                                              handleRegionChange(
-                                                slot.slotId,
-                                                region.regionKey,
-                                                region.content,
-                                                content,
-                                              )
-                                            }
-                                          />
+                                        <div
+                                          className={cn(
+                                            'qpg-question-region flex items-start gap-1',
+                                            region.blockType ===
+                                              'internalChoiceBlock' &&
+                                              'qpg-question-region-internal-choice',
+                                            startsInternalChoiceGroup(region) &&
+                                              'qpg-question-choice-group-start',
+                                            region.blockType ===
+                                              'subQuestionBlock' &&
+                                              'qpg-question-region-subquestion',
+                                            region.blockType ===
+                                              'mcqOptionBlock' &&
+                                              'qpg-question-region-option',
+                                          )}
+                                        >
+                                          {region.displayPrefix && (
+                                            <span className="qpg-question-region-prefix select-none font-medium">
+                                              {region.displayPrefix}
+                                            </span>
+                                          )}
+                                          <div className="min-w-0 flex-1">
+                                            <QuestionRegionEditor
+                                              region={region}
+                                              editable={
+                                                selectedSlotId ===
+                                                  slot.slotId &&
+                                                region.editable &&
+                                                slot.editCapabilities.editText
+                                              }
+                                              onCommit={(content) =>
+                                                handleRegionChange(
+                                                  slot.slotId,
+                                                  region.regionKey,
+                                                  region.content,
+                                                  content,
+                                                )
+                                              }
+                                            />
+                                          </div>
+                                          {region.displaySuffix && (
+                                            <span className="qpg-question-region-suffix select-none">
+                                              {region.displaySuffix}
+                                            </span>
+                                          )}
                                         </div>
-                                        {region.displaySuffix && (
-                                          <span className="qpg-question-region-suffix select-none">
-                                            {region.displaySuffix}
-                                          </span>
-                                        )}
                                       </div>
                                     ),
                                   )}

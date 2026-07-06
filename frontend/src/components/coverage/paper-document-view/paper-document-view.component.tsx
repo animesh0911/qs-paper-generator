@@ -15,6 +15,7 @@
  * @module PaperDocumentView
  */
 import { Fragment, useMemo } from 'react';
+import { MathText } from '@/components/math/math-content.component';
 import { MathExpression } from '@/components/math/math-expression.component';
 import { LatexText } from '@/components/math/latex-text.component';
 import { latexHasMath } from '@/components/math/latex';
@@ -417,13 +418,17 @@ function QuestionContent({
 }) {
   const overrides = slot.overrides?.regions ?? {};
   const fallbackStem = [{ type: 'paragraph', text: question.rawText }];
+  const stem = trimRegionBeforeStructuredSubparts(
+    overrides.stem ?? question.content.stem ?? fallbackStem,
+    question.content.subparts,
+  );
 
   return (
     <>
       {renderRegion('passage', question.content.passage, overrides)}
       {renderRegion('assertion', question.content.assertion, overrides)}
       {renderRegion('reason', question.content.reason, overrides)}
-      {renderRegion('stem', question.content.stem ?? fallbackStem, overrides)}
+      {renderRegion('stem', stem, {})}
       {question.content.options && (
         <ol
           className={
@@ -555,6 +560,43 @@ function renderRegion(
   return <PaperContentItems items={content} />;
 }
 
+function trimRegionBeforeStructuredSubparts(
+  items: ContentItem[],
+  subparts: SubQuestion[] | undefined,
+): ContentItem[] {
+  const firstLabel = subparts?.[0]?.label;
+  if (!firstLabel) return items;
+
+  const markerPattern = new RegExp(
+    String.raw`(?:^|\s)(?:\(${escapeRegExp(firstLabel)}\)|${escapeRegExp(firstLabel)}\.)\s+`,
+    'i',
+  );
+  const nextItems: ContentItem[] = [];
+
+  for (const item of items) {
+    if (!item.text) {
+      nextItems.push(item);
+      continue;
+    }
+
+    const marker = item.text.search(markerPattern);
+    if (marker === -1) {
+      nextItems.push(item);
+      continue;
+    }
+
+    const text = item.text.slice(0, marker).trim();
+    if (text) nextItems.push({ ...item, text });
+    break;
+  }
+
+  return nextItems.length > 0 ? nextItems : items;
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function PaperContentItems({ items }: { items: ContentItem[] }) {
   return (
     <>
@@ -603,7 +645,11 @@ function PaperContentItem({ item }: { item: ContentItem }) {
     );
   }
 
-  return <p>{contentItemToText(item)}</p>;
+  return (
+    <p>
+      <MathText text={contentItemToText(item)} />
+    </p>
+  );
 }
 
 function contentItemToText(item: ContentItem) {

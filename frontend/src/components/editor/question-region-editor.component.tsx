@@ -30,14 +30,22 @@ export function QuestionRegionEditor({
   onCommit: (content: ContentItem[]) => void;
 }) {
   if (!editable) {
-    return (
-      <div className="qpg-question-blocknote qpg-question-region-text">
-        <MathContent items={region.content} />
-      </div>
-    );
+    return <ReadonlyQuestionRegionContent items={region.content} />;
   }
 
   return <ActiveQuestionRegionEditor region={region} onCommit={onCommit} />;
+}
+
+function ReadonlyQuestionRegionContent({ items }: { items: ContentItem[] }) {
+  return (
+    <div className="qpg-question-blocknote qpg-question-region-text">
+      {items.map((item, index) => (
+        <div key={index} className="qpg-question-region-paragraph">
+          <MathContent items={[item]} />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function ActiveQuestionRegionEditor({
