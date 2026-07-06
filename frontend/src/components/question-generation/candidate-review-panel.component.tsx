@@ -64,19 +64,15 @@ export function CandidateReviewPanel({
   }
 
   return (
-    <div className="border-t pt-4 space-y-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+    <div className="border-t pt-5 space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <h2 className="font-medium">Review generated Q&amp;A</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {candidates.length} candidate{candidates.length === 1 ? '' : 's'} passed
-            validation and {candidates.length === 1 ? 'is' : 'are'} shown for teacher
-            review. Answers are visible by default. All candidates are accepted locally
-            until you reject them; the final import sends only accepted candidates to
-            the Question bank.
+          <p className="text-sm text-muted-foreground">
+            {candidates.length} candidate{candidates.length === 1 ? '' : 's'} ready
           </p>
         </div>
-        <div className="rounded-md border px-3 py-2 text-sm">
+        <div className="inline-flex w-fit rounded-md border bg-background px-3 py-2 text-sm">
           <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}
           <span className="font-medium">{reviewCounts.rejected}</span> rejected
         </div>
@@ -104,7 +100,7 @@ export function CandidateReviewPanel({
 
       {!candidatesLoading && !candidatesError && candidates.length > 0 && (
         <ul
-          className="max-h-[64vh] overflow-y-auto rounded-md border"
+          className="max-h-[64vh] overflow-y-auto rounded-md border bg-background"
           aria-label="Generated Q&A candidates"
         >
           {candidates.map((candidate) => {
@@ -183,7 +179,7 @@ export function CandidateReviewPanel({
         </div>
       )}
 
-      <div className="sticky bottom-0 -mx-6 border-t bg-background/95 px-6 py-4 shadow-lg backdrop-blur">
+      <div className="sticky bottom-0 -mx-5 border-t bg-background/95 px-5 py-4 shadow-lg backdrop-blur sm:-mx-6 sm:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm">
             <span className="font-medium">{reviewCounts.accepted}</span> accepted ·{' '}

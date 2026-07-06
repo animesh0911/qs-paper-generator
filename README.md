@@ -1,6 +1,6 @@
-# Question Paper Generator
+# Exam Desk
 
-CBSE Class 10 Science question paper generator. See [`PLAN.md`](PLAN.md) for the
+Exam Desk. See [`PLAN.md`](PLAN.md) for the
 design and [`PRD.md`](PRD.md) for the product requirements.
 
 ## Slice 1 — Walking skeleton

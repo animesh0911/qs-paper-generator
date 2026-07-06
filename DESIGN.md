@@ -1,5 +1,5 @@
 ---
-name: Question Paper Generator
+name: Exam Desk
 description: A quiet exam-paper review workspace for CBSE teachers.
 colors:
   background: "#ffffff"
@@ -44,7 +44,7 @@ components:
     rounded: "{rounded.md}"
 ---
 
-# Design System: Question Paper Generator
+# Design System: Exam Desk
 
 ## 1. Overview
 

@@ -402,6 +402,15 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).not.toContain('%');
   });
 
+  it('uses the same wide workspace as the AI Q&A setup screen', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace {...progressProps()} />,
+    );
+
+    expect(html).toContain('max-w-6xl');
+    expect(html).not.toContain('max-w-3xl');
+  });
+
   it('renders ready-for-review candidates with visible answers and counts', () => {
     const html = renderToStaticMarkup(
       <GenerationProgressWorkspace
@@ -419,9 +428,8 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain('Review generated Q&amp;A');
     expect(html).toContain('Ready to review');
     expect(html).not.toContain('Q&amp;A generation is in progress');
-    expect(html).toContain(
-      '1 candidate passed validation and is shown for teacher review',
-    );
+    expect(html).toContain('1 candidate ready');
+    expect(html).not.toContain('passed validation and is shown for teacher review');
     expect(html).toContain('1</span> accepted');
     expect(html).toContain('0</span> rejected');
     expect(html).toContain('Which process releases energy from glucose?');
@@ -435,6 +443,8 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).not.toContain('NCERT p. 84');
     expect(html).toContain('Reject');
     expect(html).toContain('Import accepted Q&amp;A');
+    expect(html).toContain('last:border-b-0');
+    expect(html).not.toContain('lg:grid-cols-2');
     expect(html).toMatch(
       /<button(?![^>]*disabled="")[^>]*>Import accepted Q&amp;A<\/button>/,
     );

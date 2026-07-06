@@ -10,7 +10,7 @@ CBSE-affiliated school teachers and content administrators use this tool during 
 
 ## Product Purpose
 
-Question Paper Generator helps a teacher start from a near-finished, CBSE-style draft instead of a blank document. It assembles a `PaperDocumentV1` from verified Questions, presents it in an editable review workspace, and exports final paper artifacts after teacher approval. Success means the teacher can trust the paper structure, marks, source fidelity, and final print formatting while still retaining full editorial control.
+Exam Desk helps a teacher start from a near-finished, CBSE-style draft instead of a blank document. It assembles a `PaperDocumentV1` from verified Questions, presents it in an editable review workspace, and exports final paper artifacts after teacher approval. Success means the teacher can trust the paper structure, marks, source fidelity, and final print formatting while still retaining full editorial control.
 
 ## Brand Personality
 

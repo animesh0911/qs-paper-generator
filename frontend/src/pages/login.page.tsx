@@ -49,7 +49,7 @@ export default function Login() {
             {mode === 'login' ? 'Sign in' : 'Create account'}
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Question Paper Generator — Class 10 Science
+            Exam Desk — Class 10 Science
           </p>
         </CardHeader>
         <CardContent>

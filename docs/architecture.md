@@ -1,6 +1,6 @@
 # Architecture
 
-How the question paper generator hangs together. Read this first if you're new to the codebase.
+How the Exam Desk hangs together. Read this first if you're new to the codebase.
 
 > Visual diagrams (Mermaid): [`architecture-diagrams.md`](architecture-diagrams.md).
 

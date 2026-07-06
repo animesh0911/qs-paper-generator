@@ -1,6 +1,6 @@
 # Commands
 
-Reference for building, running, and operating the Question Paper Generator
+Reference for building, running, and operating the Exam Desk
 locally. All paths are relative to the repo root unless noted.
 
 The whole stack runs in Docker Compose. Three services:

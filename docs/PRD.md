@@ -1,4 +1,4 @@
-# PRD: Question Paper Generator — CBSE Class 10 Science (MVP)
+# PRD: Exam Desk — CBSE Class 10 Science (MVP)
 
 ## Problem Statement
 

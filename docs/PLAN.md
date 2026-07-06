@@ -1,4 +1,4 @@
-# Question Paper Generator — Product & Build Plan
+# Exam Desk — Product & Build Plan
 
 _CBSE Class 10 Science · MVP · single school · stack-compatible with Apptension SaaS boilerplate_
 

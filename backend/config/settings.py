@@ -1,5 +1,5 @@
 """
-Django settings for the Question Paper Generator (Slice 1: walking skeleton).
+Django settings for the Exam Desk (Slice 1: walking skeleton).
 
 Configuration is driven by environment variables so the same image runs in
 Docker Compose and (later) in a hosted environment.

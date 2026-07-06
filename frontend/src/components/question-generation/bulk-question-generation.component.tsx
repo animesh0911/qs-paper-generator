@@ -635,7 +635,7 @@ export function GenerationProgressWorkspace({
 
   return (
     <div className="min-h-screen bg-secondary">
-      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-10">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-10">
         <div className="space-y-6 rounded-lg border border-white/70 bg-white/80 p-5 shadow-none backdrop-blur-2xl sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1.5">

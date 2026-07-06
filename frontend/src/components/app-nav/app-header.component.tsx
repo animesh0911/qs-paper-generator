@@ -87,7 +87,7 @@ export function AppHeader() {
             <p className="text-[0.625rem] font-medium uppercase tracking-wide text-muted-foreground">
               CBSE Class 10 Science
             </p>
-            <p className="text-sm font-semibold">Question Paper Generator</p>
+            <p className="text-sm font-semibold">Exam Desk</p>
           </Link>
           <div className="order-3 w-full sm:order-none sm:w-auto">
             <WorkflowNav />
