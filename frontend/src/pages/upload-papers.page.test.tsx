@@ -43,12 +43,13 @@ function baseState(
     loadingAnswers: false,
     generatingAnswers: false,
     answerGenerationError: '',
+    recentExtractedPapers: [],
     generateAnswers: vi.fn(),
+    generateAnswersForJob: vi.fn(),
     selectFile: vi.fn(),
     upload: vi.fn(),
     dismissJob: vi.fn(),
     retryJob: vi.fn(),
-    reset: vi.fn(),
     ...overrides,
   };
 }
@@ -96,6 +97,24 @@ function job(overrides: Partial<IngestionJob>): IngestionJob {
     error: '',
     created_at: '',
     updated_at: '',
+    ...overrides,
+  };
+}
+
+function extractedPaper(
+  extractedJob: IngestionJob,
+  parsedQuestions: BankQuestion[],
+  overrides: Partial<IngestionUploadState['recentExtractedPapers'][number]> = {},
+): IngestionUploadState['recentExtractedPapers'][number] {
+  return {
+    job: extractedJob,
+    parsedQuestions,
+    loadingQuestions: false,
+    answerJob: null,
+    generatedAnswers: [],
+    loadingAnswers: false,
+    generatingAnswers: false,
+    answerGenerationError: '',
     ...overrides,
   };
 }
@@ -222,32 +241,30 @@ describe('UploadPapersPage', () => {
     expect(html).not.toContain('Other uploads');
   });
 
-  it('lets the teacher start a new upload while a job is still processing', async () => {
-    // Extraction runs out-of-request and can sit in pending/running for a while.
-    // The progress card must not trap the teacher: without an escape hatch there
-    // is no visible upload control at all until the job settles.
-    const user = userEvent.setup();
-    const reset = vi.fn();
-    mockState = baseState({ job: job({ status: 'running' }), reset });
+  it('blocks parallel uploads while a job is still processing', () => {
+    mockState = baseState({ job: job({ status: 'running' }) });
+    const html = renderToStaticMarkup(<UploadPapersPage />);
 
-    render(<UploadPapersPage />);
-    await user.click(screen.getByRole('button', { name: /upload another/i }));
-
-    expect(reset).toHaveBeenCalledTimes(1);
+    expect(html).toContain('Extracting questions');
+    expect(html).not.toContain('Drop a PDF here');
+    expect(html).not.toContain('Upload another');
   });
 
-  it('keeps the upload screen minimal by showing a clickable extracted-question summary when a job is done', () => {
+  it('keeps the upload screen minimal by showing recent extracted-paper summaries', () => {
+    const doneJob = job({ status: 'done', created_count: 12, skipped_count: 3 });
+    const questions = [
+      question({}),
+      question({ id: 2, text: 'Name one strong acid.' }),
+    ];
     mockState = baseState({
-      job: job({ status: 'done', created_count: 12, skipped_count: 3 }),
-      parsedQuestions: [
-        question({}),
-        question({ id: 2, text: 'Name one strong acid.' }),
-      ],
+      job: doneJob,
+      recentExtractedPapers: [extractedPaper(doneJob, questions)],
     });
     const html = renderToStaticMarkup(<UploadPapersPage />);
 
-    expect(html).toContain('Added 12 questions to your bank');
-    expect(html).toContain('3 questions were skipped');
+    expect(html).toContain('Recent extracted papers');
+    expect(html).toContain('12 questions extracted');
+    expect(html).toContain('3 skipped');
     expect(html).toContain('Extracted questions');
     expect(html).not.toContain('2 questions grouped across 1 chapter');
     expect(html).not.toContain(
@@ -255,41 +272,44 @@ describe('UploadPapersPage', () => {
     );
     expect(html).not.toContain('What is the colour of litmus in acid?');
     expect(html).not.toContain('Name one strong acid.');
-    expect(html).toContain('Upload another');
+    expect(html).toContain('Drop a PDF here');
+    expect(html).not.toContain('Upload another');
   });
 
   it('opens the chapter-grouped extracted question screen from the review summary', async () => {
     const user = userEvent.setup();
-    mockState = baseState({
-      job: job({ status: 'done', created_count: 12, skipped_count: 3 }),
-      parsedQuestions: [
-        question({}),
-        question({
+    const doneJob = job({ status: 'done', created_count: 12, skipped_count: 3 });
+    const questions = [
+      question({}),
+      question({
+        id: 2,
+        text: 'Name one strong acid.',
+        topic_names: ['Acids'],
+        parse_quality: 'partial',
+        review_flags: ['mcq_too_few_options'],
+      }),
+      question({
+        id: 3,
+        text: 'State Ohm’s law.',
+        content: {
+          stem: [
+            { type: 'paragraph', text: 'State Ohm’s law: ' },
+            { type: 'equation', latex: 'V = IR' },
+          ],
+        },
+        topic_names: ['Acids'],
+        chapter: {
           id: 2,
-          text: 'Name one strong acid.',
-          topic_names: ['Acids'],
-          parse_quality: 'partial',
-          review_flags: ['mcq_too_few_options'],
-        }),
-        question({
-          id: 3,
-          text: 'State Ohm’s law.',
-          content: {
-            stem: [
-              { type: 'paragraph', text: 'State Ohm’s law: ' },
-              { type: 'equation', latex: 'V = IR' },
-            ],
-          },
-          topic_names: ['Acids'],
-          chapter: {
-            id: 2,
-            slug: 'electricity',
-            name: 'Electricity',
-            order: 12,
-            subject_area: 'Physics',
-          },
-        }),
-      ],
+          slug: 'electricity',
+          name: 'Electricity',
+          order: 12,
+          subject_area: 'Physics',
+        },
+      }),
+    ];
+    mockState = baseState({
+      job: doneJob,
+      recentExtractedPapers: [extractedPaper(doneJob, questions)],
     });
 
     render(<UploadPapersPage />);
@@ -322,17 +342,19 @@ describe('UploadPapersPage', () => {
 
   it('typesets raw extracted LaTeX and shows MCQ options in the review dialog', async () => {
     const user = userEvent.setup();
+    const doneJob = job({ status: 'done', created_count: 1 });
+    const questions = [
+      question({
+        text: 'Consider $$p\\,\\text{Al} + q\\,\\text{H}_2\\text{O} \\longrightarrow r\\,\\text{Al}_2\\text{O}_3 + s\\,\\text{H}_2$$',
+        options: [
+          { label: 'A', text: '$p=2$' },
+          { label: 'B', text: '$p=4$' },
+        ],
+      }),
+    ];
     mockState = baseState({
-      job: job({ status: 'done', created_count: 1 }),
-      parsedQuestions: [
-        question({
-          text: 'Consider $$p\\,\\text{Al} + q\\,\\text{H}_2\\text{O} \\longrightarrow r\\,\\text{Al}_2\\text{O}_3 + s\\,\\text{H}_2$$',
-          options: [
-            { label: 'A', text: '$p=2$' },
-            { label: 'B', text: '$p=4$' },
-          ],
-        }),
-      ],
+      job: doneJob,
+      recentExtractedPapers: [extractedPaper(doneJob, questions)],
     });
 
     render(<UploadPapersPage />);
@@ -348,11 +370,12 @@ describe('UploadPapersPage', () => {
 
   it('offers optional answer generation after extracted questions are shown', async () => {
     const user = userEvent.setup();
-    const generateAnswers = vi.fn();
+    const generateAnswersForJob = vi.fn();
+    const doneJob = job({ status: 'done', created_count: 1 });
     mockState = baseState({
-      job: job({ status: 'done', created_count: 1 }),
-      parsedQuestions: [question({})],
-      generateAnswers,
+      job: doneJob,
+      recentExtractedPapers: [extractedPaper(doneJob, [question({})])],
+      generateAnswersForJob,
     });
 
     render(<UploadPapersPage />);
@@ -362,31 +385,37 @@ describe('UploadPapersPage', () => {
     expect(screen.queryByText(/auto-save ai answers/i)).toBeNull();
     await user.click(button);
 
-    expect(generateAnswers).toHaveBeenCalledTimes(1);
+    expect(generateAnswersForJob).toHaveBeenCalledWith(1);
   });
 
   it('shows generated answers inside the extracted question review', async () => {
     const user = userEvent.setup();
-    mockState = baseState({
-      job: job({ status: 'done', created_count: 1 }),
-      parsedQuestions: [question({ id: 7 })],
-      answerJob: {
-        id: 3,
-        ingestion_job_id: 1,
-        status: 'done',
-        total_count: 1,
-        generated_count: 1,
-        skipped_count: 0,
-        error: '',
-        created_at: '',
-        updated_at: '',
+    const doneJob = job({ status: 'done', created_count: 1 });
+    const answerJob = {
+      id: 3,
+      ingestion_job_id: 1,
+      status: 'done' as const,
+      total_count: 1,
+      generated_count: 1,
+      skipped_count: 0,
+      error: '',
+      created_at: '',
+      updated_at: '',
+    };
+    const generatedAnswers = [
+      {
+        question_id: 7,
+        answer: 'Litmus turns red in an acidic solution.',
+        answer_source: 'generated_unverified' as const,
       },
-      generatedAnswers: [
-        {
-          question_id: 7,
-          answer: 'Litmus turns red in an acidic solution.',
-          answer_source: 'generated_unverified',
-        },
+    ];
+    mockState = baseState({
+      job: doneJob,
+      recentExtractedPapers: [
+        extractedPaper(doneJob, [question({ id: 7 })], {
+          answerJob,
+          generatedAnswers,
+        }),
       ],
     });
 
@@ -395,7 +424,7 @@ describe('UploadPapersPage', () => {
       screen.getByRole('button', { name: /review extracted questions/i }),
     );
 
-    expect(screen.getByText('AI draft answer · auto-saved')).toBeTruthy();
+    expect(screen.getByText('AI generated answer')).toBeTruthy();
     expect(
       screen.getByText('Litmus turns red in an acidic solution.'),
     ).toBeTruthy();
@@ -409,6 +438,7 @@ describe('UploadPapersPage', () => {
 
     expect(html).toContain('Extraction failed');
     expect(html).toContain('Unreadable scan');
-    expect(html).toContain('Try another upload');
+    expect(html).toContain('Drop a PDF here');
+    expect(html).not.toContain('Try another upload');
   });
 });

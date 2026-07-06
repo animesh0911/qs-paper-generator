@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from django.core.cache import cache
 from django.core.management import call_command
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -79,6 +80,32 @@ def _create_batch(api_client, *, chapter_slugs=None, chapter_map_node_ids=None):
         payload,
         format="json",
     )
+
+
+def test_generation_polling_does_not_throttle_generate_sources(api_client, user, settings):
+    """Background generation polling must not block the Generate source picker."""
+    settings.REST_FRAMEWORK = {
+        **settings.REST_FRAMEWORK,
+        "DEFAULT_THROTTLE_RATES": {
+            **settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"],
+            "user": "2/min",
+        },
+    }
+    cache.clear()
+    GenerationBatch.objects.create(
+        created_by=user,
+        school=user.school,
+        status=GenerationBatchStatus.GENERATING_QUESTIONS,
+        difficulty_preset="balanced",
+        requested_count=2,
+    )
+
+    assert api_client.get("/api/bank/generation-batches/").status_code == 200
+    assert api_client.get("/api/bank/generation-batches/").status_code == 200
+
+    resp = api_client.get("/api/bank/sources/")
+
+    assert resp.status_code == 200
 
 
 def _create_grounded_topic(*, empty=False):

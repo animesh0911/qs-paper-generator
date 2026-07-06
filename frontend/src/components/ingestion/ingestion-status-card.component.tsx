@@ -37,7 +37,6 @@ interface IngestionStatusCardProps {
   generatingAnswers: boolean;
   answerGenerationError: string;
   onGenerateAnswers: () => void;
-  onUploadAnother: () => void;
   onGeneratePaper: () => void;
 }
 
@@ -144,7 +143,7 @@ function ExtractedQuestionsPanel({
       className="overflow-hidden rounded-lg border border-input bg-background"
       aria-labelledby="extracted-questions-heading"
     >
-      <div className="flex flex-col gap-2 border-b border-input bg-secondary/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 border-b border-input bg-secondary/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div>
           <h3 id="extracted-questions-heading" className="text-sm font-medium">
             Extracted questions
@@ -168,7 +167,7 @@ function ExtractedQuestionsPanel({
             key={group.key}
             className="border-b border-input last:border-b-0"
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-input bg-background/95 px-4 py-2 backdrop-blur">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-input bg-background/95 px-4 py-2.5 backdrop-blur sm:px-5">
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-foreground">
                   {group.label}
@@ -191,12 +190,12 @@ function ExtractedQuestionsPanel({
               aria-label={`${group.label} questions`}
             >
               {group.questions.map((question, index) => (
-                <li key={question.id} className="px-4 py-3">
-                  <div className="flex gap-3">
-                    <span className="mt-0.5 w-7 shrink-0 text-xs tabular-nums text-muted-foreground">
+                <li key={question.id} className="px-4 py-4 sm:px-5">
+                  <div className="flex gap-3.5">
+                    <span className="mt-1 w-7 shrink-0 text-xs tabular-nums text-muted-foreground">
                       {index + 1}.
                     </span>
-                    <div className="min-w-0 flex-1 space-y-2">
+                    <div className="min-w-0 flex-1 space-y-2.5">
                       <div className="break-words text-sm leading-6 text-foreground">
                         <QuestionText question={question} />
                       </div>
@@ -216,16 +215,21 @@ function ExtractedQuestionsPanel({
                         </ol>
                       )}
                       {answersByQuestionId.has(question.id) && (
-                        <div className="rounded-md border border-input bg-secondary/50 px-3 py-2 text-sm leading-6">
-                          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                            AI draft answer · auto-saved
+                        <div className="rounded-md border border-input bg-secondary/40 px-3.5 py-3 text-sm leading-6">
+                          <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                            AI generated answer
                           </p>
-                          <p className="whitespace-pre-wrap text-foreground">
-                            {answersByQuestionId.get(question.id)?.answer}
-                          </p>
+                          <div className="whitespace-pre-wrap text-foreground">
+                            <MathText
+                              text={
+                                answersByQuestionId.get(question.id)?.answer ??
+                                ''
+                              }
+                            />
+                          </div>
                         </div>
                       )}
-                      <div className="flex flex-wrap gap-1.5 text-xs leading-5">
+                      <div className="flex flex-wrap gap-1.5 pt-0.5 text-xs leading-5">
                         <span className="rounded border border-input bg-secondary px-1.5 py-0.5 text-secondary-foreground">
                           Section {question.section}
                         </span>
@@ -329,6 +333,7 @@ function ExtractedQuestionsDialog({
   onClose: () => void;
 }) {
   const titleId = useId();
+  const descriptionId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -376,13 +381,20 @@ function ExtractedQuestionsDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        aria-describedby={descriptionId}
         className="flex max-h-[calc(100vh-3rem)] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-input bg-background shadow-lg sm:max-h-[calc(100vh-5rem)]"
       >
-        <div className="flex items-center justify-between gap-4 border-b border-input px-4 py-3.5 sm:px-5">
-          <div className="min-w-0">
+        <div className="flex items-center justify-between gap-4 border-b border-input px-4 py-4 sm:px-5">
+          <div className="min-w-0 space-y-0.5">
             <h2 id={titleId} className="text-base font-semibold leading-6">
               Extracted questions
             </h2>
+            <p
+              id={descriptionId}
+              className="text-xs leading-5 text-muted-foreground"
+            >
+              Review parsed questions and generated answers before creating a paper.
+            </p>
           </div>
           <button
             ref={closeButtonRef}
@@ -401,6 +413,101 @@ function ExtractedQuestionsDialog({
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+export function ExtractedPaperReviewCard({
+  job,
+  parsedQuestions,
+  loadingQuestions,
+  answerJob,
+  generatedAnswers,
+  loadingAnswers,
+  generatingAnswers,
+  answerGenerationError,
+  onGenerateAnswers,
+}: {
+  job: IngestionJob;
+  parsedQuestions: BankQuestion[];
+  loadingQuestions: boolean;
+  answerJob: AnswerGenerationJob | null;
+  generatedAnswers: GeneratedAnswer[];
+  loadingAnswers: boolean;
+  generatingAnswers: boolean;
+  answerGenerationError: string;
+  onGenerateAnswers: () => void;
+}) {
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const reviewTriggerRef = useRef<HTMLElement | null>(null);
+  const answersByQuestionId = new Map(
+    generatedAnswers.map((answer) => [answer.question_id, answer]),
+  );
+
+  function openReview() {
+    reviewTriggerRef.current = document.activeElement as HTMLElement | null;
+    setReviewOpen(true);
+  }
+
+  function closeReview() {
+    setReviewOpen(false);
+    window.setTimeout(() => reviewTriggerRef.current?.focus(), 0);
+  }
+
+  return (
+    <div className="rounded-lg border border-input bg-background px-4 py-3.5 sm:px-5">
+      <div className="mb-3 flex items-start gap-3 border-b border-input pb-3">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-secondary text-foreground">
+          <FileText className="size-4" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <p className="truncate text-sm font-medium leading-5">
+            {job.source_file_name || 'Uploaded PDF'}
+          </p>
+          <p className="text-xs leading-5 text-muted-foreground">
+            {job.created_count === 1
+              ? '1 question extracted'
+              : `${job.created_count} questions extracted`}
+            {job.skipped_count > 0
+              ? ` · ${job.skipped_count} skipped`
+              : ''}
+          </p>
+        </div>
+      </div>
+
+      {loadingQuestions ? (
+        <p className="rounded-md border border-input bg-secondary/40 px-3 py-2 text-sm text-muted-foreground">
+          Loading extracted questions…
+        </p>
+      ) : parsedQuestions.length > 0 ? (
+        <>
+          <ExtractedQuestionsSummary
+            questions={parsedQuestions}
+            onOpen={openReview}
+            action={
+              <AnswerGenerationPanel
+                answerJob={answerJob}
+                generatedAnswers={generatedAnswers}
+                loadingAnswers={loadingAnswers}
+                generatingAnswers={generatingAnswers}
+                answerGenerationError={answerGenerationError}
+                questionCount={parsedQuestions.length}
+                onGenerateAnswers={onGenerateAnswers}
+              />
+            }
+          />
+          <ExtractedQuestionsDialog
+            questions={parsedQuestions}
+            answersByQuestionId={answersByQuestionId}
+            open={reviewOpen}
+            onClose={closeReview}
+          />
+        </>
+      ) : (
+        <p className="rounded-md border border-input bg-secondary/40 px-3 py-2 text-sm text-muted-foreground">
+          The questions are in your bank.
+        </p>
+      )}
     </div>
   );
 }
@@ -430,7 +537,7 @@ function AnswerGenerationPanel({
   const totalCount = answerJob?.total_count ?? questionCount;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <Button
         type="button"
         size="sm"
@@ -442,20 +549,42 @@ function AnswerGenerationPanel({
         className="h-9 w-full bg-background"
       >
         {generatingAnswers
-          ? 'Queuing…'
+          ? 'Queuing answers…'
           : done
             ? 'Answers saved'
             : failed
               ? 'Try again'
               : 'Generate answers'}
       </Button>
-      {loadingAnswers && (
-        <p className="text-xs text-muted-foreground">Checking status…</p>
-      )}
-      {inProgress && (
-        <p className="text-xs text-muted-foreground" aria-live="polite">
-          Saving {generatedCount} of {totalCount}.
-        </p>
+      {(loadingAnswers || inProgress) && (
+        <div
+          className="rounded-md border border-input bg-secondary/50 px-2.5 py-2"
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-2 text-xs font-medium text-foreground">
+            <LoaderCircle
+              className="size-3.5 shrink-0 motion-safe:animate-spin"
+              aria-hidden="true"
+            />
+            <span>
+              {inProgress ? 'Generating answers' : 'Checking answer status'}
+            </span>
+            <span className="flex items-center gap-0.5" aria-hidden="true">
+              {[0, 1, 2].map((index) => (
+                <span
+                  key={index}
+                  className="size-1 rounded-full bg-foreground/50 motion-safe:animate-pulse"
+                  style={{ animationDelay: `${index * 140}ms` }}
+                />
+              ))}
+            </span>
+          </div>
+          <p className="mt-1 text-xs leading-4 text-muted-foreground">
+            {inProgress
+              ? `Creating model answers for ${totalCount} questions. They’ll appear in review when saved.`
+              : 'Looking for any answers already saved for this upload.'}
+          </p>
+        </div>
       )}
       {done && (
         <p className="text-xs text-muted-foreground" aria-live="polite">
@@ -487,7 +616,6 @@ export function IngestionStatusCard({
   generatingAnswers,
   answerGenerationError,
   onGenerateAnswers,
-  onUploadAnother,
   onGeneratePaper,
 }: IngestionStatusCardProps) {
   const fileName = job.source_file_name || 'Uploaded PDF';
@@ -567,21 +695,6 @@ export function IngestionStatusCard({
         </div>
       )}
 
-      {inProgress && (
-        // Extraction runs out-of-request, so a teacher shouldn't have to wait for
-        // it to finish before queuing the next PDF. Without this the progress
-        // card is a dead end — the only way back to the picker — leaving no
-        // visible upload control while a job is pending/running.
-        <Button
-          size="lg"
-          variant="outline"
-          className="w-full sm:w-auto"
-          onClick={onUploadAnother}
-        >
-          Upload another
-        </Button>
-      )}
-
       {job.status === 'done' && (
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-lg border border-input bg-secondary/50 px-4 py-4">
@@ -647,9 +760,6 @@ export function IngestionStatusCard({
             <Button size="lg" onClick={onGeneratePaper}>
               Generate a paper
             </Button>
-            <Button size="lg" variant="outline" onClick={onUploadAnother}>
-              Upload another
-            </Button>
           </div>
         </div>
       )}
@@ -671,14 +781,6 @@ export function IngestionStatusCard({
               </p>
             </div>
           </div>
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-full sm:w-auto"
-            onClick={onUploadAnother}
-          >
-            Try another upload
-          </Button>
         </div>
       )}
     </div>

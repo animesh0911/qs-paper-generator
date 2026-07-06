@@ -4,8 +4,8 @@
  * Flow: a teacher picks a PDF (validated client-side), then `upload()` POSTs it
  * and receives a queued `IngestionJob` (HTTP 202). The
  * extraction runs out-of-request (cron), so the hook polls the job until it
- * settles `done` / `failed`. `reset()` returns to the idle picker so the
- * teacher can upload another.
+ * settles `done` / `failed`. Returning to this route restores only active
+ * extraction work, so a completed upload does not block the next PDF.
  *
  * @module useIngestionUpload.hook
  */
@@ -27,6 +27,17 @@ import {
   uploadIngestionPdf,
 } from '@/lib/api';
 import { isIngestionTerminal, validatePdfFile } from '@/lib/ingestion';
+
+export interface ExtractedPaperReviewState {
+  job: IngestionJob;
+  parsedQuestions: BankQuestion[];
+  loadingQuestions: boolean;
+  answerJob: AnswerGenerationJob | null;
+  generatedAnswers: GeneratedAnswer[];
+  loadingAnswers: boolean;
+  generatingAnswers: boolean;
+  answerGenerationError: string;
+}
 
 export interface IngestionUploadState {
   file: File | null;
@@ -53,14 +64,15 @@ export interface IngestionUploadState {
   loadingAnswers: boolean;
   generatingAnswers: boolean;
   answerGenerationError: string;
+  recentExtractedPapers: ExtractedPaperReviewState[];
   generateAnswers: () => Promise<void>;
+  generateAnswersForJob: (jobId: number) => Promise<void>;
   selectFile: (file: File | null) => void;
   upload: () => Promise<void>;
   /** Remove a failed job from the queue strip. */
   dismissJob: (jobId: number) => Promise<void>;
   /** Re-queue a failed job so extraction runs again. */
   retryJob: (jobId: number) => Promise<void>;
-  reset: () => void;
 }
 
 export function useIngestionUpload(
@@ -82,25 +94,36 @@ export function useIngestionUpload(
   const [loadingAnswers, setLoadingAnswers] = useState(false);
   const [generatingAnswers, setGeneratingAnswers] = useState(false);
   const [answerGenerationError, setAnswerGenerationError] = useState('');
+  const [extractedPaperRecords, setExtractedPaperRecords] = useState<
+    Record<
+      number,
+      Omit<ExtractedPaperReviewState, 'job'> & {
+        questionsLoaded: boolean;
+        answersLoaded: boolean;
+      }
+    >
+  >({});
+  const [generatingAnswerJobIds, setGeneratingAnswerJobIds] = useState<
+    Set<number>
+  >(new Set());
   const jobId = job?.id;
   const settled = job ? isIngestionTerminal(job.status) : false;
   const polling = job != null && !settled;
 
-  // Restore the latest upload when the teacher returns to this page, including
-  // completed jobs. The header activity pill links back here after extraction;
-  // if we discard `done` jobs on mount, the teacher loses the extracted-question
-  // review and answer-generation actions. `reset()` suppresses this restore for
-  // the explicit "Upload another" escape hatch.
-  const suppressRestoreRef = useRef(false);
+  // Restore active extraction when the teacher returns to Upload PDF. Completed
+  // jobs have already landed in the bank, so they should not take over the page
+  // on refresh; the upload form is the right default once no extraction is live.
   useEffect(() => {
-    if (job || suppressRestoreRef.current) return;
+    if (job) return;
     let cancelled = false;
     fetchIngestionJobs()
       .then((jobs) => {
         if (cancelled) return;
         setRecentJobs(jobs);
-        const latest = jobs[0];
-        if (latest) setJob(latest);
+        const active = jobs.find(
+          (candidate) => !isIngestionTerminal(candidate.status),
+        );
+        if (active) setJob(active);
       })
       .catch(() => {
         // Non-fatal: the empty upload form still works if the recent-job list
@@ -186,9 +209,26 @@ export function useIngestionUpload(
   // can show exactly what was parsed (after extraction + validation finished).
   const isDone = job?.status === 'done';
   const answerJobStatus = answerJob?.status;
+  const recentExtractedJobs = [
+    ...(job?.status === 'done' ? [job] : []),
+    ...recentJobs.filter((candidate) => candidate.status === 'done'),
+  ]
+    .filter(
+      (candidate, index, all) =>
+        all.findIndex((item) => item.id === candidate.id) === index,
+    )
+    .slice(0, 3);
+  const recentExtractedJobIds = recentExtractedJobs
+    .map((candidate) => candidate.id)
+    .join(',');
+
   useEffect(() => {
     if (jobId == null || !isDone) return;
     let cancelled = false;
+    setParsedQuestions([]);
+    setAnswerJob(null);
+    setGeneratedAnswers([]);
+    setAnswerGenerationError('');
     setLoadingQuestions(true);
     setLoadingAnswers(true);
 
@@ -229,6 +269,125 @@ export function useIngestionUpload(
   }, [jobId, isDone]);
 
   useEffect(() => {
+    const jobsToLoad = recentExtractedJobs.filter((candidate) => {
+      const record = extractedPaperRecords[candidate.id];
+      return !record?.questionsLoaded || !record?.answersLoaded;
+    });
+    if (jobsToLoad.length === 0) return;
+
+    let cancelled = false;
+    for (const extractedJob of jobsToLoad) {
+      setExtractedPaperRecords((current) => ({
+        ...current,
+        [extractedJob.id]: {
+          parsedQuestions: current[extractedJob.id]?.parsedQuestions ?? [],
+          loadingQuestions: !current[extractedJob.id]?.questionsLoaded,
+          answerJob: current[extractedJob.id]?.answerJob ?? null,
+          generatedAnswers: current[extractedJob.id]?.generatedAnswers ?? [],
+          loadingAnswers: !current[extractedJob.id]?.answersLoaded,
+          generatingAnswers: generatingAnswerJobIds.has(extractedJob.id),
+          answerGenerationError:
+            current[extractedJob.id]?.answerGenerationError ?? '',
+          questionsLoaded: current[extractedJob.id]?.questionsLoaded ?? false,
+          answersLoaded: current[extractedJob.id]?.answersLoaded ?? false,
+        },
+      }));
+
+      Promise.resolve(fetchIngestionJobQuestions(extractedJob.id))
+        .then((questions) => {
+          if (cancelled) return;
+          setExtractedPaperRecords((current) => ({
+            ...current,
+            [extractedJob.id]: {
+              ...(current[extractedJob.id] ?? {
+                answerJob: null,
+                generatedAnswers: [],
+                loadingAnswers: false,
+                generatingAnswers: generatingAnswerJobIds.has(extractedJob.id),
+                answerGenerationError: '',
+                answersLoaded: false,
+              }),
+              parsedQuestions: questions ?? [],
+              loadingQuestions: false,
+              questionsLoaded: true,
+            },
+          }));
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setExtractedPaperRecords((current) => ({
+            ...current,
+            [extractedJob.id]: {
+              ...(current[extractedJob.id] ?? {
+                answerJob: null,
+                generatedAnswers: [],
+                loadingAnswers: false,
+                generatingAnswers: generatingAnswerJobIds.has(extractedJob.id),
+                answerGenerationError: '',
+                answersLoaded: false,
+              }),
+              parsedQuestions: [],
+              loadingQuestions: false,
+              questionsLoaded: true,
+            },
+          }));
+        });
+
+      Promise.resolve(fetchIngestionJobAnswers(extractedJob.id))
+        .then((answerState) => {
+          if (cancelled) return;
+          setExtractedPaperRecords((current) => ({
+            ...current,
+            [extractedJob.id]: {
+              ...(current[extractedJob.id] ?? {
+                parsedQuestions: [],
+                loadingQuestions: false,
+                questionsLoaded: false,
+              }),
+              answerJob: answerState?.job ?? null,
+              generatedAnswers: answerState?.answers ?? [],
+              loadingAnswers: false,
+              generatingAnswers: generatingAnswerJobIds.has(extractedJob.id),
+              answerGenerationError: '',
+              answersLoaded: true,
+            },
+          }));
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          setExtractedPaperRecords((current) => ({
+            ...current,
+            [extractedJob.id]: {
+              ...(current[extractedJob.id] ?? {
+                parsedQuestions: [],
+                loadingQuestions: false,
+                questionsLoaded: false,
+              }),
+              answerJob: null,
+              generatedAnswers: [],
+              loadingAnswers: false,
+              generatingAnswers: generatingAnswerJobIds.has(extractedJob.id),
+              answerGenerationError: (err as Error).message,
+              answersLoaded: true,
+            },
+          }));
+        });
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [recentExtractedJobIds]);
+
+  const recentAnswerPollJobIds = Object.entries(extractedPaperRecords)
+    .filter(([, record]) => {
+      const status = record.answerJob?.status;
+      return status === 'pending' || status === 'running';
+    })
+    .map(([id]) => id)
+    .join(',');
+
+  useEffect(() => {
     if (jobId == null || !answerJobStatus) return;
     if (answerJobStatus !== 'pending' && answerJobStatus !== 'running') return;
 
@@ -259,6 +418,66 @@ export function useIngestionUpload(
     };
   }, [answerJobStatus, jobId, pollIntervalMs]);
 
+  useEffect(() => {
+    const ids = recentAnswerPollJobIds
+      .split(',')
+      .filter(Boolean)
+      .map((id) => Number(id));
+    if (ids.length === 0) return;
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    async function pollRecentAnswers() {
+      await Promise.all(
+        ids.map(async (id) => {
+          try {
+            const next = await fetchIngestionJobAnswers(id);
+            if (cancelled) return;
+            setExtractedPaperRecords((current) => ({
+              ...current,
+              [id]: {
+                parsedQuestions: current[id]?.parsedQuestions ?? [],
+                loadingQuestions: current[id]?.loadingQuestions ?? false,
+                questionsLoaded: current[id]?.questionsLoaded ?? false,
+                answerJob: next.job,
+                generatedAnswers: next.answers,
+                loadingAnswers:
+                  next.job?.status === 'pending' || next.job?.status === 'running',
+                generatingAnswers: generatingAnswerJobIds.has(id),
+                answerGenerationError: '',
+                answersLoaded: true,
+              },
+            }));
+          } catch (err) {
+            if (cancelled) return;
+            setExtractedPaperRecords((current) => ({
+              ...current,
+              [id]: {
+                parsedQuestions: current[id]?.parsedQuestions ?? [],
+                loadingQuestions: current[id]?.loadingQuestions ?? false,
+                questionsLoaded: current[id]?.questionsLoaded ?? false,
+                answerJob: current[id]?.answerJob ?? null,
+                generatedAnswers: current[id]?.generatedAnswers ?? [],
+                loadingAnswers: false,
+                generatingAnswers: generatingAnswerJobIds.has(id),
+                answerGenerationError: (err as Error).message,
+                answersLoaded: current[id]?.answersLoaded ?? false,
+              },
+            }));
+          }
+        }),
+      );
+      if (!cancelled) timer = setTimeout(pollRecentAnswers, pollIntervalMs);
+    }
+
+    timer = setTimeout(pollRecentAnswers, pollIntervalMs);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [recentAnswerPollJobIds, pollIntervalMs]);
+
   function selectFile(next: File | null) {
     setUploadError('');
     if (!next) {
@@ -276,21 +495,93 @@ export function useIngestionUpload(
     setFile(next);
   }
 
-  async function generateAnswers() {
-    if (jobId == null || generatingAnswers) return;
-    setGeneratingAnswers(true);
-    setAnswerGenerationError('');
-    try {
-      const queued = await generateIngestionJobAnswers(jobId);
-      setAnswerJob(queued);
-      const answerState = await fetchIngestionJobAnswers(jobId);
-      setAnswerJob(answerState.job);
-      setGeneratedAnswers(answerState.answers);
-    } catch (err) {
-      setAnswerGenerationError((err as Error).message);
-    } finally {
-      setGeneratingAnswers(false);
+  async function generateAnswersForJob(targetJobId: number) {
+    if (generatingAnswerJobIds.has(targetJobId)) return;
+    setGeneratingAnswerJobIds((current) => new Set(current).add(targetJobId));
+    setExtractedPaperRecords((current) => ({
+      ...current,
+      [targetJobId]: {
+        parsedQuestions: current[targetJobId]?.parsedQuestions ?? [],
+        loadingQuestions: current[targetJobId]?.loadingQuestions ?? false,
+        answerJob: current[targetJobId]?.answerJob ?? null,
+        generatedAnswers: current[targetJobId]?.generatedAnswers ?? [],
+        loadingAnswers: true,
+        generatingAnswers: true,
+        answerGenerationError: '',
+        questionsLoaded: current[targetJobId]?.questionsLoaded ?? false,
+        answersLoaded: current[targetJobId]?.answersLoaded ?? false,
+      },
+    }));
+    if (targetJobId === jobId) {
+      setGeneratingAnswers(true);
+      setAnswerGenerationError('');
     }
+    try {
+      const queued = await generateIngestionJobAnswers(targetJobId);
+      setExtractedPaperRecords((current) => ({
+        ...current,
+        [targetJobId]: {
+          parsedQuestions: current[targetJobId]?.parsedQuestions ?? [],
+          loadingQuestions: current[targetJobId]?.loadingQuestions ?? false,
+          answerJob: queued,
+          generatedAnswers: current[targetJobId]?.generatedAnswers ?? [],
+          loadingAnswers: true,
+          generatingAnswers: true,
+          answerGenerationError: '',
+          questionsLoaded: current[targetJobId]?.questionsLoaded ?? false,
+          answersLoaded: current[targetJobId]?.answersLoaded ?? false,
+        },
+      }));
+      if (targetJobId === jobId) setAnswerJob(queued);
+      const answerState = await fetchIngestionJobAnswers(targetJobId);
+      setExtractedPaperRecords((current) => ({
+        ...current,
+        [targetJobId]: {
+          parsedQuestions: current[targetJobId]?.parsedQuestions ?? [],
+          loadingQuestions: current[targetJobId]?.loadingQuestions ?? false,
+          answerJob: answerState.job,
+          generatedAnswers: answerState.answers,
+          loadingAnswers: false,
+          generatingAnswers: false,
+          answerGenerationError: '',
+          questionsLoaded: current[targetJobId]?.questionsLoaded ?? false,
+          answersLoaded: true,
+        },
+      }));
+      if (targetJobId === jobId) {
+        setAnswerJob(answerState.job);
+        setGeneratedAnswers(answerState.answers);
+      }
+    } catch (err) {
+      const message = (err as Error).message;
+      setExtractedPaperRecords((current) => ({
+        ...current,
+        [targetJobId]: {
+          parsedQuestions: current[targetJobId]?.parsedQuestions ?? [],
+          loadingQuestions: current[targetJobId]?.loadingQuestions ?? false,
+          answerJob: current[targetJobId]?.answerJob ?? null,
+          generatedAnswers: current[targetJobId]?.generatedAnswers ?? [],
+          loadingAnswers: false,
+          generatingAnswers: false,
+          answerGenerationError: message,
+          questionsLoaded: current[targetJobId]?.questionsLoaded ?? false,
+          answersLoaded: current[targetJobId]?.answersLoaded ?? false,
+        },
+      }));
+      if (targetJobId === jobId) setAnswerGenerationError(message);
+    } finally {
+      setGeneratingAnswerJobIds((current) => {
+        const next = new Set(current);
+        next.delete(targetJobId);
+        return next;
+      });
+      if (targetJobId === jobId) setGeneratingAnswers(false);
+    }
+  }
+
+  async function generateAnswers() {
+    if (jobId == null) return;
+    await generateAnswersForJob(jobId);
   }
 
   async function upload() {
@@ -300,6 +591,13 @@ export function useIngestionUpload(
     setPollError('');
     try {
       const queued = await uploadIngestionPdf(file);
+      setParsedQuestions([]);
+      setAnswerJob(null);
+      setGeneratedAnswers([]);
+      setLoadingQuestions(false);
+      setLoadingAnswers(false);
+      setGeneratingAnswers(false);
+      setAnswerGenerationError('');
       setJob(queued);
       // Refresh the list so any earlier upload still draining shows in the queue
       // strip (and the list poller restarts on the new in-flight job).
@@ -332,6 +630,16 @@ export function useIngestionUpload(
   async function retryJob(targetId: number) {
     try {
       const requeued = await retryIngestionJob(targetId);
+      // A retry is active extraction again, so promote it into the detail card
+      // and clear any completed-job review state from the previous upload.
+      setParsedQuestions([]);
+      setAnswerJob(null);
+      setGeneratedAnswers([]);
+      setLoadingQuestions(false);
+      setLoadingAnswers(false);
+      setGeneratingAnswers(false);
+      setAnswerGenerationError('');
+      setJob(requeued);
       // Reflect the pending status at once; the list poller restarts on it.
       setRecentJobs((current) =>
         current.map((j) => (j.id === targetId ? requeued : j)),
@@ -343,22 +651,6 @@ export function useIngestionUpload(
     }
   }
 
-  function reset() {
-    suppressRestoreRef.current = true;
-    setFile(null);
-    setValidationError('');
-    setUploadError('');
-    setPollError('');
-    setJob(null);
-    setParsedQuestions([]);
-    setLoadingQuestions(false);
-    setAnswerJob(null);
-    setGeneratedAnswers([]);
-    setLoadingAnswers(false);
-    setGeneratingAnswers(false);
-    setAnswerGenerationError('');
-  }
-
   // Everything still in flight except the job already shown in the detail card.
   const queuedJobs = recentJobs.filter(
     (candidate) =>
@@ -367,6 +659,21 @@ export function useIngestionUpload(
       // so a failed extraction doesn't silently vanish (the teacher sees it
       // failed + why). `done` jobs already landed in the bank — no need to nag.
       (!isIngestionTerminal(candidate.status) || candidate.status === 'failed'),
+  );
+  const recentExtractedPapers: ExtractedPaperReviewState[] = recentExtractedJobs.map(
+    (extractedJob) => {
+      const record = extractedPaperRecords[extractedJob.id];
+      return {
+        job: extractedJob,
+        parsedQuestions: record?.parsedQuestions ?? [],
+        loadingQuestions: record?.loadingQuestions ?? true,
+        answerJob: record?.answerJob ?? null,
+        generatedAnswers: record?.generatedAnswers ?? [],
+        loadingAnswers: record?.loadingAnswers ?? true,
+        generatingAnswers: generatingAnswerJobIds.has(extractedJob.id),
+        answerGenerationError: record?.answerGenerationError ?? '',
+      };
+    },
   );
 
   return {
@@ -385,11 +692,12 @@ export function useIngestionUpload(
     loadingAnswers,
     generatingAnswers,
     answerGenerationError,
+    recentExtractedPapers,
     generateAnswers,
+    generateAnswersForJob,
     selectFile,
     upload,
     dismissJob,
     retryJob,
-    reset,
   };
 }

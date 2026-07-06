@@ -241,7 +241,8 @@ export function useCoverageForm(): CoverageForm {
       })
       .catch((err) => {
         if (cancelled) return;
-        setSources([]);
+        // Keep the last successful source list on transient failures (for
+        // example throttled background polling) so the picker remains usable.
         setSourcesError((err as Error).message);
       })
       .finally(() => {

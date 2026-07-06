@@ -4,18 +4,21 @@
  * adds the questions to the school's bank.
  *
  * Pure orchestration: `useIngestionUpload` owns the upload + polling lifecycle;
- * the dropzone, source-type field, and status card render it. Before a job
- * exists we show the picker form; once queued we swap to the live status card.
+ * the dropzone, source-type field, and status card render it. Active extraction
+ * takes over the page; once extraction settles, the picker returns with the
+ * latest review tools below it for the current session.
  *
  * @module UploadPapersPage
  */
 import { useNavigate } from 'react-router-dom';
 import { FileSearch, ListChecks } from 'lucide-react';
 import { useIngestionUpload } from '@/hooks/useIngestionUpload.hook';
+import { isIngestionTerminal } from '@/lib/ingestion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppHeader } from '@/components/app-nav';
 import {
+  ExtractedPaperReviewCard,
   IngestionQueueStrip,
   IngestionStatusCard,
   PdfDropzone,
@@ -24,6 +27,72 @@ import {
 export default function UploadPapersPage() {
   const navigate = useNavigate();
   const upload = useIngestionUpload();
+  const activeQueuedJob = upload.queuedJobs.find(
+    (candidate) => !isIngestionTerminal(candidate.status),
+  );
+  const activeJob =
+    upload.job != null && !isIngestionTerminal(upload.job.status)
+      ? upload.job
+      : (activeQueuedJob ?? null);
+  const failedJob = upload.job?.status === 'failed' ? upload.job : null;
+  const queuedJobs = activeJob
+    ? upload.queuedJobs.filter((candidate) => candidate.id !== activeJob.id)
+    : upload.queuedJobs;
+
+  const uploadForm = (
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <div className="text-sm font-medium leading-5">PDF file</div>
+          <PdfDropzone
+            file={upload.file}
+            onSelect={upload.selectFile}
+            validationError={upload.validationError}
+            disabled={upload.uploading}
+          />
+        </div>
+        {upload.uploadError && (
+          <p
+            className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+            role="alert"
+          >
+            {upload.uploadError}
+          </p>
+        )}
+        <div className="flex justify-end border-t border-input pt-5">
+          <Button
+            onClick={upload.upload}
+            disabled={!upload.file || upload.uploading}
+            className="sm:min-w-36"
+          >
+            {upload.uploading ? 'Uploading…' : 'Upload & extract'}
+          </Button>
+        </div>
+      </div>
+
+      <aside className="rounded-lg border border-input bg-secondary/50 p-4">
+        <div className="flex items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background text-foreground">
+            <ListChecks className="size-4" aria-hidden="true" />
+          </span>
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-sm font-medium leading-5">
+                Saved to the bank
+              </h2>
+              <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
+                Questions, marks, chapter tags, and source file.
+              </p>
+            </div>
+            <ul className="space-y-1.5 text-xs leading-5 text-muted-foreground">
+              <li>• Duplicates are skipped.</li>
+              <li>• Review the extracted set after upload.</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -47,10 +116,10 @@ export default function UploadPapersPage() {
           </CardHeader>
 
           <CardContent className="px-5 py-6 sm:px-6">
-            {upload.job ? (
+            {activeJob ? (
               <div className="mx-auto max-w-5xl">
                 <IngestionStatusCard
-                  job={upload.job}
+                  job={activeJob}
                   pollError={upload.pollError}
                   parsedQuestions={upload.parsedQuestions}
                   loadingQuestions={upload.loadingQuestions}
@@ -60,72 +129,74 @@ export default function UploadPapersPage() {
                   generatingAnswers={upload.generatingAnswers}
                   answerGenerationError={upload.answerGenerationError}
                   onGenerateAnswers={upload.generateAnswers}
-                  onUploadAnother={upload.reset}
                   onGeneratePaper={() => navigate('/generate')}
                 />
               </div>
             ) : (
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <div className="text-sm font-medium leading-5">PDF file</div>
-                    <PdfDropzone
-                      file={upload.file}
-                      onSelect={upload.selectFile}
-                      validationError={upload.validationError}
-                      disabled={upload.uploading}
+              <div className="space-y-6">
+                {uploadForm}
+                {failedJob && (
+                  <div className="mx-auto max-w-5xl border-t border-input pt-6">
+                    <IngestionStatusCard
+                      job={failedJob}
+                      pollError={upload.pollError}
+                      parsedQuestions={[]}
+                      loadingQuestions={false}
+                      answerJob={null}
+                      generatedAnswers={[]}
+                      loadingAnswers={false}
+                      generatingAnswers={false}
+                      answerGenerationError=""
+                      onGenerateAnswers={upload.generateAnswers}
+                      onGeneratePaper={() => navigate('/generate')}
                     />
                   </div>
-                  {upload.uploadError && (
-                    <p
-                      className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-                      role="alert"
-                    >
-                      {upload.uploadError}
-                    </p>
-                  )}
-                  <div className="flex flex-col gap-2 border-t border-input pt-5 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-xs leading-5 text-muted-foreground">
-                      Extraction runs in the background.
-                    </p>
-                    <Button
-                      onClick={upload.upload}
-                      disabled={!upload.file || upload.uploading}
-                      className="sm:min-w-36"
-                    >
-                      {upload.uploading ? 'Uploading…' : 'Upload & extract'}
-                    </Button>
-                  </div>
-                </div>
-
-                <aside className="rounded-lg border border-input bg-secondary/50 p-4">
-                  <div className="flex items-start gap-3">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background text-foreground">
-                      <ListChecks className="size-4" aria-hidden="true" />
-                    </span>
-                    <div className="space-y-3">
+                )}
+                {upload.recentExtractedPapers.length > 0 && (
+                  <section
+                    className="mx-auto max-w-5xl border-t border-input pt-6"
+                    aria-labelledby="recent-extracted-papers-heading"
+                  >
+                    <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                       <div>
-                        <h2 className="text-sm font-medium leading-5">
-                          Saved to the bank
+                        <h2
+                          id="recent-extracted-papers-heading"
+                          className="text-sm font-medium leading-5 text-foreground"
+                        >
+                          Recent extracted papers
                         </h2>
-                        <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
-                          Questions, marks, chapter tags, and source file.
+                        <p className="text-xs leading-5 text-muted-foreground">
+                          Review the last 3 completed uploads and generate answers when needed.
                         </p>
                       </div>
-                      <ul className="space-y-1.5 text-xs leading-5 text-muted-foreground">
-                        <li>• Duplicates are skipped.</li>
-                        <li>• Review the extracted set after upload.</li>
-                      </ul>
                     </div>
-                  </div>
-                </aside>
+                    <div className="space-y-3">
+                      {upload.recentExtractedPapers.map((paper) => (
+                        <ExtractedPaperReviewCard
+                          key={paper.job.id}
+                          job={paper.job}
+                          parsedQuestions={paper.parsedQuestions}
+                          loadingQuestions={paper.loadingQuestions}
+                          answerJob={paper.answerJob}
+                          generatedAnswers={paper.generatedAnswers}
+                          loadingAnswers={paper.loadingAnswers}
+                          generatingAnswers={paper.generatingAnswers}
+                          answerGenerationError={paper.answerGenerationError}
+                          onGenerateAnswers={() =>
+                            upload.generateAnswersForJob(paper.job.id)
+                          }
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
             )}
 
-            {upload.queuedJobs.length > 0 && (
+            {queuedJobs.length > 0 && (
               <div className="mx-auto max-w-5xl">
                 <IngestionQueueStrip
-                  jobs={upload.queuedJobs}
+                  jobs={queuedJobs}
                   onRetry={upload.retryJob}
                   onDismiss={upload.dismissJob}
                 />

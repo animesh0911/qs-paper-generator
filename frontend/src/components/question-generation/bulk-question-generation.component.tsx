@@ -17,6 +17,8 @@ const ACTIVE_GENERATION_STATUSES: GenerationBatch['status'][] = [
   'validating',
 ];
 
+const MAX_GENERATION_DRAFTS_TO_SHOW = 3;
+
 // Placeholder chapters shown (disabled) so teachers can see that AI Q&A
 // generation will expand to the rest of the NCERT Class 10 Science syllabus.
 // These are not yet wired to any content and cannot be selected.
@@ -119,18 +121,20 @@ export function BulkQuestionGenerationSetup({
   );
   const canStart =
     Boolean(selectedChapterSlug) && selectedTopicCount > 0 && !busy;
-  const reviewableBatches = batches.filter((batch) =>
-    [
-      'queued',
-      'generating_questions',
-      'validating',
-      'ready_for_review',
-      // Keep failures visible: a batch that died mid-generation must not
-      // silently vanish from the list — the teacher needs to see it failed and
-      // open the reason, not wonder where their generation went.
-      'failed',
-    ].includes(batch.status),
-  );
+  const reviewableBatches = batches
+    .filter((batch) =>
+      [
+        'queued',
+        'generating_questions',
+        'validating',
+        'ready_for_review',
+        // Keep failures visible: a batch that died mid-generation must not
+        // silently vanish from the list — the teacher needs to see it failed and
+        // open the reason, not wonder where their generation went.
+        'failed',
+      ].includes(batch.status),
+    )
+    .slice(0, MAX_GENERATION_DRAFTS_TO_SHOW);
 
   return (
     <div className="space-y-5 rounded-lg border border-white/70 bg-white/55 p-4">

@@ -1,15 +1,97 @@
 /**
+ * @vitest-environment jsdom
+ *
  * Tests for generation-form request payload construction and setup helpers.
  *
  * @module useCoverageFormTests
  */
-import { describe, expect, it } from 'vitest';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  fetchChapters,
+  fetchPaperFormats,
+  fetchPaperSources,
+} from '@/lib/api';
 import {
   buildChapterGroups,
   buildCoverageAssemblePayload,
   buildPaperStructureSummary,
   sortPaperSourcesByUploadTime,
+  useCoverageForm,
 } from './useCoverageForm.hook';
+
+vi.mock('@/lib/api', () => ({
+  fetchChapters: vi.fn(),
+  fetchPaperFormats: vi.fn(),
+  fetchPaperSources: vi.fn(),
+}));
+
+const mockedFetchChapters = vi.mocked(fetchChapters);
+const mockedFetchPaperFormats = vi.mocked(fetchPaperFormats);
+const mockedFetchPaperSources = vi.mocked(fetchPaperSources);
+
+describe('useCoverageForm', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    sessionStorage.clear();
+    mockedFetchChapters.mockResolvedValue([
+      {
+        id: 4,
+        slug: 'carbon-and-its-compounds',
+        name: 'Carbon and its Compounds',
+        order: 4,
+        subject_area: 'Chemistry',
+      },
+    ]);
+    mockedFetchPaperFormats.mockResolvedValue([
+      {
+        format_id: 'cbse_science_class_10_board_compact_2026_v1',
+        name: 'CBSE End Term Exam',
+        preset_name: 'board',
+        total_marks: 80,
+        section_count: 3,
+        question_count: 39,
+        marks_by_question_type: { mcq: 20 },
+      },
+    ]);
+  });
+
+  it('keeps existing source choices visible when a throttled refresh fails', async () => {
+    const existingSources = [
+      {
+        key: 'upload:7',
+        kind: 'upload' as const,
+        title: 'Recent upload',
+        detail: 'Previous year paper',
+        question_count: 12,
+        matching_question_count: 12,
+        created_at: '2026-06-22T10:00:00Z',
+        status: 'completed',
+      },
+    ];
+    mockedFetchPaperSources
+      .mockResolvedValueOnce(existingSources)
+      .mockResolvedValueOnce(existingSources)
+      .mockRejectedValueOnce(
+        new Error('Request was throttled. Expected available in 1 second.'),
+      );
+
+    const { result } = renderHook(() => useCoverageForm());
+
+    await waitFor(() =>
+      expect(result.current.sources.map((source) => source.key)).toEqual([
+        'upload:7',
+      ]),
+    );
+
+    act(() => result.current.toggleChapter('carbon-and-its-compounds'));
+
+    await waitFor(() => expect(result.current.sourcesError).toContain('throttled'));
+    expect(result.current.sources.map((source) => source.key)).toEqual([
+      'upload:7',
+    ]);
+  });
+});
 
 describe('buildCoverageAssemblePayload', () => {
   it('includes the selected backend format with explicit chapters', () => {

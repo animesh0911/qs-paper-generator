@@ -64,6 +64,27 @@ function setupProps(overrides = {}) {
   };
 }
 
+function generationBatch(overrides: Partial<GenerationBatch>): GenerationBatch {
+  return {
+    id: 1,
+    status: 'ready_for_review',
+    chapter_slugs: ['carbon-and-its-compounds'],
+    chapter_map_node_ids: ['carbon:4.1'],
+    topic_names: [],
+    difficulty_preset: 'balanced',
+    requested_count: 10,
+    candidate_count: 3,
+    error: '',
+    ready_at: '2026-06-21T00:00:03Z',
+    accepted_at: null,
+    expired_at: null,
+    discarded_at: null,
+    created_at: '2026-06-21T00:00:00Z',
+    updated_at: '2026-06-21T00:00:03Z',
+    ...overrides,
+  };
+}
+
 describe('BulkQuestionGenerationSetup', () => {
   it('shows the separate topic-scoped Q&A controls without backend-owned knobs', () => {
     const html = renderToStaticMarkup(
@@ -212,6 +233,27 @@ describe('BulkQuestionGenerationSetup', () => {
     expect(html).toContain('Batch #42 · Ready for review');
     expect(html).toContain('3 candidates ready');
     expect(html).toContain('Review draft');
+  });
+
+  it('shows only the top three generation drafts on setup', () => {
+    const html = renderToStaticMarkup(
+      <BulkQuestionGenerationSetup
+        {...setupProps({
+          batches: [
+            generationBatch({ id: 51 }),
+            generationBatch({ id: 52 }),
+            generationBatch({ id: 53 }),
+            generationBatch({ id: 54 }),
+          ],
+          onOpenBatch: vi.fn(),
+        })}
+      />,
+    );
+
+    expect(html).toContain('Batch #51 · Ready for review');
+    expect(html).toContain('Batch #52 · Ready for review');
+    expect(html).toContain('Batch #53 · Ready for review');
+    expect(html).not.toContain('Batch #54 · Ready for review');
   });
 
   it('keeps a failed batch visible with its reason so it does not silently vanish', () => {

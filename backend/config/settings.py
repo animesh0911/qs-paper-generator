@@ -126,12 +126,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    # Throttling: AnonRateThrottle is the global anonymous floor;
-    # ScopedRateThrottle lets views opt into a tighter scope via
-    # ``throttle_scope`` (used by the auth endpoints).
+    # Throttling: keep unauthenticated/auth endpoints protected, but do not
+    # apply one shared authenticated-user bucket to the whole app. Background
+    # polling (generation, ingestion) must not block foreground teacher actions
+    # such as opening the Generate source picker.
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle",
         "rest_framework.throttling.ScopedRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {

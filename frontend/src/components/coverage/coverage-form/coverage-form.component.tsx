@@ -15,8 +15,17 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { Bot, Check, ChevronDown, FileText, Sparkles, X } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Bot,
+  Check,
+  ChevronDown,
+  FileText,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { sourceReviewHref } from '@/lib/source-review';
 import {
   type ChapterGroup,
   type CoverageForm,
@@ -174,44 +183,35 @@ function PaperScopePanel({
 
   return (
     <aside
-      className="space-y-4 rounded-lg border bg-background p-4 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto"
+      className="space-y-3 rounded-lg border bg-background p-4 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto"
       aria-labelledby="paper-scope-heading"
     >
       <div>
-        <p className="text-xs font-medium text-muted-foreground">
-          Generate paper
-        </p>
+        <p className="text-xs font-medium text-muted-foreground">Scope</p>
         <h2 id="paper-scope-heading" className="mt-1 text-base font-semibold">
           Paper scope
         </h2>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          Review the filters that shape the first editor draft.
-        </p>
       </div>
 
       <ScopeBlock
         title="Chapters"
-        badge="Strict filter"
-        empty="Any chapter"
+        badge="Filter"
+        empty="All chapters"
         items={selectedChapterNames}
         moreCount={Math.max(0, selectedChapterNames.length - 4)}
-        description="Limits generated questions and swap alternatives."
       />
 
       <ScopeBlock
         title="Sources"
-        badge="First draft only"
-        empty="No source priority"
+        badge="Priority"
+        empty="Automatic balance"
         items={selectedSourceTitles}
         moreCount={Math.max(0, selectedSourceTitles.length - 4)}
-        description="Prioritises initial picks; alternatives can come from the wider compatible bank."
       />
 
-      <div className="rounded-md bg-secondary/60 p-3 text-sm leading-6">
-        <p className="font-medium">
-          {readinessMessage(hasChapters, hasSources)}
-        </p>
-      </div>
+      <p className="border-t pt-3 text-xs leading-5 text-muted-foreground">
+        {readinessMessage(hasChapters, hasSources)}
+      </p>
 
       <div className="space-y-2 border-t pt-4">
         <Button
@@ -233,22 +233,20 @@ function ScopeBlock({
   empty,
   items,
   moreCount,
-  description,
 }: {
   title: string;
   badge: string;
   empty: string;
   items: string[];
   moreCount: number;
-  description: string;
 }) {
   const visibleItems = items.slice(0, 4);
 
   return (
-    <section className="border-t pt-4">
+    <section className="border-t pt-3">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <span className="rounded-md bg-secondary/70 px-2 py-1 text-xs font-medium text-muted-foreground">
+        <h3 className="text-sm font-medium">{title}</h3>
+        <span className="rounded-md border bg-secondary/35 px-2 py-0.5 text-xs font-medium text-muted-foreground">
           {badge}
         </span>
       </div>
@@ -257,35 +255,28 @@ function ScopeBlock({
           {visibleItems.map((item) => (
             <li
               key={item}
-              className="max-w-full truncate rounded border bg-background px-2 py-1"
+              className="max-w-full truncate rounded-md border bg-background px-2 py-1 text-foreground/85"
             >
               {item}
             </li>
           ))}
           {moreCount > 0 && (
-            <li className="rounded border bg-background px-2 py-1">
+            <li className="rounded-md border bg-background px-2 py-1 text-muted-foreground">
               +{moreCount} more
             </li>
           )}
         </ul>
       ) : (
-        <p className="mt-2 text-sm font-medium">{empty}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{empty}</p>
       )}
-      <p className="mt-2 text-xs leading-5 text-muted-foreground">
-        {description}
-      </p>
     </section>
   );
 }
 
 function readinessMessage(hasChapters: boolean, hasSources: boolean) {
-  if (hasChapters && hasSources) {
-    return 'Ready: chapters restrict scope; sources guide first picks.';
-  }
-  if (hasChapters) return 'Ready: generating from selected chapters.';
-  if (hasSources) {
-    return 'Ready: generating with source priority across all chapters.';
-  }
+  if (hasChapters && hasSources) return 'Ready: chapters + source priority.';
+  if (hasChapters) return 'Ready: selected chapters.';
+  if (hasSources) return 'Ready: source priority.';
   return 'Choose chapters or sources to generate.';
 }
 
@@ -534,11 +525,11 @@ function SourceSelectionSection({ form }: { form: CoverageForm }) {
               />
             </div>
 
-            {form.sourcesLoading ? (
+            {form.sourcesLoading && form.sources.length === 0 ? (
               <p className="rounded-lg border bg-background p-3 text-sm text-muted-foreground">
                 Loading sources…
               </p>
-            ) : form.sourcesError ? (
+            ) : form.sourcesError && form.sources.length === 0 ? (
               <p
                 className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
                 role="alert"
@@ -551,16 +542,27 @@ function SourceSelectionSection({ form }: { form: CoverageForm }) {
                 from the wider bank, or upload a paper first.
               </p>
             ) : (
-              <ul className="divide-y rounded-lg border">
-                {form.sources.map((source) => (
-                  <SourceChoice
-                    key={source.key}
-                    source={source}
-                    selected={draftKeys.has(source.key)}
-                    onToggle={() => toggleDraftSource(source.key)}
-                  />
-                ))}
-              </ul>
+              <div className="space-y-2">
+                {form.sourcesError && (
+                  <p
+                    className="rounded-md border bg-secondary/35 px-3 py-2 text-xs leading-5 text-muted-foreground"
+                    role="status"
+                  >
+                    Showing last loaded sources.
+                  </p>
+                )}
+                <ul className="divide-y rounded-lg border">
+                  {form.sources.map((source) => (
+                    <SourceChoice
+                      key={source.key}
+                      source={source}
+                      selected={draftKeys.has(source.key)}
+                      reviewHref={sourceReviewHref(source.key)}
+                      onToggle={() => toggleDraftSource(source.key)}
+                    />
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
         </SelectionDialog>
@@ -572,25 +574,27 @@ function SourceSelectionSection({ form }: { form: CoverageForm }) {
 function SourceChoice({
   source,
   selected,
+  reviewHref,
   onToggle,
 }: {
   source: PaperSourceSummary;
   selected: boolean;
+  reviewHref: string | null;
   onToggle: () => void;
 }) {
   const sourceInputId = `paper-source-${source.key.replace(/[^a-z0-9_-]/gi, '-')}`;
   const matchingCount = sourceMatchingCount(source);
 
   return (
-    <li>
+    <li
+      className={cn(
+        'grid gap-2 px-3 py-3 text-sm transition-colors sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center',
+        selected ? 'bg-secondary text-foreground' : 'bg-background',
+      )}
+    >
       <label
         htmlFor={sourceInputId}
-        className={cn(
-          'grid cursor-pointer grid-cols-[auto_minmax(0,1fr)] gap-3 px-3 py-3 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring sm:grid-cols-[auto_minmax(0,1fr)_12rem_auto] sm:items-center',
-          selected
-            ? 'bg-secondary text-foreground'
-            : 'bg-background hover:bg-secondary/55',
-        )}
+        className="grid min-w-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] gap-3 rounded-md focus-within:ring-2 focus-within:ring-ring sm:items-center"
       >
         <input
           id={sourceInputId}
@@ -614,26 +618,16 @@ function SourceChoice({
             <FileText className="size-4" />
           )}
         </span>
-        <span className="min-w-0 pr-7 sm:pr-0">
+        <span className="min-w-0">
           <span className="block truncate font-medium">{source.title}</span>
           <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
             {source.detail || 'Tagged source'} ·{' '}
             {formatSourceDate(source.created_at)}
           </span>
         </span>
-        <span className="col-start-2 flex flex-wrap gap-1.5 sm:col-start-auto sm:justify-end">
-          <span className="rounded-md bg-secondary/70 px-2 py-1 text-xs font-medium text-foreground">
-            {matchingCount} chapter match{matchingCount === 1 ? '' : 'es'}
-          </span>
-          {source.question_count !== matchingCount && (
-            <span className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
-              {source.question_count} in full source
-            </span>
-          )}
-        </span>
         <span
           className={cn(
-            'col-start-2 row-start-1 mt-1 flex size-5 shrink-0 items-center justify-center justify-self-end rounded-md sm:col-start-auto sm:row-start-auto sm:mt-0',
+            'mt-1 flex size-5 shrink-0 items-center justify-center justify-self-end rounded-md sm:mt-0',
             selected
               ? 'bg-primary text-primary-foreground'
               : 'border bg-background text-transparent',
@@ -643,6 +637,26 @@ function SourceChoice({
           <Check className="size-3.5" />
         </span>
       </label>
+
+      <div className="flex flex-wrap items-center gap-1.5 pl-11 sm:justify-end sm:pl-0">
+        <span className="rounded-md bg-secondary/70 px-2 py-1 text-xs font-medium text-foreground">
+          {matchingCount} chapter match{matchingCount === 1 ? '' : 'es'}
+        </span>
+        {source.question_count !== matchingCount && (
+          <span className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
+            {source.question_count} total
+          </span>
+        )}
+        {reviewHref && (
+          <a
+            href={reviewHref}
+            className="inline-flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Review
+            <ArrowUpRight className="size-3" aria-hidden="true" />
+          </a>
+        )}
+      </div>
     </li>
   );
 }

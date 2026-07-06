@@ -9,6 +9,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { CoverageForm } from '@/hooks/useCoverageForm.hook';
+import { sourceReviewHref } from '@/lib/source-review';
 import { CoverageFormView } from './coverage-form.component';
 
 function makeForm(overrides: Partial<CoverageForm> = {}): CoverageForm {
@@ -119,6 +120,14 @@ afterEach(() => {
   document.body.style.overflow = '';
 });
 
+describe('sourceReviewHref', () => {
+  it('routes selectable generated and uploaded sources to their review screens', () => {
+    expect(sourceReviewHref('ai_batch:42')).toBe('/generation-batches/42');
+    expect(sourceReviewHref('upload:7')).toBe('/extractions/7');
+    expect(sourceReviewHref('source_file:cbse')).toBeNull();
+  });
+});
+
 describe('CoverageFormView', () => {
   it('shows fixed context and one paper format selector populated from backend formats', () => {
     const html = renderToStaticMarkup(
@@ -147,8 +156,11 @@ describe('CoverageFormView', () => {
     expect(html).toContain('Open choose chapters');
     expect(html).toContain('Open choose sources');
     expect(html).toContain('Paper scope');
-    expect(html).toContain('Strict filter');
-    expect(html).toContain('First draft only');
+    expect(html).toContain('Filter');
+    expect(html).toContain('Priority');
+    expect(html).not.toContain(
+      'Review the filters that shape the first editor draft.',
+    );
   });
 
   it('shows total marks and live paper structure summary', () => {
@@ -270,7 +282,46 @@ describe('CoverageFormView', () => {
     );
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.getByText('Newest uploaded paper')).toBeTruthy();
+    expect(screen.getByRole('link', { name: /review/i }).getAttribute('href'))
+      .toBe('/extractions/new');
 
+    await user.click(screen.getByLabelText(/Newest uploaded paper/));
+    await user.click(screen.getByRole('button', { name: 'Approve selection' }));
+    expect(toggleSource).toHaveBeenCalledWith('upload:new');
+  });
+
+  it('keeps cached sources selectable when a refresh error is present', async () => {
+    const user = userEvent.setup();
+    const toggleSource = vi.fn();
+
+    render(
+      <CoverageFormView
+        form={makeForm({
+          sourcesError: 'Request was throttled. Expected available in 1 second.',
+          sources: [
+            {
+              key: 'upload:new',
+              kind: 'upload',
+              title: 'Newest uploaded paper',
+              detail: 'Previous year paper',
+              question_count: 12,
+              matching_question_count: 5,
+              created_at: '2026-06-22T10:00:00Z',
+              status: 'ready',
+            },
+          ],
+          toggleSource,
+        })}
+        busy={false}
+        onGenerate={vi.fn()}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Open choose sources' }),
+    );
+
+    expect(screen.getByText('Showing last loaded sources.')).toBeTruthy();
     await user.click(screen.getByLabelText(/Newest uploaded paper/));
     await user.click(screen.getByRole('button', { name: 'Approve selection' }));
     expect(toggleSource).toHaveBeenCalledWith('upload:new');

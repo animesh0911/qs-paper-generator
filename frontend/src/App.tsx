@@ -25,6 +25,7 @@ const EditorPage = lazy(() => import('@/pages/editor.page'));
 const GenerationProgressPage = lazy(
   () => import('@/pages/generation-progress.page'),
 );
+const ExtractionReviewPage = lazy(() => import('@/pages/extraction-review.page'));
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -106,6 +107,22 @@ export default function App() {
               }
             >
               <GenerationProgressPage />
+            </Suspense>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/extractions/:jobId"
+        element={
+          <RequireAuth>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-secondary p-6 text-sm">
+                  Loading extracted paper...
+                </div>
+              }
+            >
+              <ExtractionReviewPage />
             </Suspense>
           </RequireAuth>
         }

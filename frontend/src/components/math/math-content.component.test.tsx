@@ -32,6 +32,19 @@ describe('MathText', () => {
     expect(html).not.toContain('$\text{CuSO}_4');
   });
 
+  it('typesets upload answer formulas that use slash-parenthesis delimiters', () => {
+    const html = renderToStaticMarkup(
+      <MathText
+        text={String.raw`Power \(P = 1\text{ kW} = 1000\text{ W}\) and voltage \(V = 220\text{ V}\). Current \(I = \frac{P}{V}\).`}
+      />,
+    );
+
+    expect(html).toContain('class="katex"');
+    expect(html).toContain('1000');
+    expect(html).toContain('<mfrac>');
+    expect(html).not.toContain('\\(P =');
+  });
+
   it('normalizes double-escaped extracted LaTeX commands before KaTeX render', () => {
     const html = renderToStaticMarkup(
       <MathText
