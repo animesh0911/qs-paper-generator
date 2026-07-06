@@ -56,6 +56,28 @@ describe('MathText', () => {
     expect(html).not.toContain('katex-error');
     expect(html).not.toContain('\\\\text{CuSO}_4');
   });
+
+  it('typesets common plain-text chemistry formulas from extracted questions', () => {
+    const html = renderToStaticMarkup(
+      <MathText text="Heat ethanol with alkaline KMnO4 and concentrated H2SO4." />,
+    );
+
+    expect(html).toContain('class="katex"');
+    expect(html).toContain('KMnO');
+    expect(html).toContain('H');
+    expect(html).not.toContain('KMnO4');
+    expect(html).not.toContain('H2SO4');
+  });
+
+  it('typesets the alcohol homologous-series formula when OCR drops LaTeX', () => {
+    const html = renderToStaticMarkup(
+      <MathText text="Alcohol has general formula CnH2n + 1 -OH." />,
+    );
+
+    expect(html).toContain('class="katex"');
+    expect(html).not.toContain('CnH2n + 1 -OH');
+    expect(html).toContain('2n+1');
+  });
 });
 
 describe('MathContent', () => {

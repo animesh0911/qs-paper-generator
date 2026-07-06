@@ -20,6 +20,9 @@ from langchain_core.messages import HumanMessage
 from ai_services.llm import LLMClient, ModelPurpose, make_chat_model, make_llm_client
 
 from . import content as content_mod
+from .extraction_pdf import count_pages, slice_page, split_pages
+from .extraction_pdf import split_pages_for_runtime as _split_pages_for_runtime
+from .extraction_prompt import page_prompt as _page_prompt
 from .models import Chapter, CognitiveLevel
 
 # Numerical: equation-like text, SI units, or standalone numbers with units.
@@ -381,83 +384,6 @@ def _as_nullable(node: dict) -> dict:
     return nullable
 
 
-def _page_prompt() -> str:
-    """Build the per-page extraction prompt (one PDF page in, English-only).
-
-    The extractor feeds the model one page at a time (see ``GeminiExtractor``),
-    so the model reads a single page deeply instead of skimming the whole paper.
-    Section is NOT requested verbatim — the coordinator derives it from each
-    question's marks (``MARKS_TO_SECTION``)."""
-    return (
-        "You are extracting questions from ONE PAGE of a CBSE Class 10 Science "
-        "board paper into a question bank. The input is a single page image.\n\n"
-        "Extract EVERY question that appears on this page. Include a question even "
-        "if it looks partial (continued from the previous page or running onto the "
-        "next) — copy whatever English text is on this page.\n\n"
-        "Ignore anything that is not itself a question: the cover page, general "
-        "instructions, the marking scheme, and any shared instruction or "
-        "'Directions' block that introduces a group of questions (for example an "
-        "assertion-reason answer-code key, 'For question numbers X and Y …', or "
-        "'Read the following passage …'). Such a block is never a question on its "
-        "own — do not emit it as a question, and never copy it into a question's "
-        "rawText or stem.\n\n"
-        "ENGLISH ONLY: these papers are bilingual. A page is usually entirely in "
-        "one language — either Hindi (Devanagari) or English. If THIS page is in "
-        "Hindi, return an empty list. If it is English, extract its questions. "
-        "Never translate Hindi; emit no Devanagari characters.\n\n"
-        "Copy each question VERBATIM from the English text — never paraphrase, "
-        "correct, complete, or summarise it.\n\n"
-        "ONE ENTRY PER PRINTED QUESTION OR OR-ALTERNATIVE: all sub-parts "
-        "(i)/(ii)/(a)/(b) that belong to one answer stay inside that entry "
-        "(content.subparts). If a question has an 'OR' alternative / internal "
-        "choice, emit EACH alternative as its own separate question entry with "
-        "the normal CBSE qtype implied by its marks.\n\n"
-        "SYMBOLS: emit scientific symbols and units as LaTeX — an inline "
-        "{type:'equation', latex:'...'} item, or the item's latex field (e.g. "
-        "\\Omega for ohm, \\rightarrow, ^\\circ C). Never paste raw Unicode glyphs "
-        "that may be garbled in the source scan.\n\n"
-        "STRUCTURE:\n"
-        "  - assertion_reason: put the Assertion sentence in content.assertion and "
-        "the Reason sentence in content.reason; the fixed (A)–(D) 'Both A and R …' "
-        "codes are the options. The shared Directions block is not the stem.\n"
-        "  - mcq/assertion_reason: ALSO mirror the choices into content.options as "
-        "labelled entries ([{label, content:[...]}]) — content.options is the "
-        "source the renderer reads; never leave it empty for an objective question.\n"
-        "Per question return:\n"
-        "  section — the section letter (A–E) if a 'SECTION X' header is visible "
-        "on this page, else your best guess; the importer re-derives it from marks.\n"
-        "  qtype — one of: mcq, assertion_reason, very_short_answer, short_answer, "
-        "long_answer, case_based. Do not emit internal_choice as a qtype.\n"
-        "  marks — the integer mark value printed for the question (the digit at "
-        "the right margin). This is important: the section is derived from it.\n"
-        "  rawText — the stem copied verbatim, WITHOUT any visible marks "
-        "(no '[1]', '(2 marks)', trailing mark digits) and WITHOUT option labels.\n"
-        "  options — for mcq/assertion_reason: [{label, text}] verbatim; else [].\n"
-        "  content — keyed by region, include only the regions the type uses:\n"
-        "    stem / assertion / reason / passage: arrays of {type, text, latex?} "
-        "where type is 'paragraph', 'equation', or 'image_placeholder'.\n"
-        "    options / subparts: [{label, marks?, content:[item, ...]}].\n"
-        "  chapter_slug — pick EXACTLY ONE slug from the allowed list the schema "
-        "enumerates, or null if unsure. Never invent or reformat a slug.\n"
-        "  cognitive_level — one of R, U, Ap, An.\n"
-        "  topic_names — short topic strings within the chapter; [] if none.\n"
-        "  primary_form — one of none, diagram_based, table_based.\n"
-        "  figures — bounding boxes of any diagrams the question depends on, for "
-        "deterministic cropping. [] if none. Each: {page, bbox, region, label?, "
-        "caption?}. Set page to 1 (this is a single page); bbox is "
-        "[x0, y0, x1, y1] normalized to [0, 1] with the page top-left as origin; "
-        "region is the content region the figure belongs to (stem / assertion / "
-        "reason / passage / options / subparts); label names the option/subpart "
-        "for options/subparts.\n\n"
-        "If a question depends on a figure or diagram, put a single "
-        "{type:'image_placeholder', text:'<short description>'} item in the region "
-        "where the figure appears AND add a matching entry to figures (same region "
-        "and, for an option/subpart, the same label). The crop is made from the "
-        "box; the placeholder is the anchor. Never invent pixels, options, or "
-        "subparts."
-    )
-
-
 def _coerce_figures(value) -> list[dict]:
     """Normalise a model ``figures`` value to clean, croppable box dicts.
 
@@ -604,88 +530,6 @@ def _coerce_question(obj: dict) -> dict:
         "primary_form": _coerce_primary_form(obj.get("primary_form")),
         "figures": _coerce_figures(obj.get("figures")),
     }
-
-
-def split_pages(pdf_bytes: bytes) -> list[bytes]:
-    """Split a PDF into one single-page PDF per page (in document order).
-
-    Each slice is fed to the model alone so it reads one page deeply rather than
-    skimming a long scanned paper. Returns ``[pdf_bytes]`` unchanged if the PDF
-    cannot be opened — the caller then does a single whole-document call."""
-    import fitz
-
-    try:
-        src = fitz.open(stream=pdf_bytes, filetype="pdf")
-    except Exception:  # noqa: BLE001 — unparseable PDF: fall back to one call
-        return [pdf_bytes]
-    try:
-        pages: list[bytes] = []
-        for i in range(src.page_count):
-            one = fitz.open()
-            try:
-                one.insert_pdf(src, from_page=i, to_page=i)
-                pages.append(one.tobytes())
-            finally:
-                one.close()
-        return pages or [pdf_bytes]
-    finally:
-        src.close()
-
-
-def count_pages(pdf_bytes: bytes) -> int:
-    """Page count with ``split_pages``'s fallback semantics: never less than 1.
-
-    An unparseable or empty PDF counts as one page — the whole-document slice
-    ``slice_page`` falls back to — so a caller iterating ``range(count_pages())``
-    over ``slice_page`` visits exactly the slices ``split_pages`` would return.
-    """
-    import fitz
-
-    try:
-        src = fitz.open(stream=pdf_bytes, filetype="pdf")
-    except Exception:  # noqa: BLE001 — unparseable PDF: one whole-document call
-        return 1
-    try:
-        return src.page_count or 1
-    finally:
-        src.close()
-
-
-def slice_page(pdf_bytes: bytes, index: int) -> bytes:
-    """One single-page PDF slice, copying only that page (O(1) per call).
-
-    The per-step counterpart to ``split_pages`` for the extraction workflow
-    (#157), whose ``extract_page`` node re-reads the PDF each super-step:
-    slicing just the wanted page keeps a paper's total split work O(pages)
-    instead of O(pages²). Same fallback as ``split_pages``: an unparseable or
-    empty PDF yields the whole document (its only slice, index 0).
-    """
-    import fitz
-
-    try:
-        src = fitz.open(stream=pdf_bytes, filetype="pdf")
-    except Exception:  # noqa: BLE001 — unparseable PDF: the whole-document slice
-        return pdf_bytes
-    try:
-        if src.page_count == 0:
-            return pdf_bytes
-        one = fitz.open()
-        try:
-            one.insert_pdf(src, from_page=index, to_page=index)
-            return one.tobytes()
-        finally:
-            one.close()
-    finally:
-        src.close()
-
-
-def _split_pages_for_runtime(pdf_bytes: bytes) -> list[bytes]:
-    """Return page slices, honoring the legacy ``bank.ingestor.split_pages`` hook."""
-    import sys
-
-    ingestor_module = sys.modules.get("bank.ingestor")
-    splitter = getattr(ingestor_module, "split_pages", split_pages)
-    return splitter(pdf_bytes)
 
 
 def merge_page_payloads(page_payloads: Iterable[dict]) -> list[dict]:

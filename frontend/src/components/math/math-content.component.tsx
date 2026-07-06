@@ -81,11 +81,7 @@ function splitMathText(text: string): MathSegment[] {
     const contentEnd = text.indexOf(delimiter.close, contentStart);
     if (contentEnd === -1) break;
     if (delimiter.index > cursor) {
-      segments.push({
-        text: text.slice(cursor, delimiter.index),
-        math: false,
-        display: false,
-      });
+      segments.push(...splitPlainFormulaText(text.slice(cursor, delimiter.index)));
     }
     segments.push({
       text: text.slice(contentStart, contentEnd),
@@ -93,6 +89,46 @@ function splitMathText(text: string): MathSegment[] {
       display: delimiter.display,
     });
     cursor = contentEnd + delimiter.close.length;
+  }
+
+  if (cursor < text.length) {
+    segments.push(...splitPlainFormulaText(text.slice(cursor)));
+  }
+  return segments;
+}
+
+const PLAIN_FORMULA_PATTERN =
+  /C[nN]H2[nN]\s*\+\s*1\s*-\s*OH|\b(?=(?:[A-Z][a-z]?\d*)+\b)(?=[A-Za-z0-9]*\d)[A-Z][A-Za-z0-9]*\b/g;
+
+function plainFormulaToLatex(value: string): string | null {
+  if (/^C[nN]H2[nN]\s*\+\s*1\s*-\s*OH$/.test(value)) {
+    return String.raw`C_nH_{2n+1}-OH`;
+  }
+
+  // Conservative chemistry shorthand: only formula-looking tokens with at
+  // least one digit reach here (H2SO4, KMnO4, O2). Words like Class/OR/What
+  // never match because they lack a digit and lowercase runs are disallowed.
+  if (!/^(?:[A-Z][a-z]?\d*)+$/.test(value) || !/\d/.test(value)) {
+    return null;
+  }
+
+  return value.replace(/(\d+)/g, '_{$1}');
+}
+
+function splitPlainFormulaText(text: string): MathSegment[] {
+  const segments: MathSegment[] = [];
+  let cursor = 0;
+
+  for (const match of text.matchAll(PLAIN_FORMULA_PATTERN)) {
+    const value = match[0];
+    const index = match.index ?? 0;
+    const latex = plainFormulaToLatex(value);
+    if (!latex) continue;
+    if (index > cursor) {
+      segments.push({ text: text.slice(cursor, index), math: false, display: false });
+    }
+    segments.push({ text: latex, math: true, display: false });
+    cursor = index + value.length;
   }
 
   if (cursor < text.length) {

@@ -16,7 +16,7 @@
  *
  * @module editorPaper
  */
-import type { Block, PartialBlock } from '@blocknote/core';
+import type { PartialBlock } from '@blocknote/core';
 import type {
   ChoiceOption,
   ContentItem,
@@ -28,6 +28,19 @@ import type {
   SlotOverrides,
   SubQuestion,
 } from '@/types';
+import {
+  contentItemsToBlockNoteBlocks,
+  contentItemsToText,
+  paragraphBlock,
+} from './editor-paper-content';
+
+export {
+  blockNoteBlocksToContentItems,
+  blockNoteBlocksToText,
+  contentItemsToText,
+  editorSlotClipboardText,
+  contentItemToText,
+} from './editor-paper-content';
 
 export type QuestionRegionBlockType =
   | 'questionStemBlock'
@@ -540,22 +553,6 @@ function questionToAlternativeView(
   };
 }
 
-export function blockNoteBlocksToContentItems(blocks: Block[]): ContentItem[] {
-  return blocks.flatMap((block): ContentItem[] => {
-    if (block.type === 'table') {
-      const rows = blockNoteTableRows(block.content);
-      return rows.length > 0 ? [{ type: 'table', rows }] : [];
-    }
-
-    const text = blockContentToText(block.content);
-    return text.length > 0 ? [{ type: 'paragraph', text }] : [];
-  });
-}
-
-export function blockNoteBlocksToText(blocks: Block[]): string[] {
-  return blocks.map((block) => blockContentToText(block.content));
-}
-
 function questionToBlockTree(
   slotId: string,
   question: DocQuestion,
@@ -865,151 +862,6 @@ function textContainsMarksLabel(text: string, marks: number) {
   return bracketedLabel.test(text) || trailingLabel.test(text);
 }
 
-export function contentItemsToText(items: ContentItem[]): string {
-  return items.map(contentItemToText).filter(Boolean).join('\n');
-}
-
-/**
- * Full printable question text for a Slot, for the per-question copy control.
- *
- * Joins the question's source regions (display prefix + region text) and
- * deliberately omits editor-only chrome — marks labels (`displaySuffix`) and
- * the question-type badge — so teachers copy the question as printed, not the
- * editor's metadata.
- */
-export function editorSlotClipboardText(slot: EditorPaperSlotView): string {
-  const lines: string[] = [];
-
-  for (const region of slot.questionBlockTree.children) {
-    if (
-      region.blockType === 'internalChoiceBlock' &&
-      (region.internalChoiceOptionIndex ?? 0) > 0
-    ) {
-      lines.push('OR');
-    } else if (
-      region.blockType === 'internalChoiceBlock' &&
-      (region.internalChoiceGroupIndex ?? 0) > 0 &&
-      (region.internalChoiceOptionIndex ?? 0) === 0
-    ) {
-      lines.push('');
-    }
-
-    const line = [region.displayPrefix, region.text]
-      .map((part) => part.trim())
-      .filter(Boolean)
-      .join(' ');
-    if (line) lines.push(line);
-  }
-
-  return lines.join('\n').trim();
-}
-
-export function contentItemToText(item: ContentItem): string {
-  if (item.text) return item.text;
-  if (item.latex) return item.latex;
-  if (item.type === 'table' && item.rows) {
-    return item.rows.map((row) => row.join(' | ')).join(' / ');
-  }
-  if (item.type === 'image_placeholder') {
-    return item.caption ? `[Diagram: ${item.caption}]` : '[Diagram]';
-  }
-  return item.caption ?? '';
-}
-
-function contentItemsToBlockNoteBlocks(items: ContentItem[]): PartialBlock[] {
-  const blocks = items.map(contentItemToBlockNoteBlock);
-
-  return blocks.length > 0 ? blocks : [paragraphBlock('')];
-}
-
-function contentItemToBlockNoteBlock(item: ContentItem): PartialBlock {
-  if (item.type === 'table' && item.rows) {
-    return {
-      type: 'table',
-      content: {
-        type: 'tableContent',
-        rows: item.rows.map((row) => ({ cells: row })),
-      },
-    };
-  }
-
-  return paragraphBlock(contentItemToText(item));
-}
-
-function blockContentToText(content: unknown): string {
-  if (typeof content === 'string') return content;
-  if (!Array.isArray(content)) return '';
-
-  return content
-    .map((item) => {
-      if (
-        item &&
-        typeof item === 'object' &&
-        'text' in item &&
-        typeof item.text === 'string'
-      ) {
-        return item.text;
-      }
-      return '';
-    })
-    .filter(Boolean)
-    .join('');
-}
-
-function blockNoteTableRows(content: unknown): string[][] {
-  if (
-    !content ||
-    typeof content !== 'object' ||
-    !('type' in content) ||
-    content.type !== 'tableContent' ||
-    !('rows' in content) ||
-    !Array.isArray(content.rows)
-  ) {
-    return [];
-  }
-
-  return content.rows
-    .map((row) => {
-      if (
-        !row ||
-        typeof row !== 'object' ||
-        !('cells' in row) ||
-        !Array.isArray(row.cells)
-      ) {
-        return [];
-      }
-
-      return row.cells.map(cellToText);
-    })
-    .filter((row) => row.length > 0);
-}
-
-function cellToText(cell: unknown): string {
-  if (typeof cell === 'string') return cell;
-  if (!Array.isArray(cell)) return '';
-
-  return cell
-    .map((item) => {
-      if (typeof item === 'string') return item;
-      if (
-        item &&
-        typeof item === 'object' &&
-        'text' in item &&
-        typeof item.text === 'string'
-      ) {
-        return item.text;
-      }
-      return '';
-    })
-    .join('');
-}
-
-function paragraphBlock(content: string): PartialBlock {
-  return {
-    type: 'paragraph',
-    content,
-  };
-}
 
 function marksLabel(marks: number): string {
   return `${marks} mark${marks === 1 ? '' : 's'}`;

@@ -44,10 +44,7 @@ import {
   getPaperFormatRendererResult,
   type PaperFormatRenderer,
 } from '@/lib/paper-format-renderers';
-import {
-  editorSlotClipboardText,
-  type EditorQuestionRegionBlock,
-} from '@/lib/editor-paper';
+import { editorSlotClipboardText } from '@/lib/editor-paper';
 import {
   reconcileAnswerDocumentForPaper,
   saveThenDownloadPdfPackage,
@@ -66,39 +63,14 @@ import {
   QuestionRegionEditor,
   SortableQuestionSlot,
 } from '@/components/editor';
+import {
+  shouldShowInternalChoiceDivider,
+  startsInternalChoiceGroup,
+  toRoman,
+} from '@/components/editor/paper-canvas-view';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { PaperAnswerDocument, PaperDocument } from '@/types';
-
-function toRoman(value: number) {
-  const numerals = [
-    'I',
-    'II',
-    'III',
-    'IV',
-    'V',
-    'VI',
-    'VII',
-    'VIII',
-    'IX',
-    'X',
-  ];
-  return numerals[value - 1] ?? String(value);
-}
-
-function shouldShowInternalChoiceDivider(region: EditorQuestionRegionBlock) {
-  return (
-    region.blockType === 'internalChoiceBlock' &&
-    (region.internalChoiceOptionIndex ?? 0) > 0
-  );
-}
-
-function startsInternalChoiceGroup(region: EditorQuestionRegionBlock) {
-  return (
-    region.blockType === 'internalChoiceBlock' &&
-    (region.internalChoiceOptionIndex ?? 0) === 0
-  );
-}
 
 export default function EditorPage() {
   const { paperId } = useParams();
