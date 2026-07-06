@@ -21,7 +21,7 @@ import {
   Check,
   ChevronDown,
   FileText,
-  Sparkles,
+  Library,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,6 +39,16 @@ export interface CoverageFormProps {
   onGenerate: () => void;
   trailing?: ReactNode;
 }
+
+/** Teacher-facing labels for the contract QuestionType codes. */
+const QUESTION_TYPE_LABELS: Record<string, string> = {
+  mcq: 'MCQ',
+  assertion_reason: 'Assertion-Reason',
+  very_short_answer: 'Very short answer',
+  short_answer: 'Short answer',
+  long_answer: 'Long answer',
+  case_based: 'Case-based',
+};
 
 export function CoverageFormView({
   form,
@@ -84,10 +94,10 @@ function PaperSetupHeader({ form }: { form: CoverageForm }) {
           </p>
         </div>
         <a
-          href="/ai-qa"
+          href="/question-bank"
           className="inline-flex h-9 w-fit items-center gap-1.5 rounded-md border bg-background px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Sparkles className="size-4" aria-hidden="true" />
+          <Library className="size-4" aria-hidden="true" />
           Question bank
         </a>
       </div>
@@ -196,7 +206,7 @@ function PaperScopePanel({
       <ScopeBlock
         title="Chapters"
         badge="Filter"
-        empty="All chapters"
+        empty="None selected yet"
         items={selectedChapterNames}
         moreCount={Math.max(0, selectedChapterNames.length - 4)}
       />
@@ -305,7 +315,7 @@ function SelectionLauncher({
             {summary}
           </p>
           <Button type="button" variant="outline" onClick={onOpen}>
-            Open {title.toLowerCase()}
+            {title}
           </Button>
         </div>
       </div>
@@ -936,7 +946,10 @@ function PaperStructureSummary({ form }: { form: CoverageForm }) {
             label="Questions"
             value={`≈ ${structureSummary.approximateQuestionCount}`}
           />
-          <SummaryItem label="Chapters" value={selectedSlugs.size} />
+          <SummaryItem
+            label="Chapters"
+            value={selectedSlugs.size || 'None yet'}
+          />
         </dl>
       </div>
       <details className="group mt-3 border-t pt-3">
@@ -954,7 +967,7 @@ function PaperStructureSummary({ form }: { form: CoverageForm }) {
                 key={type}
                 className="flex justify-between gap-3 rounded-md bg-secondary/55 px-2 py-1.5"
               >
-                <span>{type}</span>
+                <span>{QUESTION_TYPE_LABELS[type] ?? type}</span>
                 <span className="font-medium">{marks}</span>
               </li>
             ),

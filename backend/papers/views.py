@@ -35,7 +35,7 @@ from .answer_document import (
 from .assets import strip_resolved_asset_urls, with_resolved_asset_urls
 from .builder import PaperBuilder
 from .document import reconcile_document_format_defaults
-from .document_contract import PaperDocumentContractError
+from .document_contract import PaperDocumentContractError, validate_paper_document
 from .models import Paper, PaperFormat, PaperStatus
 from .pdf import (
     PdfRenderBusyError,
@@ -50,6 +50,42 @@ logger = logging.getLogger(__name__)
 
 _PDF_CACHE_TTL = 60 * 60 * 24  # 1 day
 _SCHEMA_VERSION = "paper_document.v1"
+
+
+def _asset_url(asset_id: str) -> str:
+    """Loadable URL for a stored asset, resolved for the requesting browser.
+
+    Local storage returns a path-relative URL (MEDIA_URL has no leading slash);
+    force it root-relative so the browser resolves it against the page origin —
+    the dev server proxies ``/media`` to the backend. A remote backend (signed
+    S3/CDN) already returns an absolute URL, which is left untouched. A
+    host-absolute URL is deliberately NOT built from the request here: behind
+    the dev proxy the request host is the Docker-internal service name
+    (``web:8000``), which a teacher's browser cannot resolve.
+    """
+    url = default_storage.url(asset_id)
+    if "://" not in url and not url.startswith("/"):
+        url = "/" + url
+    return url
+
+
+def _validate_document_contract(document: dict) -> Response | None:
+    """Reject a draft save whose document breaks the v1 contract.
+
+    The same guard the builder applies to its own output: persisting an invalid
+    document would only surface later as the opaque editor "Unable to open
+    paper", so a bad client payload is a clean 400 here instead.
+    """
+    errors = validate_paper_document(document)
+    if errors:
+        return Response(
+            {
+                "error": "Paper document failed contract validation.",
+                "details": errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    return None
 
 
 def _marks_by_question_type(template) -> dict[str, int]:
@@ -122,7 +158,14 @@ class PaperDetailView(APIView):
     def get(self, request, pk):
         paper = get_object_or_404(Paper, pk=pk, created_by=request.user)
         if paper.document is not None:
-            return Response(_document_with_format_defaults(paper))
+            # Enrich the response copy with loadable asset URLs so consumers
+            # that render diagrams (the print route feeding PDF download) can
+            # show them. The stored document keeps the assetId-only shape.
+            return Response(
+                with_resolved_asset_urls(
+                    _document_with_format_defaults(paper), _asset_url
+                )
+            )
         return Response(PaperSerializer(paper).data)
 
     def patch(self, request, pk):
@@ -141,6 +184,12 @@ class PaperDetailView(APIView):
                 {"error": f"document.schemaVersion must be '{_SCHEMA_VERSION}'."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        # The GET above enriches asset items with a non-canonical ``url``; a
+        # client that round-trips that copy must not persist it (contract §13).
+        document = strip_resolved_asset_urls(document)
+        invalid = _validate_document_contract(document)
+        if invalid is not None:
+            return invalid
         paper.document = document
         # Bump the revision so a queued AI job (#31) whose base_revision was
         # taken before this edit is cancelled by the drain instead of spending
@@ -172,22 +221,14 @@ class PaperEditorDraftView(APIView):
 
         # Enrich the response copies with backend-issued asset URLs the editor
         # can load (grill decision on #122). The stored documents keep the lean
-        # canonical assetId-only shape; the url is non-canonical and request-
-        # absolute, so it must never be persisted.
-        def url_for(asset_id: str) -> str:
-            url = default_storage.url(asset_id)
-            # Local storage returns a path-relative URL (MEDIA_URL has no leading
-            # slash); force it root-relative so build_absolute_uri anchors it at
-            # the host, not the API path. A remote backend (signed S3/CDN) already
-            # returns an absolute URL, which is left untouched.
-            if "://" not in url and not url.startswith("/"):
-                url = "/" + url
-            return request.build_absolute_uri(url)
-
+        # canonical assetId-only shape; the url is non-canonical, so it must
+        # never be persisted.
         return Response(
             {
-                "document": with_resolved_asset_urls(paper.document, url_for),
-                "answer_document": with_resolved_asset_urls(answer_document, url_for),
+                "document": with_resolved_asset_urls(paper.document, _asset_url),
+                "answer_document": with_resolved_asset_urls(
+                    answer_document, _asset_url
+                ),
                 "status": paper.status,
             }
         )
@@ -230,6 +271,9 @@ class PaperEditorDraftView(APIView):
         # so the editor round-trip never leaks a host-absolute/expiring URL into
         # the stored documents (kept assetId-only, contract §13).
         document = strip_resolved_asset_urls(document)
+        invalid = _validate_document_contract(document)
+        if invalid is not None:
+            return invalid
         answer_document = strip_resolved_asset_urls(request.data.get("answer_document"))
         if not isinstance(answer_document, dict):
             return Response(

@@ -41,7 +41,12 @@ function shouldUseTypesetQuestionRegionPreview(items: ContentItem[]) {
   return items.some(
     (item) =>
       Boolean(item.latex && latexHasMath(item.latex)) ||
-      Boolean(item.text && textContainsMathDelimiter(item.text)),
+      Boolean(item.text && textContainsMathDelimiter(item.text)) ||
+      // BlockNote flattens content to plain paragraphs, so editing a region
+      // that carries a stored diagram would silently drop the image from the
+      // committed override. Image-bearing regions render as typeset previews,
+      // the same rule math regions already follow.
+      (item.type === 'image' && Boolean(item.assetId)),
   );
 }
 

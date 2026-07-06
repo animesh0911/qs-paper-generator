@@ -44,6 +44,10 @@ export default defineConfig({
     allowedHosts: ['frontend'],
     proxy: {
       '/api': { target: apiTarget, changeOrigin: true },
+      // Diagram assets: the backend resolves assetIds to root-relative
+      // /media/... URLs, so images load through the page's own origin — from
+      // the host browser and from the backend's print Chromium alike.
+      '/media': { target: apiTarget, changeOrigin: true },
     },
   },
 });

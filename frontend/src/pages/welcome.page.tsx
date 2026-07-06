@@ -21,19 +21,19 @@ const WORKFLOWS = [
   {
     to: '/generate',
     title: 'Generate',
-    description: 'Build from the bank.',
+    description: 'Assemble a CBSE-style paper from your bank.',
     icon: FileText,
   },
   {
     to: '/upload',
     title: 'Upload',
-    description: 'Add PDFs.',
+    description: 'Add questions from past-paper PDFs.',
     icon: UploadCloud,
   },
   {
     to: '/ai-qa',
     title: 'AI Q&A',
-    description: 'Create candidates.',
+    description: 'Draft new questions with AI.',
     icon: Sparkles,
   },
 ] as const;
@@ -48,7 +48,7 @@ export default function WelcomePage() {
         <section aria-labelledby="welcome-heading" className="w-full">
           <div className="mb-7 max-w-2xl lg:mb-8">
             <p className="text-sm font-medium text-muted-foreground">
-              Exam desk
+              Exam Desk
             </p>
             <h1
               id="welcome-heading"
@@ -57,7 +57,8 @@ export default function WelcomePage() {
               Welcome, {welcomeName}.
             </h1>
             <p className="mt-2 text-base leading-7 text-muted-foreground">
-              Upload and AI Q&A feed the bank. Generate uses it.
+              Grow the question bank by upload or AI, then generate a paper from
+              it.
             </p>
           </div>
 

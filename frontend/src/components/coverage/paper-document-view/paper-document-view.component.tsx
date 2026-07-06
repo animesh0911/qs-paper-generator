@@ -623,6 +623,27 @@ function PaperContentItem({ item }: { item: ContentItem }) {
     );
   }
 
+  // Stored diagram crops. The backend resolves `assetId` to a loadable `url`
+  // on the document endpoints; a missing URL falls through to the visible
+  // `[Diagram]` marker below so the gap is never silent on paper or print.
+  if (item.type === 'image' && item.assetId) {
+    const url = (item as ContentItem & { url?: string }).url;
+    if (url) {
+      return (
+        <img
+          className="paper-content-image"
+          src={url}
+          alt={item.caption || 'Question diagram'}
+        />
+      );
+    }
+    return (
+      <p className="paper-content-image-missing">
+        {item.caption ? `[Diagram: ${item.caption}]` : '[Diagram]'}
+      </p>
+    );
+  }
+
   // Math lives in a dedicated `latex` field — typeset it rather than dumping
   // the raw source. Use the same mixed prose + math renderer as the editor info
   // drawer: plain `\text{…}` wrappers become readable text, while genuine math

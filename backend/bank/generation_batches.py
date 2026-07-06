@@ -16,7 +16,7 @@ from datetime import timedelta
 from uuid import uuid4
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils import timezone
 
 from ai_services.errors import friendly_llm_error
@@ -391,6 +391,7 @@ def list_generation_batches(user, *, limit: int = 20):
     return list(
         GenerationBatch.objects.filter(created_by=user, school=user.school)
         .prefetch_related("chapters")
+        .annotate(candidate_count_annotation=Count("candidates"))
         .order_by("created_at")[:limit]
     )
 

@@ -420,6 +420,17 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
     distribution = _default_distribution_for_count(total_candidates)
     per_node_lines = _per_node_target_lines(targets, generation_targets)
     grounding_lines = _grounding_prompt_lines(request.grounding_manifest)
+    long_answer_target = final_distribution.get(str(QuestionType.LA), 0)
+    long_answer_line = (
+        [
+            "Meet the final reviewed batch target as closely as possible; this "
+            f"batch should include about {long_answer_target} long_answer items."
+        ]
+        if long_answer_target
+        else [
+            "Meet the final reviewed batch target as closely as possible.",
+        ]
+    )
     return "\n".join(
         [
             "Generate CBSE Class 10 Science Question-and-answer candidates.",
@@ -431,11 +442,11 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
             "Distribute candidates approximately equally across selected "
             "Chapters unless the configured distribution says otherwise.",
             *per_node_lines,
-            f"Difficulty targets: {difficulty}",
+            f"Difficulty targets (percent of candidates, easy/medium/hard): "
+            f"{difficulty}",
             f"Requested counts by QuestionType: {distribution}",
             f"Final reviewed batch target by QuestionType: {final_distribution}",
-            "Meet the final reviewed batch target as closely as possible; for a "
-            "30-question batch this should include about 5 long_answer items.",
+            *long_answer_line,
             "Marks are fixed by QuestionType: mcq=1, very_short_answer=2, "
             "short_answer=3, long_answer=5.",
             "raw_text must be a non-empty plain-text copy of the full Question "
@@ -447,12 +458,14 @@ def build_question_generation_prompt(request: QuestionGenerationRequest) -> str:
             "English words/symbols; do not include Hindi/Sanskrit terms unless "
             "the scientific term itself requires them.",
             "Use content.stem as an array of paragraph blocks. For MCQ only, "
-            "include content.options as four objects with label A-D and "
-            "paragraph content; non-MCQ content must still include content.stem.",
+            "include content.options as exactly four objects labelled A, B, C, D "
+            "with paragraph content; non-MCQ content must still include "
+            "content.stem.",
             "Every question must be self-contained for a student who cannot see "
             "the NCERT excerpt. Do not write phrases like 'as recorded in Section', "
-            "'according to the excerpt', 'based on the given data/table/figure', "
-            "or 'above process' unless the needed data/process/table is explicitly "
+            "'according to the excerpt', 'according to the experimental data', "
+            "'based on the given data/table/figure', 'as shown/seen above', or "
+            "'above process' unless the needed data/process/table is explicitly "
             "reproduced in content.stem/options.",
             "For MCQ, create exactly one unambiguously correct option. Distractors "
             "must be plausible but clearly wrong from the cited NCERT text, and "

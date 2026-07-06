@@ -69,7 +69,9 @@ def chat(request):
     serializer.is_valid(raise_exception=True)
     paper = _get_owned_paper(request, serializer.validated_data["paperId"])
     message = assistant.answer_chat(
-        serializer.validated_data["text"], paper_title=paper.title
+        serializer.validated_data["text"],
+        paper_title=paper.title,
+        snapshot=assistant.paper_snapshot(paper.document),
     )
     return Response({"status": "chat", "message": message})
 

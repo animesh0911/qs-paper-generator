@@ -7,6 +7,23 @@ from factory.django import DjangoModelFactory
 from accounts.models import School, User
 from bank.models import Chapter, Question, QuestionType, Section
 
+# Ambient extraction config that would make tests pick a *live* pipeline. With
+# EXTRACTION_PIPELINE=mistral-ocr-* in the shell (a normal dev .env), the drain
+# tests would silently call the real Mistral API — a paid, network-dependent
+# test run. Tests must always exercise the default injected-fake path unless
+# they opt in explicitly.
+_LIVE_PIPELINE_ENV_VARS = (
+    "EXTRACTION_PIPELINE",
+    "MISTRAL_API_KEY",
+    "MISTRAL_OCR_API",
+)
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_extraction_env(monkeypatch):
+    for name in _LIVE_PIPELINE_ENV_VARS:
+        monkeypatch.delenv(name, raising=False)
+
 
 class SchoolFactory(DjangoModelFactory):
     class Meta:

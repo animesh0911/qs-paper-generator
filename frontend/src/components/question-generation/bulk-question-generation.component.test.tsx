@@ -127,7 +127,9 @@ describe('BulkQuestionGenerationSetup', () => {
     );
 
     expect(html.match(/10.1 The Human Eye/g)).toHaveLength(1);
-    expect(html).not.toContain('Nutrition and respiration in living organisms.');
+    expect(html).not.toContain(
+      'Nutrition and respiration in living organisms.',
+    );
   });
 
   it('prevents generation until at least one topic is selected', () => {
@@ -456,8 +458,10 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain('Review generated Q&amp;A');
     expect(html).toContain('Ready to review');
     expect(html).not.toContain('Q&amp;A generation is in progress');
-    expect(html).toContain('1 candidate ready');
-    expect(html).not.toContain('passed validation and is shown for teacher review');
+    expect(html).toContain('1 question ready for review');
+    expect(html).not.toContain(
+      'passed validation and is shown for teacher review',
+    );
     expect(html).toContain('1</span> accepted');
     expect(html).toContain('0</span> rejected');
     expect(html).toContain('Which process releases energy from glucose?');

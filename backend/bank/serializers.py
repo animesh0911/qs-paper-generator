@@ -17,6 +17,7 @@ from rest_framework import serializers
 
 from corpus.models import ChapterMapNode
 
+from .citation_support import review_candidate_citation_support
 from .generation import DIFFICULTY_TARGETS_BY_PRESET
 from .models import (
     AnswerGenerationJob,
@@ -100,19 +101,41 @@ class BankQuestionSerializer(serializers.ModelSerializer):
         ]
 
 
+MAX_UPLOAD_PDF_BYTES = 25 * 1024 * 1024  # Mirrors the dropzone's "up to 25 MB".
+
+
 class IngestionUploadSerializer(serializers.Serializer):
     """Validates a teacher's PDF-upload request (multipart/form-data).
 
     ``pdf`` is the source file; ``source_type`` is the caller-supplied
     provenance (one of ``SourceType``), defaulting to ``previous_year_paper`` —
     no longer hardcoded on the server. The view (not this serializer) supplies
-    ``school`` and ``created_by`` from the authenticated teacher."""
+    ``school`` and ``created_by`` from the authenticated teacher.
+
+    The size/magic-byte checks reject a bad file at upload time with an
+    actionable message, instead of queueing a job the drain worker can only
+    fail minutes later."""
 
     pdf = serializers.FileField()
     source_type = serializers.ChoiceField(
         choices=SourceType.choices,
         default=SourceType.PREVIOUS_YEAR_PAPER,
     )
+
+    def validate_pdf(self, value):
+        if value.size > MAX_UPLOAD_PDF_BYTES:
+            raise serializers.ValidationError(
+                "This file is larger than 25 MB. Compress the PDF or split the "
+                "paper into smaller files, then try again."
+            )
+        head = value.read(5)
+        value.seek(0)
+        if head != b"%PDF-":
+            raise serializers.ValidationError(
+                "This file is not a PDF. Export or scan the paper as a PDF, "
+                "then try again."
+            )
+        return value
 
 
 class IngestionJobSerializer(serializers.ModelSerializer):
@@ -257,11 +280,16 @@ class GenerationBatchSerializer(serializers.ModelSerializer):
         return list(obj.chapters.order_by("order").values_list("slug", flat=True))
 
     def get_candidate_count(self, obj):
-        return obj.candidates.count()
+        # The list view annotates the count so 20 polled batches don't issue 20
+        # extra COUNT queries; single-batch serialization falls back to a query.
+        annotated = getattr(obj, "candidate_count_annotation", None)
+        return obj.candidates.count() if annotated is None else annotated
 
 
 class GeneratedQuestionCandidateSerializer(serializers.ModelSerializer):
     """Review-list shape for valid generated Question candidates."""
+
+    support_review = serializers.SerializerMethodField()
 
     class Meta:
         model = GeneratedQuestionCandidate
@@ -270,12 +298,36 @@ class GeneratedQuestionCandidateSerializer(serializers.ModelSerializer):
             "status",
             "payload",
             "grounding_manifest",
+            "support_review",
             "question_id",
             "accepted_at",
             "rejected_at",
             "created_at",
             "updated_at",
         ]
+
+    def get_support_review(self, obj):
+        """Deterministic citation-support screen (``bank.citation_support``).
+
+        Computed at serialization time so no migration/backfill is needed: it
+        checks whether the cited NCERT excerpts lexically support the generated
+        question and answer, and flags formula/diagram-shaped prompts. ``None``
+        for ungrounded batches (no excerpts to check against). This is a
+        review aid, not a proof — the teacher still owns acceptance.
+        """
+        manifest = obj.grounding_manifest or {}
+        if not isinstance(manifest, dict) or not manifest.get("excerpts"):
+            return None
+        review = review_candidate_citation_support(obj.payload or {}, manifest)
+        return {
+            "supported": review.supported,
+            "question_supported": review.question_supported,
+            "answer_supported": review.answer_supported,
+            "issues": [
+                {"field": issue.field, "code": issue.code, "detail": issue.detail}
+                for issue in review.issues
+            ],
+        }
 
 
 class GenerationBatchAcceptSerializer(serializers.Serializer):

@@ -82,7 +82,9 @@ def _create_batch(api_client, *, chapter_slugs=None, chapter_map_node_ids=None):
     )
 
 
-def test_generation_polling_does_not_throttle_generate_sources(api_client, user, settings):
+def test_generation_polling_does_not_throttle_generate_sources(
+    api_client, user, settings
+):
     """Background generation polling must not block the Generate source picker."""
     settings.REST_FRAMEWORK = {
         **settings.REST_FRAMEWORK,
@@ -120,7 +122,6 @@ def test_sources_lists_accepted_ai_sessions_with_imported_question_count(
         accepted_at=timezone.now(),
         difficulty_preset="balanced",
         requested_count=3,
-        candidate_count=3,
     )
     batch.chapters.set([chapter])
     imported_question = Question.objects.create(

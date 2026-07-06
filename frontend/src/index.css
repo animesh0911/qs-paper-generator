@@ -828,6 +828,21 @@
     vertical-align: top;
   }
 
+  /* Stored diagram crops inside question content. Sized like a board paper
+     figure: block-level, capped so a tall crop never dominates the page. */
+  .paper-content-image {
+    display: block;
+    margin: 5pt 0;
+    max-width: 62%;
+    max-height: 170pt;
+    object-fit: contain;
+  }
+
+  .paper-content-image-missing {
+    margin: 3pt 0;
+    font-style: italic;
+  }
+
   .paper-marks {
     justify-self: end;
     padding-top: 0.15em;

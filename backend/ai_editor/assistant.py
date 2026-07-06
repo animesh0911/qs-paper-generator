@@ -92,13 +92,59 @@ def classify_intent(text: str, *, paper_title: str) -> dict:
     return {"route": route, "reason": result.reason}
 
 
-def answer_chat(text: str, *, paper_title: str) -> str:
+def paper_snapshot(document: dict | None) -> str:
+    """Compact factual summary of a paper document for grounding chat answers.
+
+    Without this the chat model only sees the paper *title* and must guess at
+    section structure or marks — the classic hallucination setup. A few lines of
+    derived facts (sections, filled slots, marks) cost ~100 tokens and let the
+    model answer "how many marks is Section C" from data instead of invention.
+    Returns "" when there is no document; the prompt then says so explicitly.
+    """
+    if not isinstance(document, dict):
+        return ""
+    paper = document.get("paper")
+    if not isinstance(paper, dict):
+        return ""
+    lines: list[str] = []
+    total_marks = paper.get("totalMarks")
+    duration = paper.get("durationMinutes")
+    if total_marks is not None:
+        lines.append(f"Total marks: {total_marks}.")
+    if duration:
+        lines.append(f"Duration: {duration} minutes.")
+    for section in paper.get("sections", []):
+        if not isinstance(section, dict):
+            continue
+        slots = [slot for slot in section.get("slots") or [] if isinstance(slot, dict)]
+        filled = sum(1 for slot in slots if slot.get("selectedQuestionId"))
+        or_groups = {
+            slot.get("orGroup") for slot in slots if slot.get("orGroup") is not None
+        }
+        question_count = (
+            len(slots) - sum(1 for s in slots if s.get("orGroup") is not None)
+        ) + len(or_groups)
+        title = section.get("title") or section.get("id") or "Section"
+        subtitle = section.get("subtitle")
+        label = f"{title} ({subtitle})" if subtitle else str(title)
+        lines.append(
+            f"{label}: {question_count} questions "
+            f"({filled}/{len(slots)} slots filled), {section.get('marks')} marks."
+        )
+    return "\n".join(lines)
+
+
+def answer_chat(text: str, *, paper_title: str, snapshot: str = "") -> str:
     """Answer a read-only paper/editor question. Never proposes a change."""
+    facts = snapshot or "No structure facts are available for this paper."
     prompt = (
         f"{_GUARDRAIL}\n\n"
         f"Paper: {paper_title!r}.\n"
-        f"Answer the teacher's question concisely. Do not propose document "
-        f"changes.\n\n"
+        f"Paper facts:\n{facts}\n\n"
+        f"Answer the teacher's question concisely. Ground every number or "
+        f"structural claim in the paper facts above; if the facts do not cover "
+        f"it, say you cannot see that detail rather than guessing. Do not "
+        f"propose document changes.\n\n"
         f"Question: {text}"
     )
     return (make_model(ModelPurpose.EDITOR_ASSISTANT) | StrOutputParser()).invoke(
