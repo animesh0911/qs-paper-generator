@@ -92,7 +92,7 @@ function useBankQuestionCount(): BankCountState {
 
   useEffect(() => {
     let cancelled = false;
-    fetchBankQuestions({ limit: 1 })
+    fetchBankQuestions({ limit: 1 }, { clearAuthOnUnauthorized: false })
       .then((response) => {
         if (!cancelled) setState({ status: 'ready', count: response.count });
       })

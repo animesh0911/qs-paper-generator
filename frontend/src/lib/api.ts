@@ -64,23 +64,32 @@ export function onTokenChange(listener: () => void): () => void {
   };
 }
 
+type ApiRequestOptions = RequestInit & {
+  /**
+   * Authenticated background adornments can opt out so a non-critical 401 does
+   * not kick the teacher off the current screen.
+   */
+  clearAuthOnUnauthorized?: boolean;
+};
+
 async function request(
   path: string,
-  options: RequestInit = {},
+  options: ApiRequestOptions = {},
   tokenOverride?: string | null,
 ): Promise<Response> {
   // FormData bodies must set their own multipart boundary, so we never force a
   // JSON Content-Type on them (the PDF upload relies on this).
   const isFormData =
     typeof FormData !== 'undefined' && options.body instanceof FormData;
+  const { clearAuthOnUnauthorized = true, ...fetchOptions } = options;
   const headers: Record<string, string> = {
     ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-    ...(options.headers as Record<string, string>),
+    ...(fetchOptions.headers as Record<string, string>),
   };
   const token = tokenOverride === undefined ? getToken() : tokenOverride;
   if (token) headers['Authorization'] = `Token ${token}`;
 
-  const res = await fetch(`/api${path}`, { ...options, headers });
+  const res = await fetch(`/api${path}`, { ...fetchOptions, headers });
   if (!res.ok) {
     let detail = `Request failed (${res.status})`;
     try {
@@ -90,6 +99,7 @@ async function request(
       /* ignore non-JSON error bodies */
     }
     if (
+      clearAuthOnUnauthorized &&
       tokenOverride === undefined &&
       token &&
       (res.status === 401 || res.status === 403)
@@ -283,6 +293,7 @@ export async function fetchBankQuestionSources(): Promise<
 /** List bank questions for the browsable Question Bank view (paginated). */
 export async function fetchBankQuestions(
   filters: BankQuestionFilters = {},
+  options: ApiRequestOptions = {},
 ): Promise<BankQuestionsResponse> {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(filters)) {
@@ -291,7 +302,10 @@ export async function fetchBankQuestions(
     }
   }
   const query = params.toString();
-  const res = await request(`/bank/questions/${query ? `?${query}` : ''}`);
+  const res = await request(
+    `/bank/questions/${query ? `?${query}` : ''}`,
+    options,
+  );
   return res.json();
 }
 

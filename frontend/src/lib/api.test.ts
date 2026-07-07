@@ -18,6 +18,7 @@ import {
   fetchEditorDraft,
   fetchGenerationBatch,
   fetchGenerationCandidates,
+  fetchBankQuestions,
   fetchPaperFormats,
   fetchPaperDocument,
   getToken,
@@ -121,6 +122,25 @@ describe('paper formats', () => {
     await expect(fetchPaperDocument('paper_1', 'print-token')).rejects.toThrow(
       'Invalid token.',
     );
+
+    expect(getToken()).toBe('current-session-token');
+  });
+
+  it('can keep the current screen mounted when a non-critical request is unauthorized', async () => {
+    storage.set('qpg_token', 'current-session-token');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ detail: 'Invalid token.' }), {
+            status: 401,
+          }),
+      ),
+    );
+
+    await expect(
+      fetchBankQuestions({ limit: 1 }, { clearAuthOnUnauthorized: false }),
+    ).rejects.toThrow('Invalid token.');
 
     expect(getToken()).toBe('current-session-token');
   });
