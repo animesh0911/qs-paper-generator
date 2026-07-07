@@ -33,98 +33,80 @@
 }
 
 @layer components {
-  .qpg-welcome-note,
-  .qpg-flow-stage {
-    border-color: rgb(148 163 184 / 0.28);
+  .qpg-flow-card {
+    border-color: hsl(var(--muted-foreground) / 0.35);
   }
 
-  .qpg-flow-stage {
-    isolation: isolate;
-  }
-
-  .qpg-flow-line {
-    background-color: rgb(100 116 139 / 0.28);
-    overflow: hidden;
-  }
-
-  .qpg-flow-line::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgb(15 23 42 / 0) 28%,
-      rgb(15 23 42 / 0.42) 50%,
-      rgb(15 23 42 / 0) 72%,
-      transparent 100%
-    );
-    background-size: 240% 100%;
-    animation: qpg-flow-east 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-  }
-
-  .qpg-flow-line-south::after {
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgb(15 23 42 / 0) 28%,
-      rgb(15 23 42 / 0.38) 50%,
-      rgb(15 23 42 / 0) 72%,
-      transparent 100%
-    );
-    background-size: 100% 240%;
-    animation-name: qpg-flow-south;
-    animation-delay: 0.35s;
-  }
-
-  .qpg-flow-line-final::after {
-    animation-delay: 0.7s;
-  }
-
-  .qpg-flow-card,
-  .qpg-flow-bridge-label {
-    border-color: rgb(148 163 184 / 0.34);
-  }
-
+  /*
+   * Pipeline nodes fade in with a short stagger. Opacity only: the welcome
+   * wires are measured from the cards' rendered boxes, and a transform-based
+   * entrance would put the measurement 6-8px off while it plays.
+   */
   .qpg-flow-node {
     --qpg-flow-order: 0;
-    animation: qpg-flow-node-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(var(--qpg-flow-order) * 70ms);
+    animation: qpg-flow-node-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--qpg-flow-order) * 55ms);
   }
 
   @keyframes qpg-flow-node-in {
     from {
       opacity: 0;
-      transform: translateY(8px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
     }
   }
 
-  @keyframes qpg-flow-east {
+  .qpg-wire-layer {
+    animation: qpg-wire-in 420ms ease-out 260ms both;
+  }
+
+  @keyframes qpg-wire-in {
     from {
-      background-position: 140% 0;
+      opacity: 0;
     }
     to {
-      background-position: -140% 0;
+      opacity: 1;
     }
   }
 
-  @keyframes qpg-flow-south {
+  .qpg-wire {
+    stroke: hsl(var(--muted-foreground) / 0.45);
+  }
+
+  /* A short dash travelling along each wire, in the direction of data flow. */
+  .qpg-wire-comet {
+    stroke: hsl(var(--foreground) / 0.45);
+    stroke-dasharray: 9 91;
+    stroke-linecap: round;
+    animation: qpg-wire-flow 3.2s linear infinite;
+  }
+
+  @keyframes qpg-wire-flow {
     from {
-      background-position: 0 -140%;
+      stroke-dashoffset: 100;
     }
     to {
-      background-position: 0 140%;
+      stroke-dashoffset: 0;
     }
+  }
+
+  .qpg-wire-port {
+    fill: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  .qpg-wire-arrow {
+    fill: hsl(var(--muted-foreground) / 0.55);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .qpg-flow-node,
-    .qpg-flow-line::after {
+    .qpg-wire-layer {
       animation: none;
+    }
+
+    .qpg-wire-comet {
+      display: none;
     }
   }
 

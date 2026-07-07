@@ -17,8 +17,17 @@ vi.mock('@/hooks/useAuth.hook', () => ({
   useAuth: () => ({ logout: vi.fn() }),
 }));
 
+vi.mock('@/lib/api', () => ({
+  fetchBankQuestions: vi.fn(async () => ({
+    count: 0,
+    limit: 1,
+    offset: 0,
+    results: [],
+  })),
+}));
+
 describe('WelcomePage', () => {
-  it('presents the three primary workflows after sign-in', () => {
+  it('presents the pipeline: sources feed the bank, generate uses it', () => {
     const html = renderToStaticMarkup(<WelcomePage />);
 
     expect(html).toContain('Welcome, Varad.');
@@ -26,18 +35,14 @@ describe('WelcomePage', () => {
     expect(html).toContain(
       'Grow the question bank by upload or AI, then generate a paper',
     );
-    expect(html).toContain('Generate');
-    expect(html).toContain('Upload');
+    expect(html).toContain('Upload papers');
     expect(html).toContain('AI Q&amp;A');
     expect(html).toContain('Question bank');
-    expect(html).toContain('Feeds bank');
-    expect(html).toContain('Uses bank');
-    expect(html).not.toContain('Class 10 Science exam desk');
-    expect(html).not.toContain('Verified question bank');
+    expect(html).toContain('Generate paper');
     expect(html).not.toContain('Sign out');
-    expect(html).not.toContain('Diagram variants');
-    expect(html).toContain('href="/generate"');
     expect(html).toContain('href="/upload"');
     expect(html).toContain('href="/ai-qa"');
+    expect(html).toContain('href="/question-bank"');
+    expect(html).toContain('href="/generate"');
   });
 });
