@@ -4,7 +4,7 @@ import type {
   GenerationBatch,
   GeneratedQuestionCandidate,
 } from '@/types';
-import { Check, LoaderCircle, MousePointer2, X } from 'lucide-react';
+import { ArrowLeft, Check, LoaderCircle, MousePointer2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CandidateReviewPanel } from './candidate-review-panel.component';
@@ -142,63 +142,67 @@ export function BulkQuestionGenerationSetup({
           )}
           {reviewableBatches.length > 0 && (
             <ul className="space-y-2">
-              {reviewableBatches.map(({ batch, ready, failed, statusLabel, detail }) => {
-                return (
-                  <li
-                    key={batch.id}
-                    className="flex flex-col gap-2 rounded-lg border border-white/70 bg-white/70 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <span className="text-sm leading-5">
-                      <span className="font-medium">
-                        Batch #{batch.id} · {statusLabel}
-                      </span>
-                      <span
-                        className={cn(
-                          'block',
-                          failed ? 'text-destructive' : 'text-muted-foreground',
-                        )}
-                      >
-                        {detail}
-                      </span>
-                    </span>
-                    {failed ? (
-                      <span className="flex shrink-0 items-center gap-2">
-                        {onRetryBatch && (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onRetryBatch(batch.id)}
-                          >
-                            Retry
-                          </Button>
-                        )}
-                        {onDiscardBatch && (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => onDiscardBatch(batch.id)}
-                          >
-                            Remove
-                          </Button>
-                        )}
-                      </span>
-                    ) : (
-                      onOpenBatch && (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant={ready ? 'default' : 'outline'}
-                          onClick={() => onOpenBatch(batch.id)}
+              {reviewableBatches.map(
+                ({ batch, ready, failed, statusLabel, detail }) => {
+                  return (
+                    <li
+                      key={batch.id}
+                      className="flex flex-col gap-2 rounded-lg border border-white/70 bg-white/70 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <span className="text-sm leading-5">
+                        <span className="font-medium">
+                          Batch #{batch.id} · {statusLabel}
+                        </span>
+                        <span
+                          className={cn(
+                            'block',
+                            failed
+                              ? 'text-destructive'
+                              : 'text-muted-foreground',
+                          )}
                         >
-                          {ready ? 'Review draft' : 'View progress'}
-                        </Button>
-                      )
-                    )}
-                  </li>
-                );
-              })}
+                          {detail}
+                        </span>
+                      </span>
+                      {failed ? (
+                        <span className="flex shrink-0 items-center gap-2">
+                          {onRetryBatch && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onRetryBatch(batch.id)}
+                            >
+                              Retry
+                            </Button>
+                          )}
+                          {onDiscardBatch && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => onDiscardBatch(batch.id)}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </span>
+                      ) : (
+                        onOpenBatch && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant={ready ? 'default' : 'outline'}
+                            onClick={() => onOpenBatch(batch.id)}
+                          >
+                            {ready ? 'Review draft' : 'View progress'}
+                          </Button>
+                        )
+                      )}
+                    </li>
+                  );
+                },
+              )}
             </ul>
           )}
         </section>
@@ -469,6 +473,7 @@ export interface GenerationProgressWorkspaceProps {
   onAcceptCandidates: (acceptedCandidateIds: number[]) => void;
   onRetryCandidates: () => void;
   onBackToPaperSetup: () => void;
+  onBackToGeneratePaper?: () => void;
   discarding?: boolean;
   discardError?: string;
   onGenerateAnother?: () => void;
@@ -518,6 +523,7 @@ export function GenerationProgressWorkspace({
   onAcceptCandidates,
   onRetryCandidates,
   onBackToPaperSetup,
+  onBackToGeneratePaper,
   discarding = false,
   discardError = '',
   onGenerateAnother,
@@ -541,7 +547,8 @@ export function GenerationProgressWorkspace({
   // On a still-active review batch this discards first; on a settled batch it
   // just returns to the (pre-filled) setup. Either way it frees a queue slot,
   // so the teacher never needs the browser back button to generate again.
-  const canGenerateAnother = Boolean(onGenerateAnother) && batchCanGenerateAnother;
+  const canGenerateAnother =
+    Boolean(onGenerateAnother) && batchCanGenerateAnother;
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -556,11 +563,25 @@ export function GenerationProgressWorkspace({
                 We’ll prepare the Q&amp;A and bring it here for review.
               </p>
             </div>
-            {batch && (
-              <span className="inline-flex w-fit rounded-md bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-                {progressStageLabel(batch.status)}
-              </span>
-            )}
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              {onBackToGeneratePaper && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={onBackToGeneratePaper}
+                  className="gap-1.5 bg-background"
+                >
+                  <ArrowLeft className="size-4" aria-hidden="true" />
+                  Back to Generate paper
+                </Button>
+              )}
+              {batch && (
+                <span className="inline-flex w-fit rounded-md bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                  {progressStageLabel(batch.status)}
+                </span>
+              )}
+            </div>
           </div>
 
           {loading && !batch && (
@@ -715,13 +736,6 @@ export function GenerationProgressWorkspace({
                             : ''}
                       </p>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={onBackToPaperSetup}
-                    >
-                      Back to paper setup
-                    </Button>
                   </div>
                   <CandidateReviewPanel
                     candidates={visibleCandidates}

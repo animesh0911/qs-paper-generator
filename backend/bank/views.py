@@ -138,8 +138,9 @@ def sources(request):
         parse_quality__in=["clean", "partial"],
     )
     source_fields = ("source_type", "source_name", "source_file_name")
+    bank_source_questions = visible_questions.filter(ingestion_job__isnull=True)
     bank_sources = (
-        visible_questions.exclude(source_file_name="")
+        bank_source_questions.exclude(source_file_name="")
         .values(*source_fields)
         .annotate(question_count=Count("id"), created_at=Max("created_at"))
     )
@@ -149,7 +150,7 @@ def sources(request):
             (row["source_type"], row["source_name"], row["source_file_name"]): row[
                 "matching_question_count"
             ]
-            for row in visible_questions.filter(chapter__slug__in=chapter_slugs)
+            for row in bank_source_questions.filter(chapter__slug__in=chapter_slugs)
             .exclude(source_file_name="")
             .values(*source_fields)
             .annotate(matching_question_count=Count("id"))

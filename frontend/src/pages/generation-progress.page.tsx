@@ -14,6 +14,10 @@ export default function GenerationProgressPage() {
     navigate('/ai-qa');
   }
 
+  function backToGeneratePaper() {
+    navigate('/generate');
+  }
+
   async function generateAnother() {
     const settled = await progress.generateAnother();
     if (settled === null) return; // discard failed; stay so the error shows
@@ -53,6 +57,7 @@ export default function GenerationProgressPage() {
         onAcceptCandidates={progress.acceptCandidates}
         onRetryCandidates={progress.retryCandidates}
         onBackToPaperSetup={backToPaperSetup}
+        onBackToGeneratePaper={backToGeneratePaper}
         onGenerateAnother={generateAnother}
       />
     </>

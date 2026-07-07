@@ -78,6 +78,19 @@ describe('MathText', () => {
     expect(html).not.toContain('CnH2n + 1 -OH');
     expect(html).toContain('2n+1');
   });
+
+  it('typesets raw un-delimited LaTeX equations from uploaded PDFs', () => {
+    const html = renderToStaticMarkup(
+      <MathText
+        text={String.raw`Balance the following chemical equations :(a) \text{CO}_2 + \text{H}_2\text{O} \xrightarrow[\text{Chlorophyll}]{\text{Sunlight}} \text{C}_6\text{H}_{12}\text{O}_6 + \text{O}_2 + \text{H}_2\text{O}(b) \text{Pb}(\text{NO}_3)_2 \xrightarrow{\text{Heat}} \text{PbO} + \text{NO}_2 + \text{O}_2`}
+      />,
+    );
+
+    expect(html).toContain('class="katex"');
+    expect(html).toContain('x-arrow');
+    expect(html).toContain('(b)');
+    expect(html).not.toContain('katex-error');
+  });
 });
 
 describe('MathContent', () => {

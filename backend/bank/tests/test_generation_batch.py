@@ -26,6 +26,8 @@ from bank.models import (
     GeneratedQuestionCandidateStatus,
     GenerationBatch,
     GenerationBatchStatus,
+    IngestionJob,
+    IngestionJobStatus,
     Question,
     SourceType,
 )
@@ -108,6 +110,47 @@ def test_generation_polling_does_not_throttle_generate_sources(
     resp = api_client.get("/api/bank/sources/")
 
     assert resp.status_code == 200
+
+
+def test_sources_prefers_upload_review_entry_over_duplicate_source_file(
+    api_client, user
+):
+    """An uploaded PDF appears once in Generate sources, with its review route."""
+    chapter = Chapter.objects.get(slug="life-processes")
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        source_file_name="worksheet.pdf",
+        source_type=SourceType.PREVIOUS_YEAR_PAPER,
+        status=IngestionJobStatus.DONE,
+    )
+    Question.objects.create(
+        school=user.school,
+        ingestion_job=job,
+        chapter=chapter,
+        section="A",
+        qtype="mcq",
+        marks=1,
+        text="Uploaded question?",
+        parse_quality="clean",
+        source_type=SourceType.PREVIOUS_YEAR_PAPER,
+        source_name="worksheet",
+        source_file_name="worksheet.pdf",
+    )
+
+    resp = api_client.get("/api/bank/sources/")
+
+    assert resp.status_code == 200
+    upload_rows = [row for row in resp.data if row["key"] == f"upload:{job.pk}"]
+    duplicate_bank_rows = [
+        row
+        for row in resp.data
+        if row["kind"] == "bank_source" and row["title"] == "worksheet"
+    ]
+    assert len(upload_rows) == 1
+    assert duplicate_bank_rows == []
+    assert upload_rows[0]["kind"] == "upload"
+    assert upload_rows[0]["question_count"] == 1
 
 
 def test_sources_lists_accepted_ai_sessions_with_imported_question_count(

@@ -441,6 +441,22 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).not.toContain('max-w-3xl');
   });
 
+  it('offers a quiet return path to Generate paper from source review', () => {
+    const html = renderToStaticMarkup(
+      <GenerationProgressWorkspace
+        {...progressProps({
+          batch: { ...baseBatch, status: 'accepted' },
+          candidates: acceptedCandidates,
+          onBackToGeneratePaper: vi.fn(),
+        })}
+      />,
+    );
+
+    expect(html).toContain('Back to Generate paper');
+    expect(html).toContain('border border-input hover:bg-secondary');
+    expect(html).toContain('bg-background');
+  });
+
   it('renders ready-for-review candidates with visible answers and counts', () => {
     const html = renderToStaticMarkup(
       <GenerationProgressWorkspace
@@ -532,6 +548,7 @@ describe('GenerationProgressWorkspace', () => {
         {...progressProps({
           batch: { ...baseBatch, status: 'accepted' },
           candidates: acceptedCandidates,
+          onBackToGeneratePaper: vi.fn(),
         })}
       />,
     );
@@ -547,7 +564,8 @@ describe('GenerationProgressWorkspace', () => {
     expect(html).toContain('A. Respiration');
     expect(html).not.toContain('Rejected generated question');
     expect(html).not.toContain('Rejected answer');
-    expect(html).toContain('Back to paper setup');
+    expect(html).toContain('Back to Generate paper');
+    expect(html).not.toContain('Back to paper setup');
     expect(html).not.toContain('Undo reject');
     expect(html).not.toContain('Import accepted Q&amp;A');
   });
