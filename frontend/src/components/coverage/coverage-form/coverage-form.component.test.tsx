@@ -272,6 +272,7 @@ describe('CoverageFormView', () => {
     await user.click(screen.getByRole('button', { name: 'Choose sources' }));
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.getByText('Newest uploaded paper')).toBeTruthy();
+    expect(screen.getByText('5/12 match count')).toBeTruthy();
     expect(
       screen.getByRole('link', { name: /review/i }).getAttribute('href'),
     ).toBe('/extractions/new');
@@ -409,5 +410,38 @@ describe('CoverageFormView', () => {
     expect(
       screen.getByRole('heading', { name: 'Choose sources' }),
     ).toBeTruthy();
+  });
+
+  it('shows a zero match ratio in source selection until chapters are selected', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <CoverageFormView
+        form={makeForm({
+          selectedSlugs: new Set(),
+          hasSelectedChapters: false,
+          sources: [
+            {
+              key: 'upload:new',
+              kind: 'upload',
+              title: 'Newest uploaded paper',
+              detail: 'Previous year paper',
+              question_count: 12,
+              matching_question_count: 5,
+              created_at: '2026-06-22T10:00:00Z',
+              status: 'ready',
+            },
+          ],
+        })}
+        busy={false}
+        onGenerate={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Choose sources' }));
+
+    expect(screen.getAllByText('0/12')).toHaveLength(1);
+    expect(screen.getByText('0/12 match count')).toBeTruthy();
+    expect(screen.queryByText(/chapter matches?/i)).toBeNull();
   });
 });

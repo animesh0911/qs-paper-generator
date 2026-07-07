@@ -153,6 +153,43 @@ def test_sources_prefers_upload_review_entry_over_duplicate_source_file(
     assert upload_rows[0]["question_count"] == 1
 
 
+def test_sources_counts_only_selected_chapter_matches_for_uploads(api_client, user):
+    """Upload source match counts are scoped to the selected chapters."""
+    life = Chapter.objects.get(slug="life-processes")
+    light = Chapter.objects.get(slug="light-reflection-and-refraction")
+    job = IngestionJob.objects.create(
+        school=user.school,
+        created_by=user,
+        source_file_name="mixed-worksheet.pdf",
+        source_type=SourceType.PREVIOUS_YEAR_PAPER,
+        status=IngestionJobStatus.DONE,
+    )
+    for chapter, text in [
+        (life, "Uploaded life processes question?"),
+        (light, "Uploaded light question?"),
+    ]:
+        Question.objects.create(
+            school=user.school,
+            ingestion_job=job,
+            chapter=chapter,
+            section="A",
+            qtype="mcq",
+            marks=1,
+            text=text,
+            parse_quality="clean",
+            source_type=SourceType.PREVIOUS_YEAR_PAPER,
+            source_name="mixed worksheet",
+            source_file_name="mixed-worksheet.pdf",
+        )
+
+    resp = api_client.get("/api/bank/sources/?chapter=life-processes")
+
+    assert resp.status_code == 200
+    item = next(row for row in resp.data if row["key"] == f"upload:{job.pk}")
+    assert item["question_count"] == 2
+    assert item["matching_question_count"] == 1
+
+
 def test_sources_lists_accepted_ai_sessions_with_imported_question_count(
     api_client, user
 ):
@@ -204,6 +241,50 @@ def test_sources_lists_accepted_ai_sessions_with_imported_question_count(
     assert item["title"] == f"AI Q&A session #{batch.pk}"
     assert item["detail"] == "Life Processes · 1 imported"
     assert item["question_count"] == 1
+    assert item["matching_question_count"] == 0
+
+
+def test_sources_counts_only_selected_chapter_matches_for_ai_sessions(
+    api_client, user
+):
+    """AI session match counts are scoped to accepted Questions in selected chapters."""
+    life = Chapter.objects.get(slug="life-processes")
+    light = Chapter.objects.get(slug="light-reflection-and-refraction")
+    batch = GenerationBatch.objects.create(
+        school=user.school,
+        created_by=user,
+        status=GenerationBatchStatus.ACCEPTED,
+        accepted_at=timezone.now(),
+        difficulty_preset="balanced",
+        requested_count=2,
+    )
+    batch.chapters.set([life, light])
+    for chapter, text in [
+        (life, "Generated life processes question?"),
+        (light, "Generated light question?"),
+    ]:
+        imported_question = Question.objects.create(
+            school=user.school,
+            chapter=chapter,
+            section="A",
+            qtype="mcq",
+            marks=1,
+            text=text,
+            answer="A",
+        )
+        GeneratedQuestionCandidate.objects.create(
+            batch=batch,
+            status=GeneratedQuestionCandidateStatus.ACCEPTED,
+            question=imported_question,
+            payload=_payload(raw_text=text),
+            accepted_at=timezone.now(),
+        )
+
+    resp = api_client.get("/api/bank/sources/?chapter=life-processes")
+
+    assert resp.status_code == 200
+    item = next(row for row in resp.data if row["key"] == f"ai_batch:{batch.pk}")
+    assert item["question_count"] == 2
     assert item["matching_question_count"] == 1
 
 

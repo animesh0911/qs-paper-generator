@@ -1,10 +1,10 @@
 /**
  * Authenticated welcome screen.
  *
- * Shows the product pipeline as a live diagram: Upload and AI Q&A feed the
- * Question bank, and Generate assembles a paper from it. Desktop wires are
- * measured from the rendered card positions, so they stay attached to the
- * cards at any viewport size; below `lg` the pipeline stacks vertically.
+ * Presents the product pipeline as a calm exam-desk map: Upload Papers and
+ * AI Q&A feed the Question Bank, and Generate Paper opens the editor. Desktop
+ * wires are measured from rendered card positions so the animation stays
+ * attached to the cards at every viewport width; below `lg` the flow stacks.
  *
  * @module WelcomePage
  */
@@ -14,25 +14,31 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowDown,
   ArrowRight,
+  BookOpenText,
+  ChevronDown,
+  ChevronRight,
+  CircleHelp,
+  FilePlus2,
   FileText,
   Library,
+  PencilLine,
   Sparkles,
-  UploadCloud,
+  UserRound,
 } from 'lucide-react';
 import { fetchBankQuestions } from '@/lib/api';
 
 const SOURCE_WORKFLOWS = [
   {
     to: '/upload',
-    title: 'Upload papers',
-    description: 'Add questions from past-paper PDFs.',
-    icon: UploadCloud,
+    title: 'Upload Papers',
+    description: 'Extract questions from any PDF or past-paper document.',
+    icon: FilePlus2,
     animationOrder: 1,
   },
   {
     to: '/ai-qa',
     title: 'AI Q&A',
-    description: 'Draft new questions with AI.',
+    description: 'Generate questions and answers from a selected topic with AI.',
     icon: Sparkles,
     animationOrder: 2,
   },
@@ -43,29 +49,66 @@ export default function WelcomePage() {
   const welcomeName = resolveWelcomeName(location.state);
 
   return (
-    <div className="min-h-screen bg-secondary">
-      <main className="mx-auto flex min-h-screen w-full max-w-6xl items-center px-4 py-10 sm:px-6">
+    <div className="qpg-welcome-shell min-h-screen bg-secondary text-foreground">
+      <WelcomeHeader welcomeName={welcomeName} />
+      <main className="relative z-10 w-full px-6 py-10 sm:px-10 lg:px-16 lg:py-12 xl:px-[6.75rem]">
         <section aria-labelledby="welcome-heading" className="w-full">
-          <div className="mb-9 max-w-2xl lg:mb-11">
-            <p className="text-sm font-medium text-foreground/70">
+          <div className="mb-9 max-w-3xl sm:mb-10 lg:mb-11">
+            <p className="text-sm font-medium leading-6 text-slate-500">
               Exam Desk · CBSE Class 10 Science
             </p>
             <h1
               id="welcome-heading"
-              className="mt-2 text-3xl font-semibold leading-9 tracking-[-0.01em] text-foreground"
+              className="mt-2.5 text-[1.875rem] font-semibold leading-[1.12] tracking-[-0.02em] text-slate-950 text-balance sm:text-[2.125rem] lg:text-4xl"
             >
               Welcome, {welcomeName}.
             </h1>
-            <p className="mt-2 text-base leading-7 text-foreground/70">
-              Grow the question bank by upload or AI, then generate a paper from
-              it.
-            </p>
           </div>
 
           <PipelineDiagram />
         </section>
       </main>
     </div>
+  );
+}
+
+function WelcomeHeader({ welcomeName }: { welcomeName: string }) {
+  return (
+    <header className="qpg-welcome-header relative z-20 border-b border-slate-200/80 bg-white/95 backdrop-blur">
+      <div className="flex h-[4.75rem] items-center justify-between gap-4 px-6 sm:px-10 lg:px-16 xl:px-[4.25rem]">
+        <Link
+          to="/"
+          className="group flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          aria-label="Exam Desk home"
+        >
+          <span className="qpg-home-logo flex size-10 shrink-0 items-center justify-center rounded-[0.625rem] bg-slate-950 text-white transition-transform duration-200 ease-out group-hover:-translate-y-0.5">
+            <BookOpenText className="size-5" aria-hidden="true" />
+          </span>
+          <span className="truncate text-lg font-semibold tracking-[-0.015em] text-slate-950">
+            Exam Desk
+          </span>
+        </Link>
+
+        <div className="flex items-center justify-end gap-3 text-slate-500 sm:gap-5">
+          <button
+            type="button"
+            className="inline-flex size-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label="Help"
+          >
+            <CircleHelp className="size-5" aria-hidden="true" />
+          </button>
+          <div className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-1.5 text-sm font-medium text-slate-600">
+            <span className="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500">
+              <UserRound className="size-5" aria-hidden="true" />
+            </span>
+            <span className="hidden max-w-32 truncate sm:inline">
+              {welcomeName}
+            </span>
+            <ChevronDown className="hidden size-4 text-slate-400 sm:block" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+    </header>
   );
 }
 
@@ -115,7 +158,7 @@ type WireGeometry = {
 
 /** Cubic wire with horizontal tangents, like node-editor connections. */
 function wirePath(x1: number, y1: number, x2: number, y2: number): string {
-  const reach = Math.max(24, Math.min(90, (x2 - x1) * 0.55));
+  const reach = Math.max(30, Math.min(110, (x2 - x1) * 0.58));
   return `M ${x1} ${y1} C ${x1 + reach} ${y1}, ${x2 - reach} ${y2}, ${x2} ${y2}`;
 }
 
@@ -154,7 +197,7 @@ function PipelineDiagram() {
 
       // Wires only make sense in the three-column layout; when the pipeline
       // stacks vertically the gaps collapse and the SVG stays empty.
-      if (b.left - u.right < 16 || g.left - b.right < 16) {
+      if (b.left - u.right < 18 || g.left - b.right < 18) {
         setGeometry(null);
         return;
       }
@@ -163,7 +206,7 @@ function PipelineDiagram() {
         wires: [
           wirePath(u.right, u.cy, b.left - 2, b.cy),
           wirePath(a.right, a.cy, b.left - 2, b.cy),
-          wirePath(b.right, b.cy, g.left - 7, g.cy),
+          wirePath(b.right, b.cy, g.left - 8, g.cy),
         ],
         ports: [
           [u.right, u.cy],
@@ -171,7 +214,7 @@ function PipelineDiagram() {
           [b.left, b.cy],
           [b.right, b.cy],
         ],
-        arrow: `M ${g.left - 1} ${g.cy} L ${g.left - 8} ${g.cy - 4.5} L ${g.left - 8} ${g.cy + 4.5} Z`,
+        arrow: `M ${g.left - 1} ${g.cy} L ${g.left - 11} ${g.cy - 6} L ${g.left - 11} ${g.cy + 6} Z`,
       });
     }
 
@@ -188,9 +231,9 @@ function PipelineDiagram() {
   return (
     <div
       ref={stageRef}
-      className="relative grid gap-5 lg:grid-cols-[minmax(240px,1fr)_minmax(230px,0.72fr)_minmax(250px,1fr)] lg:items-center"
+      className="relative isolate grid gap-5 lg:grid-cols-[minmax(20rem,0.9fr)_minmax(13rem,0.48fr)_minmax(23rem,1fr)] lg:items-center lg:gap-7 xl:grid-cols-[24.5rem_13rem_28rem] xl:gap-20"
     >
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
+      <div className="relative z-10 grid gap-5 lg:gap-6">
         {SOURCE_WORKFLOWS.map((workflow) => (
           <WorkflowCard
             key={workflow.to}
@@ -201,16 +244,16 @@ function PipelineDiagram() {
       </div>
 
       <div
-        className="qpg-flow-node flex flex-col items-center justify-center gap-2"
+        className="qpg-flow-node relative z-10 flex flex-col items-center justify-center gap-3"
         style={{ '--qpg-flow-order': 3 } as CSSProperties}
       >
         <ArrowDown
-          className="size-4 text-muted-foreground/70 lg:hidden"
+          className="size-5 text-slate-400 lg:hidden"
           aria-hidden="true"
         />
         <BankNode ref={bankRef} bankCount={bankCount} />
         <ArrowDown
-          className="size-4 text-muted-foreground/70 lg:hidden"
+          className="size-5 text-slate-400 lg:hidden"
           aria-hidden="true"
         />
       </div>
@@ -219,7 +262,7 @@ function PipelineDiagram() {
 
       {geometry && (
         <svg
-          className="qpg-wire-layer pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
+          className="qpg-wire-layer pointer-events-none absolute inset-0 z-0 hidden h-full w-full lg:block"
           aria-hidden="true"
         >
           {geometry.wires.map((d) => (
@@ -237,9 +280,9 @@ function PipelineDiagram() {
               d={d}
               className="qpg-wire-comet"
               fill="none"
-              strokeWidth="1.5"
+              strokeWidth="2.75"
               pathLength={100}
-              style={{ animationDelay: `${index * -1.1}s` }}
+              style={{ animationDelay: `${index * -0.95}s` }}
             />
           ))}
           {geometry.ports.map(([x, y]) => (
@@ -247,7 +290,7 @@ function PipelineDiagram() {
               key={`${x}-${y}`}
               cx={x}
               cy={y}
-              r="2.5"
+              r="3"
               className="qpg-wire-port"
             />
           ))}
@@ -272,28 +315,32 @@ function WorkflowCard({
       ref={ref}
       to={workflow.to}
       style={{ '--qpg-flow-order': workflow.animationOrder } as CSSProperties}
-      className="qpg-flow-card qpg-flow-node group flex min-h-[9.75rem] flex-col rounded-lg border bg-background p-5 transition-colors duration-200 ease-out hover:border-foreground/30 active:bg-secondary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary"
+      className="qpg-flow-card qpg-source-card qpg-flow-node group/bank relative z-10 flex min-h-[9.75rem] items-center gap-4 rounded-xl bg-white/72 p-5 backdrop-blur-md transition-colors duration-200 ease-out hover:border-slate-300 hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary sm:p-6"
     >
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-secondary/55 text-foreground transition-colors duration-200 group-hover:bg-foreground group-hover:text-background">
-        <Icon className="size-[1.0625rem]" aria-hidden="true" />
-      </div>
+      <span className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 bg-white/58 text-slate-950 backdrop-blur-sm transition-colors duration-200 group-hover/bank:bg-white/90">
+        <Icon className="size-6" aria-hidden="true" />
+      </span>
 
-      <div className="mt-3 min-w-0">
-        <h2 className="text-lg font-semibold leading-7 text-foreground">
+      <span className="min-w-0 flex-1">
+        <span className="block text-base font-semibold leading-6 tracking-[-0.015em] text-slate-950">
           {workflow.title}
-        </h2>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+        </span>
+        <span className="mt-2 block max-w-[17rem] text-sm leading-6 text-slate-500 text-pretty">
           {workflow.description}
-        </p>
-      </div>
+        </span>
+        <span className="mt-5 inline-flex items-center gap-2.5 text-sm font-medium text-slate-950">
+          Open
+          <ArrowRight
+            className="size-4 text-slate-700 transition-transform duration-200 group-hover/bank:translate-x-1"
+            aria-hidden="true"
+          />
+        </span>
+      </span>
 
-      <div className="mt-auto flex w-full items-center justify-end gap-1 pt-4 text-xs font-medium leading-4 text-foreground/70">
-        Open
-        <ArrowRight
-          className="size-3.5 shrink-0 text-foreground/55 transition-transform duration-200 group-hover:translate-x-0.5"
-          aria-hidden="true"
-        />
-      </div>
+      <ChevronRight
+        className="size-5 shrink-0 text-slate-500 transition-transform duration-200 group-hover/bank:translate-x-1 group-hover/bank:text-slate-800"
+        aria-hidden="true"
+      />
     </Link>
   );
 }
@@ -309,24 +356,28 @@ function BankNode({
     <Link
       ref={ref}
       to="/question-bank"
-      className="qpg-flow-card group/bank relative flex flex-col items-center gap-1 rounded-lg border bg-background px-5 py-3.5 text-center transition-colors duration-200 ease-out hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary"
+      className="qpg-flow-card qpg-bank-node group/bank relative z-10 flex w-full max-w-[13rem] flex-col items-center rounded-xl bg-white/74 px-5 py-5 text-center backdrop-blur-md transition-colors duration-200 ease-out hover:border-slate-300 hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary"
     >
-      <Library
-        className="size-4 text-muted-foreground transition-colors duration-200 group-hover/bank:text-foreground"
-        aria-hidden="true"
-      />
-      <span className="text-[0.8125rem] font-semibold leading-4 text-foreground">
-        Question bank
+      <span className="flex size-12 items-center justify-center rounded-xl border border-slate-200/80 bg-white/58 text-slate-950 backdrop-blur-sm transition-colors duration-200 group-hover/bank:bg-white/90">
+        <Library className="size-6" aria-hidden="true" />
       </span>
-      <span className="min-h-4 text-xs leading-4 text-muted-foreground">
+      <span className="mt-4 text-base font-semibold leading-6 tracking-[-0.015em] text-slate-950">
+        Question Bank
+      </span>
+      <span className="mt-0.5 min-h-5 text-sm font-medium leading-5 text-blue-700">
         {bankCount.status === 'loading' && (
           <span
-            className="inline-block h-3 w-16 animate-pulse rounded bg-secondary align-middle"
-            aria-hidden="true"
+            className="inline-block h-3.5 w-24 animate-pulse rounded-full bg-slate-200 align-middle"
+            aria-label="Loading question count"
           />
         )}
         {bankCount.status === 'ready' &&
           `${bankCount.count} ${bankCount.count === 1 ? 'question' : 'questions'}`}
+        {bankCount.status === 'hidden' && 'Source library'}
+      </span>
+      <span className="mt-3 h-px w-full bg-slate-200/80" aria-hidden="true" />
+      <span className="mt-3 text-xs leading-5 text-slate-500 text-pretty">
+        Built from uploaded papers and AI-generated content.
       </span>
     </Link>
   );
@@ -338,26 +389,42 @@ function GenerateCard({ ref }: { ref: React.Ref<HTMLAnchorElement> }) {
       ref={ref}
       to="/generate"
       style={{ '--qpg-flow-order': 4 } as CSSProperties}
-      className="qpg-flow-node group flex min-h-[11rem] flex-col rounded-lg border border-primary bg-primary p-6 text-primary-foreground transition-colors duration-200 ease-out hover:bg-primary/90 active:bg-primary/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary"
+      className="qpg-generate-card qpg-flow-node group relative z-10 flex min-h-[20.5rem] flex-col overflow-hidden rounded-xl border border-white/10 bg-slate-950/90 p-6 text-white backdrop-blur-md transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary lg:h-[23.25rem] lg:p-8"
     >
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-primary-foreground/15 bg-primary-foreground/10">
-        <FileText className="size-[1.0625rem]" aria-hidden="true" />
-      </div>
+      <span className="relative z-10 flex size-12 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <FileText className="size-6" aria-hidden="true" />
+      </span>
 
-      <div className="mt-3 min-w-0">
-        <h2 className="text-xl font-semibold leading-7">Generate paper</h2>
-        <p className="mt-1 text-sm leading-6 text-primary-foreground/75">
-          Assemble a CBSE-style paper from your bank.
-        </p>
-      </div>
+      <span className="relative z-10 mt-6 block min-w-0">
+        <span className="block text-[1.375rem] font-semibold leading-8 tracking-[-0.02em] text-white">
+          Generate Paper
+        </span>
+        <span className="mt-2 block max-w-[20rem] text-base leading-6 text-slate-300 text-pretty">
+          Create a paper from your question bank and open it in the editor.
+        </span>
+      </span>
 
-      <div className="mt-auto flex w-full items-center justify-end gap-1 pt-4 text-xs font-medium leading-4 text-primary-foreground/90">
+      <span className="relative z-10 mt-4 inline-flex w-fit items-center gap-2 rounded-lg border border-white/10 bg-white/10 px-3 py-1.5 text-sm font-medium leading-5 text-white/90 backdrop-blur-sm">
+        <PencilLine className="size-4" aria-hidden="true" />
+        Opens BlockNote editor
+      </span>
+
+      <span
+        className="relative z-10 mt-5 h-px w-full bg-white/15"
+        aria-hidden="true"
+      />
+      <span className="relative z-10 mt-4 block max-w-[23rem] text-sm leading-6 text-slate-300 text-pretty">
+        Swap alternate questions, rearrange sections, and finalize the paper
+        manually.
+      </span>
+
+      <span className="relative z-10 mt-auto flex w-full items-center justify-end gap-3 pt-5 text-base font-semibold leading-7 text-white">
         Start
         <ArrowRight
-          className="size-3.5 shrink-0 text-primary-foreground/75 transition-transform duration-200 group-hover:translate-x-0.5"
+          className="size-6 text-white/85 transition-transform duration-200 group-hover:translate-x-1.5"
           aria-hidden="true"
         />
-      </div>
+      </span>
     </Link>
   );
 }

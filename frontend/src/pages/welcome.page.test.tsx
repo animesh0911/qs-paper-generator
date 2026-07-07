@@ -32,13 +32,14 @@ describe('WelcomePage', () => {
 
     expect(html).toContain('Welcome, Varad.');
     expect(html).toContain('Exam Desk');
-    expect(html).toContain(
-      'Grow the question bank by upload or AI, then generate a paper',
+    expect(html).not.toContain(
+      'Build your question bank from PDFs or AI, then generate a paper in',
     );
-    expect(html).toContain('Upload papers');
+    expect(html).toContain('Upload Papers');
     expect(html).toContain('AI Q&amp;A');
-    expect(html).toContain('Question bank');
-    expect(html).toContain('Generate paper');
+    expect(html).toContain('Question Bank');
+    expect(html).toContain('Generate Paper');
+    expect(html).toContain('Opens BlockNote editor');
     expect(html).not.toContain('Sign out');
     expect(html).toContain('href="/upload"');
     expect(html).toContain('href="/ai-qa"');

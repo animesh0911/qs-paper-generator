@@ -159,11 +159,7 @@ def sources(request):
     bank_items = []
     for row in bank_sources:
         source_key = (row["source_type"], row["source_name"], row["source_file_name"])
-        matching_question_count = (
-            matching_counts.get(source_key, 0)
-            if chapter_slugs
-            else row["question_count"]
-        )
+        matching_question_count = matching_counts.get(source_key, 0)
         if chapter_slugs and matching_question_count == 0:
             continue
         bank_items.append(
@@ -188,7 +184,13 @@ def sources(request):
 
     uploads = (
         IngestionJob.objects.filter(school=request.user.school)
-        .annotate(question_count=Count("questions"))
+        .annotate(
+            question_count=Count("questions"),
+            matching_question_count=Count(
+                "questions",
+                filter=Q(questions__chapter__slug__in=chapter_slugs),
+            ),
+        )
         .order_by("-created_at")[:20]
     )
     upload_items = [
@@ -198,7 +200,7 @@ def sources(request):
             "title": job.source_file_name or f"Upload #{job.pk}",
             "detail": job.get_source_type_display(),
             "question_count": job.question_count,
-            "matching_question_count": job.question_count,
+            "matching_question_count": job.matching_question_count,
             "created_at": job.created_at,
             "status": job.status,
         }
@@ -215,12 +217,18 @@ def sources(request):
         .order_by("-accepted_at", "-created_at")[:20]
     )
     batch_ids = [batch.pk for batch in batches]
+    accepted_candidates = GeneratedQuestionCandidate.objects.filter(
+        batch_id__in=batch_ids,
+        status=GeneratedQuestionCandidateStatus.ACCEPTED,
+        question_id__isnull=False,
+    )
     counts = dict(
-        GeneratedQuestionCandidate.objects.filter(
-            batch_id__in=batch_ids,
-            status=GeneratedQuestionCandidateStatus.ACCEPTED,
-            question_id__isnull=False,
-        )
+        accepted_candidates.values("batch_id")
+        .annotate(n=Count("question_id"))
+        .values_list("batch_id", "n")
+    )
+    matching_counts_by_batch = dict(
+        accepted_candidates.filter(question__chapter__slug__in=chapter_slugs)
         .values("batch_id")
         .annotate(n=Count("question_id"))
         .values_list("batch_id", "n")
@@ -228,6 +236,7 @@ def sources(request):
     batch_items = []
     for batch in batches:
         imported_count = counts.get(batch.pk, 0)
+        matching_count = matching_counts_by_batch.get(batch.pk, 0)
         chapter_detail = ", ".join(
             batch.chapters.order_by("order").values_list("name", flat=True)[:3]
         )
@@ -242,7 +251,7 @@ def sources(request):
                 if detail_prefix
                 else imported_label,
                 "question_count": imported_count,
-                "matching_question_count": imported_count,
+                "matching_question_count": matching_count,
                 "created_at": batch.accepted_at or batch.created_at,
                 "status": batch.status,
             }

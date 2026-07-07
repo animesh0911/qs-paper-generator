@@ -436,15 +436,15 @@ function SourceSelectionSection({ form }: { form: CoverageForm }) {
     () => new Set(form.selectedSourceKeys),
   );
   const selectedCount = form.selectedSourceKeys.size;
+  const hasChapterFilter = form.selectedSlugs.size > 0;
   const matchingQuestionCount = form.sources.reduce(
-    (sum, source) => sum + sourceMatchingCount(source),
+    (sum, source) => sum + sourceMatchingCount(source, hasChapterFilter),
     0,
   );
   const totalQuestionCount = form.sources.reduce(
     (sum, source) => sum + source.question_count,
     0,
   );
-  const hasChapterFilter = form.selectedSlugs.size > 0;
   const sourceSummary = selectedCount
     ? `${selectedCount} selected`
     : form.sourcesLoading
@@ -523,10 +523,8 @@ function SourceSelectionSection({ form }: { form: CoverageForm }) {
 
             <div className="grid gap-2 text-sm sm:grid-cols-3">
               <SummaryItem
-                label={
-                  hasChapterFilter ? 'Chapter matches' : 'Source questions'
-                }
-                value={matchingQuestionCount}
+                label="Match count"
+                value={`${matchingQuestionCount}/${totalQuestionCount}`}
               />
               <SummaryItem label="Sources shown" value={form.sources.length} />
               <SummaryItem
@@ -567,6 +565,7 @@ function SourceSelectionSection({ form }: { form: CoverageForm }) {
                       key={source.key}
                       source={source}
                       selected={draftKeys.has(source.key)}
+                      hasChapterFilter={hasChapterFilter}
                       reviewHref={sourceReviewHref(source.key)}
                       onToggle={() => toggleDraftSource(source.key)}
                     />
@@ -584,16 +583,18 @@ function SourceSelectionSection({ form }: { form: CoverageForm }) {
 function SourceChoice({
   source,
   selected,
+  hasChapterFilter,
   reviewHref,
   onToggle,
 }: {
   source: PaperSourceSummary;
   selected: boolean;
+  hasChapterFilter: boolean;
   reviewHref: string | null;
   onToggle: () => void;
 }) {
   const sourceInputId = `paper-source-${source.key.replace(/[^a-z0-9_-]/gi, '-')}`;
-  const matchingCount = sourceMatchingCount(source);
+  const matchingCount = sourceMatchingCount(source, hasChapterFilter);
 
   return (
     <li
@@ -649,14 +650,9 @@ function SourceChoice({
       </label>
 
       <div className="flex flex-wrap items-center gap-1.5 pl-11 sm:justify-end sm:pl-0">
-        <span className="rounded-md bg-secondary/70 px-2 py-1 text-xs font-medium text-foreground">
-          {matchingCount} chapter match{matchingCount === 1 ? '' : 'es'}
+        <span className="rounded-md bg-secondary/70 px-2.5 py-1 text-xs font-medium tabular-nums text-foreground">
+          {matchingCount}/{source.question_count} match count
         </span>
-        {source.question_count !== matchingCount && (
-          <span className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
-            {source.question_count} total
-          </span>
-        )}
         {reviewHref && (
           <a
             href={reviewHref}
@@ -671,7 +667,11 @@ function SourceChoice({
   );
 }
 
-function sourceMatchingCount(source: PaperSourceSummary) {
+function sourceMatchingCount(
+  source: PaperSourceSummary,
+  hasChapterFilter: boolean,
+) {
+  if (!hasChapterFilter) return 0;
   return source.matching_question_count ?? source.question_count;
 }
 
