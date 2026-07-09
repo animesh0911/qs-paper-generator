@@ -108,8 +108,8 @@ describe('useIngestionUpload', () => {
 
     expect(result.current.job).toBeNull();
     expect(
-      result.current.recentExtractedPapers.map((paper) =>
-        paper.job.source_file_name,
+      result.current.recentExtractedPapers.map(
+        (paper) => paper.job.source_file_name,
       ),
     ).toEqual(['paper-1.pdf', 'paper-2.pdf', 'paper-3.pdf']);
   });
@@ -196,6 +196,58 @@ describe('useIngestionUpload', () => {
     expect(result.current.parsedQuestions).toEqual([]);
     expect(result.current.generatedAnswers).toEqual([]);
     expect(result.current.answerJob).toBeNull();
+  });
+
+  it('clears the selected file once the upload is accepted', async () => {
+    // Regression: the accepted file used to stay "selected", leaving a dead
+    // chip with no picker and an enabled button that re-uploaded the same PDF.
+    fetchIngestionJobsMock.mockResolvedValue([]);
+    fetchIngestionJobMock.mockResolvedValue(job({ id: 12, status: 'pending' }));
+    uploadIngestionPdfMock.mockResolvedValue(
+      job({ id: 12, status: 'pending' }),
+    );
+
+    const { result } = renderHook(() => useIngestionUpload(10_000));
+
+    act(() => {
+      result.current.selectFile(
+        new File(['%PDF-1.4'], 'paper.pdf', { type: 'application/pdf' }),
+      );
+    });
+    expect(result.current.file?.name).toBe('paper.pdf');
+
+    await act(async () => {
+      await result.current.upload();
+    });
+
+    expect(result.current.job?.id).toBe(12);
+    expect(result.current.file).toBeNull();
+    expect(result.current.validationError).toBe('');
+  });
+
+  it('keeps the selected file for one-click retry when the upload fails', async () => {
+    fetchIngestionJobsMock.mockResolvedValue([]);
+    uploadIngestionPdfMock.mockRejectedValue(
+      new Error('The request timed out. Check your connection and try again.'),
+    );
+
+    const { result } = renderHook(() => useIngestionUpload(10_000));
+
+    act(() => {
+      result.current.selectFile(
+        new File(['%PDF-1.4'], 'paper.pdf', { type: 'application/pdf' }),
+      );
+    });
+    await act(async () => {
+      await result.current.upload();
+    });
+
+    expect(result.current.uploading).toBe(false);
+    expect(result.current.uploadError).toBe(
+      'The request timed out. Check your connection and try again.',
+    );
+    expect(result.current.file?.name).toBe('paper.pdf');
+    expect(result.current.job).toBeNull();
   });
 
   it('promotes a retried failed job into the main polling card', async () => {

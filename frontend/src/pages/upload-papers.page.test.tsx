@@ -104,7 +104,9 @@ function job(overrides: Partial<IngestionJob>): IngestionJob {
 function extractedPaper(
   extractedJob: IngestionJob,
   parsedQuestions: BankQuestion[],
-  overrides: Partial<IngestionUploadState['recentExtractedPapers'][number]> = {},
+  overrides: Partial<
+    IngestionUploadState['recentExtractedPapers'][number]
+  > = {},
 ): IngestionUploadState['recentExtractedPapers'][number] {
   return {
     job: extractedJob,
@@ -158,13 +160,13 @@ describe('UploadPapersPage', () => {
     ).toBeNull();
   });
 
-  it('reports progress while a queued job extracts', () => {
+  it('reports progress while a queued job extracts, below an intact dropzone', () => {
     mockState = baseState({ job: job({ status: 'running' }) });
     const html = renderToStaticMarkup(<UploadPapersPage />);
 
     expect(html).toContain('Extracting questions');
     expect(html).toContain('CBSE-2023.pdf');
-    expect(html).not.toContain('Drop a PDF here');
+    expect(html).toContain('Drop a PDF here');
   });
 
   it('shows every other in-flight upload in a queue strip beside the current one', () => {
@@ -241,17 +243,35 @@ describe('UploadPapersPage', () => {
     expect(html).not.toContain('Other uploads');
   });
 
-  it('blocks parallel uploads while a job is still processing', () => {
-    mockState = baseState({ job: job({ status: 'running' }) });
-    const html = renderToStaticMarkup(<UploadPapersPage />);
-
-    expect(html).toContain('Extracting questions');
-    expect(html).not.toContain('Drop a PDF here');
-    expect(html).not.toContain('Upload another');
+  it('keeps the file picker mounted in every job state', () => {
+    // Regression: the form used to unmount whenever any job was non-terminal.
+    // A stuck pending job (worker down, hung extraction) then removed the
+    // picker indefinitely — "the upload button does nothing". The dropzone
+    // input must exist regardless of job state.
+    const states: Partial<IngestionUploadState>[] = [
+      { job: job({ status: 'pending' }) },
+      { job: job({ status: 'running' }) },
+      { job: job({ status: 'failed', error: 'Unreadable scan' }) },
+      // A colleague's/background in-flight job must not hide the form either.
+      { job: null, queuedJobs: [job({ id: 9, status: 'pending' })] },
+    ];
+    for (const overrides of states) {
+      mockState = baseState(overrides);
+      render(<UploadPapersPage />);
+      expect(
+        document.querySelector('input[type=file]'),
+        `no file input with state ${JSON.stringify(overrides.job ?? overrides.queuedJobs)}`,
+      ).not.toBeNull();
+      cleanup();
+    }
   });
 
   it('keeps the upload screen minimal by showing recent extracted-paper summaries', () => {
-    const doneJob = job({ status: 'done', created_count: 12, skipped_count: 3 });
+    const doneJob = job({
+      status: 'done',
+      created_count: 12,
+      skipped_count: 3,
+    });
     const questions = [
       question({}),
       question({ id: 2, text: 'Name one strong acid.' }),
@@ -278,7 +298,11 @@ describe('UploadPapersPage', () => {
 
   it('opens the chapter-grouped extracted question screen from the review summary', async () => {
     const user = userEvent.setup();
-    const doneJob = job({ status: 'done', created_count: 12, skipped_count: 3 });
+    const doneJob = job({
+      status: 'done',
+      created_count: 12,
+      skipped_count: 3,
+    });
     const questions = [
       question({}),
       question({

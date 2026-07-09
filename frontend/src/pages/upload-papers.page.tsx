@@ -4,9 +4,14 @@
  * adds the questions to the school's bank.
  *
  * Pure orchestration: `useIngestionUpload` owns the upload + polling lifecycle;
- * the dropzone, source-type field, and status card render it. Active extraction
- * takes over the page; once extraction settles, the picker returns with the
- * latest review tools below it for the current session.
+ * the dropzone, source-type field, and status card render it.
+ *
+ * The upload form is ALWAYS mounted. Extraction progress (or a failed job)
+ * renders below it, never instead of it: any conditional unmount of the form
+ * has produced "the upload button does nothing" incidents — a stuck pending
+ * job removed the picker indefinitely, and the form flashing on load then
+ * being swapped out mid-click swallowed clicks. Do not gate the form on job
+ * state.
  *
  * @module UploadPapersPage
  */
@@ -35,8 +40,13 @@ export default function UploadPapersPage() {
       ? upload.job
       : (activeQueuedJob ?? null);
   const failedJob = upload.job?.status === 'failed' ? upload.job : null;
-  const queuedJobs = activeJob
-    ? upload.queuedJobs.filter((candidate) => candidate.id !== activeJob.id)
+  // One detail card below the form: live extraction wins, else the failed job.
+  const statusJob = activeJob ?? failedJob;
+  // Review/answer state in the hook belongs to `upload.job`; when the card is
+  // showing some other in-flight job (e.g. a colleague's), pass inert props.
+  const isOwnStatusJob = statusJob != null && statusJob.id === upload.job?.id;
+  const queuedJobs = statusJob
+    ? upload.queuedJobs.filter((candidate) => candidate.id !== statusJob.id)
     : upload.queuedJobs;
 
   const uploadForm = (
@@ -105,7 +115,8 @@ export default function UploadPapersPage() {
               <div className="space-y-1.5">
                 <CardTitle className="text-xl leading-7">Upload PDF</CardTitle>
                 <p className="max-w-xl text-sm leading-5 text-muted-foreground">
-                  Extract questions from a paper and add them to the question bank.
+                  Extract questions from a paper and add them to the question
+                  bank.
                 </p>
               </div>
               <span className="inline-flex w-fit items-center gap-1.5 rounded-md border border-input bg-secondary px-2.5 py-1.5 text-xs font-medium text-secondary-foreground">
@@ -116,92 +127,88 @@ export default function UploadPapersPage() {
           </CardHeader>
 
           <CardContent className="px-5 py-6 sm:px-6">
-            {activeJob ? (
-              <div className="mx-auto max-w-5xl">
-                <IngestionStatusCard
-                  job={activeJob}
-                  pollError={upload.pollError}
-                  parsedQuestions={upload.parsedQuestions}
-                  loadingQuestions={upload.loadingQuestions}
-                  answerJob={upload.answerJob}
-                  generatedAnswers={upload.generatedAnswers}
-                  loadingAnswers={upload.loadingAnswers}
-                  generatingAnswers={upload.generatingAnswers}
-                  answerGenerationError={upload.answerGenerationError}
-                  onGenerateAnswers={upload.generateAnswers}
-                  onGeneratePaper={() => navigate('/generate')}
-                />
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {uploadForm}
-                {failedJob && (
-                  <div className="mx-auto max-w-5xl border-t border-input pt-6">
-                    <IngestionStatusCard
-                      job={failedJob}
-                      pollError={upload.pollError}
-                      parsedQuestions={[]}
-                      loadingQuestions={false}
-                      answerJob={null}
-                      generatedAnswers={[]}
-                      loadingAnswers={false}
-                      generatingAnswers={false}
-                      answerGenerationError=""
-                      onGenerateAnswers={upload.generateAnswers}
-                      onGeneratePaper={() => navigate('/generate')}
-                    />
+            {/* The form never unmounts — extraction state renders below it. */}
+            <div className="space-y-6">
+              {uploadForm}
+              {statusJob && (
+                <div className="mx-auto max-w-5xl border-t border-input pt-6">
+                  <IngestionStatusCard
+                    job={statusJob}
+                    pollError={upload.pollError}
+                    parsedQuestions={
+                      isOwnStatusJob ? upload.parsedQuestions : []
+                    }
+                    loadingQuestions={
+                      isOwnStatusJob ? upload.loadingQuestions : false
+                    }
+                    answerJob={isOwnStatusJob ? upload.answerJob : null}
+                    generatedAnswers={
+                      isOwnStatusJob ? upload.generatedAnswers : []
+                    }
+                    loadingAnswers={
+                      isOwnStatusJob ? upload.loadingAnswers : false
+                    }
+                    generatingAnswers={
+                      isOwnStatusJob ? upload.generatingAnswers : false
+                    }
+                    answerGenerationError={
+                      isOwnStatusJob ? upload.answerGenerationError : ''
+                    }
+                    onGenerateAnswers={upload.generateAnswers}
+                    onGeneratePaper={() => navigate('/generate')}
+                  />
+                </div>
+              )}
+              {upload.recentExtractedPapers.length > 0 && (
+                <section
+                  className="mx-auto max-w-5xl border-t border-input pt-6"
+                  aria-labelledby="recent-extracted-papers-heading"
+                >
+                  <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <h2
+                        id="recent-extracted-papers-heading"
+                        className="text-sm font-medium leading-5 text-foreground"
+                      >
+                        Recent extracted papers
+                      </h2>
+                      <p className="text-xs leading-5 text-muted-foreground">
+                        Review the last 3 completed uploads and generate answers
+                        when needed.
+                      </p>
+                    </div>
                   </div>
-                )}
-                {upload.recentExtractedPapers.length > 0 && (
-                  <section
-                    className="mx-auto max-w-5xl border-t border-input pt-6"
-                    aria-labelledby="recent-extracted-papers-heading"
-                  >
-                    <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                      <div>
-                        <h2
-                          id="recent-extracted-papers-heading"
-                          className="text-sm font-medium leading-5 text-foreground"
-                        >
-                          Recent extracted papers
-                        </h2>
-                        <p className="text-xs leading-5 text-muted-foreground">
-                          Review the last 3 completed uploads and generate answers when needed.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      {upload.recentExtractedPapers.map((paper) => (
-                        <ExtractedPaperReviewCard
-                          key={paper.job.id}
-                          job={paper.job}
-                          parsedQuestions={paper.parsedQuestions}
-                          loadingQuestions={paper.loadingQuestions}
-                          answerJob={paper.answerJob}
-                          generatedAnswers={paper.generatedAnswers}
-                          loadingAnswers={paper.loadingAnswers}
-                          generatingAnswers={paper.generatingAnswers}
-                          answerGenerationError={paper.answerGenerationError}
-                          onGenerateAnswers={() =>
-                            upload.generateAnswersForJob(paper.job.id)
-                          }
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )}
-              </div>
-            )}
+                  <div className="space-y-3">
+                    {upload.recentExtractedPapers.map((paper) => (
+                      <ExtractedPaperReviewCard
+                        key={paper.job.id}
+                        job={paper.job}
+                        parsedQuestions={paper.parsedQuestions}
+                        loadingQuestions={paper.loadingQuestions}
+                        answerJob={paper.answerJob}
+                        generatedAnswers={paper.generatedAnswers}
+                        loadingAnswers={paper.loadingAnswers}
+                        generatingAnswers={paper.generatingAnswers}
+                        answerGenerationError={paper.answerGenerationError}
+                        onGenerateAnswers={() =>
+                          upload.generateAnswersForJob(paper.job.id)
+                        }
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
 
-            {queuedJobs.length > 0 && (
-              <div className="mx-auto max-w-5xl">
-                <IngestionQueueStrip
-                  jobs={queuedJobs}
-                  onRetry={upload.retryJob}
-                  onDismiss={upload.dismissJob}
-                />
-              </div>
-            )}
+              {queuedJobs.length > 0 && (
+                <div className="mx-auto max-w-5xl">
+                  <IngestionQueueStrip
+                    jobs={queuedJobs}
+                    onRetry={upload.retryJob}
+                    onDismiss={upload.dismissJob}
+                  />
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </main>

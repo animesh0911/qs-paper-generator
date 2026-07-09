@@ -19,6 +19,7 @@ import {
   fetchGenerationBatch,
   fetchGenerationCandidates,
   fetchBankQuestions,
+  fetchIngestionJobs,
   fetchPaperFormats,
   fetchPaperDocument,
   getToken,
@@ -28,6 +29,7 @@ import {
   downloadPaperPdfPackage,
   openPaperPrintPreview,
   reservePaperPrintPreview,
+  uploadIngestionPdf,
 } from './api';
 
 const storage = new Map<string, string>();
@@ -494,5 +496,44 @@ describe('paper persistence', () => {
       '/api/papers/123/approve/',
       expect.objectContaining({ method: 'POST' }),
     );
+  });
+});
+
+describe('request timeouts', () => {
+  // Regression: a stalled connection used to leave `fetch` pending forever —
+  // the upload page showed "Uploading…" indefinitely with no error and no
+  // retry. Every request now carries an abort signal and a timeout surfaces
+  // as a readable, actionable message.
+  it('maps a timed-out request to a readable error', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn(async () => new Response('[]'))
+        .mockRejectedValue(
+          new DOMException('The operation timed out.', 'TimeoutError'),
+        ),
+    );
+
+    await expect(fetchIngestionJobs()).rejects.toThrow(
+      'The request timed out. Check your connection and try again.',
+    );
+  });
+
+  it('sends an abort signal on every request so none can hang forever', async () => {
+    const fetchMock = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) =>
+        new Response('[]'),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await fetchIngestionJobs();
+    await uploadIngestionPdf(
+      new File(['%PDF-1.4'], 'paper.pdf', { type: 'application/pdf' }),
+    );
+
+    for (const [, init] of fetchMock.mock.calls) {
+      expect(init?.signal).toBeInstanceOf(AbortSignal);
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
