@@ -443,7 +443,8 @@ export function useIngestionUpload(
                 answerJob: next.job,
                 generatedAnswers: next.answers,
                 loadingAnswers:
-                  next.job?.status === 'pending' || next.job?.status === 'running',
+                  next.job?.status === 'pending' ||
+                  next.job?.status === 'running',
                 generatingAnswers: generatingAnswerJobIds.has(id),
                 answerGenerationError: '',
                 answersLoaded: true,
@@ -591,6 +592,12 @@ export function useIngestionUpload(
     setPollError('');
     try {
       const queued = await uploadIngestionPdf(file);
+      // The PDF was accepted (202): clear the picker so the form is ready for
+      // the next upload. Leaving the chip would render a dead "selected file"
+      // with no way to open the picker and an enabled button that re-uploads
+      // the same PDF. On failure the file stays selected for one-click retry.
+      setFile(null);
+      setValidationError('');
       setParsedQuestions([]);
       setAnswerJob(null);
       setGeneratedAnswers([]);
@@ -660,8 +667,8 @@ export function useIngestionUpload(
       // failed + why). `done` jobs already landed in the bank — no need to nag.
       (!isIngestionTerminal(candidate.status) || candidate.status === 'failed'),
   );
-  const recentExtractedPapers: ExtractedPaperReviewState[] = recentExtractedJobs.map(
-    (extractedJob) => {
+  const recentExtractedPapers: ExtractedPaperReviewState[] =
+    recentExtractedJobs.map((extractedJob) => {
       const record = extractedPaperRecords[extractedJob.id];
       return {
         job: extractedJob,
@@ -673,8 +680,7 @@ export function useIngestionUpload(
         generatingAnswers: generatingAnswerJobIds.has(extractedJob.id),
         answerGenerationError: record?.answerGenerationError ?? '',
       };
-    },
-  );
+    });
 
   return {
     file,

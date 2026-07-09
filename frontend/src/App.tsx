@@ -7,7 +7,7 @@
  *
  * @module App
  */
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth.hook';
 import {
@@ -25,7 +25,9 @@ const EditorPage = lazy(() => import('@/pages/editor.page'));
 const GenerationProgressPage = lazy(
   () => import('@/pages/generation-progress.page'),
 );
-const ExtractionReviewPage = lazy(() => import('@/pages/extraction-review.page'));
+const ExtractionReviewPage = lazy(
+  () => import('@/pages/extraction-review.page'),
+);
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -33,6 +35,28 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  // A file dropped anywhere outside a dropzone would otherwise navigate the
+  // tab to the file, silently discarding all app state. Allow the drag
+  // (dragover preventDefault) and swallow stray drops — but never intercept a
+  // drop landing on a real file input, which handles it natively.
+  useEffect(() => {
+    const allowDrag = (event: DragEvent) => {
+      event.preventDefault();
+    };
+    const swallowStrayDrop = (event: DragEvent) => {
+      const target = event.target;
+      const onFileInput =
+        target instanceof HTMLInputElement && target.type === 'file';
+      if (!onFileInput) event.preventDefault();
+    };
+    window.addEventListener('dragover', allowDrag);
+    window.addEventListener('drop', swallowStrayDrop);
+    return () => {
+      window.removeEventListener('dragover', allowDrag);
+      window.removeEventListener('drop', swallowStrayDrop);
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />

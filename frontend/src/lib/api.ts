@@ -38,6 +38,22 @@ import { paperDocumentSchema } from '@/types/paper-document.schema';
 const TOKEN_KEY = 'qpg_token';
 const AUTH_TOKEN_CHANGED_EVENT = 'qpg:auth-token-changed';
 
+/**
+ * Every request aborts eventually. Without a signal, a stalled connection
+ * (dead wifi, hung proxy) leaves `fetch` pending forever and any UI state
+ * keyed on it — e.g. the upload page's "Uploading…" — stuck with no error.
+ * Uploads get a longer budget: a 25 MB scan on school wifi is slow but alive.
+ */
+const REQUEST_TIMEOUT_MS = 30_000;
+const UPLOAD_TIMEOUT_MS = 120_000;
+
+function isAbortError(err: unknown): boolean {
+  return (
+    err instanceof DOMException &&
+    (err.name === 'TimeoutError' || err.name === 'AbortError')
+  );
+}
+
 function notifyTokenChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(AUTH_TOKEN_CHANGED_EVENT));
@@ -89,7 +105,21 @@ async function request(
   const token = tokenOverride === undefined ? getToken() : tokenOverride;
   if (token) headers['Authorization'] = `Token ${token}`;
 
-  const res = await fetch(`/api${path}`, { ...fetchOptions, headers });
+  let res: Response;
+  try {
+    res = await fetch(`/api${path}`, {
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      ...fetchOptions,
+      headers,
+    });
+  } catch (err) {
+    if (isAbortError(err)) {
+      throw new Error(
+        'The request timed out. Check your connection and try again.',
+      );
+    }
+    throw err;
+  }
   if (!res.ok) {
     let detail = `Request failed (${res.status})`;
     try {
@@ -394,7 +424,11 @@ export async function downloadPaperPdfPackage(paper: PaperDocument) {
 export async function uploadIngestionPdf(pdf: File): Promise<IngestionJob> {
   const body = new FormData();
   body.append('pdf', pdf);
-  const res = await request('/bank/ingest/', { method: 'POST', body });
+  const res = await request('/bank/ingest/', {
+    method: 'POST',
+    body,
+    signal: AbortSignal.timeout(UPLOAD_TIMEOUT_MS),
+  });
   return res.json();
 }
 
