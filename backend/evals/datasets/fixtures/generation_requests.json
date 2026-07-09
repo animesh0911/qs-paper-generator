@@ -1,0 +1,21 @@
+[
+  {
+    "_comment": "Grounded generation fixtures. chapter_map_node_ids are stable_node_ids from the seeded chapter map; leave empty to use node_selector at runtime (resolved against the live ChapterMapNode table so the fixture survives re-imports). TODO(implementation issue: generation eval): pin explicit node ids once the corpus seed is final.",
+    "fixture_id": "carbon-compounds-grounded",
+    "chapter_slug": "carbon-and-its-compounds",
+    "source_document": "jesc104",
+    "chapter_map_node_ids": [],
+    "node_selector": {"strategy": "first_major_topics", "count": 2},
+    "topic_names": [],
+    "difficulty_preset": "balanced"
+  },
+  {
+    "fixture_id": "light-reflection-grounded",
+    "chapter_slug": "light-reflection-and-refraction",
+    "source_document": "jesc110",
+    "chapter_map_node_ids": [],
+    "node_selector": {"strategy": "first_major_topics", "count": 2},
+    "topic_names": [],
+    "difficulty_preset": "balanced"
+  }
+]

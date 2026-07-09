@@ -1,0 +1,13 @@
+{
+  "_comment": "Per-user monthly usage assumptions for the cost roll-up (evals.report). Numbers are inputs, not measurements — edit freely; the report recomputes. 'brief_defaults' encodes the eval brief's assumptions; 'pricing_doc_median' maps docs/pricing_model.md's median paying teacher (6 papers/mo). extraction/answers runs per month in that profile are assumptions to refine with real instrumentation (pricing doc: 'instrument papers/user/month from day one').",
+  "brief_defaults": {
+    "generation": {"runs_per_month": 1, "batch_size": 30},
+    "extraction": {"runs_per_month": 1, "pages_per_run": 50},
+    "answers": {"runs_per_month": 1, "questions_per_run": 250}
+  },
+  "pricing_doc_median": {
+    "generation": {"runs_per_month": 6, "batch_size": 30},
+    "extraction": {"runs_per_month": 2, "pages_per_run": 30},
+    "answers": {"runs_per_month": 2, "questions_per_run": 40}
+  }
+}
