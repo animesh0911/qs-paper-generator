@@ -1,0 +1,1827 @@
+[
+  {
+    "batch": 1,
+    "pages": [
+      1
+    ],
+    "questions": 0,
+    "payload": {
+      "questions": []
+    }
+  },
+  {
+    "batch": 2,
+    "pages": [
+      3
+    ],
+    "questions": 1,
+    "payload": {
+      "questions": [
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "In the electrolysis of water, the mass ratio of hydrogen and oxygen gases liberated at the electrodes is :",
+          "options": [
+            {
+              "label": "A",
+              "text": "1 : 2"
+            },
+            {
+              "label": "B",
+              "text": "1 : 4"
+            },
+            {
+              "label": "C",
+              "text": "1 : 8"
+            },
+            {
+              "label": "D",
+              "text": "1 : 16"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "In the electrolysis of water, the mass ratio of hydrogen and oxygen gases liberated at the electrodes is :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "1 : 2"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "1 : 4"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "1 : 8"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "1 : 16"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "chemical-reactions-and-equations",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Electrolysis of water"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 3,
+    "pages": [
+      5
+    ],
+    "questions": 3,
+    "payload": {
+      "questions": [
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "The body of human beings works within the pH range of :\n(A) 6.1 to 6.8 (B) 6.5 to 7.3\n(C) 7.0 to 7.8 (D) 7.5 to 8.1",
+          "options": [
+            {
+              "label": "A",
+              "text": "6.1 to 6.8"
+            },
+            {
+              "label": "B",
+              "text": "6.5 to 7.3"
+            },
+            {
+              "label": "C",
+              "text": "7.0 to 7.8"
+            },
+            {
+              "label": "D",
+              "text": "7.5 to 8.1"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "The body of human beings works within the pH range of :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "6.1 to 6.8"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "6.5 to 7.3"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "7.0 to 7.8"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "7.5 to 8.1"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "acids-bases-and-salts",
+          "cognitive_level": "R",
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "Two metals zinc and tin are dissolved separately in definite proportions in molten copper (the primary metal) to obtain two different alloys respectively known as :\n(A) Bronze and Brass (B) Brass and Solder\n(C) Brass and Bronze (D) Solder and Bronze",
+          "options": [
+            {
+              "label": "A",
+              "text": "Bronze and Brass"
+            },
+            {
+              "label": "B",
+              "text": "Brass and Solder"
+            },
+            {
+              "label": "C",
+              "text": "Brass and Bronze"
+            },
+            {
+              "label": "D",
+              "text": "Solder and Bronze"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Two metals zinc and tin are dissolved separately in definite proportions in molten copper (the primary metal) to obtain two different alloys respectively known as :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Bronze and Brass"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Brass and Solder"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Brass and Bronze"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Solder and Bronze"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "metals-and-non-metals",
+          "cognitive_level": "R",
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "Aluminium powder is used in thermit welding because :\n(A) Its reaction with iron is highly exothermic.\n(B) When it is heated with iron (III) oxide, molten iron is obtained.\n(C) When it is heated with iron (III) oxide, molten aluminium oxide is obtained to join railway tracks.\n(D) Its melting point is low as compared to iron and a molten alloy of iron and aluminium is formed on heating which is used to join railway tracks.",
+          "options": [
+            {
+              "label": "A",
+              "text": "Its reaction with iron is highly exothermic."
+            },
+            {
+              "label": "B",
+              "text": "When it is heated with iron (III) oxide, molten iron is obtained."
+            },
+            {
+              "label": "C",
+              "text": "When it is heated with iron (III) oxide, molten aluminium oxide is obtained to join railway tracks."
+            },
+            {
+              "label": "D",
+              "text": "Its melting point is low as compared to iron and a molten alloy of iron and aluminium is formed on heating which is used to join railway tracks."
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Aluminium powder is used in thermit welding because :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Its reaction with iron is highly exothermic."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "When it is heated with iron (III) oxide, molten iron is obtained."
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "When it is heated with iron (III) oxide, molten aluminium oxide is obtained to join railway tracks."
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Its melting point is low as compared to iron and a molten alloy of iron and aluminium is formed on heating which is used to join railway tracks."
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "metals-and-non-metals",
+          "cognitive_level": "U",
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 4,
+    "pages": [
+      7
+    ],
+    "questions": 2,
+    "payload": {
+      "questions": [
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "Select the correct option from the following statements about the functioning of the human heart.\n(A) Right atrium receives deoxygenated blood from different parts of the body and sends it to pulmonary veins.\n(B) Left atrium sends oxygenated blood to right ventricle which pumps it to different parts of the body.\n(C) Right atrium receives deoxygenated blood from the body and sends it to the right ventricle.\n(D) Left atrium receives oxygenated blood from the pulmonary arteries and sends it to the left ventricle.",
+          "options": [
+            {
+              "label": "A",
+              "text": "Right atrium receives deoxygenated blood from different parts of the body and sends it to pulmonary veins."
+            },
+            {
+              "label": "B",
+              "text": "Left atrium sends oxygenated blood to right ventricle which pumps it to different parts of the body."
+            },
+            {
+              "label": "C",
+              "text": "Right atrium receives deoxygenated blood from the body and sends it to the right ventricle."
+            },
+            {
+              "label": "D",
+              "text": "Left atrium receives oxygenated blood from the pulmonary arteries and sends it to the left ventricle."
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Select the correct option from the following statements about the functioning of the human heart."
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Right atrium receives deoxygenated blood from different parts of the body and sends it to pulmonary veins."
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Left atrium sends oxygenated blood to right ventricle which pumps it to different parts of the body."
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Right atrium receives deoxygenated blood from the body and sends it to the right ventricle."
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Left atrium receives oxygenated blood from the pulmonary arteries and sends it to the left ventricle."
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "life-processes",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Transportation in Human Beings"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "One-cell thick blood vessels are known as :\n(A) Alveoli\n(B) Capillaries\n(C) Arteries\n(D) Veins",
+          "options": [
+            {
+              "label": "A",
+              "text": "Alveoli"
+            },
+            {
+              "label": "B",
+              "text": "Capillaries"
+            },
+            {
+              "label": "C",
+              "text": "Arteries"
+            },
+            {
+              "label": "D",
+              "text": "Veins"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "One-cell thick blood vessels are known as :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Alveoli"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Capillaries"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Arteries"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Veins"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "life-processes",
+          "cognitive_level": "R",
+          "topic_names": [
+            "Transportation in Human Beings"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 5,
+    "pages": [
+      9
+    ],
+    "questions": 3,
+    "payload": {
+      "questions": [
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "Which of the following is the correct sequence of parts of female reproductive system of flowering plants in terms of their placement ?\n(A) Stigma, ovule, ovary, style\n(B) Ovule, stigma, ovary, style\n(C) Style, stigma, ovule, ovary\n(D) Stigma, style, ovary, ovule",
+          "options": [
+            {
+              "label": "A",
+              "text": "Stigma, ovule, ovary, style"
+            },
+            {
+              "label": "B",
+              "text": "Ovule, stigma, ovary, style"
+            },
+            {
+              "label": "C",
+              "text": "Style, stigma, ovule, ovary"
+            },
+            {
+              "label": "D",
+              "text": "Stigma, style, ovary, ovule"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Which of the following is the correct sequence of parts of female reproductive system of flowering plants in terms of their placement ?"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Stigma, ovule, ovary, style"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Ovule, stigma, ovary, style"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Style, stigma, ovule, ovary"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Stigma, style, ovary, ovule"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "how-do-organisms-reproduce",
+          "cognitive_level": "R",
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "The number of chromosomes in a cell division is halved. This kind of cell division is observed in :\n(A) Only testis\n(B) Only ovary\n(C) Ovary and testis both\n(D) All cells of the body",
+          "options": [
+            {
+              "label": "A",
+              "text": "Only testis"
+            },
+            {
+              "label": "B",
+              "text": "Only ovary"
+            },
+            {
+              "label": "C",
+              "text": "Ovary and testis both"
+            },
+            {
+              "label": "D",
+              "text": "All cells of the body"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "The number of chromosomes in a cell division is halved. This kind of cell division is observed in :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Only testis"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Only ovary"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Ovary and testis both"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "All cells of the body"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "how-do-organisms-reproduce",
+          "cognitive_level": "U",
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "An electric bulb is connected to a power supply of 220 V. If the current drawn by the bulb from the supply is 500 mA, the power of the bulb is :\n(A) 11 W\n(B) 110 W\n(C) 220 W\n(D) 1100 W",
+          "options": [
+            {
+              "label": "A",
+              "text": "11 W"
+            },
+            {
+              "label": "B",
+              "text": "110 W"
+            },
+            {
+              "label": "C",
+              "text": "220 W"
+            },
+            {
+              "label": "D",
+              "text": "1100 W"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "An electric bulb is connected to a power supply of 220 V. If the current drawn by the bulb from the supply is 500 mA, the power of the bulb is :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "11 W"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "110 W"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "220 W"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "1100 W"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "electricity",
+          "cognitive_level": "Ap",
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 6,
+    "pages": [
+      11
+    ],
+    "questions": 4,
+    "payload": {
+      "questions": [
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "The part of the human eye which can modify the curvature of the eye lens to some extent is :\n(A) Pupil\n(B) Cornea\n(C) Ciliary muscles\n(D) Aqueous humour",
+          "options": [
+            {
+              "label": "A",
+              "text": "Pupil"
+            },
+            {
+              "label": "B",
+              "text": "Cornea"
+            },
+            {
+              "label": "C",
+              "text": "Ciliary muscles"
+            },
+            {
+              "label": "D",
+              "text": "Aqueous humour"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "The part of the human eye which can modify the curvature of the eye lens to some extent is :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Pupil"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Cornea"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Ciliary muscles"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Aqueous humour"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "human-eye-and-the-colourful-world",
+          "cognitive_level": "R",
+          "topic_names": [
+            "Structure of Human Eye"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "If the absolute refractive indices of two media X and Y are $\\frac{6}{5}$ and $\\frac{4}{3}$ respectively, then the refractive index of Y with respect to X will be :\n(A) $\\frac{10}{9}$\n(B) $\\frac{9}{10}$\n(C) $\\frac{9}{8}$\n(D) $\\frac{8}{9}$",
+          "options": [
+            {
+              "label": "A",
+              "text": "$\\frac{10}{9}$"
+            },
+            {
+              "label": "B",
+              "text": "$\\frac{9}{10}$"
+            },
+            {
+              "label": "C",
+              "text": "$\\frac{9}{8}$"
+            },
+            {
+              "label": "D",
+              "text": "$\\frac{8}{9}$"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "latex": "If the absolute refractive indices of two media X and Y are $\\frac{6}{5}$ and $\\frac{4}{3}$ respectively, then the refractive index of Y with respect to X will be :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "latex": "$\\frac{10}{9}$"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "latex": "$\\frac{9}{10}$"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "latex": "$\\frac{9}{8}$"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "latex": "$\\frac{8}{9}$"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "light-reflection-and-refraction",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Refractive Index"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "An object is placed at a distance of 30 cm from the pole of a concave mirror. If its real and inverted image is formed at 60 cm in front of the mirror, the focal length of the mirror is :\n(A) -15 cm\n(B) -20 cm\n(C) +20 cm\n(D) +15 cm",
+          "options": [
+            {
+              "label": "A",
+              "text": "-15 cm"
+            },
+            {
+              "label": "B",
+              "text": "-20 cm"
+            },
+            {
+              "label": "C",
+              "text": "+20 cm"
+            },
+            {
+              "label": "D",
+              "text": "+15 cm"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "An object is placed at a distance of 30 cm from the pole of a concave mirror. If its real and inverted image is formed at 60 cm in front of the mirror, the focal length of the mirror is :"
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "-15 cm"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "-20 cm"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "+20 cm"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "+15 cm"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "light-reflection-and-refraction",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Mirror Formula",
+            "Concave Mirror"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "mcq",
+          "marks": 1,
+          "rawText": "Identify from the following a group containing all non-biodegradable substances.\n(A) Leather, Glass, Plastic\n(B) Cotton, Wood, Nylon\n(C) DDT, Polyester, Glass\n(D) Leather, Silk, Wool",
+          "options": [
+            {
+              "label": "A",
+              "text": "Leather, Glass, Plastic"
+            },
+            {
+              "label": "B",
+              "text": "Cotton, Wood, Nylon"
+            },
+            {
+              "label": "C",
+              "text": "DDT, Polyester, Glass"
+            },
+            {
+              "label": "D",
+              "text": "Leather, Silk, Wool"
+            }
+          ],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Identify from the following a group containing all non-biodegradable substances."
+              }
+            ],
+            "options": [
+              {
+                "label": "A",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Leather, Glass, Plastic"
+                  }
+                ]
+              },
+              {
+                "label": "B",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Cotton, Wood, Nylon"
+                  }
+                ]
+              },
+              {
+                "label": "C",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "DDT, Polyester, Glass"
+                  }
+                ]
+              },
+              {
+                "label": "D",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Leather, Silk, Wool"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "our-environment",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Biodegradable and Non-biodegradable Substances"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 7,
+    "pages": [
+      13
+    ],
+    "questions": 6,
+    "payload": {
+      "questions": [
+        {
+          "section": "A",
+          "qtype": "assertion_reason",
+          "marks": 1,
+          "rawText": "Assertion (A) : Ductility is that property of metals which enables copper to be used in making cooking utensils.\nReason (R) : Copper is a metal which is ductile as well as malleable.",
+          "content": {
+            "assertion": [
+              {
+                "type": "paragraph",
+                "text": "Ductility is that property of metals which enables copper to be used in making cooking utensils."
+              }
+            ],
+            "reason": [
+              {
+                "type": "paragraph",
+                "text": "Copper is a metal which is ductile as well as malleable."
+              }
+            ]
+          },
+          "chapter_slug": "metals-and-non-metals",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Physical properties of metals"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "assertion_reason",
+          "marks": 1,
+          "rawText": "Assertion (A) : A mango seed will germinate to form a mango tree.\nReason (R) : Heredity determines the process by which traits and characteristics are reliably inherited from parents to offspring.",
+          "content": {
+            "assertion": [
+              {
+                "type": "paragraph",
+                "text": "A mango seed will germinate to form a mango tree."
+              }
+            ],
+            "reason": [
+              {
+                "type": "paragraph",
+                "text": "Heredity determines the process by which traits and characteristics are reliably inherited from parents to offspring."
+              }
+            ]
+          },
+          "chapter_slug": "heredity",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Accumulation of Variation during Reproduction",
+            "Heredity"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "assertion_reason",
+          "marks": 1,
+          "rawText": "Assertion (A) : The bending of a wire in the form of a coil of several turns does not affect its electrical resistance.\nReason (R) : The electrical resistance of a wire is directly proportional to its electrical resistivity.",
+          "content": {
+            "assertion": [
+              {
+                "type": "paragraph",
+                "text": "The bending of a wire in the form of a coil of several turns does not affect its electrical resistance."
+              }
+            ],
+            "reason": [
+              {
+                "type": "paragraph",
+                "text": "The electrical resistance of a wire is directly proportional to its electrical resistivity."
+              }
+            ]
+          },
+          "chapter_slug": "electricity",
+          "cognitive_level": "An",
+          "topic_names": [
+            "Factors on which the Resistance of a Conductor depends"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "A",
+          "qtype": "assertion_reason",
+          "marks": 1,
+          "rawText": "Assertion (A) : Animals will not get energy if they eat (consume) coal as food.\nReason (R) : Specific enzymes are needed for the breakdown of a particular food.",
+          "content": {
+            "assertion": [
+              {
+                "type": "paragraph",
+                "text": "Animals will not get energy if they eat (consume) coal as food."
+              }
+            ],
+            "reason": [
+              {
+                "type": "paragraph",
+                "text": "Specific enzymes are needed for the breakdown of a particular food."
+              }
+            ]
+          },
+          "chapter_slug": "life-processes",
+          "cognitive_level": "An",
+          "topic_names": [
+            "Nutrition in Animals"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "B",
+          "qtype": "very_short_answer",
+          "marks": 2,
+          "rawText": "(a) In common practice silver is recovered from silver nitrate solution by the use of copper metal. Name the type of reaction that takes place in this process and give the chemical equation of the reaction involved.\n(b) Name the method used for refining silver.",
+          "content": {
+            "subparts": [
+              {
+                "label": "a",
+                "marks": 1,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "In common practice silver is recovered from silver nitrate solution by the use of copper metal. Name the type of reaction that takes place in this process and give the chemical equation of the reaction involved."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 1,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Name the method used for refining silver."
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "chemical-reactions-and-equations",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Displacement Reaction",
+            "Refining of Metals"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "B",
+          "qtype": "very_short_answer",
+          "marks": 2,
+          "rawText": "A person is making a list to purchase few things from a nearby market. Explain how the fore-brain plays an important role in performing this activity.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "A person is making a list to purchase few things from a nearby market. Explain how the fore-brain plays an important role in performing this activity."
+              }
+            ]
+          },
+          "chapter_slug": "control-and-coordination",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Human Brain"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 8,
+    "pages": [
+      15
+    ],
+    "questions": 3,
+    "payload": {
+      "questions": [
+        {
+          "section": "B",
+          "qtype": "short_answer",
+          "marks": 2,
+          "rawText": "(a) Write one function each of the following, in a seed :\n(i) Seed coat\n(ii) Cotyledon\n(iii) Radicle\n(iv) Plumule\n\nOR\n\n(b) Write the main steps to culture yeast in the laboratory.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Write one function each of the following, in a seed :\n(i) Seed coat\n(ii) Cotyledon\n(iii) Radicle\n(iv) Plumule"
+              }
+            ],
+            "choices": [
+              {
+                "displayStyle": "or",
+                "chooseCount": 1,
+                "options": [
+                  {
+                    "label": "a",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "Write one function each of the following, in a seed :\n(i) Seed coat\n(ii) Cotyledon\n(iii) Radicle\n(iv) Plumule"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "b",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "Write the main steps to culture yeast in the laboratory."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "how-do-organisms-reproduce",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Sexual Reproduction in Flowering Plants",
+            "Asexual Reproduction"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "B",
+          "qtype": "short_answer",
+          "marks": 2,
+          "rawText": "How and why is an electric fuse used in an electric circuit ? Briefly describe its function.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "How and why is an electric fuse used in an electric circuit ? Briefly describe its function."
+              }
+            ]
+          },
+          "chapter_slug": "magnetic-effects-of-electric-current",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Domestic Electric Circuits"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "C",
+          "qtype": "short_answer",
+          "marks": 3,
+          "rawText": "(a) (i) Define the term decomposition reaction. Write one chemical equation each for decomposition reaction where energy is supplied in the form of heat, light or electricity.\n(ii) Decomposition of vegetable matter into compost is considered an exothermic reaction. Why ?\n\nOR\n\n(b) Why are decomposition reactions called the opposite of combination reactions ? Write one chemical equation each for these two types of reactions mentioning the name of the reactant(s) and the product(s) involved in the reactions.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "(i) Define the term decomposition reaction. Write one chemical equation each for decomposition reaction where energy is supplied in the form of heat, light or electricity.\n(ii) Decomposition of vegetable matter into compost is considered an exothermic reaction. Why ?"
+              }
+            ],
+            "choices": [
+              {
+                "displayStyle": "or",
+                "chooseCount": 1,
+                "options": [
+                  {
+                    "label": "a",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "(i) Define the term decomposition reaction. Write one chemical equation each for decomposition reaction where energy is supplied in the form of heat, light or electricity.\n(ii) Decomposition of vegetable matter into compost is considered an exothermic reaction. Why ?"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "b",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "Why are decomposition reactions called the opposite of combination reactions ? Write one chemical equation each for these two types of reactions mentioning the name of the reactant(s) and the product(s) involved in the reactions."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "chemical-reactions-and-equations",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Types of Chemical Reactions"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 9,
+    "pages": [
+      17
+    ],
+    "questions": 6,
+    "payload": {
+      "questions": [
+        {
+          "section": "C",
+          "qtype": "short_answer",
+          "marks": 3,
+          "rawText": "Two substances ‘A’ and ‘B’ are burnt in air separately. For ‘A’, ashes are collected and dissolved in water to get solution ‘X’, while for ‘B’, fumes produced are passed through water to get solution ‘Y’. Both the solutions ‘X’ and ‘Y’ are then tested with pH paper.\n(a) If ‘X’ gives light blue colour and ‘Y’ gives orange colour to the pH paper, then write the nature and range of pH of ‘X’ and ‘Y’.\n(b) Which one of the two – A and B, is a metal ? Justify your answer.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Two substances ‘A’ and ‘B’ are burnt in air separately. For ‘A’, ashes are collected and dissolved in water to get solution ‘X’, while for ‘B’, fumes produced are passed through water to get solution ‘Y’. Both the solutions ‘X’ and ‘Y’ are then tested with pH paper."
+              }
+            ],
+            "subparts": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "If ‘X’ gives light blue colour and ‘Y’ gives orange colour to the pH paper, then write the nature and range of pH of ‘X’ and ‘Y’."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Which one of the two – A and B, is a metal ? Justify your answer."
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "acids-bases-and-salts",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "pH of Solutions",
+            "Oxides of Metals and Non-metals"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "C",
+          "qtype": "short_answer",
+          "marks": 3,
+          "rawText": "(a) Define hormone.\n(b) “Hormones should be secreted in precise quantities. We have a feedback mechanism through which this is done.” With the help of an example justify the statement.",
+          "content": {
+            "subparts": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Define hormone."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "“Hormones should be secreted in precise quantities. We have a feedback mechanism through which this is done.” With the help of an example justify the statement."
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "control-and-coordination",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Animal Hormones",
+            "Feedback Mechanism"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "C",
+          "qtype": "short_answer",
+          "marks": 3,
+          "rawText": "A pure pea plant bearing terminal flowers was cross-pollinated with a pure plant having axillary flowers. In F₁ generation, plants with axial flowers only were obtained. F₁ generation plants are self-pollinated and F₂ generation is obtained.\n(a) Work out the pattern of inheritance in this case.\n(b) What will be the ratio of plants obtained in F₂ generation ?",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "A pure pea plant bearing terminal flowers was cross-pollinated with a pure plant having axillary flowers. In F₁ generation, plants with axial flowers only were obtained. F₁ generation plants are self-pollinated and F₂ generation is obtained."
+              }
+            ],
+            "subparts": [
+              {
+                "label": "a",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Work out the pattern of inheritance in this case."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "What will be the ratio of plants obtained in F₂ generation ?"
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "heredity",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Monohybrid Cross",
+            "Mendelian Inheritance"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "C",
+          "qtype": "short_answer",
+          "marks": 3,
+          "rawText": "A convex mirror used for rear view on an automobile has a focal length of 1.5 m. If a 3 m high bus is located at 6.0 m from the mirror, use mirror formula to determine the position and size of the image of the bus as seen in the mirror.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "A convex mirror used for rear view on an automobile has a focal length of 1.5 m. If a 3 m high bus is located at 6.0 m from the mirror, use mirror formula to determine the position and size of the image of the bus as seen in the mirror."
+              }
+            ]
+          },
+          "chapter_slug": "light-reflection-and-refraction",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Mirror Formula",
+            "Magnification"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "C",
+          "qtype": "short_answer",
+          "marks": 3,
+          "rawText": "Three resistors of 2 Ω, 3 Ω and 6 Ω are connected in (i) series, and (ii) parallel. Draw the arrangements of the resistors and find the equivalent resistance of each arrangement.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Three resistors of 2 Ω, 3 Ω and 6 Ω are connected in (i) series, and (ii) parallel. Draw the arrangements of the resistors and find the equivalent resistance of each arrangement."
+              }
+            ]
+          },
+          "chapter_slug": "electricity",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Resistors in Series",
+            "Resistors in Parallel"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "C",
+          "qtype": "short_answer",
+          "marks": 3,
+          "rawText": "Some harmful chemicals get accumulated in human bodies through the food chain. Name this phenomenon. Explain the reason of maximum concentration of these chemicals found in our bodies.",
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "Some harmful chemicals get accumulated in human bodies through the food chain. Name this phenomenon. Explain the reason of maximum concentration of these chemicals found in our bodies."
+              }
+            ]
+          },
+          "chapter_slug": "our-environment",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Biological Magnification"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 10,
+    "pages": [
+      19
+    ],
+    "questions": 0,
+    "payload": {
+      "questions": []
+    }
+  },
+  {
+    "batch": 11,
+    "pages": [
+      21
+    ],
+    "questions": 2,
+    "payload": {
+      "questions": [
+        {
+          "section": "D",
+          "qtype": "long_answer",
+          "marks": 5,
+          "rawText": "(b) (i) Define the term solenoid. Draw the pattern of the magnetic field lines in and around a current carrying straight solenoid. Mark on the pattern the (i) direction of current, (ii) direction of field lines near the ends of the solenoid, and (iii) region where the magnetic field is uniform.\n(ii) How would you make an electromagnet using a current carrying solenoid ?",
+          "options": [],
+          "content": {
+            "stem": [
+              {
+                "type": "paragraph",
+                "text": "(b) (i) Define the term solenoid. Draw the pattern of the magnetic field lines in and around a current carrying straight solenoid. Mark on the pattern the (i) direction of current, (ii) direction of field lines near the ends of the solenoid, and (iii) region where the magnetic field is uniform."
+              },
+              {
+                "type": "paragraph",
+                "text": "(ii) How would you make an electromagnet using a current carrying solenoid ?"
+              }
+            ]
+          },
+          "chapter_slug": "magnetic-effects-of-electric-current",
+          "cognitive_level": "Ap",
+          "topic_names": [
+            "Magnetic Field due to a Current in a Solenoid",
+            "Electromagnet"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "D",
+          "qtype": "long_answer",
+          "marks": 5,
+          "rawText": "(a) (i) A compound 'X' having two carbon atoms in its molecule turns blue litmus red and 5 – 8% solution of 'X' in water is widely used as a preservative. Identify the compound 'X' and write its structure.\n(ii) Compare its pH nature with a mineral acid.\n(iii) 'X' on reacting with alcohols produces sweet smelling compounds, used in making perfumes. Name the reaction and write its chemical equation.\n(iv) When sodium carbonate is added to 'X', a colourless gas is produced which turns lime water milky. Write the chemical equation for the reaction giving the name of the salt produced.\nOR\n(b) (i) Differentiate between saturated and unsaturated hydrocarbons by giving one example each, with a structural formula.\n(ii) Write the method of converting an unsaturated hydrocarbon into a saturated hydrocarbon. Name the industry where this reaction is commonly used.\n(iii) Write the name and structure of a hydrocarbon having double bond and four carbon atoms in its one molecule.",
+          "options": [],
+          "content": {
+            "choices": [
+              {
+                "displayStyle": "or",
+                "chooseCount": 1,
+                "options": [
+                  {
+                    "label": "a",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "(i) A compound 'X' having two carbon atoms in its molecule turns blue litmus red and 5 – 8% solution of 'X' in water is widely used as a preservative. Identify the compound 'X' and write its structure."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(ii) Compare its pH nature with a mineral acid."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(iii) 'X' on reacting with alcohols produces sweet smelling compounds, used in making perfumes. Name the reaction and write its chemical equation."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(iv) When sodium carbonate is added to 'X', a colourless gas is produced which turns lime water milky. Write the chemical equation for the reaction giving the name of the salt produced."
+                      }
+                    ]
+                  },
+                  {
+                    "label": "b",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "(i) Differentiate between saturated and unsaturated hydrocarbons by giving one example each, with a structural formula."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(ii) Write the method of converting an unsaturated hydrocarbon into a saturated hydrocarbon. Name the industry where this reaction is commonly used."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(iii) Write the name and structure of a hydrocarbon having double bond and four carbon atoms in its one molecule."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "carbon-and-its-compounds",
+          "cognitive_level": "An",
+          "topic_names": [
+            "Properties of Ethanoic Acid",
+            "Esterification Reaction",
+            "Saturated and Unsaturated Hydrocarbons",
+            "Hydrogenation of Vegetable Oils"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 12,
+    "pages": [
+      23
+    ],
+    "questions": 2,
+    "payload": {
+      "questions": [
+        {
+          "section": "D",
+          "qtype": "long_answer",
+          "marks": 5,
+          "rawText": "(a) (i) “The length of the small intestine in various animals depends on the food they eat.” Justify the statement.\n(ii) Discuss the role of the pancreas and bile juice in the digestion of food in human beings.\n(iii) How is the small intestine designed to absorb digested food ?\n\nOR\n\n(b) (i) State the role of rings of cartilage present in the throat.\n(ii) Discuss the role of the ribs and diaphragm when air is taken in during the breathing cycle.\n(iii) Why do we get muscle cramps during heavy exercise ? Explain.",
+          "content": {
+            "stem": [],
+            "choices": [
+              {
+                "displayStyle": "or",
+                "chooseCount": 1,
+                "options": [
+                  {
+                    "label": "a",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "(i) “The length of the small intestine in various animals depends on the food they eat.” Justify the statement."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(ii) Discuss the role of the pancreas and bile juice in the digestion of food in human beings."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(iii) How is the small intestine designed to absorb digested food ?"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "b",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "(i) State the role of rings of cartilage present in the throat."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(ii) Discuss the role of the ribs and diaphragm when air is taken in during the breathing cycle."
+                      },
+                      {
+                        "type": "paragraph",
+                        "text": "(iii) Why do we get muscle cramps during heavy exercise ? Explain."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "life-processes",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Nutrition in Human Beings",
+            "Respiration"
+          ],
+          "primary_form": "none",
+          "figures": []
+        },
+        {
+          "section": "E",
+          "qtype": "case_based",
+          "marks": 4,
+          "rawText": "When a girl is born, the ovaries already contain thousands of immature eggs. On reaching puberty, some of these start maturing. One matured egg is released every month by one of the ovaries. The two oviducts unite into an elastic bag-like structure known as uterus.\n(a) Write the site of fertilization in human female.\n(b) How does the uterus prepare itself to receive and nurture the growing embryo ? Explain.\n(c) (i) What happens when the egg is not fertilized ?\n\nOR\n\n(c) (ii) How does the developing embryo get nutrition from the mother's blood ? Explain.",
+          "content": {
+            "passage": [
+              {
+                "type": "paragraph",
+                "text": "When a girl is born, the ovaries already contain thousands of immature eggs. On reaching puberty, some of these start maturing. One matured egg is released every month by one of the ovaries. The two oviducts unite into an elastic bag-like structure known as uterus."
+              }
+            ],
+            "subparts": [
+              {
+                "label": "a",
+                "marks": 1,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "Write the site of fertilization in human female."
+                  }
+                ]
+              },
+              {
+                "label": "b",
+                "marks": 1,
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "text": "How does the uterus prepare itself to receive and nurture the growing embryo ? Explain."
+                  }
+                ]
+              }
+            ],
+            "choices": [
+              {
+                "displayStyle": "or",
+                "chooseCount": 1,
+                "options": [
+                  {
+                    "label": "c(i)",
+                    "marks": 2,
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "What happens when the egg is not fertilized ?"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "c(ii)",
+                    "marks": 2,
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "text": "How does the developing embryo get nutrition from the mother's blood ? Explain."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "chapter_slug": "how-do-organisms-reproduce",
+          "cognitive_level": "U",
+          "topic_names": [
+            "Sexual Reproduction in Flowering Plants and Animals"
+          ],
+          "primary_form": "none",
+          "figures": []
+        }
+      ]
+    }
+  },
+  {
+    "batch": 13,
+    "pages": [
+      25
+    ],
+    "questions": 0,
+    "payload": {
+      "questions": []
+    }
+  },
+  {
+    "batch": 14,
+    "pages": [
+      27
+    ],
+    "questions": 0,
+    "payload": {
+      "questions": []
+    }
+  }
+]

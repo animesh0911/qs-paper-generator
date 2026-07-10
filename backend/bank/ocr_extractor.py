@@ -157,18 +157,29 @@ class MistralOcrMarkdownExtractor:
         )
 
     def structure_markdown(self, markdown: str) -> dict:
-        if _looks_hindi_only(markdown):
-            return {"questions": []}
-        try:
-            chapter_slugs = Chapter.objects.values_list("slug", flat=True)
-            schema = build_question_schema(chapter_slugs)
-        except OperationalError:
-            # Local artifact-only POCs may run without the Docker/Postgres DB.
-            # Keep the extraction test moving with the seeded taxonomy.
-            schema = build_question_schema(_POC_CHAPTER_SLUGS)
-        prompt = _markdown_extraction_prompt(markdown, schema)
-        response = self.chat_model.invoke([HumanMessage(content=prompt)])
-        return _drop_visual_questions(_parse_json_response(response.content))
+        return structure_ocr_markdown(markdown, self.chat_model)
+
+
+def structure_ocr_markdown(markdown: str, chat_model: BaseChatModel) -> dict:
+    """Structure OCR markdown into the upload Question payload shape.
+
+    This is the importable seam used by both production OCR upload extraction
+    and live cost evals. It intentionally does *not* require an OCR client, so
+    evals can cache/reuse ``ocr.json`` and repeatedly test different LLMs or
+    batch sizes against the same OCR markdown without another OCR API call.
+    """
+    if _looks_hindi_only(markdown):
+        return {"questions": []}
+    try:
+        chapter_slugs = Chapter.objects.values_list("slug", flat=True)
+        schema = build_question_schema(chapter_slugs)
+    except OperationalError:
+        # Local artifact-only POCs may run without the Docker/Postgres DB.
+        # Keep the extraction test moving with the seeded taxonomy.
+        schema = build_question_schema(_POC_CHAPTER_SLUGS)
+    prompt = _markdown_extraction_prompt(markdown, schema)
+    response = chat_model.invoke([HumanMessage(content=prompt)])
+    return _drop_visual_questions(_parse_json_response(response.content))
 
 
 def _markdown_extraction_prompt(markdown: str, schema: dict) -> str:

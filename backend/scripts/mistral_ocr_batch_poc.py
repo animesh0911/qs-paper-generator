@@ -212,8 +212,12 @@ def main() -> int:
 
     django.setup()
 
-    from bank.extraction import merge_page_payloads
-    from bank.ocr_extractor import MistralOcrClient, MistralOcrMarkdownExtractor
+    from bank.ocr_extractor import (
+        MistralOcrClient,
+        MistralOcrMarkdownExtractor,
+        pages_from_ocr_response,
+    )
+    from bank.upload_extraction.pipeline import UploadExtractionPipeline
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     pdf_bytes = args.pdf.read_bytes()
@@ -232,21 +236,24 @@ def main() -> int:
             json.dumps(ocr, indent=2, ensure_ascii=False), encoding="utf-8"
         )
 
-    pages = _pages_from_ocr(ocr)
-    selected = _filter_pages(pages)
-    batches = _batch_pages(selected, args.batch_pages)
-    if args.max_batches > 0:
-        batches = batches[: args.max_batches]
+    extractor = MistralOcrMarkdownExtractor(ocr_client=ocr_client)
+    pipeline = UploadExtractionPipeline(extractor.chat_model)
+    pages = pipeline.coerce_ocr_pages(pages_from_ocr_response(ocr))
+    run = pipeline.structure_pages(
+        pages=pages,
+        batch_size=args.batch_pages,
+        max_batches=args.max_batches,
+    )
 
     (args.out_dir / "ocr_all.md").write_text(
-        "\n\n--- PAGE ---\n\n".join(page["markdown"] for page in pages),
+        "\n\n--- PAGE ---\n\n".join(page.markdown for page in pages),
         encoding="utf-8",
     )
     (args.out_dir / "selected_pages.json").write_text(
         json.dumps(
             [
-                {"page": page["index"] + 1, "chars": len(page["markdown"])}
-                for page in selected
+                {"page": page.index + 1, "chars": len(page.markdown)}
+                for page in run.selected_pages
             ],
             indent=2,
         ),
@@ -254,30 +261,26 @@ def main() -> int:
     )
 
     print(
-        f"OCR pages={len(pages)}; selected English/question pages={len(selected)}; "
-        f"LLM batches={len(batches)} x up to {args.batch_pages} pages"
+        f"OCR pages={len(pages)}; "
+        f"selected English/question pages={len(run.selected_pages)}; "
+        f"LLM batches={len(run.batches)} x up to {args.batch_pages} pages"
     )
 
-    extractor = MistralOcrMarkdownExtractor(ocr_client=ocr_client)
-    payloads = []
-    batch_artifacts = []
-    for batch_index, batch in enumerate(batches, start=1):
-        page_numbers = [page["index"] + 1 for page in batch]
-        markdown = _batch_markdown(batch)
-        payload = extractor.structure_markdown(markdown)
-        payloads.append(payload)
-        batch_artifacts.append(
-            {"batch": batch_index, "pages": page_numbers, "payload": payload}
-        )
+    for batch in run.batches:
         print(
-            f"batch {batch_index}/{len(batches)} pages={page_numbers}: "
-            f"{len(payload.get('questions', []))} raw question(s)"
+            f"batch {batch.batch_index}/{len(run.batches)} "
+            f"pages={list(batch.pages)}: {batch.question_count} raw question(s)"
         )
 
     (args.out_dir / "structured_batches.json").write_text(
-        json.dumps(batch_artifacts, indent=2, ensure_ascii=False), encoding="utf-8"
+        json.dumps(
+            [batch.as_artifact() for batch in run.batches],
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
     )
-    questions = merge_page_payloads(payloads)
+    questions = run.questions
     (args.out_dir / "questions.json").write_text(
         json.dumps(questions, indent=2, ensure_ascii=False), encoding="utf-8"
     )

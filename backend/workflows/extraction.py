@@ -183,22 +183,23 @@ def build_ocr_batch_extraction_graph(
     from bank.ocr_extractor import (
         MistralOcrClient,
         MistralOcrMarkdownExtractor,
-        batch_ocr_markdown,
-        is_english_question_page,
         pages_from_ocr_response,
     )
+    from bank.upload_extraction.pipeline import UploadExtractionPipeline
 
     ocr_client = MistralOcrClient()
     extractor = MistralOcrMarkdownExtractor(ocr_client=ocr_client)
+    pipeline = UploadExtractionPipeline(extractor.chat_model)
     ingestor = Ingestor(extractor=extractor)
 
     def plan(state: OcrBatchExtractionState) -> dict:
         _, pdf_bytes = _load_job_pdf(state["job_id"])
         ocr = ocr_client.process_pdf(pdf_bytes)
         pages = [
-            page
-            for page in pages_from_ocr_response(ocr)
-            if is_english_question_page(page["markdown"])
+            page.as_raw()
+            for page in pipeline.select_pages(
+                pipeline.coerce_ocr_pages(pages_from_ocr_response(ocr))
+            )
         ]
         total_pages = len(pages)
         IngestionJob.objects.filter(pk=state["job_id"]).update(
@@ -215,8 +216,8 @@ def build_ocr_batch_extraction_graph(
     def structure_batch(state: OcrBatchExtractionState) -> dict:
         start = state["next_batch"] * state["batch_pages"]
         end = start + state["batch_pages"]
-        batch = state["ocr_pages"][start:end]
-        payload = extractor.structure_markdown(batch_ocr_markdown(batch))
+        batch = pipeline.coerce_ocr_pages(state["ocr_pages"][start:end])
+        payload = pipeline.structure_batch(batch).payload
         next_batch = state["next_batch"] + 1
         pages_done = min(end, state["total_pages"])
         IngestionJob.objects.filter(pk=state["job_id"]).update(pages_done=pages_done)

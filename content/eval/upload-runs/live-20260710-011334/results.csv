@@ -1,0 +1,4 @@
+pdf_pages,ocr_model,ocr_cost,ocr_latency,ocr_output_size,llm_model,batch_size,llm_cost,llm_latency,total_cost,questions
+27,mistral-ocr-latest,0.027000,3758,32628,google/gemini-3.5-flash,1,0.196926,86604,0.223926,32
+27,mistral-ocr-latest,0.027000,3758,32628,google/gemini-3.5-flash,5,0.169246,72098,0.196246,30
+27,mistral-ocr-latest,0.027000,3758,32628,google/gemini-3.5-flash,all,0.163721,66815,0.190721,31
