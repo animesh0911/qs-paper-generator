@@ -29,70 +29,34 @@ from collections.abc import Callable, Sequence
 from django.core.management.base import BaseCommand, CommandError
 from langchain_core.language_models import BaseChatModel
 from langchain_core.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, Field
 
 from ai_services.llm import ModelPurpose, make_chat_model
-from bank.models import AnswerSource, Question
+from bank.answer_generation import (
+    answerable_questions,
+    persist_answer_if_unanswered,
+)
+from bank.answer_generation_core import (
+    AnswerGenerator,
+    AnswerQuestion,
+    BatchAnswers,
+    build_answer_prompt,
+    render_answer_question,
+)
+from bank.models import Question
 
 _DEFAULT_BATCH_SIZE = 10
 
-_QTYPE_HINT = {
-    "mcq": "Write the correct option label (e.g. 'A') followed by the option text.",
-    "assertion_reason": (
-        "State whether the assertion and reason are true and whether the "
-        "reason correctly explains the assertion."
-    ),
-    "very_short_answer": "Write a concise answer in 1-2 sentences (max 30 words).",
-    "short_answer": "Write a model answer in 3-5 sentences (max 80 words).",
-    "long_answer": "Write a structured model answer with key points (max 200 words).",
-    "case_based": "Address each sub-part of the case study in order.",
-    "internal_choice": "Provide a model answer for one of the choices only.",
-}
-
-
-class _GeneratedAnswer(BaseModel):
-    """One model answer keyed back to the question it answers."""
-
-    id: int = Field(description="The Q# id of the question being answered.")
-    answer: str = Field(description="The model answer text only — no preamble.")
-
-
-class _BatchAnswers(BaseModel):
-    """The structured output of one batch call — one entry per question asked."""
-
-    answers: list[_GeneratedAnswer]
-
 
 def _render_question(q: Question) -> str:
-    """Render one question as a block in a batch prompt, including its id so the
-    model's answer can be mapped back."""
-    hint = _QTYPE_HINT.get(q.qtype, "Write a concise model answer.")
-    chapter = q.chapter.name if q.chapter else "unknown chapter"
-    options_block = ""
-    if q.options:
-        # .get(): a malformed option dict must not crash prompt-building (and
-        # thereby abort the whole batch — rendering runs before the per-batch try
-        # in handle()).
-        lines = "\n".join(
-            f"    {o.get('label', '?')}. {o.get('text', '')}" for o in q.options
-        )
-        options_block = f"\n  Options:\n{lines}"
-    marks = f"{q.marks} mark{'s' if q.marks != 1 else ''}"
-    return (
-        f"[id={q.pk}] Type: {q.qtype} ({marks}); Chapter: {chapter}\n"
-        f"  Question: {q.text}{options_block}\n"
-        f"  Instruction: {hint}"
-    )
+    """Backwards-compatible wrapper around the shared production renderer."""
+    return render_answer_question(AnswerQuestion.from_model(q))
 
 
 def _build_batch_prompt(questions: Sequence[Question], format_instructions: str) -> str:
-    blocks = "\n\n".join(_render_question(q) for q in questions)
-    return (
-        "You are generating CBSE Class 10 Science model answers for a marking "
-        "scheme. Answer every question below, keyed by its id. Return only the "
-        "answer text for each — no preamble, no restatement of the question.\n\n"
-        f"{blocks}\n\n"
-        f"{format_instructions}"
+    """Backwards-compatible wrapper around the shared production prompt."""
+    return build_answer_prompt(
+        [AnswerQuestion.from_model(question) for question in questions],
+        format_instructions,
     )
 
 
@@ -139,7 +103,11 @@ class Command(BaseCommand):
         if batch_size < 1:
             raise CommandError("--batch-size must be at least 1.")
 
-        qs = Question.objects.filter(answer="").select_related("chapter")
+        qs = (
+            answerable_questions(Question.objects.filter(answer=""))
+            .select_related("chapter")
+            .order_by("section", "id")
+        )
         if options["qtype"]:
             qs = qs.filter(qtype__in=options["qtype"])
         if options["limit"]:
@@ -150,7 +118,7 @@ class Command(BaseCommand):
             self.stdout.write("No unanswered questions found.")
             return
 
-        parser = PydanticOutputParser(pydantic_object=_BatchAnswers)
+        parser = PydanticOutputParser(pydantic_object=BatchAnswers)
         dry_run = options["dry_run"]
 
         if dry_run:
@@ -162,17 +130,18 @@ class Command(BaseCommand):
             return
 
         # One model for the whole run; the seam attaches per-call telemetry.
-        chain = self.make_model(ModelPurpose.ANSWER_GENERATION) | parser
+        generator = AnswerGenerator(self.make_model(ModelPurpose.ANSWER_GENERATION))
 
-        updated = failed = 0
+        updated = failed = skipped = 0
         for batch in _chunk(questions, batch_size):
             ids = [q.pk for q in batch]
             # One bad batch (unparseable reply, transport error) must not abort
             # the rest of the run, so the whole call is guarded.
             try:
-                prompt = _build_batch_prompt(batch, parser.get_format_instructions())
-                result = chain.invoke(prompt)
-                by_id = {a.id: a.answer.strip() for a in result.answers}
+                result = generator.generate(
+                    [AnswerQuestion.from_model(question) for question in batch]
+                )
+                by_id = {item["id"]: item["answer"] for item in result.accepted}
             except Exception as exc:  # noqa: BLE001
                 failed += len(batch)
                 self.stderr.write(self.style.ERROR(f"Batch {ids}: failed — {exc}"))
@@ -186,12 +155,17 @@ class Command(BaseCommand):
                         self.style.ERROR(f"Q#{q.pk} ({q.qtype}): no answer returned.")
                     )
                     continue
-                q.answer = answer
-                q.answer_source = AnswerSource.GENERATED_UNVERIFIED
-                q.save(update_fields=["answer", "answer_source"])
-                updated += 1
-                self.stdout.write(f"Q#{q.pk} ({q.qtype}): generated.")
+                if persist_answer_if_unanswered(q.pk, answer):
+                    updated += 1
+                    self.stdout.write(f"Q#{q.pk} ({q.qtype}): generated.")
+                else:
+                    skipped += 1
+                    self.stdout.write(
+                        f"Q#{q.pk} ({q.qtype}): skipped; answer already exists."
+                    )
 
         self.stdout.write(
-            self.style.SUCCESS(f"Done: {updated} generated, {failed} failed.")
+            self.style.SUCCESS(
+                f"Done: {updated} generated, {skipped} skipped, {failed} failed."
+            )
         )

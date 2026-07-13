@@ -25,7 +25,7 @@ from dataclasses import dataclass
 
 # Stamp of when the verified prices below were last checked against provider
 # price pages. Bump whenever any rate is edited.
-PRICING_AS_OF = "2026-07-10"  # openrouter.ai/api/v1/models live listing
+PRICING_AS_OF = "2026-07-13"  # OpenRouter listing + Mistral OCR pricing page
 
 # FX planning rate from docs/pricing_model.md ("FX assumption: ₹88 / USD").
 INR_PER_USD = 88.0
@@ -190,8 +190,13 @@ OCR_ENGINES: dict[str, OcrEngineSpec] = {
     for spec in (
         OcrEngineSpec(
             eval_id="mistral-ocr",
-            usd_per_page=None,
-            notes="Production OCR arm (bank.ocr_extractor). VERIFY $/page rate.",
+            usd_per_page=0.004,
+            pricing_verified=True,
+            notes=(
+                "Production OCR arm (bank.ocr_extractor). "
+                "Mistral OCR 4 rate: $4 per 1,000 pages, verified 2026-07-13 "
+                "from https://mistral.ai/pricing/api/."
+            ),
         ),
         OcrEngineSpec(
             eval_id="docling",

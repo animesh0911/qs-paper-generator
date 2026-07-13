@@ -14,8 +14,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
+from langgraph.checkpoint.memory import MemorySaver
 from rest_framework.test import APIClient
 
+from bank.answer_generation_core import AnswerBatchResult
 from bank.management.commands import drain_answer_generation_jobs as drain_mod
 from bank.models import (
     AnswerGenerationJob,
@@ -171,6 +173,46 @@ def test_drain_persists_generated_answers_as_unverified(user, monkeypatch):
     assert factory.build_count == 1
 
 
+def test_generation_persists_successful_answers_and_skips_missing_output(
+    api_client, user, monkeypatch
+):
+    job = _done_upload(user)
+    answered = _question(job, text="Answered question?")
+    missing = _question(job, text="Missing question?")
+    AnswerGenerationJob.objects.create(
+        ingestion_job=job,
+        school=user.school,
+        created_by=user,
+        total_count=2,
+    )
+    factory = _FakeFactory({answered.pk: "Generated answer."})
+    monkeypatch.setattr(drain_mod, "make_chat_model", factory)
+
+    call_command("drain_answer_generation_jobs")
+
+    answered.refresh_from_db()
+    missing.refresh_from_db()
+    answer_job = AnswerGenerationJob.objects.get()
+    assert answered.answer == "Generated answer."
+    assert missing.answer == ""
+    assert answer_job.status == AnswerGenerationJobStatus.DONE
+    assert answer_job.generated_count == 1
+    assert answer_job.skipped_count == 1
+
+    response = api_client.get(f"/api/bank/ingest/{job.pk}/answers/")
+    assert response.status_code == 200
+    assert response.data["job"]["status"] == "done"
+    assert response.data["job"]["generated_count"] == 1
+    assert response.data["job"]["skipped_count"] == 1
+    assert response.data["answers"] == [
+        {
+            "question_id": answered.pk,
+            "answer": "Generated answer.",
+            "answer_source": AnswerSource.GENERATED_UNVERIFIED,
+        }
+    ]
+
+
 def test_persist_retry_counts_already_written_generated_answer_as_generated(user):
     """A retry of the persist node after answers were written stays idempotent
     and keeps job counts stable instead of converting successes to skips."""
@@ -191,6 +233,90 @@ def test_persist_retry_counts_already_written_generated_answer_as_generated(user
 
     assert first == {"generated_count": 1, "skipped_count": 0}
     assert second == {"generated_count": 1, "skipped_count": 0}
+
+
+def test_upload_answer_generation_can_checkpoint_one_paid_call_per_batch(
+    user, monkeypatch
+):
+    job = _done_upload(user)
+    questions = [_question(job, text=f"Question {i}?") for i in range(3)]
+    AnswerGenerationJob.objects.create(
+        ingestion_job=job,
+        school=user.school,
+        created_by=user,
+        total_count=3,
+    )
+    factory = _FakeFactory({q.pk: f"Answer {i}." for i, q in enumerate(questions)})
+    monkeypatch.setattr(drain_mod, "make_chat_model", factory)
+
+    call_command("drain_answer_generation_jobs", batch_size=1)
+
+    for i, question in enumerate(questions):
+        question.refresh_from_db()
+        assert question.answer == f"Answer {i}."
+    assert factory.build_count == 3
+    answer_job = AnswerGenerationJob.objects.get()
+    assert answer_job.generated_count == 3
+    assert answer_job.skipped_count == 0
+
+
+def test_answer_graph_resume_does_not_repeat_completed_paid_batches(user):
+    from workflows.answer_generation import build_answer_generation_graph
+
+    job = _done_upload(user)
+    questions = [_question(job, text=f"Question {i}?") for i in range(3)]
+    answer_job = AnswerGenerationJob.objects.create(
+        ingestion_job=job,
+        school=user.school,
+        created_by=user,
+        total_count=3,
+    )
+
+    class FlakyGenerator:
+        def __init__(self):
+            self.calls = []
+            self.failed_once = False
+
+        def generate(self, question_ids):
+            self.calls.append(list(question_ids))
+            if question_ids == [questions[1].pk] and not self.failed_once:
+                self.failed_once = True
+                raise RuntimeError("simulated provider interruption")
+            return AnswerBatchResult(
+                accepted=tuple(
+                    {"id": question_id, "answer": f"Answer for {question_id}."}
+                    for question_id in question_ids
+                )
+            )
+
+    generator = FlakyGenerator()
+    checkpointer = MemorySaver()
+    config = {"configurable": {"thread_id": "answer-resume-test"}}
+    graph = build_answer_generation_graph(
+        checkpointer,
+        generator_factory=lambda: generator,
+        batch_size=1,
+    )
+
+    with pytest.raises(RuntimeError, match="simulated provider interruption"):
+        graph.invoke({"answer_job_id": answer_job.pk}, config)
+
+    # A new graph simulates a worker restart. Resume from the checkpoint rather
+    # than passing initial state again.
+    resumed = build_answer_generation_graph(
+        checkpointer,
+        generator_factory=lambda: generator,
+        batch_size=1,
+    )
+    final = resumed.invoke(None, config)
+
+    assert generator.calls.count([questions[0].pk]) == 1
+    assert generator.calls.count([questions[1].pk]) == 2
+    assert generator.calls.count([questions[2].pk]) == 1
+    assert final["generated_count"] == 3
+    for question in questions:
+        question.refresh_from_db()
+        assert question.answer == f"Answer for {question.pk}."
 
 
 def test_drain_skips_questions_that_already_have_answers(user, monkeypatch):

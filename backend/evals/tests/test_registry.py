@@ -1,6 +1,8 @@
 """Registry invariants: the brief's matrix is complete and cost math is exact."""
 
-from evals.registry import MODELS, cost_usd, get_model, to_inr
+import pytest
+
+from evals.registry import MODELS, OCR_ENGINES, cost_usd, get_model, to_inr
 
 BRIEF_MODELS = (
     "google/gemini-3.5-flash",
@@ -55,6 +57,12 @@ def test_unverified_pricing_yields_none_not_zero():
     spec = get_model("google/gemini-2.5-flash-lite")
     assert cost_usd(spec, input_tokens=1000, output_tokens=1000) is None
     assert to_inr(None) is None
+
+
+def test_mistral_ocr_price_is_registered_per_page():
+    ocr = OCR_ENGINES["mistral-ocr"]
+    assert ocr.pricing_verified is True
+    assert ocr.usd_per_page == pytest.approx(0.004)
 
 
 def test_env_overrides_route_through_the_production_seam_convention():

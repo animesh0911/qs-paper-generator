@@ -14,6 +14,7 @@ batch sizes without re-billing OCR for every cell. Costs are still reported as
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import os
 import time
@@ -24,7 +25,12 @@ from typing import Any
 from ai_services.llm import ModelPurpose
 from bank.extraction import count_pages
 from bank.ocr_extractor import MistralOcrClient, pages_from_ocr_response
-from bank.upload_extraction.costing import price_llm_tokens, price_ocr_pages, total_cost
+from bank.upload_extraction.costing import (
+    DEFAULT_MISTRAL_OCR_USD_PER_1000_PAGES,
+    price_llm_tokens,
+    price_ocr_pages,
+    total_cost,
+)
 from bank.upload_extraction.pipeline import (
     BatchSize,
     FilterPolicy,
@@ -35,6 +41,7 @@ from evals.registry import to_inr
 
 _SIMPLE_COLUMNS = [
     "pdf_pages",
+    "ocr_billable_pages",
     "ocr_model",
     "ocr_cost",
     "ocr_latency",
@@ -58,7 +65,7 @@ class LiveUploadEvalConfig:
     batch_sizes: list[BatchSize]
     out_dir: Path
     ocr_model: str | None = None
-    ocr_usd_per_1000_pages: float | None = 1.0
+    ocr_usd_per_1000_pages: float | None = DEFAULT_MISTRAL_OCR_USD_PER_1000_PAGES
     reuse_ocr: bool = True
     filter_policy: FilterPolicy = "english-question"
     max_batches: int = 0
@@ -69,6 +76,7 @@ class LiveUploadEvalRow:
     """One simple report row for a model × batch-size cell."""
 
     pdf_pages: int
+    ocr_billable_pages: int
     ocr_model: str
     ocr_cost: float | None
     ocr_latency: int
@@ -99,6 +107,7 @@ class CachedOcrRun:
     raw: dict[str, Any]
     pages: list[dict[str, Any]]
     pdf_pages: int
+    billable_pages: int
     model: str
     latency_ms: int
     output_chars: int
@@ -136,19 +145,23 @@ class UploadExtractionEvalRun:
         cfg = self.config
         pdf_path = cfg.pdf_path.resolve()
         pdf_bytes = pdf_path.read_bytes()
+        pdf_sha256 = hashlib.sha256(pdf_bytes).hexdigest()
         pdf_pages = count_pages(pdf_bytes)
         model = cfg.ocr_model or os.getenv("MISTRAL_OCR_MODEL") or "mistral-ocr-latest"
         ocr_path = cfg.out_dir / "ocr.json"
         meta_path = cfg.out_dir / "ocr_meta.json"
 
         latency_ms = 0
-        if cfg.reuse_ocr and ocr_path.is_file():
+        meta: dict[str, Any] = {}
+        if cfg.reuse_ocr and ocr_path.is_file() and meta_path.is_file():
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        cache_matches = (
+            meta.get("pdf_sha256") == pdf_sha256 and meta.get("model") == model
+        )
+        if cfg.reuse_ocr and ocr_path.is_file() and cache_matches:
             raw = json.loads(ocr_path.read_text(encoding="utf-8"))
-            if meta_path.is_file():
-                meta = json.loads(meta_path.read_text(encoding="utf-8"))
-                latency_ms = int(meta.get("latency_ms") or 0)
-                model = str(meta.get("model") or model)
-                pdf_pages = int(meta.get("pdf_pages") or pdf_pages)
+            latency_ms = int(meta.get("latency_ms") or 0)
+            pdf_pages = int(meta.get("pdf_pages") or pdf_pages)
         else:
             started = time.monotonic()
             raw = MistralOcrClient(model=model).process_pdf(pdf_bytes)
@@ -156,23 +169,36 @@ class UploadExtractionEvalRun:
             ocr_path.write_text(json.dumps(raw, ensure_ascii=False, indent=2), "utf-8")
             meta_path.write_text(
                 json.dumps(
-                    {"model": model, "latency_ms": latency_ms, "pdf_pages": pdf_pages},
+                    {
+                        "model": model,
+                        "latency_ms": latency_ms,
+                        "pdf_pages": pdf_pages,
+                        "pdf_sha256": pdf_sha256,
+                    },
                     indent=2,
                 ),
                 "utf-8",
             )
 
         pages = pages_from_ocr_response(raw)
+        usage_info = raw.get("usage_info") or {}
+        try:
+            billable_pages = int(usage_info["pages_processed"])
+        except (KeyError, TypeError, ValueError):
+            # Older/cached responses may not expose provider usage. Keep the
+            # local PDF count as an explicit fallback rather than losing cost.
+            billable_pages = pdf_pages
         output_chars = sum(len(page.get("markdown") or "") for page in pages)
         return CachedOcrRun(
             raw=raw,
             pages=pages,
             pdf_pages=pdf_pages,
+            billable_pages=billable_pages,
             model=model,
             latency_ms=latency_ms,
             output_chars=output_chars,
             cost_usd=price_ocr_pages(
-                pdf_pages, usd_per_1000_pages=cfg.ocr_usd_per_1000_pages
+                billable_pages, usd_per_1000_pages=cfg.ocr_usd_per_1000_pages
             ),
         )
 
@@ -231,6 +257,7 @@ class UploadExtractionEvalRun:
         )
         return LiveUploadEvalRow(
             pdf_pages=ocr.pdf_pages,
+            ocr_billable_pages=ocr.billable_pages,
             ocr_model=ocr.model,
             ocr_cost=ocr.cost_usd,
             ocr_latency=ocr.latency_ms,
@@ -285,7 +312,7 @@ def run_live_upload_extraction_eval(
     batch_sizes: list[BatchSize],
     out_dir: Path,
     ocr_model: str | None = None,
-    ocr_usd_per_1000_pages: float | None = 1.0,
+    ocr_usd_per_1000_pages: float | None = DEFAULT_MISTRAL_OCR_USD_PER_1000_PAGES,
     reuse_ocr: bool = True,
     filter_policy: FilterPolicy = "english-question",
     max_batches: int = 0,

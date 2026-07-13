@@ -90,6 +90,15 @@ def _build_parser() -> argparse.ArgumentParser:
     p_ans = sub.add_parser("answers", help="Scenario 3: answers for extraction.")
     add_common(p_ans)
     p_ans.add_argument("--ingestion-job", type=int, default=None)
+    p_ans.add_argument(
+        "--questions-artifact",
+        type=Path,
+        default=None,
+        help=(
+            "Extraction JSON containing a question list. Runs the exact "
+            "production answer core with no Question/IngestionJob rows."
+        ),
+    )
     p_ans.add_argument("--question-limit", type=int, default=250)
     p_ans.add_argument("--chunk-sizes", type=_csv_int, default=[25])
     p_ans.set_defaults(func=_cmd_run, scenario="answers")

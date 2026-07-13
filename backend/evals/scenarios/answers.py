@@ -59,6 +59,11 @@ def build_units(args: argparse.Namespace) -> list[EvalUnit]:
                         model_eval_id=model_id,
                         config={
                             "ingestion_job_id": args.ingestion_job,
+                            "questions_artifact": (
+                                str(args.questions_artifact)
+                                if getattr(args, "questions_artifact", None)
+                                else None
+                            ),
                             "question_limit": args.question_limit,
                             "chunk_size": chunk_size,
                         },
@@ -87,16 +92,10 @@ def estimate(unit: EvalUnit) -> UnitEstimate:
 
 
 def run_unit(unit: EvalUnit) -> RunRecord:
-    """Chunked production answer generation over one upload's questions.
-
-    PLACEHOLDER (issue: "answers eval — question seeding"): the run needs
-    Question rows. v1 requires ``--ingestion-job`` pointing at a completed
-    extraction in the eval database. The issue adds a seeding path that loads
-    a stored extraction artifact through ``Ingestor.ingest_extracted`` (the
-    production persist tail) under a dedicated eval school/user, so answer
-    runs are reproducible without re-running paid extraction.
-    """
+    """Chunked production answer generation from DB rows or a JSON artifact."""
+    from ai_services.llm import ModelPurpose
     from bank.answer_generation import USABLE_PARSE_QUALITIES, BankAnswerGenerator
+    from bank.answer_generation_core import AnswerGenerator, AnswerQuestion
     from bank.models import IngestionJob
 
     spec = get_model(unit.model_eval_id)
@@ -104,45 +103,92 @@ def run_unit(unit: EvalUnit) -> RunRecord:
     meter = Meter(spec.model)
 
     job_id = unit.config.get("ingestion_job_id")
-    if not job_id:
+    artifact_path = unit.config.get("questions_artifact")
+    if not job_id and not artifact_path:
         raise EvalNotImplemented(
-            "Pass --ingestion-job <id> (a completed extraction) until the "
-            "artifact-seeding path lands (issue: answers eval)."
+            "Pass either --questions-artifact <json> (no DB) or --ingestion-job <id>."
         )
-    job = IngestionJob.objects.get(pk=job_id)
-    question_ids = list(
-        job.questions.filter(parse_quality__in=USABLE_PARSE_QUALITIES)
-        .order_by("section", "id")
-        .values_list("pk", flat=True)
-    )
+
     limit = int(unit.config.get("question_limit") or 0)
-    if limit:
-        question_ids = question_ids[:limit]
-    if not question_ids:
-        raise EvalNotImplemented(
-            f"IngestionJob {job_id} has no usable questions; extract first."
+    artifact_questions: list[dict[str, Any]] = []
+    question_ids: list[int] = []
+    if artifact_path:
+        import json
+        from pathlib import Path
+
+        raw = json.loads(Path(str(artifact_path)).read_text())
+        values = raw.get("questions") if isinstance(raw, dict) else raw
+        if not isinstance(values, list):
+            raise EvalNotImplemented(
+                "Question artifact must be a list or {questions: [...]}"
+            )
+        for index, value in enumerate(values, start=1):
+            if not isinstance(value, dict):
+                continue
+            item = dict(value)
+            item.setdefault("id", index)
+            artifact_questions.append(item)
+        if limit:
+            artifact_questions = artifact_questions[:limit]
+        question_ids = [int(item["id"]) for item in artifact_questions]
+    else:
+        job = IngestionJob.objects.get(pk=job_id)
+        question_ids = list(
+            job.questions.filter(parse_quality__in=USABLE_PARSE_QUALITIES)
+            .order_by("section", "id")
+            .values_list("pk", flat=True)
         )
+        if limit:
+            question_ids = question_ids[:limit]
+
+    if not question_ids:
+        raise EvalNotImplemented("The selected source has no usable questions.")
 
     chunk_size = int(unit.config["chunk_size"])
     record.batch_size = len(question_ids)
     answers: list[dict] = []
+    batch_diagnostics: list[dict[str, Any]] = []
+
+    def collect_result(result, source_ids: list[int]) -> None:
+        answers.extend(result.accepted)
+        batch_diagnostics.append(
+            {
+                "question_ids": source_ids,
+                "missing_ids": list(result.missing_ids),
+                "duplicate_ids": list(result.duplicate_ids),
+                "unexpected_ids": list(result.unexpected_ids),
+                "blank_ids": list(result.blank_ids),
+            }
+        )
 
     with unit_wall(record):
         with seam_env(spec.env_overrides("answer_generation")):
-            generator = BankAnswerGenerator(make_model=metered_make_model(meter))
-            for start in range(0, len(question_ids), chunk_size):
-                answers.extend(
-                    generator.generate(question_ids[start : start + chunk_size])
-                )
+            make_model = metered_make_model(meter)
+            if artifact_questions:
+                generator = AnswerGenerator(make_model(ModelPurpose.ANSWER_GENERATION))
+                questions = [
+                    AnswerQuestion.from_mapping(item) for item in artifact_questions
+                ]
+                for start in range(0, len(questions), chunk_size):
+                    batch = questions[start : start + chunk_size]
+                    collect_result(generator.generate(batch), [q.id for q in batch])
+            else:
+                generator = BankAnswerGenerator(make_model=make_model)
+                for start in range(0, len(question_ids), chunk_size):
+                    batch_ids = question_ids[start : start + chunk_size]
+                    collect_result(generator.generate(batch_ids), batch_ids)
 
     record.delivered = len(answers)
     save_artifact(
         record,
         {
             "ingestion_job_id": job_id,
+            "questions_artifact": artifact_path,
+            "input_questions": artifact_questions,
             "question_ids": question_ids,
             "chunk_size": chunk_size,
             "answers": answers,
+            "batch_diagnostics": batch_diagnostics,
         },
     )
     record.success = True
@@ -165,10 +211,31 @@ def score_unit(record: dict) -> dict[str, Any]:
     artifact = load_artifact(record)
     answers: list[dict] = artifact.get("answers", [])
     question_ids = [int(item["id"]) for item in answers if item.get("id")]
-    questions = {
-        q.pk: q
-        for q in Question.objects.filter(pk__in=question_ids).select_related("chapter")
+    input_questions = artifact.get("input_questions") or []
+    artifact_by_id = {
+        int(item["id"]): item
+        for item in input_questions
+        if isinstance(item, dict) and item.get("id") is not None
     }
+    questions = (
+        {
+            q.pk: q
+            for q in Question.objects.filter(pk__in=question_ids).select_related(
+                "chapter"
+            )
+        }
+        if not artifact_by_id
+        else {}
+    )
+    chapter_slugs = (
+        [
+            str(item.get("chapter_slug"))
+            for item in artifact_by_id.values()
+            if item.get("chapter_slug")
+        ]
+        if artifact_by_id
+        else [q.chapter.slug for q in questions.values() if q.chapter]
+    )
 
     return {
         "answered_rate": (
@@ -176,11 +243,8 @@ def score_unit(record: dict) -> dict[str, Any]:
             if record.get("batch_size")
             else 0.0
         ),
-        "corpus_coverage": corpus_coverage(
-            [q.chapter.slug for q in questions.values() if q.chapter]
-        ).fraction,
+        "corpus_coverage": corpus_coverage(chapter_slugs).fraction,
     }
-
 
 def golden_items(record: dict, sample: int) -> list[tuple[str, dict, str]]:
     """Frozen (key, payload, context) triples a human grades into goldens.

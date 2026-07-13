@@ -44,3 +44,17 @@ def test_estimate_scales_with_units_and_none_propagates():
     ]
     assert estimate_units_usd(spec, units) == pytest.approx(2 * 0.06075)
     assert estimate_units_usd(get_model("google/gemini-2.5-flash-lite"), units) is None
+
+
+def test_estimate_includes_mistral_ocr_page_cost():
+    spec = get_model("google/gemini-3.5-flash")
+    units = [
+        UnitEstimate(
+            "ocr",
+            calls=0,
+            input_tokens_per_call=0,
+            output_tokens_per_call=0,
+            ocr_pages=25,
+        )
+    ]
+    assert estimate_units_usd(spec, units) == pytest.approx(0.10)

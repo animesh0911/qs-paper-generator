@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
-from evals.registry import ModelSpec, cost_usd
+from evals.registry import OCR_ENGINES, ModelSpec, cost_usd
 
 DEFAULT_MAX_RUN_USD = 5.0
 
@@ -60,6 +60,11 @@ def estimate_units_usd(spec: ModelSpec, units: list[UnitEstimate]) -> float | No
         if per_call is None:
             return None
         total += per_call * unit.calls
+        if unit.ocr_pages:
+            ocr_rate = OCR_ENGINES["mistral-ocr"].usd_per_page
+            if ocr_rate is None:
+                return None
+            total += unit.ocr_pages * ocr_rate
     return total
 
 

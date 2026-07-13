@@ -48,7 +48,7 @@ from typing import Annotated, Protocol, TypedDict
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, StateGraph
 
-from ai_services.llm import make_chat_model
+from ai_services.llm import ModelPurpose, make_chat_model
 from bank.extraction import (
     MakeChatModel,
     SeamExtractor,
@@ -64,7 +64,14 @@ class PageExtractor(Protocol):
     def extract_page(self, page_bytes: bytes) -> dict: ...
 
 
+class OcrMarkdownClient(Protocol):
+    """OCR adapter returning the shared ``pages[].markdown`` response shape."""
+
+    def process_pdf(self, pdf_bytes: bytes) -> dict: ...
+
+
 ExtractorFactory = Callable[[], PageExtractor]
+OcrClientFactory = Callable[[], OcrMarkdownClient]
 
 
 class ExtractionState(TypedDict, total=False):
@@ -171,6 +178,8 @@ def build_ocr_batch_extraction_graph(
     checkpointer: BaseCheckpointSaver,
     *,
     batch_pages: int = 999,
+    make_ocr_client: OcrClientFactory | None = None,
+    make_model: MakeChatModel = make_chat_model,
 ):
     """Compile the whole-PDF OCR + structuring extraction graph.
 
@@ -187,9 +196,13 @@ def build_ocr_batch_extraction_graph(
     )
     from bank.upload_extraction.pipeline import UploadExtractionPipeline
 
-    ocr_client = MistralOcrClient()
-    extractor = MistralOcrMarkdownExtractor(ocr_client=ocr_client)
-    pipeline = UploadExtractionPipeline(extractor.chat_model)
+    ocr_client = make_ocr_client() if make_ocr_client else MistralOcrClient()
+    chat_model = make_model(ModelPurpose.EXTRACTION)
+    extractor = MistralOcrMarkdownExtractor(
+        ocr_client=ocr_client,
+        chat_model=chat_model,
+    )
+    pipeline = UploadExtractionPipeline(chat_model)
     ingestor = Ingestor(extractor=extractor)
 
     def plan(state: OcrBatchExtractionState) -> dict:

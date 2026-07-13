@@ -12,7 +12,7 @@ from typing import Any
 from evals.datasets import RESULTS_DIR
 from evals.metering import Meter
 from evals.records import RunRecord
-from evals.registry import ModelSpec, cost_usd, to_inr
+from evals.registry import OCR_ENGINES, ModelSpec, cost_usd, to_inr
 
 ARTIFACTS_DIR = RESULTS_DIR / "artifacts"
 
@@ -56,11 +56,20 @@ def settle_record(record: RunRecord, meter: Meter, spec: ModelSpec) -> RunRecord
     record.output_tokens = meter.output_tokens
     record.cache_read_tokens = meter.cache_read_tokens
     record.ocr_pages = meter.ocr_pages
-    record.cost_usd = cost_usd(
+    llm_cost = cost_usd(
         spec,
         input_tokens=meter.input_tokens,
         output_tokens=meter.output_tokens,
         cache_read_tokens=meter.cache_read_tokens,
+    )
+    ocr_rate = OCR_ENGINES["mistral-ocr"].usd_per_page
+    ocr_cost = (
+        None
+        if meter.ocr_pages and ocr_rate is None
+        else meter.ocr_pages * (ocr_rate or 0.0)
+    )
+    record.cost_usd = (
+        None if llm_cost is None or ocr_cost is None else llm_cost + ocr_cost
     )
     record.cost_inr = to_inr(record.cost_usd)
     return record

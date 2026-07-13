@@ -105,6 +105,22 @@ def test_qtype_filter():
 
 
 @pytest.mark.django_db
+def test_broken_questions_are_not_sent_for_answer_generation():
+    usable = _make_question(text="Usable?", parse_quality="clean")
+    broken = _make_question(text="Broken?", parse_quality="broken")
+    factory = _FakeFactory(
+        _batch_msg([(usable.pk, "Usable answer."), (broken.pk, "Must be ignored.")])
+    )
+
+    _run(factory)
+
+    usable.refresh_from_db()
+    broken.refresh_from_db()
+    assert usable.answer == "Usable answer."
+    assert broken.answer == ""
+
+
+@pytest.mark.django_db
 def test_limit_caps_questions_processed():
     """--limit caps how many questions enter the run; the rest are untouched."""
     questions = [_make_question(text=f"Question {i}?") for i in range(5)]
@@ -136,6 +152,31 @@ def test_batching_splits_into_multiple_calls():
     for q, expected in [(q1, "a1"), (q2, "a2"), (q3, "a3")]:
         q.refresh_from_db()
         assert q.answer == expected
+
+
+@pytest.mark.django_db
+def test_generation_does_not_overwrite_answer_saved_during_model_call():
+    question = _make_question(text="Concurrent edit?")
+
+    class ConcurrentEditModel(GenericFakeChatModel):
+        def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+            Question.objects.filter(pk=question.pk).update(
+                answer="Teacher answer.",
+                answer_source=AnswerSource.HUMAN,
+            )
+            return super()._generate(messages, stop, run_manager, **kwargs)
+
+    class ConcurrentEditFactory:
+        def __call__(self, purpose):
+            return ConcurrentEditModel(
+                messages=iter([_batch_msg([(question.pk, "Generated answer.")])])
+            )
+
+    _run(ConcurrentEditFactory())
+
+    question.refresh_from_db()
+    assert question.answer == "Teacher answer."
+    assert question.answer_source == AnswerSource.HUMAN
 
 
 @pytest.mark.django_db

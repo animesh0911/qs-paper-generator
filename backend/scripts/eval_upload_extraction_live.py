@@ -81,8 +81,8 @@ def main() -> int:
     parser.add_argument(
         "--ocr-usd-per-1000-pages",
         type=float,
-        default=1.0,
-        help="Used for per-run cost reporting; default $1/1000 pages.",
+        default=4.0,
+        help="Used for per-run cost reporting; default $4/1000 pages (OCR 4 standard API).",
     )
     parser.add_argument(
         "--filter-policy",
@@ -140,7 +140,7 @@ def main() -> int:
     )
 
     print("\nResults")
-    print("pdf_pages,ocr_model,ocr_cost,ocr_latency,ocr_output_size,"
+    print("pdf_pages,ocr_billable_pages,ocr_model,ocr_cost,ocr_latency,ocr_output_size,"
           "llm_model,batch_size,llm_cost,llm_latency,total_cost,questions")
     for row in rows:
         values = row.simple_csv_dict()
@@ -149,6 +149,7 @@ def main() -> int:
                 "" if values[key] is None else str(values[key])
                 for key in (
                     "pdf_pages",
+                    "ocr_billable_pages",
                     "ocr_model",
                     "ocr_cost",
                     "ocr_latency",

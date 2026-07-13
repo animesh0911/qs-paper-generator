@@ -9,15 +9,19 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Protocol
 from uuid import uuid4
 
 from django.db import transaction
 from langchain_core.language_models import BaseChatModel
-from langchain_core.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, Field
 
 from ai_services.errors import friendly_llm_error
 from ai_services.llm import ModelPurpose, make_chat_model
+from bank.answer_generation_core import (
+    AnswerBatchResult,
+    AnswerGenerator,
+    AnswerQuestion,
+)
 from bank.models import (
     AnswerGenerationJob,
     AnswerGenerationJobStatus,
@@ -31,6 +35,12 @@ from workflows.checkpointer import get_checkpointer
 USABLE_PARSE_QUALITIES = ("clean", "partial")
 
 
+class StoredQuestionAnswerGenerator(Protocol):
+    """Paid-batch seam used by the checkpointed answer workflow."""
+
+    def generate(self, question_ids: list[int]) -> AnswerBatchResult: ...
+
+
 class AnswerGenerationConflict(Exception):
     def __init__(self, detail: str):
         self.detail = detail
@@ -39,30 +49,9 @@ class AnswerGenerationConflict(Exception):
 
 @dataclass(frozen=True)
 class ProcessedAnswerGeneration:
+    status: str
     generated_count: int
     skipped_count: int
-
-
-class _GeneratedAnswer(BaseModel):
-    id: int = Field(description="Question id being answered.")
-    answer: str = Field(description="Model answer text only.")
-
-
-class _BatchAnswers(BaseModel):
-    answers: list[_GeneratedAnswer]
-
-
-_QTYPE_HINT = {
-    "mcq": "Write the correct option label and option text.",
-    "assertion_reason": (
-        "State whether assertion/reason are true and whether the reason "
-        "correctly explains the assertion."
-    ),
-    "very_short_answer": "Write a concise answer in 1-2 sentences.",
-    "short_answer": "Write a model answer in 3-5 sentences.",
-    "long_answer": "Write a structured model answer with key points.",
-    "case_based": "Address each sub-part of the case study in order.",
-}
 
 
 def get_owned_ingestion_job(user, ingestion_job_id: int) -> IngestionJob | None:
@@ -72,10 +61,14 @@ def get_owned_ingestion_job(user, ingestion_job_id: int) -> IngestionJob | None:
         return None
 
 
+def answerable_questions(queryset=None):
+    """Apply the shared structural eligibility policy for answer generation."""
+    questions = queryset if queryset is not None else Question.objects.all()
+    return questions.filter(parse_quality__in=USABLE_PARSE_QUALITIES)
+
+
 def target_questions_for_upload(ingestion_job: IngestionJob):
-    return ingestion_job.questions.filter(
-        parse_quality__in=USABLE_PARSE_QUALITIES
-    ).order_by("section", "id")
+    return answerable_questions(ingestion_job.questions.all()).order_by("section", "id")
 
 
 def queue_ingestion_answer_generation(user, ingestion_job_id: int):
@@ -132,38 +125,6 @@ def answer_generation_state(user, ingestion_job_id: int):
     return job, answered
 
 
-def _render_question(q: Question) -> str:
-    chapter = q.chapter.name if q.chapter else "unknown chapter"
-    hint = _QTYPE_HINT.get(q.qtype, "Write a concise model answer.")
-    options_block = ""
-    if q.options:
-        lines = "\n".join(
-            f"    {o.get('label', '?')}. {o.get('text', '')}" for o in q.options
-        )
-        options_block = f"\n  Options:\n{lines}"
-    return (
-        f"[id={q.pk}] Type: {q.qtype}; Marks: {q.marks}; Chapter: {chapter}\n"
-        f"  Question: {q.text}{options_block}\n"
-        f"  Instruction: {hint}"
-    )
-
-
-def _build_prompt(questions: list[Question], format_instructions: str) -> str:
-    blocks = "\n\n".join(_render_question(q) for q in questions)
-    return (
-        "Generate CBSE Class 10 Science model answers for the extracted "
-        "questions below. Return an answer for each id. Persistable answer text "
-        "only: no preamble and no restatement of the question.\n"
-        "Match answer depth to the marks: roughly one key point per mark, in "
-        "CBSE marking-scheme style. For numerical questions, show the formula, "
-        "the substitution, and the final value with its SI unit. If a question "
-        "depends on a diagram or data you cannot see, answer only what the "
-        "text supports and note the dependency briefly — never invent labels "
-        "or values.\n\n"
-        f"{blocks}\n\n{format_instructions}"
-    )
-
-
 class BankAnswerGenerator:
     """Boundary wrapper around the chat model used by the answer graph."""
 
@@ -173,20 +134,16 @@ class BankAnswerGenerator:
     ):
         self.make_model = make_model
 
-    def generate(self, question_ids: list[int]) -> list[dict]:
+    def generate(self, question_ids: list[int]) -> AnswerBatchResult:
         questions = list(
             Question.objects.filter(pk__in=question_ids)
             .select_related("chapter")
             .order_by("section", "id")
         )
         if not questions:
-            return []
-        parser = PydanticOutputParser(pydantic_object=_BatchAnswers)
-        chain = self.make_model(ModelPurpose.ANSWER_GENERATION) | parser
-        result = chain.invoke(
-            _build_prompt(questions, parser.get_format_instructions())
-        )
-        return [{"id": item.id, "answer": item.answer} for item in result.answers]
+            return AnswerBatchResult()
+        generator = AnswerGenerator(self.make_model(ModelPurpose.ANSWER_GENERATION))
+        return generator.generate([AnswerQuestion.from_model(q) for q in questions])
 
 
 def plan_answer_generation(job: AnswerGenerationJob) -> dict:
@@ -197,6 +154,20 @@ def plan_answer_generation(job: AnswerGenerationJob) -> dict:
         "total_count": len(questions),
         "skipped_count": len(questions) - len(unanswered),
     }
+
+
+def persist_answer_if_unanswered(question_id: int, answer: str) -> bool:
+    """Atomically store one generated answer without overwriting a later edit."""
+    text = str(answer or "").strip()
+    if not text:
+        return False
+    return (
+        Question.objects.filter(pk=question_id, answer="").update(
+            answer=text,
+            answer_source=AnswerSource.GENERATED_UNVERIFIED,
+        )
+        == 1
+    )
 
 
 @transaction.atomic
@@ -223,24 +194,25 @@ def persist_generated_answers(job: AnswerGenerationJob, answers: list[dict]) -> 
         if not answer:
             skipped += 1
             continue
-        question.answer = answer
-        question.answer_source = AnswerSource.GENERATED_UNVERIFIED
-        question.save(update_fields=["answer", "answer_source"])
-        generated += 1
+        if persist_answer_if_unanswered(question.pk, answer):
+            generated += 1
+        else:
+            skipped += 1
     return {"generated_count": generated, "skipped_count": skipped}
 
 
 def build_generator(
     make_model: Callable[[ModelPurpose], BaseChatModel] = make_chat_model,
-):
+) -> StoredQuestionAnswerGenerator:
     return BankAnswerGenerator(make_model=make_model)
 
 
 def process_answer_generation_job(
     job: AnswerGenerationJob,
     *,
-    generator_factory: Callable[[], object] | None = None,
+    generator_factory: Callable[[], StoredQuestionAnswerGenerator] | None = None,
     checkpointer_cm=get_checkpointer,
+    batch_size: int | None = None,
 ) -> ProcessedAnswerGeneration:
     """Run/resume one answer-generation graph and settle the ledger row."""
     from workflows.answer_generation import build_answer_generation_graph
@@ -256,14 +228,13 @@ def process_answer_generation_job(
             graph = build_answer_generation_graph(
                 checkpointer,
                 generator_factory=generator_factory or build_generator,
+                batch_size=batch_size,
             )
             config = {"configurable": {"thread_id": job.thread_id}}
             snapshot = graph.get_state(config)
-            if snapshot.values and not snapshot.next:
-                final = snapshot.values
-            else:
+            if not snapshot.values or snapshot.next:
                 state = None if snapshot.values else {"answer_job_id": job.pk}
-                final = graph.invoke(state, config, durability="sync")
+                graph.invoke(state, config, durability="sync")
     except Exception as exc:  # noqa: BLE001
         job.status = AnswerGenerationJobStatus.FAILED
         # Sanitise raw provider errors before they reach the teacher-visible job.
@@ -271,10 +242,15 @@ def process_answer_generation_job(
         job.save(update_fields=["status", "error", "updated_at"])
         raise
 
+    targets = target_questions_for_upload(job.ingestion_job)
     job.status = AnswerGenerationJobStatus.DONE
-    job.total_count = final.get("total_count", job.total_count)
-    job.generated_count = final.get("generated_count", 0)
-    job.skipped_count = final.get("skipped_count", 0)
+    job.total_count = targets.count()
+    job.generated_count = (
+        targets.filter(answer_source=AnswerSource.GENERATED_UNVERIFIED)
+        .exclude(answer="")
+        .count()
+    )
+    job.skipped_count = job.total_count - job.generated_count
     job.error = ""
     job.save(
         update_fields=[
@@ -286,4 +262,4 @@ def process_answer_generation_job(
             "updated_at",
         ]
     )
-    return ProcessedAnswerGeneration(job.generated_count, job.skipped_count)
+    return ProcessedAnswerGeneration(job.status, job.generated_count, job.skipped_count)

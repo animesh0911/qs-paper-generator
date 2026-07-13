@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import json
 import urllib.request
-from functools import cache
 
 from evals.registry import MODELS, cost_usd
 
-DEFAULT_MISTRAL_OCR_USD_PER_1000_PAGES = 1.0
+# Mistral OCR 4 standard synchronous API price, verified 2026-07-12:
+# https://mistral.ai/pricing/api/
+DEFAULT_MISTRAL_OCR_USD_PER_1000_PAGES = 4.0
 
 
 def price_ocr_pages(
@@ -44,7 +45,15 @@ def price_llm_tokens(
                 + output_tokens * pricing["completion"]
             )
 
-    spec = MODELS.get(model)
+    spec = next(
+        (
+            candidate
+            for candidate in MODELS.values()
+            if candidate.provider == provider
+            and (candidate.eval_id == model or candidate.model == model)
+        ),
+        None,
+    )
     if spec:
         return cost_usd(
             spec,
@@ -62,14 +71,20 @@ def total_cost(*costs: float | None) -> float | None:
     return sum(cost for cost in costs if cost is not None)
 
 
-@cache
+_OPENROUTER_PRICING_CACHE: dict[str, dict[str, float]] | None = None
+
 def _openrouter_pricing() -> dict[str, dict[str, float]]:
+    global _OPENROUTER_PRICING_CACHE
+    if _OPENROUTER_PRICING_CACHE is not None:
+        return _OPENROUTER_PRICING_CACHE
     try:
         with urllib.request.urlopen(
             "https://openrouter.ai/api/v1/models", timeout=10
         ) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
     except Exception:  # noqa: BLE001 - pricing failure should not fail the run
+        # Do not cache transient failures: a later cell may be able to price
+        # successfully after connectivity recovers.
         return {}
     prices = {}
     for model in payload.get("data") or []:
@@ -81,4 +96,6 @@ def _openrouter_pricing() -> dict[str, dict[str, float]]:
             }
         except (KeyError, TypeError, ValueError):
             continue
+    if prices:
+        _OPENROUTER_PRICING_CACHE = prices
     return prices

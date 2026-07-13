@@ -27,6 +27,15 @@ class Command(BaseCommand):
             help="Max number of jobs to process this run (default: all).",
         )
         parser.add_argument(
+            "--batch-size",
+            type=int,
+            default=None,
+            help=(
+                "Questions per checkpointed model call. Default keeps the "
+                "historical one-call-per-upload behavior."
+            ),
+        )
+        parser.add_argument(
             "--dry-run",
             action="store_true",
             help="List queued answer jobs and exit WITHOUT calling a model.",
@@ -56,19 +65,26 @@ class Command(BaseCommand):
                 )
             return
 
+        batch_size = options["batch_size"]
+        if batch_size is not None and batch_size < 1:
+            self.stderr.write("--batch-size must be at least 1.")
+            return
         for job in jobs:
-            self._process(job)
+            self._process(job, batch_size=batch_size)
 
-    def _process(self, job: AnswerGenerationJob) -> None:
+    def _process(
+        self, job: AnswerGenerationJob, *, batch_size: int | None = None
+    ) -> None:
         try:
             result = process_answer_generation_job(
                 job,
                 generator_factory=lambda: build_generator(make_chat_model),
+                batch_size=batch_size,
             )
         except Exception as exc:  # noqa: BLE001
             self.stderr.write(f"Answer generation job #{job.pk} failed: {exc}")
             return
         self.stdout.write(
-            f"Answer generation job #{job.pk} done: "
+            f"Answer generation job #{job.pk} {result.status}: "
             f"{result.generated_count} generated, {result.skipped_count} skipped."
         )

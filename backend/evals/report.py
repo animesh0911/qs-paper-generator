@@ -38,16 +38,17 @@ def group_key(row: dict) -> tuple:
 def reprice(row: dict) -> float | None:
     """Current-registry cost for one record: LLM tokens + OCR pages."""
     spec = MODELS.get(row["model_eval_id"])
-    llm = (
-        cost_usd(
+    if spec:
+        llm = cost_usd(
             spec,
             input_tokens=row.get("input_tokens", 0),
             output_tokens=row.get("output_tokens", 0),
             cache_read_tokens=row.get("cache_read_tokens", 0),
         )
-        if spec
-        else 0.0
-    )
+    elif row["model_eval_id"] == "none":
+        llm = 0.0
+    else:
+        llm = None
     ocr_pages = row.get("ocr_pages", 0)
     ocr = 0.0
     if ocr_pages:

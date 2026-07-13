@@ -6,7 +6,7 @@ Lean live eval for the upload AI feature:
 PDF -> Mistral OCR -> OCR markdown -> structuring LLM -> extracted Questions
 ```
 
-The eval uses real API keys, caches OCR once, then tests any LLM model/batch-size matrix against the same OCR output.
+The eval uses real API keys, caches OCR once, then tests any LLM model/batch-size matrix against the same OCR output. Cache reuse is accepted only when the PDF SHA-256 and OCR model match the cached metadata.
 
 ## Code paths
 

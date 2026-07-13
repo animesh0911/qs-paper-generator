@@ -150,11 +150,17 @@ def textbook_context_for_question(question) -> str:
 
     if question.chapter is None:
         return ""
-    context = PostgresTextbookRetriever().retrieve(
-        TextbookRetrievalRequest(
-            chapter=question.chapter,
-            query_text=question.text[:500],
-            limit=5,
+    try:
+        context = PostgresTextbookRetriever().retrieve(
+            TextbookRetrievalRequest(
+                chapter=question.chapter,
+                query_text=question.text[:500],
+                limit=5,
+            )
         )
-    )
+    except ValueError:
+        # The production lexical retriever rejects queries without usable
+        # alphanumeric terms (for example pure equations or very short text).
+        # In eval scoring that means "no textbook context", not a failed run.
+        return ""
     return "\n\n".join(result.chunk.text for result in context.results)
