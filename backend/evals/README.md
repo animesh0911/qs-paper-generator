@@ -32,9 +32,13 @@ docker compose exec web python -m evals.run generation \
 # 2. Paid phase (explicit consent + budget cap; records + raw artifacts saved)
 docker compose exec web python -m evals.run generation ... --yes --max-usd 2
 
-# 3. Scoring phase (no candidate-model spend; judge = claude CLI by default)
+# 3a. Deterministic scoring (free, no LLM: yield, shape, citation support)
 docker compose exec web python -m evals.run score \
-    --records /content/eval/results/generation-<ts>.jsonl --judge claude
+    --records /content/eval/results/generation-<ts>.jsonl
+
+# 3b. Judged scoring — THE one judged path (consent-gated judge billing)
+docker compose exec web python -m evals.run deepeval-score \
+    --records /content/eval/results/generation-<ts>.jsonl --yes
 
 # 4. Report (pure aggregation: tables + per-user monthly cost)
 docker compose exec web python -m evals.report \
@@ -58,12 +62,11 @@ verifying a price later fixes past reports without re-running.
 
 ## Judges (accuracy harness)
 
-Pluggable via `--judge` on the score command:
-
-- `claude` (default) — shells out to `claude -p --output-format json`; needs an
-  authenticated Claude Code CLI. Subscription-covered: scoring is free.
-- `codex` — `codex exec` subprocess (cross-family second opinion).
-- `seam` — pinned API model through the production seam, for unattended CI.
+There is exactly **one judged scoring path**: `deepeval-score` (below).
+`score` is deterministic-only, so "which number is the number" never has two
+answers. The Judge-protocol backends in `evals/judges/` (`claude -p`,
+`codex exec`, seam) are retained as a *library* for cross-family second
+opinions on golden sets — they are no longer a CLI scoring lane.
 
 Rubrics live in `evals/judges/rubrics/*.md`, are versioned
 (`rubric_version:`), and every verdict records its rubric version and judge id

@@ -32,10 +32,19 @@ _AGREEMENT_DIMS = (
     "answer_correctness",
     "difficulty_plausibility",
 )
-# Budget-gate priors per judged case: 4 G-Eval calls + ~3 Faithfulness calls.
-_EST_JUDGE_CALLS_PER_CASE = 7
-_EST_INPUT_TOKENS_PER_CALL = 2_000
-_EST_OUTPUT_TOKENS_PER_CALL = 250
+# Judge-call priors per metric (G-Evals are one call, Faithfulness ~3; code
+# metrics are free) with per-call tokens trued to the 2026-07-13 suite run
+# ($0.25 actual vs $0.73 forecast on the old 2k/250 priors — G-Eval prompts
+# are short: steps + rendered question + a small cited excerpt).
+_LLM_CALLS_BY_METRIC = {
+    "ncert_fidelity": 1,
+    "self_containedness": 1,
+    "answer_correctness": 1,
+    "difficulty_plausibility": 1,
+    "Faithfulness": 3,
+}
+_EST_INPUT_TOKENS_PER_CALL = 900
+_EST_OUTPUT_TOKENS_PER_CALL = 120
 
 
 @dataclass
@@ -58,11 +67,21 @@ class SuiteResult:
     failures: list[str] = field(default_factory=list)
 
 
-def plan_generation_suite(records_path: Path, sample: int, judge_model: str):
+def plan_generation_suite(
+    records_path: Path,
+    sample: int,
+    judge_model: str,
+    metrics_filter: list[str] | None = None,
+):
     """Dry-run forecast: what would run and roughly what the judge bills."""
     rows = _generation_rows(records_path)
     cases = sum(len(_case_indices(row, sample)) for row in rows)
-    calls = cases * _EST_JUDGE_CALLS_PER_CASE
+    calls_per_case = sum(
+        calls
+        for name, calls in _LLM_CALLS_BY_METRIC.items()
+        if not metrics_filter or name in metrics_filter
+    )
+    calls = cases * calls_per_case
     spec = get_model(judge_model)
     est = cost_usd(
         spec,
@@ -85,8 +104,14 @@ def score_generation_records(
     sample: int = 5,
     out_dir: Path | None = None,
     max_concurrent: int = 8,
+    metrics_filter: list[str] | None = None,
 ) -> SuiteResult:
-    """Score sampled questions from every generation record in a JSONL."""
+    """Score sampled questions from every generation record in a JSONL.
+
+    ``metrics_filter`` (bare metric names) exists for the tuning loop: one
+    metric over the golden sample costs cents, so a criteria change can be
+    validated against human grades without re-billing the whole suite.
+    """
     from deepeval import evaluate
     from deepeval.evaluate import AsyncConfig, DisplayConfig, ErrorConfig
 
@@ -110,7 +135,7 @@ def score_generation_records(
         total_cases += len(cases)
         result = evaluate(
             test_cases=cases,
-            metrics=build_generation_metrics(judge),
+            metrics=_filter_metrics(build_generation_metrics(judge), metrics_filter),
             hyperparameters={
                 "candidate_model": row.get("model_eval_id"),
                 "batch_size": row.get("batch_size"),
@@ -165,6 +190,20 @@ def score_generation_records(
         results_folder=str(out_dir),
         failures=failures,
     )
+
+
+def _filter_metrics(metrics: list, wanted: list[str] | None) -> list:
+    if not wanted:
+        return metrics
+    kept = [m for m in metrics if _bare_metric_name(m) in set(wanted)]
+    if not kept:
+        known = ", ".join(_bare_metric_name(m) for m in metrics)
+        raise ValueError(f"--metrics matched nothing; known metrics: {known}")
+    return kept
+
+
+def _bare_metric_name(metric: Any) -> str:
+    return str(getattr(metric, "name", "") or getattr(metric, "__name__", ""))
 
 
 def _generation_rows(records_path: Path) -> list[dict[str, Any]]:

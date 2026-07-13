@@ -46,11 +46,13 @@ from evals.scenarios.base import (
 
 SCENARIO = "generation"
 
-# Rough per-call token priors for the budget gate, from the June 2026 cost
-# report's representative Q&A call (10.5k in / 5k out at batch 30). Output
-# scales ~linearly with batch size; input is dominated by grounding + schema.
-_EST_INPUT_TOKENS = 10_500
-_EST_OUTPUT_TOKENS_PER_QUESTION = 170  # ≈5k out / 30 questions
+# Per-call token priors for the budget gate, trued to the recorded smoke run
+# (generation-20260710-134623): grounded calls carried ~14-17k prompt tokens
+# (manifest + schema dominate) and ~700-900 output tokens per requested
+# question across gemini/deepseek. The June 2026 cost report's 10.5k/170
+# priors under-forecast that run ~3.5x.
+_EST_INPUT_TOKENS = 15_000
+_EST_OUTPUT_TOKENS_PER_QUESTION = 800
 
 
 def build_units(args: argparse.Namespace) -> list[EvalUnit]:

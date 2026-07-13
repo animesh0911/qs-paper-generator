@@ -9,8 +9,9 @@ Commands:
 - ``generation | extraction | answers`` — the paid phase for one scenario.
   **Dry-run by default**: prints the unit matrix + cost forecast and exits.
   Add ``--yes`` to consent to API spend (subject to ``--max-usd``).
-- ``score`` — grade stored run records (deterministic + ``--judge``). Spends
-  no candidate-model money; CLI judges are subscription-covered.
+- ``score`` — deterministic metrics for stored records (free, no LLM).
+- ``deepeval-score`` — the one judged scoring path: decomposed metrics +
+  golden agreement (judge billing is consent-gated with ``--yes``).
 - ``list-models`` — the registry with pricing status (what still needs
   verification before it can be run priced).
 
@@ -93,12 +94,11 @@ def _build_parser() -> argparse.ArgumentParser:
     p_ans.add_argument("--chunk-sizes", type=_csv_int, default=[25])
     p_ans.set_defaults(func=_cmd_run, scenario="answers")
 
-    p_score = sub.add_parser("score", help="Score stored run records.")
-    p_score.add_argument("--records", type=Path, required=True)
-    p_score.add_argument(
-        "--judge", choices=["claude", "codex", "seam", "none"], default="claude"
+    p_score = sub.add_parser(
+        "score",
+        help="Deterministic metrics for stored records (judged: deepeval-score).",
     )
-    p_score.add_argument("--judge-model", default=None)
+    p_score.add_argument("--records", type=Path, required=True)
     p_score.add_argument("--out", type=Path, default=None)
     p_score.set_defaults(func=_cmd_score)
 
@@ -124,6 +124,12 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_deep.add_argument("--out-dir", type=Path, default=None)
     p_deep.add_argument("--max-concurrent", type=int, default=8)
+    p_deep.add_argument(
+        "--metrics",
+        type=_csv,
+        default=None,
+        help="Bare metric names to run (tuning loop); default: full suite.",
+    )
     p_deep.add_argument(
         "--yes",
         action="store_true",
@@ -212,17 +218,11 @@ def _cmd_run(args: argparse.Namespace) -> int:
 
 
 def _cmd_score(args: argparse.Namespace) -> int:
-    from evals.judges import get_judge
+    # Deterministic-only by design: there is exactly ONE judged scoring path
+    # (deepeval-score), so "which number is the number" never has two answers.
+    # The Judge-protocol backends in evals/judges/ remain as a library for
+    # cross-family spot checks, not as a CLI lane.
     from evals.records import read_records
-
-    judge = None
-    if args.judge != "none":
-        kwargs = {}
-        if args.judge == "claude" and args.judge_model:
-            kwargs["model"] = args.judge_model
-        if args.judge == "seam" and args.judge_model:
-            kwargs["model_eval_id"] = args.judge_model
-        judge = get_judge(args.judge, **kwargs)
 
     rows = read_records(args.records)
     out = args.out or args.records.with_suffix(".scored.jsonl")
@@ -230,10 +230,14 @@ def _cmd_score(args: argparse.Namespace) -> int:
     with out.open("w", encoding="utf-8") as fh:
         for row in rows:
             module = _scenario_module(row["scenario"])
-            row["accuracy"] = module.score_unit(row, judge)
+            row["accuracy"] = module.score_unit(row, None)
             fh.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
             scored += 1
     print(f"scored {scored} records -> {out}")
+    print(
+        "judged metrics + golden agreement: python -m evals.run deepeval-score "
+        f"--records {args.records}"
+    )
     print(f"next: python -m evals.report --records {out}")
     return 0
 
@@ -272,11 +276,15 @@ def _cmd_deepeval_score(args: argparse.Namespace) -> int:
         score_generation_records,
     )
 
-    plan = plan_generation_suite(args.records, args.sample, args.judge_model)
+    plan = plan_generation_suite(
+        args.records, args.sample, args.judge_model, args.metrics
+    )
     est = "unpriced" if plan.est_judge_usd is None else f"~${plan.est_judge_usd:.2f}"
+    selected = f" metrics={','.join(args.metrics)};" if args.metrics else ""
     print(
-        f"deepeval suite: {plan.cases} test cases from {plan.records} records; "
-        f"judge {plan.judge_model}, ~{plan.est_judge_calls} judge calls, {est}"
+        f"deepeval suite: {plan.cases} test cases from {plan.records} records;"
+        f"{selected} judge {plan.judge_model}, "
+        f"~{plan.est_judge_calls} judge calls, {est}"
     )
     if not args.yes:
         print("\nDRY RUN (no judge calls made). Re-run with --yes to execute.")
@@ -288,6 +296,7 @@ def _cmd_deepeval_score(args: argparse.Namespace) -> int:
         sample=args.sample,
         out_dir=args.out_dir,
         max_concurrent=args.max_concurrent,
+        metrics_filter=args.metrics,
     )
     print(f"\nscored {result.cases} cases -> {result.results_folder}")
     print(f"{'metric':<26} {'mean':>6} {'pass':>6}")

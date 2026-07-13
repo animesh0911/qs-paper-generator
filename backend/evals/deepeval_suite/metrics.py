@@ -5,11 +5,11 @@ Design (from the 2026-07-10 judge–human calibration):
 - One G-Eval per subjective rubric dimension instead of one holistic prompt —
   scores stop averaging away each other's failures, and each dimension gets
   its own pass threshold.
-- The calibration's two systematic judge errors are written into the
-  evaluation steps: fidelity must respect the *citation contract* (a
-  chapter-true fact cited to the wrong excerpt is a grounding failure), and
-  difficulty must penalize near-verbatim lifts and unshown-data recall (the
-  Table 4.1 failure the old judge missed).
+- The calibration's systematic judge errors are written into the metrics:
+  fidelity's steps enforce the *citation contract* (a chapter-true fact cited
+  to the wrong excerpt is a grounding failure), and difficulty is band-
+  anchored to the human grading policy via ``Rubric`` ranges after the v1
+  "penalize lifts" phrasing overshot (judge 2.62 vs human 4.50).
 - Faithfulness (claim decomposition) localizes *which* claim is unsupported.
 - Structure and lexical citation support are pure code — deterministic, free,
   and reusing production's own screen (``bank.citation_support``).
@@ -18,6 +18,7 @@ Design (from the 2026-07-10 judge–human calibration):
 from __future__ import annotations
 
 from deepeval.metrics import BaseMetric, FaithfulnessMetric, GEval
+from deepeval.metrics.g_eval.utils import Rubric
 from deepeval.test_case import LLMTestCase, SingleTurnParams
 
 from evals.deepeval_suite.judge import SeamJudgeLLM
@@ -87,18 +88,57 @@ def build_generation_metrics(judge: SeamJudgeLLM) -> list[BaseMetric]:
             model=judge,
             threshold=0.8,
         ),
+        # Difficulty is classified into the human grading policy's bands, not
+        # free-scored: the first (v1) steps said "penalize verbatim lifts"
+        # open-endedly and the judge collapsed to 2.62/5 vs humans' 4.50
+        # (2026-07-13 calibration). The rubric anchors below map the three
+        # failure modes humans actually distinguished onto fixed ranges.
         GEval(
             name="difficulty_plausibility",
             evaluation_steps=[
-                "Assess whether this works as a CBSE Class 10 board exam "
-                "item at its stated marks.",
-                "Penalize items whose stem, correct option, or answer copies "
-                "a sentence from the retrieval context nearly verbatim — "
-                "trivially copyable items are poor discriminators.",
-                "Penalize trivia recall (dates, data constants) that boards "
-                "do not ask.",
-                "Reward items requiring understanding or application over "
-                "rote lookup.",
+                "Classify this item's plausibility as a CBSE Class 10 board "
+                "exam question at its stated marks.",
+                "First check: does answering require recalling data values "
+                "(table constants, figure details) that are not reproduced "
+                "in the question itself? Only such items are not "
+                "exam-plausible.",
+                "Second check: is the stem, correct option, or answer a "
+                "near-verbatim copy of a whole sentence from the retrieval "
+                "context? Such items are exam-usable, just weak "
+                "discriminators — this is a minor defect, not a failure.",
+                "Otherwise it is a normal grounded exam item: shared "
+                "technical terminology with the context is expected and is "
+                "not verbatim copying.",
+            ],
+            rubric=[
+                Rubric(
+                    score_range=(0, 4),
+                    expected_outcome=(
+                        "answering requires unshown data values or pure "
+                        "trivia recall — not plausible as a board item"
+                    ),
+                ),
+                Rubric(
+                    score_range=(5, 6),
+                    expected_outcome=(
+                        "borderline: answerable but too trivial for its " "stated marks"
+                    ),
+                ),
+                Rubric(
+                    score_range=(7, 8),
+                    expected_outcome=(
+                        "solid item whose stem or answer near-verbatim "
+                        "copies a context sentence — usable, weaker "
+                        "discriminator"
+                    ),
+                ),
+                Rubric(
+                    score_range=(9, 10),
+                    expected_outcome=(
+                        "plausible board item at its marks requiring "
+                        "understanding or application, not verbatim lookup"
+                    ),
+                ),
             ],
             evaluation_params=[
                 SingleTurnParams.ACTUAL_OUTPUT,

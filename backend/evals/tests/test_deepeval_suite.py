@@ -137,6 +137,37 @@ def test_citation_support_metric_mirrors_production_screen(tmp_path):
     assert "missing_cited_text" in metric.reason
 
 
+def test_metric_filter_selects_bare_names_and_rejects_unknown():
+    from deepeval.models import DeepEvalBaseLLM
+
+    from evals.deepeval_suite.metrics import build_generation_metrics
+    from evals.deepeval_suite.runner import _bare_metric_name, _filter_metrics
+
+    class FakeJudgeLLM(DeepEvalBaseLLM):
+        def load_model(self):
+            return None
+
+        def generate(self, prompt, schema=None, **kwargs):
+            return ""
+
+        async def a_generate(self, prompt, schema=None, **kwargs):
+            return ""
+
+        def get_model_name(self):
+            return "fake"
+
+    metrics = build_generation_metrics(FakeJudgeLLM())
+    names = [_bare_metric_name(m) for m in metrics]
+    assert "difficulty_plausibility" in names
+    assert "citation_support" in names
+
+    kept = _filter_metrics(metrics, ["difficulty_plausibility"])
+    assert [_bare_metric_name(m) for m in kept] == ["difficulty_plausibility"]
+    assert _filter_metrics(metrics, None) is metrics
+    with pytest.raises(ValueError, match="known metrics"):
+        _filter_metrics(metrics, ["nope"])
+
+
 class _Verdict(BaseModel):
     score: float
     reason: str
