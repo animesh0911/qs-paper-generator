@@ -110,6 +110,27 @@ def _build_parser() -> argparse.ArgumentParser:
     p_draft.add_argument("--sample", type=int, default=12)
     p_draft.set_defaults(func=_cmd_draft_goldens)
 
+    p_deep = sub.add_parser(
+        "deepeval-score",
+        help="Score stored generation runs with the deepeval metric suite.",
+    )
+    p_deep.add_argument("--records", type=Path, required=True)
+    p_deep.add_argument("--judge-model", default="google/gemini-3.5-flash")
+    p_deep.add_argument(
+        "--sample",
+        type=int,
+        default=5,
+        help="Questions per record (0 = all; golden items win when present).",
+    )
+    p_deep.add_argument("--out-dir", type=Path, default=None)
+    p_deep.add_argument("--max-concurrent", type=int, default=8)
+    p_deep.add_argument(
+        "--yes",
+        action="store_true",
+        help="Consent to paid judge LLM calls (without this: dry-run).",
+    )
+    p_deep.set_defaults(func=_cmd_deepeval_score)
+
     p_list = sub.add_parser("list-models", help="Registry + pricing status.")
     p_list.set_defaults(func=_cmd_list_models)
     return parser
@@ -242,6 +263,49 @@ def _cmd_draft_goldens(args: argparse.Namespace) -> int:
         "Human next: fill every human_scores dimension (0-5, -1 = n/a), "
         "set verified_by + verified_at, and commit the file."
     )
+    return 0
+
+
+def _cmd_deepeval_score(args: argparse.Namespace) -> int:
+    from evals.deepeval_suite.runner import (
+        plan_generation_suite,
+        score_generation_records,
+    )
+
+    plan = plan_generation_suite(args.records, args.sample, args.judge_model)
+    est = "unpriced" if plan.est_judge_usd is None else f"~${plan.est_judge_usd:.2f}"
+    print(
+        f"deepeval suite: {plan.cases} test cases from {plan.records} records; "
+        f"judge {plan.judge_model}, ~{plan.est_judge_calls} judge calls, {est}"
+    )
+    if not args.yes:
+        print("\nDRY RUN (no judge calls made). Re-run with --yes to execute.")
+        return 0
+
+    result = score_generation_records(
+        args.records,
+        judge_model=args.judge_model,
+        sample=args.sample,
+        out_dir=args.out_dir,
+        max_concurrent=args.max_concurrent,
+    )
+    print(f"\nscored {result.cases} cases -> {result.results_folder}")
+    print(f"{'metric':<26} {'mean':>6} {'pass':>6}")
+    for name, mean in result.metric_means.items():
+        print(f"{name:<26} {mean:>6.2f} {result.metric_pass_rates.get(name, 0):>6.0%}")
+    if result.agreement:
+        print("\njudge-human agreement (0-5 scale, vs verified goldens)")
+        for name, stats in result.agreement.items():
+            print(
+                f"{name:<26} n={stats['n']} mad={stats['mean_abs_diff']:.2f} "
+                f"within_1={stats['within_1']:.0%}"
+            )
+    if result.failures:
+        print(f"\n{len(result.failures)} metric executions errored (ignored):")
+        for failure in result.failures[:10]:
+            print(f"  {failure}")
+    spend = result.judge_cost_usd
+    print(f"\njudge spend: {'unpriced' if spend is None else f'${spend:.4f}'}")
     return 0
 
 
