@@ -102,6 +102,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_score.add_argument("--out", type=Path, default=None)
     p_score.set_defaults(func=_cmd_score)
 
+    p_draft = sub.add_parser(
+        "draft-goldens",
+        help="Draft golden files from stored runs for human verification.",
+    )
+    p_draft.add_argument("--records", type=Path, required=True)
+    p_draft.add_argument("--sample", type=int, default=12)
+    p_draft.set_defaults(func=_cmd_draft_goldens)
+
     p_list = sub.add_parser("list-models", help="Registry + pricing status.")
     p_list.set_defaults(func=_cmd_list_models)
     return parser
@@ -206,6 +214,34 @@ def _cmd_score(args: argparse.Namespace) -> int:
             scored += 1
     print(f"scored {scored} records -> {out}")
     print(f"next: python -m evals.report --records {out}")
+    return 0
+
+
+def _cmd_draft_goldens(args: argparse.Namespace) -> int:
+    from evals.golden import RUBRIC_DIMENSIONS, draft_golden_set
+    from evals.records import read_records
+
+    drafted = 0
+    for row in read_records(args.records):
+        scenario = row["scenario"]
+        if scenario not in RUBRIC_DIMENSIONS:
+            print(f"skip {row.get('run_id')}: no golden lane for {scenario!r}")
+            continue
+        module = _scenario_module(scenario)
+        items = module.golden_items(row, args.sample)
+        if not items:
+            print(f"skip {row.get('run_id')}: artifact has no gradable items")
+            continue
+        path = draft_golden_set(row, items)
+        drafted += 1
+        print(f"drafted {path}")
+    if not drafted:
+        print("ERROR: no golden drafts written.", file=sys.stderr)
+        return 1
+    print(
+        "Human next: fill every human_scores dimension (0-5, -1 = n/a), "
+        "set verified_by + verified_at, and commit the file."
+    )
     return 0
 
 

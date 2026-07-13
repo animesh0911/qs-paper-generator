@@ -32,6 +32,7 @@ from evals.registry import get_model
 from evals.scenarios.base import (
     EvalNotImplemented,
     EvalUnit,
+    golden_agreement,
     load_artifact,
     new_record,
     save_artifact,
@@ -193,21 +194,56 @@ def score_unit(
                 judge.judge(
                     JudgeRequest(
                         rubric_name="answers",
-                        payload={
-                            "question": question.text,
-                            "qtype": question.qtype,
-                            "marks": question.marks,
-                            "options": question.options,
-                            "generated_answer": item.get("answer", ""),
-                        },
+                        payload=_judge_payload(question, item),
                         context=context,
                         context_kind="ncert_excerpts" if context else "",
                     )
                 )
             )
         accuracy["judge"] = summarise_verdicts(verdicts)
-
-    # PLACEHOLDER (issue: "answers eval — golden calibration"): compare judge
-    # verdicts against the hand-verified golden set in /content/eval/golden/
-    # and report judge–human agreement alongside the scores.
+        accuracy.update(golden_agreement(record, judge))
     return accuracy
+
+
+def golden_items(record: dict, sample: int) -> list[tuple[str, dict, str]]:
+    """Frozen (key, payload, context) triples a human grades into goldens.
+
+    Payload and context are exactly what ``score_unit`` hands the judge, so
+    judge–human agreement compares grades of the same thing. Contexts are
+    frozen at draft time: agreement stays comparable even as the corpus grows.
+    """
+    from bank.models import Question
+    from evals.datasets.loaders import textbook_context_for_question
+    from evals.golden import spread_indices
+
+    artifact = load_artifact(record)
+    answers: list[dict] = artifact.get("answers", [])
+    items = []
+    for idx in spread_indices(len(answers), sample):
+        item = answers[idx]
+        question = (
+            Question.objects.filter(pk=int(item.get("id") or 0))
+            .select_related("chapter")
+            .first()
+        )
+        if question is None:
+            continue
+        items.append(
+            (
+                f"q:{question.pk}",
+                _judge_payload(question, item),
+                textbook_context_for_question(question),
+            )
+        )
+    return items
+
+
+def _judge_payload(question, item: dict) -> dict[str, Any]:
+    """The answer-under-test as both the judge and a golden grader see it."""
+    return {
+        "question": question.text,
+        "qtype": question.qtype,
+        "marks": question.marks,
+        "options": question.options,
+        "generated_answer": item.get("answer", ""),
+    }

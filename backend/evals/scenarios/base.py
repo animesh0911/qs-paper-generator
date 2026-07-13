@@ -84,6 +84,26 @@ def load_artifact(record: dict) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def golden_agreement(record: dict, judge) -> dict[str, Any]:
+    """Judge–human agreement keys for one record, when goldens exist for it.
+
+    Empty dict when no golden file references this run — scoring works fine
+    without calibration; the keys only appear once a human has verified (or
+    at least drafted) a golden set for the run.
+    """
+    from evals.golden import judge_human_agreement, load_golden_sets
+
+    goldens, pending = load_golden_sets(
+        str(record.get("scenario") or ""), str(record.get("run_id") or "")
+    )
+    out: dict[str, Any] = {}
+    if goldens:
+        out["judge_agreement"] = judge_human_agreement(judge, goldens)
+    if pending:
+        out["golden_drafts_pending"] = pending
+    return out
+
+
 @dataclass
 class Stopwatch:
     """Wall-clock for the whole unit (includes non-LLM work, by design)."""
