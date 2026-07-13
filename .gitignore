@@ -59,3 +59,4 @@ frontend/tsconfig.tsbuildinfo
 AGENTS.md*
 CLAUDE.md*
 .test_run.lock
+content/eval/deepeval-runs/golden-gate/

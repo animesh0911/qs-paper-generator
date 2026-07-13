@@ -101,6 +101,27 @@ settings at collection, so compose defaults `OPENROUTER_BASE_URL`; telemetry
 is opted out in the package `__init__`. Follow-ups: #225 regression gate,
 #226 retriever/answers metrics, #227 agentic tracing, #228 experimentation.
 
+**Regression gate** (`evals/tests/test_golden_gate.py`, #225): two layers.
+The deterministic layer runs on every plain `pytest` — structural + lexical
+grounding metrics over the 20 golden cases against a frozen per-case
+baseline (deliberate behaviour changes update the baseline in the same
+commit). The judged layer asserts judge–human agreement holds (mad ≤ 0.75,
+within-1 ≥ 80% per dimension — #225's uniform target, with headroom over the
+2026-07-13 measurements of 0.10–0.53 mad — plus Faithfulness pass rate ≥
+0.90) and is consent-gated behind an env var because cache misses bill the
+judge:
+
+```bash
+docker compose exec -e EVALS_GOLDEN_GATE=1 web \
+    pytest evals/tests/test_golden_gate.py -q
+```
+
+deepeval's disk cache (`backend/.deepeval-cache.json`, gitignored, persists
+via the bind mount) makes unchanged re-runs free — verified: a second gate
+run reports $0.00 judge spend. Changing a metric's steps/rubric invalidates
+only that metric's cache entries, so a tuning change re-bills cents, not the
+suite.
+
 **Judge calibration** (`evals/golden.py`): `python -m evals.run draft-goldens
 --records <run>.jsonl` freezes a sample of a stored run's payloads+contexts
 into `/content/eval/golden/<scenario>-<run_id>.golden.json` with *unscored*

@@ -105,15 +105,24 @@ def score_generation_records(
     out_dir: Path | None = None,
     max_concurrent: int = 8,
     metrics_filter: list[str] | None = None,
+    use_cache: bool = False,
 ) -> SuiteResult:
     """Score sampled questions from every generation record in a JSONL.
 
     ``metrics_filter`` (bare metric names) exists for the tuning loop: one
     metric over the golden sample costs cents, so a criteria change can be
     validated against human grades without re-billing the whole suite.
+    ``use_cache`` reads deepeval's disk cache (written on every run), so
+    unchanged case+metric pairs cost zero judge calls — the regression gate
+    relies on this.
     """
     from deepeval import evaluate
-    from deepeval.evaluate import AsyncConfig, DisplayConfig, ErrorConfig
+    from deepeval.evaluate import (
+        AsyncConfig,
+        CacheConfig,
+        DisplayConfig,
+        ErrorConfig,
+    )
 
     rows = _generation_rows(records_path)
     out_dir = out_dir or (DEEPEVAL_RUNS_DIR / records_path.stem)
@@ -143,6 +152,7 @@ def score_generation_records(
                 "judge": judge.get_model_name(),
             },
             async_config=AsyncConfig(max_concurrent=max_concurrent),
+            cache_config=CacheConfig(use_cache=use_cache),
             error_config=ErrorConfig(ignore_errors=True),
             display_config=DisplayConfig(
                 results_folder=str(out_dir),

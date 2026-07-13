@@ -131,6 +131,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Bare metric names to run (tuning loop); default: full suite.",
     )
     p_deep.add_argument(
+        "--use-cache",
+        action="store_true",
+        help="Reuse deepeval's disk cache; unchanged cases cost no judge calls.",
+    )
+    p_deep.add_argument(
         "--yes",
         action="store_true",
         help="Consent to paid judge LLM calls (without this: dry-run).",
@@ -297,6 +302,7 @@ def _cmd_deepeval_score(args: argparse.Namespace) -> int:
         out_dir=args.out_dir,
         max_concurrent=args.max_concurrent,
         metrics_filter=args.metrics,
+        use_cache=args.use_cache,
     )
     print(f"\nscored {result.cases} cases -> {result.results_folder}")
     print(f"{'metric':<26} {'mean':>6} {'pass':>6}")
