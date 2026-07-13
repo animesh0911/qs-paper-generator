@@ -1,0 +1,1808 @@
+{
+ "request_fixture": {
+  "_comment": "Grounded generation fixtures. chapter_map_node_ids are pinned stable_node_ids (SECTION nodes) from the seeded chapter map, frozen so a run resolves identically regardless of re-imports; node_selector documents how they were chosen and stays as the runtime fallback for fixtures that leave chapter_map_node_ids empty.",
+  "fixture_id": "carbon-compounds-grounded",
+  "chapter_slug": "carbon-and-its-compounds",
+  "source_document": "jesc104",
+  "chapter_map_node_ids": [
+   "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+   "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+  ],
+  "node_selector": {
+   "strategy": "first_major_topics",
+   "count": 2
+  },
+  "topic_names": [],
+  "difficulty_preset": "balanced"
+ },
+ "grounding_manifest": {
+  "chapter_slug": "carbon-and-its-compounds",
+  "requested_chapter_map_node_ids": [
+   "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+   "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+  ],
+  "included_chapter_map_node_ids": [
+   "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+   "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+   "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+   "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+   "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+   "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+   "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+  ],
+  "excerpts": [
+   {
+    "citation_id": "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     1
+    ],
+    "source_element_ids": [
+     "479959a0e3ff84ee720ce8768a221fbf19d69a3987e8e40ad80070f6836e5261",
+     "7573d5a9402b6cc5f59f058ddf3770e71eb7bfe2bbccc3e1ccc3213ca718b404"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nIn the previous Chapter, we have studied the properties of ionic compounds. We saw that ionic compounds have high melting and boiling points and conduct electricity in solution or in the molten state. We also\nScience saw how the nature of bonding in ionic compounds explains these properties. Let us now study the properties of some carbon compounds. Most carbon compounds are poor conductors of electricity as we have seen in Chapter 2. From the data given in Table 4.1 on the boiling and melting points of the carbon compounds, we find that these compounds have low melting and boiling points as compared to ionic compounds (Chapter 3). We can conclude that the forces of attraction between the molecules are not very strong. Since these compounds are largely non-conductors of electricity, we can conclude that the bonding in these compounds does not give rise to any ions."
+   },
+   {
+    "citation_id": "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     2
+    ],
+    "source_element_ids": [
+     "3439a0e96d603b970bd342b2646e389b9a45fceb41e17e5e54a5bd64655a0ca2",
+     "0b3e0d0d65ceeb0797e0d54998287a2287c6934fdb9ab039c3279034cf868df5"
+    ],
+    "content_types": [
+     "caption",
+     "table"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nCompound\nMelting point (K)\nBoiling point (K)\nAcetic acid (CH 3 COOH)\n290\n391\nChloroform (CHCl 3 )\n209\n334\nEthanol (CH 3 CH 2 OH)\n156\n351\nMethane (CH 4 )\n90\n111\nTable 4.1 Melting points and boiling points of some compounds of carbon"
+   },
+   {
+    "citation_id": "cac31e0ad5de8eb8d5b821116cb65b83fe11ac6e7ce799e21f7f9b6e1b201b99",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     2
+    ],
+    "source_element_ids": [
+     "146e41a4faf7f4b9b5b7808c42a5560fd6b25c021cbeed0b39d201f5519aaf57",
+     "64046a6b050c52d0047dd779b82c4d02420300f6a154e8cec00bdf91cd4cdb84"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nIn Class IX, we learnt about the combining capacity of various elements and how it depends on the number of valence electrons. Let us now look at the electronic configuration of carbon. The atomic number of carbon is 6. What would be the distribution of electrons in various shells of carbon? How many valence electrons will carbon have?\nWe know that the reactivity of elements is explained as their tendency to attain a completely filled outer shell, that is, attain noble gas configuration. Elements forming ionic compounds achieve this by either gaining or losing electrons from the outermost shell. In the case of carbon, it has four electrons in its outermost shell and needs to gain or lose four electrons to attain noble gas configuration. If it were to gain or lose electrons -"
+   },
+   {
+    "citation_id": "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     2
+    ],
+    "source_element_ids": [
+     "83e87762d5163d3d10f9d7d998e3f7d1ba5c35cbd6839d0ca2f34681c7aca54c",
+     "6287b654ee1c29d7fb766ac298dbc6bd3b698adf255667f800958a7f957b72a4"
+    ],
+    "content_types": [
+     "list_item"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\n(i) It could gain four electrons forming C 4- anion. But it would be difficult for the nucleus with six protons to hold on to ten electrons, that is, four extra electrons.\n(ii) It could lose four electrons forming C 4+ cation. But it would require a large amount of energy to remove four electrons leaving behind a carbon cation with six protons in its nucleus holding on to just two electrons."
+   },
+   {
+    "citation_id": "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     2
+    ],
+    "source_element_ids": [
+     "f186517796f230cbbb53f7271d2636aae61c6574a036a66cea6a48ee3b798cb0",
+     "4b23c5cd69bc100bd5a382a9c861b2d1b67f011f359a46d17bc111eec28274ad"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nCarbon overcomes this problem by sharing its valence electrons with other atoms of carbon or with atoms of other elements. Not just carbon, but many other elements form molecules by sharing electrons in this manner. The shared electrons 'belong' to the outermost shells of both the atoms and lead to both atoms attaining the noble gas configuration. Before going on to compounds of carbon, let us look at some simple molecules formed by the sharing of valence electrons.\nThe simplest molecule formed in this manner is that of hydrogen. As you have learnt earlier, the atomic number of hydrogen is 1. Hence hydrogen has one electron in its K shell and it requires one more electron to fill the K shell. So two hydrogen atoms share their electrons to form a molecule of hydrogen, H 2 . This allows each hydrogen atom to attain the electronic configuration of the nearest noble gas, helium, which has two electrons in its K shell. We can depict this using dots or crosses to represent valence electrons (Fig. 4.1)."
+   },
+   {
+    "citation_id": "3a65e65c81ef5a4f93b0949d89be029c1a3102525f5a40f0af89009afcc42b48",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "533864c72031dee59e748c3e1c8d5e755947f450edf0e6e5ed52919449280516",
+     "db9431bf8ba783f731a7c7e2daeafd67d4ec461dedfb23f97ae4a4e71371f74d",
+     "c4b87d46facfd88a3fd3816fd8a51a9d3ef87d99dea22402b6f57d04d45e0d87",
+     "b4fbbb3a69ed7883a30b77887a5082e922d6ca6471558be98d1b326d60485a60",
+     "9c871cf29a710b507ed15620e7cf2183b272e1f2b53440f6a052d2f05f0b7269",
+     "1ba65e4a09d0f9a67747443f8fb0ec0f2d951a2a161250bf377c0593e1fa90e1",
+     "6db868ef6a169fedc7f7f350fd5918ae988c835fd6d7e01fb5d3a2996a3d49ba",
+     "20319b21ee9d0f29826e6e0340bc3855976ca33c66290b8cd44b937c369f1aa3"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nH x\nxH\nHydrogen atoms\nX\nH\nH\nH, molecule\nX"
+   },
+   {
+    "citation_id": "04d7eeb3c4d54210cec022203f79e06de25f7151d1d2fdd3b5277439352d436b",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "c8d38988ec9bb423aadfeefd2991dd40da8bfd69558de2b96616d1a0373edb48",
+     "f8fc37df708c392b35925b4ca4b5d194fdd549171133f9eaf4ad76d8012e7568"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nFigure 4.1 A molecule of hydrogen"
+   },
+   {
+    "citation_id": "29fc4f6587a7c85b0a84be5b9ce43d8694ef4b620a19eb721094e5269c478442",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "0eaa58490d19818d7f45c1fea981fc3417d900fb1cc770ecf1309af94afcc2b8",
+     "672a7d5c278d8090f3e079eb6cdf52254961828c3f721a2caed06f8318146d52",
+     "476f19c422235f5f8ee126e263453b065b001a3b8e6218268ad0c5916484c06a",
+     "c426c8c700addcfc52f2143219cfb820dad6ad5c3e9f197b7a725a1a9b849504",
+     "0459b18af759f2d912ccab6d67f82e69afd66fac6a70b259ee23167bc78e1d66",
+     "0fc29806e8a8be1f1b0798eb2a3c2b7cf350d2fb79fcd0481c85f3829ca90375",
+     "63285f03eaa910d7cc4d9e2e1544140320244681bf3ed64028af9f9056f376b5",
+     "21915bfc11aab104d39e4b8c9e51964453aa7028b2a875dc249e0928582ca8dd"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nX\nH\nH\nH-H\nX\nThe shared pair of electrons is said to constitute a single covalent bond between the two hydrogen atoms. A single covalent bond is also represented by a line between the two atoms, as shown in Fig. 4.2.\nSharedelectrons\nThe atomic number of chlorine is 17. What would be its electronic configuration and its valency? Chlorine forms a diatomic molecule, Cl 2 . Can you draw the electron dot structure for this molecule? Note that only the valence shell electrons need to be depicted."
+   },
+   {
+    "citation_id": "7d950bdcba331b3e789c2cc485742210fe2e5bce6d17226dec97a25441dc863e",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "8231c8f7547bf6638dc0e288bf54ca1fdca451acab75f004035932e536033daf",
+     "e202c2cca00839c6c750e536d1e422b981f6e0b3354a4def911f5a9d11905d5b"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nFigure 4.2 Single bond between two hydrogen atoms"
+   },
+   {
+    "citation_id": "2a0d297249cf18e955f25c0257eb282352f619d77510863f27aa520b15088268",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "8d4326d102d64f716236b760fa18825acab9d72f9e2dc91053592073edcbdbea",
+     "38525d4abaa3bbf85c4820195467ec10481d9a6dae3edaf80da995ba0081db6c",
+     "ca4546f4a76efaa2247105da4cf8c8c0fd8be0d610d99bac1e75ca4b04e3d168",
+     "8eb81ac000a90479e11515f41cb8b559da4ae83aadea1fb19e142e00ce6b18bb",
+     "95fa7fe1ad610483145e767cce2c5b39960e5675f27a95a4d161819c5056ea79",
+     "f1bd3d56cf773a78df0686754522c9a587519bae24d1bcb3cf11645100f7b13f",
+     "1d0dde14c75fa107dfa467c37905e27a2da2cecaa36bd2f802356dd96336be18",
+     "aa90afed0e4e6fc2b5d23e4fd24cd1fe5a56a75a1317f1c38e7ac77b1d0eb1e7",
+     "c31758738fa068b97e329184db943e514f1717a191363e55e369f4eb988b1573",
+     "223dcab35455ecf219b063a4937c8edf7a8ee72bdf57d59041cf6e25df5b7754",
+     "b6a0276db337de6f09dcc4a49cf2967dac68d52a678519b55c0a67843cb8f187",
+     "c1486ef62e316c3c584fd55381c5ddbaccc3076e552562bc82d90e223168f09a",
+     "35c5441db4739496c278f771e6d6f34c7f6bbd5d9d10f1480fc65181e2f21ff3",
+     "3ccc33db5c89a0ce0bc52dbbabcbff467f265583d35d465a8d726c5628f6e383",
+     "0de887239907a5dda23744e55b3d60f26462b9ba4d8dd1e8dd825102f9fec355",
+     "87868c67e824c5a2804ec920b0aabdb7a715b1f288ca946eb6c0ebdee35a262f",
+     "f8d3909710cdf8362fea977d66fd9dbed5d4961629e872567d855a0d9b079a99"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nXX\nXX\nOx\nXX\nXX\nXX\nXX\n0\nXX\nXX\n0\nO2 molecule\nXX\nXX\n:0=0:\nIn the case of oxygen, we see the formation of a double bond between two oxygen atoms. This is because an atom of oxygen has six electrons in its L shell (the atomic number of oxygen is eight) and it requires two more electrons to complete its octet. So each atom of oxygen shares two electrons with another atom of oxygen to give us the structure shown in Fig. 4.3. The two electrons contributed by each oxygen atom give rise to two shared pairs of electrons. This is said to constitute a double bond between the two atoms.\nCan you now depict a molecule of water showing the nature of bonding between one oxygen atom and two hydrogen atoms? Does the molecule have single bonds or double bonds?"
+   },
+   {
+    "citation_id": "81bc69b5f6c0ade2a0cdd22c4c1bce10ea1d4206308b4a6f634b51cde9cb08b3",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "8cfb3b893e8a049886ed56342e95398575c8a595fe35a28c3d979fba2928591d",
+     "77e5531581d03580ea2526922e93ed0ac7513498263b824ef0e41b95d3315a1e"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nFigure 4.3 Double bond between two oxygen atoms"
+   },
+   {
+    "citation_id": "023856c5ca8b22845939aecdc6284e7a99f0b3bb6d0df9c297f541e249a0ee21",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "10e82897d3877df24319d19f99aca1cf22273f063544fd86321ffdde3e46422e",
+     "a5b5a80f9d696b132f96cd29bccb313bf822bf443a94c5e94346959f1502c1c3",
+     "1b5021c5dc34b5a6bbafa53e577d5223a90e00ba886738753c098433c5c3836e",
+     "62abb51919110a881ab4016c4ee67762b1168b2ae7f3b46d46314d13a360918a",
+     "331cad2fa1e43a6cb1158cd0a1baf62d606cce1867573956e76623dd9a601750",
+     "0b4b3912893c60e7ac8dc0d2267a145daa06a12d3e9c7bb494c3e46e0c495a23",
+     "766bd417977daf73bc544186f6dbe1347dd106bc3287150525c3a6c5ea8fc214",
+     "b7d3da5a653d1ed608fdf33b290d18a32cd7addf83add734aff3717baae74ffe",
+     "e240bcd9225065c6b8a0b4abaa1051d913a9c9a743c686d0e8e857edd388a049",
+     "049f0da7542ba583147d3a611d4de5d6437993c7cc75c09a967f685f4d6d711d",
+     "35f1e84b7bcb15b94b0db362cbf851127aedcc313f7aa4135a294fb4a05ea669"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nXN\nX\nXNX\nX\nNitrogen atoms\nX\nX\nxN\nNx\nN, molecule\nN=N"
+   },
+   {
+    "citation_id": "5143ecc8d2109121fbdf02c342fac13371f6cf53d9bb43a0c717504505a17682",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "609e8b980d63267bc0dd6e5a677be04ba5f7cb25d7c8fbf4b87f253437465395"
+    ],
+    "content_types": [
+     "caption"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nFigure 4.4 Triple bond between two nitrogen atoms"
+   },
+   {
+    "citation_id": "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "6d0cacaddde8c2d31cf2c10daea3ab8270ef44c889074a74b327aee6f4db9941",
+     "1cc013dc1c8c1208cbb58662c1f9e153f3a8473d50c5d33fba36fe85b86042b3",
+     "e77768647a5c38527602cb8e70ccdb27578b3688f3bf2e875cbe55e985eab21e"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nWhat would happen in the case of a diatomic molecule of nitrogen? Nitrogen has the atomic number 7. What would be its electronic configuration and its combining capacity? In order to attain an octet, each nitrogen atom in a molecule of nitrogen contributes three electrons giving rise to three shared pairs of electrons. This is said to constitute a triple bond between the two atoms. The electron dot structure of N 2 and its triple bond can be depicted as in Fig. 4.4.\nA molecule of ammonia has the formula NH 3 . Can you draw the electron dot structure for this molecule showing how all four atoms achieve noble gas configuration? Will the molecule have single, double or triple bonds?\nLet us now take a look at methane, which is a compound of carbon. Methane is widely used as a fuel and is a major component of bio-gas and Compressed Natural Gas (CNG). It is also one of the simplest compounds formed by carbon. Methane has a formula CH 4 . Hydrogen, as you know, has a valency of 1. Carbon is tetravalent because it has four valence electrons. In order to achieve noble gas configuration, carbon shares these electrons with four atoms of hydrogen as shown in Fig. 4.5."
+   },
+   {
+    "citation_id": "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     3
+    ],
+    "source_element_ids": [
+     "22a0461ac02b26a144be97aa6e812a2e2c206931d753d5fdf7e19c63a0668b50"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nSuch bonds which are formed by the sharing of an electron pair between two atoms are known as covalent bonds. Covalently bonded molecules are seen to have strong bonds within the molecule, but inter molecular forces are weak. This gives rise to the low melting and boiling points of these compounds. Since the electrons are shared between atoms and no charged particles are formed, such covalent compounds are generally poor conductors of electricity."
+   },
+   {
+    "citation_id": "93e7a6e48871d0ae1e147da5aa6d1493ec381fc5043a76a7d768265ab3ee061b",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "01ddbb1ee484bc335534be6d1154533ea326dc92aed71f9d6413ffbd1d010833",
+     "ccc02a83edd030b6b9e8623569e9fc89955da2507dbfedf58db39c77d930cb5e"
+    ],
+    "content_types": [
+     "section_header"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nOD\nAllotropes of carbon"
+   },
+   {
+    "citation_id": "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "55f6c09a9abc29abc9ecb8ec5e96eb286c5b91feaa8f16c9067ce6cee67dbd2b"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThe element carbon occurs in different forms in nature with widely varying physical properties. Both diamond and graphite are formed by carbon atoms, the difference lies in the manner in which the carbon atoms are bonded to one another. In diamond, each carbon atom is bonded to four other carbon atoms forming a rigid three-dimensional structure. In graphite, each carbon atom is bonded to three other carbon atoms in the same plane giving a hexagonal array. One of these bonds is a double-bond, and thus the valency of carbon is satisfied. Graphite structure is formed by the hexagonal arrays being placed in layers one above the other."
+   },
+   {
+    "citation_id": "490c68ad41503ce2fc03ad092489eefe0e6c8e1098f3adb2d7e7b434d1f8a9ca",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "02d24de450080f74a1a2f1b977e250e0cdb71a5f10b9b96d3cc8f5dbf828ed80",
+     "37f73879e692965ae61fb15f03923af3759953495bd4375c2abeb6c372d3aa9c"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThe structure of diamond"
+   },
+   {
+    "citation_id": "073a02ac1d66151580391bddb78338dea1356e72b21840302ed0b1bce95c7206",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "5030c05530d25aa05674912de9ea95c7cc5f681e05c34416d893078a5802b576",
+     "874d51ce6bd4296e961b45289f387f5c156049d549234393be7586b1a6881292",
+     "021e566eb6493618d7817242989125f7f9e2765603e5cbe6aab541897a5b69c8",
+     "bf8bb6afacdd928f840cc79f578466b8f2208cc49ca44fe27c6a2a091a5361d1",
+     "8fbd4c3ac48beef703c8284e5e3c8baac7c59c05d4f5b2d9a9595c6f71642858",
+     "69416fa9522becf0dfd77da0bc698a782a710c7e923792a16d8d535e42a2e48d",
+     "07b119cfce6548d13b7142e56b286f3983898d32b953774db85eeacac9263d0a",
+     "e3e40211fc785dc5555ad5456717a09b8dc94a465c5410aedfd6a3bb19dd4856",
+     "4d18e5e8c7810c252ac9582ff6c167b1a865f24669abf189c45f14a0f58f5bc6"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nH\nX\nH\n·X\nC\nX·\nH\nX\nH"
+   },
+   {
+    "citation_id": "3e3fc62014f56d35c6555968e52043414a5dd42061a48b934604a5359a4d5885",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "4e5e1ab0a99656e785ee2534c80eac78f9bd906324c57a0125180a88215db3ce",
+     "1ecb016d400e19dc49415faeea4bb804864367f0a078fb82975497ab02144155"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nFigure 4.5 Electron dot structure for methane"
+   },
+   {
+    "citation_id": "38de64a3053c9308010ddd55fd609293636bed83892357e400d97fb83fc61188",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "d345083964a3ab8c1293f051b75242bb65192a7c16ab2cc50d27ea4b315702b7",
+     "f62ac43c7cbbdfa1c685e2ad83eae33c4f7eabc6c54398dca4053456a31e7a86"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThe structure of C-60 Buckminsterfullerene"
+   },
+   {
+    "citation_id": "8d12db0da8f76674ec2c22ead9c53c375e452626ea79c4dadcd1b4a789b84d67",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "85bd0c5b527404f716fee07dde62c9dcd45eac2799c46278400279920fae7f00"
+    ],
+    "content_types": [
+     "caption"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThe structure of graphite"
+   },
+   {
+    "citation_id": "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6",
+    "chapter_map_node_id": "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "pages": [
+     4
+    ],
+    "source_element_ids": [
+     "16f55bd8997c264707ec83058a7d92e58bc16ee9686f815589150d2917c6ca42",
+     "3a625425bc0bfb748941829fe1e9a82abc73775d8e6c3de0d6f9585f2e98712e",
+     "d00ae17907bb63cd840c01871ace18a3e579d3f9f84ec7dfdac1545d51e80b03"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThese two different structures result in diamond and graphite having very different physical properties even though their chemical properties are the same. Diamond is the hardest substance known while graphite is smooth and slippery. Graphite is also a very good conductor of electricity unlike other non-metals that you studied in the previous Chapter.\nDiamonds can be synthesised by subjecting pure carbon to very high pressure and temperature. These synthetic diamonds are small but are otherwise indistinguishable from natural diamonds.\nFullerenes form another class of carbon allotropes. The first one to be identified was C-60 which has carbon atoms arranged in the shape of a football. Since this looked like the geodesic dome designed by the US architect Buckminster Fuller, the molecule was named fullerene."
+   },
+   {
+    "citation_id": "deed9865a4b1a6e59c6d77e0146d2a534084b57cbf3d3c030e9b228e4f987935",
+    "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "pages": [
+     5
+    ],
+    "source_element_ids": [
+     "e809c921f798ed21949550849e1fef1b168ada48efe1e4d82bddd4fc1fbe86b5"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\nWe have seen the formation of covalent bonds by the sharing of electrons in various elements and compounds. We have also seen the structure of a simple carbon compound, methane. In the beginning of the Chapter, we saw how many things we use contain carbon. In fact, we ourselves are made up of carbon compounds. The numbers of carbon compounds whose formulae are known to chemists was recently estimated to be in millions! This outnumbers by a large margin the compounds formed by all the other elements put together. Why is it that this property is seen in carbon and no other element? The nature of the covalent bond enables carbon to form a large number of compounds. Two factors noticed in the case of carbon are -"
+   },
+   {
+    "citation_id": "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+    "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "pages": [
+     5
+    ],
+    "source_element_ids": [
+     "e869ed673e26739a9fdfe1f7adf90263cae79f69c5109d506eba664962c5efc8"
+    ],
+    "content_types": [
+     "list_item"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n(i) Carbon has the unique ability to form bonds with other atoms of carbon, giving rise to large molecules. This property is called catenation. These compounds may have long chains of carbon, branched chains of carbon or even carbon atoms arranged in rings. In addition, carbon atoms may be linked by single, double or triple bonds. Compounds of carbon, which are linked by only single bonds between the carbon atoms are called saturated compounds. Compounds of carbon having double or triple bonds between their carbon atoms are called unsaturated compounds."
+   },
+   {
+    "citation_id": "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+    "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "pages": [
+     5
+    ],
+    "source_element_ids": [
+     "56068fc3a72772fca71ec4709052e090536dadb42531ae11afae36bd9fca1777"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\nNo other element exhibits the property of catenation to the extent seen in carbon compounds. Silicon forms compounds with hydrogen which have chains of upto seven or eight atoms, but these compounds are very reactive. The carbon-carbon bond is very strong and hence stable. This gives us the large number of compounds with many carbon atoms linked to each other."
+   },
+   {
+    "citation_id": "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d",
+    "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "pages": [
+     5
+    ],
+    "source_element_ids": [
+     "55df7ee84b5ac22c64ac224f1bd2518407740aedf17f607d94b3134917d039cb"
+    ],
+    "content_types": [
+     "list_item"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n(ii) Since carbon has a valency of four, it is capable of bonding with four other atoms of carbon or atoms of some other mono-valent element. Compounds of carbon are formed with oxygen, hydrogen, nitrogen, sulphur, chlorine and many other elements giving rise to compounds with specific properties which depend on the elements other than carbon present in the molecule."
+   },
+   {
+    "citation_id": "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+    "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "pages": [
+     5
+    ],
+    "source_element_ids": [
+     "d6cc35c6f79e373c10650ca76972519e3495fd5a5f835d712dedd8f091ff1eb3"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\nAgain the bonds that carbon forms with most other elements are very strong making these compounds exceptionally stable. One reason for the formation of strong bonds by carbon is its small size. This enables the nucleus to hold on to the shared pairs of electrons strongly. The bonds formed by elements having bigger atoms are much weaker."
+   },
+   {
+    "citation_id": "c0282130e08398cce56f608405112ec10683c1c5e259266cda8fe430e526b48b",
+    "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "79a6e75d09375906765b7b27c44c276e9837b4381004d479cd2ac06187daa04d"
+    ],
+    "content_types": [
+     "section_header"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\nOrganic compounds"
+   },
+   {
+    "citation_id": "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5",
+    "chapter_map_node_id": "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "ddf4dcb0ce67231f034a420dec6a073791cc1f76235f32aa59e87b2fb3a410c8"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\nThe two characteristic features seen in carbon, that is, tetravalency and catenation, put together give rise to a large number of compounds. Many have the same non-carbon atom or group of atoms attached to different carbon chains. These compounds were initially extracted from natural substances and it was thought that these carbon compounds or organic compounds could only be formed within a living system. That is, it was postulated that a 'vital force' was necessary for their synthesis. Friedrich Wöhler disproved this in 1828 by preparing urea from ammonium cyanate. But carbon compounds, except for carbides, oxides of carbon, carbonate and hydrogencarbonate salts continue to be studied under organic chemistry."
+   },
+   {
+    "citation_id": "56b355894fed2fd83428e1fa08de9285a1173adff97c8ec3b5f04ab76cb18ede",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "78335a70f67ecf7c4b8efc6f5b3d746c64a6af77e482d6ae75ea54da22b4b372",
+     "3efd675cda4028cf50e17f480d1130164d2a9cceeebf7bf19305f055e1a43760"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nWe have already seen the structure of methane. Another compound formed between carbon and hydrogen is ethane with a formula of C 2 H6 .\nIn order to arrive at the structure of simple carbon compounds, the first step is to link the carbon atoms together with a single bond (Fig. 4.6a) and then use the hydrogen atoms to satisfy the remaining valencies of carbon (Fig. 4.6b). For example, the structure of ethane is arrived in the following steps -"
+   },
+   {
+    "citation_id": "655506c795839d6ee25ab53d9315f4354da7205d38d98384a61c0dff38e940ad",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "1a4805eaa8b95f00d45d8dbe086adaa9d2381aa70e82ef3db01c0cc1437f3b9a",
+     "e0ce7c14e768f24987233f72f3d5d7b44988c0ce022c7192f46c67ce6f49a2fa"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nC-C\nStep 1"
+   },
+   {
+    "citation_id": "e6ab6fe5f4dbdcb4f60ac5a10b5b6c7df7f79cfe16b33056b0161fb725164c13",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "6aab43bb13c2173c830d156dd46bc48d42822f9773afe576076849b463787670"
+    ],
+    "content_types": [
+     "caption"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nFigure 4.6 (a) Carbon atoms linked together with a single bond"
+   },
+   {
+    "citation_id": "8b03dbf4b2c175919f8d64cd9d1f669459fc15777bbe255f9cd98f4dc700d291",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "b213f3316e3869be7eb90a52764e3c7dd3b542ad268dd5ca2259d1adf0aa8152"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nThree valencies of each carbon atom remain unsatisfied, so each is bonded to three hydrogen atoms giving:"
+   },
+   {
+    "citation_id": "6f2142f0eabe0da083195afc63d4080da68f77676f72004ca04f8f1b10b93b9d",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "04c84b11ec61ab2a096acfc5404b16058a1e3bcd80b19c49f2b8308a42a9218d"
+    ],
+    "content_types": [
+     "caption"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nFigure 4.6 (b) Each carbon atom bonded to three hydrogen atoms"
+   },
+   {
+    "citation_id": "dcabe4f8ff04ba02c9427192203f2f06a542dcc3c15d3b4368085b93804dc890",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "adf5dd351698982c34d8302b78b7bb0b3fdfaeb742e08f2336bb4044a60e6557",
+     "9623d512d125042d9fce356a2cac1cd9efa638ddce8731409d7da9a80397625d",
+     "53dd17dc8917d9e5c3e6d60821e92d40197eaecd85352a50203d26c0b5ea2f1a",
+     "2c3fac48571cfbab2ef434008e49731c8de5366ead917ad9672f65f8d2ffb845",
+     "45a149c87bf3b21446157a5805b4b3c1ce732c79a8456a143707f2f45b5ddc0a",
+     "38fa559d5c94afdf2f57277d58e79f15779419304ac034f7832e90d94985cdb2"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nThe electron dot structure of ethane is shown in Fig. 4.6(c).\nCan you draw the structure of propane, which has the molecular formula C 3 H8 in a similar manner? You will see that the valencies of all the atoms are satisfied by single bonds between them. Such carbon compounds are called saturated compounds. These compounds are normally not very reactive.\nHowever, another compound of carbon and hydrogen has the formula C2 H4 and is called ethene. How can this molecule be depicted? We follow the same step-wise approach as above.\nCarbon-carbon atoms linked together with a single bond (Step 1).\nWe see that one valency per carbon atom remains unsatisfied (Step 2). This can be satisfied only if there is a double bond between the two carbons (Step 3).\nCarbon and its Compounds C-C Step 1"
+   },
+   {
+    "citation_id": "197c767fb3535febe7e4a583db8e28c55f204da95042810650601750bd197e2b",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "13b8832d901fa973d3320efb3c859e5b7b134a191b1f9cb60958244bf7fa210f",
+     "d9e28e5175080c4f253ace64808ad98fab5c238df76b3544179561899bd3e448",
+     "f4b27d846295722ff1a3599bb81ac7870351feae3501244ddc789e5530aa6e3c",
+     "862ba94e67d6f27941f08e6273f633a3f02746914a6ba61acac578ce3698ba02",
+     "e7759e7dfe123343edb6dc194a0a1273c6210919050014b0169a23f36dcd67c0",
+     "5130c6ee860c60ae60a52f8243a11034bfede69f994adcc012e9fd29cbb520e7",
+     "cd40d390f4ebcc23f57a51db75fc193f86b2968ea4e7d65c821a9223b0c74709",
+     "027cc0da21e267ad8b15e0469c31125c79932ffef7ede49ff22298587d33feec",
+     "1ac1c3844afede2b103feb8f6800fb50ddcb9e1ea7ffb5a22df5d9489423cf32",
+     "dc6a177ddad9789ea6720249448694381cbe4ca8eb5a264e77ff54b3dc269c3e",
+     "5fc6f4ac459f60fd6fe7e4b91b42b5cdc5533cae51fb5fbe750fe222185d59d1",
+     "229e3f6ca3ab23d3a20a07ba2096c55284844d35ebe3478f26bc49f8b8cb1203",
+     "6237f4c68092b789a046f7d23f8d5e93648133ba95d03e0a51e2e07dd61b76db",
+     "cf241e2f38e4f2c016f831f1257bbc90243a1a68aa468625909aa711b8836026"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nH\nH\nX\nX\nH\n·X\nC\nXX\nC\nX·\nH\n·x\nH\nH"
+   },
+   {
+    "citation_id": "019543ad536d39bef3a9b99792450dc91e8c7edb2a766fba166b3b9e5b4342b5",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "6af91df699b1b954bcdc1a34811342cc4f6a4864fe378ed2106e3db78cda23c7",
+     "e80b7327f34f1767186fedd87fd7b93743c282d055d3b499f66c6ce947ca5a5d"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nFigure 4.6 (c) Electron dot structure of ethane"
+   },
+   {
+    "citation_id": "99ed801effcb95d48b52e9fcc03e6d92dfb6b31268f2f4c5352d96fd65bbdbbd",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "613a437bf66768aae0fb8c6abdf8b9cc4769411c50ab81625c98a28f5f5760f2",
+     "2d6056d35fd8be604724ddada8d222710482863d66787a46157bddebf2311884",
+     "98ae2882ea89dcfba1d73f73047b699f0f5ae5ea2dbd5387762fa62f096ed2c6",
+     "9feeae9090eb1cfcdec2813694a17bfb77eedebd6b193bc55ba4e3edcc3a5eba",
+     "c82b7756d0626b6d677d217ec0d92812f7c42febbf649a9747e8bbb1b5a539b4"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nStep 2\nH\nH\nH\nH"
+   },
+   {
+    "citation_id": "e5a13daa392744746eb6fe22ad6ea2822fc621046895a485896a9d6cbf7262bf",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     6
+    ],
+    "source_element_ids": [
+     "79bbbf90a05d477bead97d74f72ce690d6248243e7740bea7cb7114d7180a08a",
+     "d903bc7561b6752199c6a268d62c269a117950fea18a930ca330d854f4757f06",
+     "e68660748312a35dfd9a70bcabca276e88fbddc76d1d4ecc6bb641c9c8a25d8e",
+     "bb568786b89ba8a8e8ec968755e011a952a5b86631a9493fe31b8ef6fff19b74",
+     "62c80cd19af90013394920d77cc99350bbadbcc8408ec2c751916258dae18390",
+     "8f1af2d708fefe6e120c307274899a82a266d8d35120098ee33ce1c616b493b6"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nStep 3\nH\nH\nC三C\nH\nH"
+   },
+   {
+    "citation_id": "7f267a019c27c952a81d49064844bf0f4936a6f13c25ae11f1f4c39e5dad6348",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     7
+    ],
+    "source_element_ids": [
+     "b6515d5efa2a2bde03e5cdaa79cba04582fbd8d7127ef3b6bc5912a60b5ece08",
+     "e7f037308158c39fe0e45ecf7bb883ae3852f7fff2eab20a50513ad8f8336ef1",
+     "ebaa32bff762224c4745a5c58ba12757b838e2da2738652a0f7a3bbabb271df8",
+     "432da25ace3d9ec175ac8463e1f055c468c1479674fe4c4d454cb81fe8e6f689",
+     "22a07000357adcfc751ead9c9980c5009f54f171991976d5d0a9ebb086299be2",
+     "50b2155419b2cfac9422b64065169e650bfadbf66a4155657d7a2ac40554a875",
+     "c10bec986de00c0995b7b53eea2702297ed7f01f8d04b1e4c5d16386ef860944",
+     "258782de9c6d97d3dcae91bd5b7747c50ec81f2c79b0821c9f8845617575bc9a",
+     "856fac23b8c0d1fd16e6a1ed10e6b74e4c29d7eef6e66153618f015a9f577c54",
+     "9e20dd0c7a91623e2722cf61db71c747d4f47950cd87923a6ac83ddbbdd5f3cb",
+     "7470dd2d1278fd35ac7e0a1139ccf5e92cb0dd76f4b16980e2cea1835e0a144a",
+     "cabce3b732d847b5bfd7fbc418d043f2e0c124d4e8c1ed4bc23adb601a3ff6dd",
+     "1356293c2de8a3fe00fa2baa41d567081b20840728858cb75aec0e66826fa7b3"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nH\nH\nX\nX\nC\nXX\nC\nXX\nX\nX\nH\nH\nThe electron dot structure for ethene is given in Fig. 4.7. Yet another compound of hydrogen and carbon has the formula C2 H2 and is called ethyne. Can you draw the electron dot structure for ethyne? How many bonds are necessary between the two carbon atoms in order to satisfy their valencies? Such compounds of carbon having double or triple bonds between the carbon atoms are known as unsaturated carbon compounds and they are more reactive than the saturated carbon compounds."
+   },
+   {
+    "citation_id": "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d",
+    "chapter_map_node_id": "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "pages": [
+     7
+    ],
+    "source_element_ids": [
+     "dc69e76bbb2b3436361bcfebdbd6ab922b7e7c5e573d1f1f73c5577177b35a09"
+    ],
+    "content_types": [
+     "caption"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.1 Saturated and Unsaturated Carbon Compounds\nFigure 4.7 Structure of ethene"
+   },
+   {
+    "citation_id": "e0480541d6d82d323c530a71bbc2c027bc569ff024fd1ca0dbabd5e2ae0041d6",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     7
+    ],
+    "source_element_ids": [
+     "255515501bd73cce7e3c03a2341aff57b367de36a1535e3d70a4684dcc8c7390"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nIn the earlier section, we mentioned the carbon compounds methane, ethane and propane, containing respectively 1, 2 and 3 carbon atoms. Such 'chains' of carbon atoms can contain many more carbon atoms. The names and structures of six of these are given in Table 4.2."
+   },
+   {
+    "citation_id": "da4665d36a969f249ff4f9f87eaa7d7097f29594e2f7997d6e6d4e7162bb89c0",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     7
+    ],
+    "source_element_ids": [
+     "9fb5d70d285beac042f7ecd70d79815e47e429679d79baaa9f5fe75974870375",
+     "7a624481ec4534f799a04ca92428ecf22492ccde816b24909af5dd220c4b8f40"
+    ],
+    "content_types": [
+     "caption",
+     "table"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nNo. of C atoms\nName\nFormula\nStructure\n1\nMethane\nCH 4\n2\nEthane\nC 2 H 6\n3\nPropane\nC 3 H 8\n4\nButane\nC 4 H 10\n5\nPentane\nC 5 H 12\n6\nHexane\nC 6 H 14\nTable 4.2 Formulae and structures of saturated compounds of carbon and hydrogen"
+   },
+   {
+    "citation_id": "32b75e216d1031c216a6a14555d48b12119d39e60dfa2e6dd25e7da21b2bf35c",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "a63a7ed71fc809fb1e7a629325cd3bde87da5014f57bb84c815aba443192dd57"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nBut, let us take another look at butane. If we make the carbon 'skeleton' with four carbon atoms, we see that two different possible 'skeletons' are -"
+   },
+   {
+    "citation_id": "efb71c4cfda607c15989df213488757526f80fe34aed883b4ed50c758db467a9",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "f20facd71f42fda28b76ce304638419bbd6f92b091f420819d833ad31cb4d163",
+     "cb3c1c19fe9f6fa8b2abd5e5f04458bbe108477c9bd1db9f1b588bba81574741"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nFigure 4.8 (a) Two possible carbon-skeletons"
+   },
+   {
+    "citation_id": "ad4eaf8c062035859b4432c25b0d6b74f3dfba81428679b0e0a660ec2c16f869",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "4f48b24a69664eafbb6a8fd4ce7f958ad7198b5be03714f0e704744d0eb33bb0",
+     "d017f9838baecb17c3173ddd592523283b8b7aad4f2085703aa199324e1e8a94",
+     "3f30b48c5bc520c7635f4d7b7ed11512b9a7b8b5a1d4ec3317f72c1b2d8b09ef"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nC-C-C-C\nC\nFilling the remaining valencies with hydrogen gives us -"
+   },
+   {
+    "citation_id": "07a7d439bbbd03f79dd18ff04a437766be33a1e917d91828eb61a239ca81aa40",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "754a1f84ba8390c6e0b0daeb1f4b44ca83f41b95ff33975ff79f90dc7a5acc1a",
+     "bf3624d7142cca831b6f1d6f2437d79a8c72e3885d886708218b3ab40331ec5c"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nFigure 4.8 (b) Complete molecules for two structures with formula C 4 H10"
+   },
+   {
+    "citation_id": "b893b3ed2f9d6aca112f781c4b92ad49922fb24350603e7ac86ebf5a2c3751f7",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "9e1ea4b986096eee38d081ea462b7fdc12dfd400f9531a55cd140a424119b384",
+     "588afdfab2bc47d7b64d1b5fe55886aa49f6cfc311e9e4c8522f75bc9ca2935f",
+     "e5bcae22dc34db5062d331b5774b0bc94c9a521dc2cc3fe0f355689aaf42a5a8",
+     "70057d5f8b9c001f93612c9f4daa3b889d9cb0b56e86bbb965c99ba48985a318",
+     "adf17a104076cffaa0fb286193db9aa7481b7d6c18f8298de81e3cf7d989bf27",
+     "260c5fa0d7737091e0dc043a08caed3e0802f3a0945e9db6b9a5bc37437e2c4b",
+     "7216a3e729dc0f978496cc1ce96ed47cfb1d9d5676edbdf8583b039d22b098ed",
+     "1dffa4d47ee89004d9fe1497aada47a80f6b793d1ecd64b08c93e1567e7cf7b1",
+     "4838914d4767684931e6f8b78061b7f9506231ed767cb1f451089cd253cbd3e9",
+     "17e8d576cdace811b56150ffd12d369e9132f17d3465c5c5a7b11677933329b3",
+     "8e3e9302f6f72f9de39f3ff5b4b213027a790a0927b666cff29daffc434bdd99",
+     "4c7fd2dc022b6b41b4523ec4ae78ca65214480e8d5af2de03d74e12b02689f06",
+     "d678dcec35cd2b90be5433cfc7bb270349d7ee482c2b05222d15a3e771ac0b46",
+     "4e204272b1056a77e45cbe1833eb374f4cd7e5b4e5fa226fc8348b2ada4158f6",
+     "2a726198c81f79b7739d9ddcfe103a5585ea8230b5580ec71c23f47095ad9ce9"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nH\nHHHH\nH\nH\nH-C-C-C-C-H\nH-C-C<\nH\nH\nHHHH\n一\nHH\nC\nH\nWe see that both these structures have the same formula C 4 H10 . Such compounds with identical molecular formula but different structures are called structural isomers.\nIn addition to straight and branched carbon chains, some compounds have carbon atoms arranged in the form of a ring. For example, cyclohexane has the formula C 6 H12 and the following structure -"
+   },
+   {
+    "citation_id": "756a49ee75cbef114090df4d7b057f3e867cacbb036f676e90d12ff2a7721669",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "15e7e4f83f37ccfccdbbaab64a72d55c24407a2a57d7652022475d850f184a9c",
+     "2f741dcf89d1b254189accd28adac8c2db41231533a5cc9944ea75457cb21602"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nFigure 4.9 Structure of cyclohexane (a) carbon skeleton (b) complete molecule"
+   },
+   {
+    "citation_id": "190a4a93bb84747d734aa57260363cf65913d0cd47f7fe2ffce2d79aa16c4975",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "226437e5f5d1539af6bfdf1f1eb1ac55251890b9c113cd898d51d79ce534b8b5",
+     "50fca788f05fc68433e4f1263c12f3e36c30e726b686ef7179725c954b07b292",
+     "87d794ba3019ce34b78af3ec225dbfd04ce377d18a63f7de58a3331402b7fe56",
+     "4f45d615e3879d28f20bead5718ad48186bc29ecbdd57da58cc7afa9d6a4b57b",
+     "ced4fef7361c79b18a089ed59b25b9aed409660a67b62fc50b8b7db5342af826",
+     "200ab40d4357b44f5d1c02d0bf172504c7bc329891eb09986b56414811d1ee58",
+     "d2154f18fc4864f88c2024d69bc0e7cd9466100d5a77f1d518cb4802f8c47a0b",
+     "61cff6f303430cfc04d309a1a985819d89bd57c9c1c40e9509d13b9b7a3d38d2",
+     "b93de57445af75552ba1a68444672342ecb2d220f06081407485dc6a98f3770f",
+     "6effbcd38081afb5dbce27783e19120d357b0aaf05900ac0a191b58c747de9cc",
+     "316cb44247b7c7184057d836e028148f25bc1a14ecbc8061d6338f6c891460b5",
+     "60197209e946677125933967200682797d5f511081b0a8bc6223deb3ed356211",
+     "92b3bbb46c6bbf1c2eba8d7e4e5dcdb8ab037c65b00783f652b4f37b5f19c3bd"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\n(a)\n(b)\nH\nHH\nH\nH\nH\nH\nH\nH\nHH\nH\nCan you draw the electron dot structure for cyclohexane? Straight chain, branched chain and cyclic carbon compounds, all may be saturated or unsaturated. For example, benzene, C 6 H6 , has the following structure -"
+   },
+   {
+    "citation_id": "7a407d2d4bdcc3e39461e3d4d3b4cbd7acab088b477ff49095b9ecd74c97b6bb",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "51f5aff2822ca0cf3cb68682f1648c572d23d3eb3d17c0e657f500b4e158f5c9",
+     "f9032481918eebbd1d4083b8ac591569d3b26a5b4f1654048859f45a54ce154b"
+    ],
+    "content_types": [
+     "caption",
+     "picture"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nFigure 4.10 Structure of benzene"
+   },
+   {
+    "citation_id": "596697eb1c46959d54ae3376b84e9d883e5b9b51861677d9d014b1fab0a52ebc",
+    "chapter_map_node_id": "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "b8f7da1a8c4002818894db6999acf2616a74ec7d77ef4c86cd9770fb75876d3d",
+     "63203729dc78cdf13f177c7045862be73718e6159e71e2eb84f29940f3788857",
+     "65b0ad257dcc34b5670b367d29f3641f2d4ceb65441d25816dd84413dcfd6acf",
+     "94ceb88e691ab37295788be372068c009d7ce01b1ca8b6f0465eb78faede5f6b",
+     "f4ed16cb13fc92a3ee9381cf5b0c57a84e1f75792c8f3ae5ae81bede6ec4fcd1",
+     "cf6d65844331ba75430e574f7063969e20a93da58aefd80ae6061b4e74263e81",
+     "931ae7d8d6cbcdd8eeb7217f1aa4416b68364e708fe3a2818ce24c6cfa98b62a",
+     "45b8ce969b53151eba4309efa5ad7c54c7db6b9bcbbdae009252b4bc54b8e182",
+     "548cec04a316970bf61705e8cdb81a4d0c475a6d716266fccb284afd8029d718",
+     "3cbca8e129837fed4a792da360d60a6801dc09db73341a10f73716f0d50cb279",
+     "9ccb6826131611a53eaaaf5cc347d5041db28098844f461ced1837cdd25d68e6"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.2 Chains, Branches and Rings\nBenzene - C\n6\nH6\nH\nC\nH-(\n-H\nH\nH\nH\nAll these carbon compounds which contain only carbon and hydrogen are called hydrocarbons. Among these, the saturated hydrocarbons are called alkanes. The unsaturated hydrocarbons which contain one or more double bonds are called alkenes. Those containing one or more triple bonds are called alkynes."
+   },
+   {
+    "citation_id": "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+    "chapter_map_node_id": "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+    "pages": [
+     8
+    ],
+    "source_element_ids": [
+     "4dbd08ff07454ad8751c4761c6129a86cbba80a9a887fda29c3b74b1bbe6d18f",
+     "52b46efede0ed5208c83dd7f85ceb5debe5e3bda94acce8d896025ffb2dfc028"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.3 Will you be my Friend?\nCarbon seems to be a very friendly element. So far we have been looking at compounds containing carbon and hydrogen only. But carbon also forms\nCarbon and its Compounds bonds with other elements such as halogens, oxygen, nitrogen and sulphur. In a hydrocarbon chain, one or more hydrogens can be replaced by these elements, such that the valency of carbon remains satisfied. In such compounds, the element replacing hydrogen is referred to as a heteroatom. These heteroatoms are also present in some groups as given in Table 4.3."
+   },
+   {
+    "citation_id": "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908",
+    "chapter_map_node_id": "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+    "pages": [
+     9
+    ],
+    "source_element_ids": [
+     "ed797eb31f45f7527291f34aa80e1e353fa0e049eeab766cdf517ce2fba1684e",
+     "8b3817e6d4030ce5f7a6ed806257d5099448b8eb4dfd3071dab9df98dd1b9689"
+    ],
+    "content_types": [
+     "caption",
+     "table"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.3 Will you be my Friend?\nHetero atom\nClass of compounds\nFormula of functional group\nCl/Br\nHalo- (Chloro/bromo) alkane\n-Cl, -Br (substitutes for hydrogen atom)\nOxygen\n1. Alcohol\n-OH\n2. Aldehyde\n3. Ketone\n4. Carboxylic acid\nTable 4.3 Some functional groups in carbon compounds"
+   },
+   {
+    "citation_id": "83ac761049fdecffa2a06d14a8b7b99c68047b54774e47b6302be671ca9e6eb0",
+    "chapter_map_node_id": "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+    "pages": [
+     9
+    ],
+    "source_element_ids": [
+     "aa401ad346e5a7fa3308bc9bcf0d1a5715675c4168e85bb111048c716848e660",
+     "d6e28cad0535e2cb0ffdb96c093aeb9c662d7bad6358d4ee29da6b7fb7e27c3a"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.4 Homologous Series\nYou have seen that carbon atoms can be linked together to form chains of varying lengths. These chains can be branched also. In addition, hydrogen atom or other atoms on these carbon chains can be replaced by any of the functional groups that we saw above. The presence of a functional group such as alcohol decides the properties of the carbon compound, regardless of the length of the carbon chain. For example, the chemical properties of CH 3 OH, C 2 H5 OH, C 3 H7 OH and C 4 H9 OH are all very similar. Hence, such a series of compounds in which the same functional group substitutes for hydrogen in a carbon chain is called a homologous series.\nLet us look at the homologous series that we saw earlier in Table 4.2. If we look at the formulae of successive compounds, say -"
+   },
+   {
+    "citation_id": "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53",
+    "chapter_map_node_id": "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+    "pages": [
+     9
+    ],
+    "source_element_ids": [
+     "a9515612ed48b6005be1edbd41aa0fb6d40ee8e964e8f5dc9f9d6f2f342c1044"
+    ],
+    "content_types": [
+     "code"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.4 Homologous Series\nCH4 and C 2 H6 -these differ by a -CH 2 - unit C2 H6 and C 3 H8 -these differ by a -CH 2 - unit"
+   },
+   {
+    "citation_id": "a73972f96aff8c33e4985d40329a2b6d9597bd175098db1d2556539ffb487cd7",
+    "chapter_map_node_id": "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+    "pages": [
+     9,
+     10
+    ],
+    "source_element_ids": [
+     "6ee936f5a1e2e9d176b3a51fe5d310ede60d3b48e837926f02b3bb2c554ec86c",
+     "17caefd0b63dfd23faf4d66cec062b71949f086b44bcd5d6b4620ea1a2d7148f",
+     "4164eb9ef01a4f29af388e8976cf8dd209b16383bd2634ed471c7bc9585ee773",
+     "bd016e9a0a4de2fd48ec9c9a411052c2eb267f0dec301c6f61c2d85beb174386",
+     "7afe03d6864f4dd100cdea60106dae668599d904469b5f338a1b86f117605d39"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.4 Homologous Series\nWhat is the difference between the next pair - propane and butane (C 4 H10 )? Can you find out the difference in molecular masses between these pairs (the atomic mass of carbon is 12 u and the atomic mass of hydrogen\nis 1 u)?\nSimilarly, take the homologous series for alkenes. The first member of the series is ethene which we have already come across in Section 4.2.1. What is the formula for ethene? The succeeding members have the formula C 3 H6 , C 4 H8 and C 5 H10 . Do these also differ by a -CH 2 -\nThese heteroatoms and the group containing these confer specific properties to the compound, regardless of the length and nature of the carbon chain and hence are called functional groups. Some important functional groups are given in the Table 4.3. Free valency or valencies of the group are shown by the single line. The functional group is attached to the carbon chain through this valency by replacing one hydrogen atom or atoms.\nunit? Do you see any relation between the number of carbon and hydrogen atoms in these compounds? The general formula for alkenes can be written as C n H2n , where n = 2, 3, 4. Can you similarly generate the general formula for alkanes and alkynes?"
+   },
+   {
+    "citation_id": "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd",
+    "chapter_map_node_id": "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+    "pages": [
+     10
+    ],
+    "source_element_ids": [
+     "0f1cf22df388ac805a12adf1ea39880833304670ec63b6cc8c405386d1019a28"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.4 Homologous Series\nAs the molecular mass increases in any homologous series, a gradation in physical properties is seen. This is because the melting and boiling points increase with increasing molecular mass. Other physical properties such as solubility in a particular solvent also show a similar gradation. But the chemical properties, which are determined solely by the functional group, remain similar in a homologous series."
+   },
+   {
+    "citation_id": "92f1f70e881ed5898c58a5093c823492fd34e2521fac0ad8d2bdd4e08464cf12",
+    "chapter_map_node_id": "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+    "pages": [
+     10
+    ],
+    "source_element_ids": [
+     "4602af23886ed178c6c9da80a966a313f2dcd0bff4ba2e48894ccb241a402734",
+     "3327807010a387462b2bcfdc6d054216058fd31db79949262060581e797096d2",
+     "13fc650fd6f969b1844f70ab35c63f5816dadf0a1ce89194e90227f117a525f3",
+     "a568136172cb4acd75453db1ee519d3b757a45e053532763fc68e68cb6a84229",
+     "8aac7a99ea795ab34d1942f21fb217c3be2ccf4fe36d9ca6ea94c8ded28546bf"
+    ],
+    "content_types": [
+     "activity",
+     "list_item",
+     "section_header"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.4 Homologous Series\nActivity 4.2\nActivity 4.2\n/square6 Calculate the difference in the formulae and molecular masses for (a) CH 3 OH and C 2 H5 OH (b) C 2 H5 OH and C 3 H7 OH, and (c) C 3 H7OH and C 4 H9 OH.\n/square6 Is there any similarity in these three?\n/square6 Arrange these alcohols in the order of increasing carbon atoms to get a family. Can we call this family a homologous series?\n/square6 Generate the homologous series for compounds containing up to four carbons for the other functional groups given in Table 4.3."
+   },
+   {
+    "citation_id": "0db0f6fe055b94256cc4a6832e006a3053a0e7a2abdaf8374cb4cdb139879472",
+    "chapter_map_node_id": "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa",
+    "pages": [
+     10
+    ],
+    "source_element_ids": [
+     "7a16113725547ebdac2f5bc0a62e8560f4219af1684a9a618ea358c97a71c4e7",
+     "f0ddd9d5e7d2d0282efa8c8e157363a4b699f62e3b640ebbc456921c4d76417c"
+    ],
+    "content_types": [
+     "text"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.5 Nomenclature of Carbon Compounds\nThe names of compounds in a homologous series are based on the name of the basic carbon chain modified by a 'prefix' 'phrase before' or 'suffix' 'phrase after' indicating the nature of the functional group. For example, the names of the alcohols taken in Activity 4.2 are methanol, ethanol, propanol and butanol.\nNaming a carbon compound can be done by the following method -"
+   },
+   {
+    "citation_id": "9e81ee60ee395aa342b2725bd9dbcb281a104a5050c7cf8ec610e2faef39691f",
+    "chapter_map_node_id": "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa",
+    "pages": [
+     10
+    ],
+    "source_element_ids": [
+     "2236216de585df7980590dc1d06854cdfd9612a2cad5ef125e6c5a2287596091",
+     "31634957585fdd2311174b7c24fd6319ec3db318a400e28afc1f28051f8103fb",
+     "8c9ada286c30e7fe2d4a269d4c50dca832813cb6fb4a3e804975dd3e968b25bc",
+     "0841bfca228380863c21ff4b19d4ff01b5647344e39d4c59a252ba03eca75b0e"
+    ],
+    "content_types": [
+     "list_item"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.5 Nomenclature of Carbon Compounds\n(i) Identify the number of carbon atoms in the compound. A compound having three carbon atoms would have the name propane.\n(ii) In case a functional group is present, it is indicated in the name of the compound with either a prefix or a suffix (as given in Table 4.4).\n(iii) If the name of the functional group is to be given as a suffix, and the suffix of the functional group begins with a vowel a, e, i, o, u, then the name of the carbon chain is modified by deleting the final 'e' and adding the appropriate suffix. For example, a three-carbon chain with a ketone group would be named in the following manner Propane - 'e' = propan + 'one' = propanone.\n(iv) If the carbon chain is unsaturated, then the final 'ane' in the name of the carbon chain is substituted by 'ene' or 'yne' as given in Table 4.4. For example, a three-carbon chain with a double bond would be called propene and if it has a triple bond, it would be called propyne."
+   },
+   {
+    "citation_id": "e74071216abd84e0af3d00dfbc2938c82cba5de0267737b6465e9aaa20394c15",
+    "chapter_map_node_id": "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa",
+    "pages": [
+     11
+    ],
+    "source_element_ids": [
+     "d3d361609ec40242ca5f3260300b0dc055065b3fdbf10de1173a569d4062cd8d",
+     "fcc2a7e90199acdaaa20da16ac3fc54d3d0e81712a8eb06bbe950e25a2df97af"
+    ],
+    "content_types": [
+     "caption",
+     "table"
+    ],
+    "text": "4.2 VERSATILE NATURE OF CARBON\n4.2.5 Nomenclature of Carbon Compounds\nbromo, etc. Prefix-chloro,\nClass of compounds\nPrefix/Suffix\nExample\n1. Halo alkane\nChloropropane\nBromopropane\n2. Alcohol\nSuffix - ol\nPropanol\n3. Aldehyde\nSuffix - al\nPropanal\n4. Ketone\nSuffix - one\nPropanone\n5. Carboxylic acid\nSuffix - oic acid\nPropanoic acid\n6. Alkenes\nSuffix - ene\nPropene\n7. Alkynes\nSuffix - yne\nPropyne\nTable 4.4 Nomenclature of organic compounds"
+   }
+  ],
+  "unsupported_content_policy": "Excluded by default: existing NCERT question/exercise chunks, picture-only chunks without captions, formula-only chunks, and diagram-image generation.",
+  "diagnostics": {
+   "mode": "chapter_map_subtree",
+   "chapter_slug": "carbon-and-its-compounds",
+   "requested_chapter_map_node_ids": [
+    "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+   ],
+   "included_chapter_map_node_ids": [
+    "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+    "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43",
+    "928083e9b1c81ab906ef72890701436514e00c781d43564805cb9b7315c4fd5d",
+    "d388ac9b3d600f99613c7c537ad7389ffd84d6b1b4ecb1de93e420bb22248a14",
+    "5ff433535b2f12a6571726b1b101b37bbdc2a2fe86edf44c235440ebb226b998",
+    "634c2f3647bc5b5b7a86240f2feb9c2d2b6532dcbf62967376434938fa7fbb9e",
+    "5c9964a11db6b6cd53e2f16916df7a48c0c530cfb858cb5f6f9321d64bb148fa"
+   ],
+   "included_chunk_count": 63,
+   "skipped_chunk_count": 14,
+   "context_char_count": 24078,
+   "context_char_limit": 25000,
+   "cap_reached": false,
+   "chunk_limit_reached": false
+  }
+ },
+ "questions": [
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "mcq",
+   "marks": 1,
+   "cognitive_level": "R",
+   "raw_text": "Which of the following organic compounds has a melting point of 290 K and a boiling point of 391 K?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Which of the following organic compounds has a melting point of 290 K and a boiling point of 391 K?"
+     }
+    ],
+    "options": [
+     {
+      "label": "A",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Chloroform"
+       }
+      ]
+     },
+     {
+      "label": "B",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Methane"
+       }
+      ]
+     },
+     {
+      "label": "C",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Acetic acid"
+       }
+      ]
+     },
+     {
+      "label": "D",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Ethanol"
+       }
+      ]
+     }
+    ]
+   },
+   "topic_names": [
+    "Melting points and boiling points of some compounds of carbon"
+   ],
+   "answer": "C",
+   "question_citation_ids": [
+    "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7"
+   ],
+   "answer_citation_ids": [
+    "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "mcq",
+   "marks": 1,
+   "cognitive_level": "U",
+   "raw_text": "Why do covalent compounds like methane generally exhibit low melting and boiling points?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Why do covalent compounds like methane generally exhibit low melting and boiling points?"
+     }
+    ],
+    "options": [
+     {
+      "label": "A",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "The covalent bonds inside the molecule are extremely weak."
+       }
+      ]
+     },
+     {
+      "label": "B",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "The forces of attraction between the molecules are not very strong."
+       }
+      ]
+     },
+     {
+      "label": "C",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "They readily split into positively and negatively charged ions."
+       }
+      ]
+     },
+     {
+      "label": "D",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "They contain a rigid three-dimensional network similar to diamond."
+       }
+      ]
+     }
+    ]
+   },
+   "topic_names": [
+    "4.1 BONDING IN CARBON - THE COVALENT BOND"
+   ],
+   "answer": "B",
+   "question_citation_ids": [
+    "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+    "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+   ],
+   "answer_citation_ids": [
+    "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+    "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "mcq",
+   "marks": 1,
+   "cognitive_level": "U",
+   "raw_text": "What is the primary reason why carbon does not form a C4+ cation?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "What is the primary reason why carbon does not form a C4+ cation?"
+     }
+    ],
+    "options": [
+     {
+      "label": "A",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "It has only two shells, making it impossible to lose electrons."
+       }
+      ]
+     },
+     {
+      "label": "B",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "It requires a large amount of energy to remove four electrons, leaving six protons holding only two electrons."
+       }
+      ]
+     },
+     {
+      "label": "C",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "The carbon nucleus cannot hold on to ten electrons."
+       }
+      ]
+     },
+     {
+      "label": "D",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Carbon has no valence electrons in its outermost shell."
+       }
+      ]
+     }
+    ]
+   },
+   "topic_names": [
+    "4.1 BONDING IN CARBON - THE COVALENT BOND"
+   ],
+   "answer": "B",
+   "question_citation_ids": [
+    "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+   ],
+   "answer_citation_ids": [
+    "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "mcq",
+   "marks": 1,
+   "cognitive_level": "R",
+   "raw_text": "How many shared pairs of electrons constitute a triple bond in a nitrogen molecule (N2)?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "How many shared pairs of electrons constitute a triple bond in a nitrogen molecule (N2)?"
+     }
+    ],
+    "options": [
+     {
+      "label": "A",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "One"
+       }
+      ]
+     },
+     {
+      "label": "B",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Two"
+       }
+      ]
+     },
+     {
+      "label": "C",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Three"
+       }
+      ]
+     },
+     {
+      "label": "D",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Four"
+       }
+      ]
+     }
+    ]
+   },
+   "topic_names": [
+    "4.1 BONDING IN CARBON - THE COVALENT BOND"
+   ],
+   "answer": "C",
+   "question_citation_ids": [
+    "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+   ],
+   "answer_citation_ids": [
+    "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "mcq",
+   "marks": 1,
+   "cognitive_level": "R",
+   "raw_text": "In diamond, each carbon atom is bonded to how many other carbon atoms to form a rigid three-dimensional structure?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "In diamond, each carbon atom is bonded to how many other carbon atoms to form a rigid three-dimensional structure?"
+     }
+    ],
+    "options": [
+     {
+      "label": "A",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Three"
+       }
+      ]
+     },
+     {
+      "label": "B",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Four"
+       }
+      ]
+     },
+     {
+      "label": "C",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Five"
+       }
+      ]
+     },
+     {
+      "label": "D",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Six"
+       }
+      ]
+     }
+    ]
+   },
+   "topic_names": [
+    "Allotropes of carbon"
+   ],
+   "answer": "B",
+   "question_citation_ids": [
+    "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+   ],
+   "answer_citation_ids": [
+    "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "mcq",
+   "marks": 1,
+   "cognitive_level": "R",
+   "raw_text": "Identify the carbon allotrope that is arranged in the shape of a football and named after an architect.",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Identify the carbon allotrope that is arranged in the shape of a football and named after an architect."
+     }
+    ],
+    "options": [
+     {
+      "label": "A",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Diamond"
+       }
+      ]
+     },
+     {
+      "label": "B",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Graphite"
+       }
+      ]
+     },
+     {
+      "label": "C",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "C-60 Buckminsterfullerene"
+       }
+      ]
+     },
+     {
+      "label": "D",
+      "content": [
+       {
+        "type": "paragraph",
+        "text": "Coal"
+       }
+      ]
+     }
+    ]
+   },
+   "topic_names": [
+    "Allotropes of carbon"
+   ],
+   "answer": "C",
+   "question_citation_ids": [
+    "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+   ],
+   "answer_citation_ids": [
+    "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "very_short_answer",
+   "marks": 2,
+   "cognitive_level": "R",
+   "raw_text": "Why is it difficult for a carbon atom to form a C4- anion by gaining four electrons?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Why is it difficult for a carbon atom to form a C4- anion by gaining four electrons?"
+     }
+    ]
+   },
+   "topic_names": [
+    "4.1 BONDING IN CARBON - THE COVALENT BOND"
+   ],
+   "answer": "It is difficult because the carbon nucleus possesses only six protons, making it extremely hard to hold on to ten electrons (meaning four extra electrons).",
+   "question_citation_ids": [
+    "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+   ],
+   "answer_citation_ids": [
+    "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "very_short_answer",
+   "marks": 2,
+   "cognitive_level": "U",
+   "raw_text": "Why are carbon compounds generally poor conductors of electricity?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Why are carbon compounds generally poor conductors of electricity?"
+     }
+    ]
+   },
+   "topic_names": [
+    "4.1 BONDING IN CARBON - THE COVALENT BOND"
+   ],
+   "answer": "In carbon compounds, electrons are shared between atoms to form covalent bonds. Since no charged particles or ions are generated during this sharing, these compounds do not conduct electricity.",
+   "question_citation_ids": [
+    "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+    "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+   ],
+   "answer_citation_ids": [
+    "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b",
+    "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "very_short_answer",
+   "marks": 2,
+   "cognitive_level": "R",
+   "raw_text": "Define the property of 'catenation' seen in carbon.",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Define the property of 'catenation' seen in carbon."
+     }
+    ]
+   },
+   "topic_names": [
+    "4.2 VERSATILE NATURE OF CARBON"
+   ],
+   "answer": "Catenation is the unique ability of carbon to form strong and stable covalent bonds with other atoms of carbon, giving rise to large molecules in the form of long chains, branched chains, or rings.",
+   "question_citation_ids": [
+    "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+   ],
+   "answer_citation_ids": [
+    "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "very_short_answer",
+   "marks": 2,
+   "cognitive_level": "U",
+   "raw_text": "Why does silicon not exhibit the property of catenation to the same extent as carbon, even though it lies in the same group?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Why does silicon not exhibit the property of catenation to the same extent as carbon, even though it lies in the same group?"
+     }
+    ]
+   },
+   "topic_names": [
+    "4.2 VERSATILE NATURE OF CARBON"
+   ],
+   "answer": "Silicon forms compounds with hydrogen that have chains of only up to seven or eight atoms, but these compounds are very reactive. In contrast, the carbon-carbon bond is exceedingly strong and stable, allowing exceptionally large networks to form.",
+   "question_citation_ids": [
+    "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+   ],
+   "answer_citation_ids": [
+    "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "very_short_answer",
+   "marks": 2,
+   "cognitive_level": "U",
+   "raw_text": "Explain why carbon forms exceptionally strong and stable covalent bonds with other elements.",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Explain why carbon forms exceptionally strong and stable covalent bonds with other elements."
+     }
+    ]
+   },
+   "topic_names": [
+    "4.2 VERSATILE NATURE OF CARBON"
+   ],
+   "answer": "One reason for the formation of strong bonds is the small size of the carbon atom. This small size enables its nucleus to hold on to the shared pairs of electrons strongly. Elements with bigger atoms form much weaker bonds.",
+   "question_citation_ids": [
+    "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+   ],
+   "answer_citation_ids": [
+    "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "short_answer",
+   "marks": 3,
+   "cognitive_level": "U",
+   "raw_text": "What are saturated and unsaturated hydrocarbon compounds? State which of these are generally more reactive and why.",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "What are saturated and unsaturated hydrocarbon compounds? State which of these are generally more reactive and why."
+     }
+    ]
+   },
+   "topic_names": [
+    "4.2 VERSATILE NATURE OF CARBON"
+   ],
+   "answer": "Saturated hydrocarbons are compounds containing only single bonds between the carbon atoms (e.g., alkanes). They are normally not very reactive.\n\nUnsaturated hydrocarbons are compounds containing one or more double or triple bonds between carbon atoms (e.g., alkenes and alkynes). These are more reactive than saturated compounds because the double or triple bonds are easier to link with other species.",
+   "question_citation_ids": [
+    "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+    "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+   ],
+   "answer_citation_ids": [
+    "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+    "8c086b7d82fa7f7881a043390d654e155c542e026958209bb3b36fff5476a34d"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "short_answer",
+   "marks": 3,
+   "cognitive_level": "An",
+   "raw_text": "Historically, what was the 'vital force' theory regarding organic compounds, and how was it disproved?",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "Historically, what was the 'vital force' theory regarding organic compounds, and how was it disproved?"
+     }
+    ]
+   },
+   "topic_names": [
+    "4.2 VERSATILE NATURE OF CARBON"
+   ],
+   "answer": "Originally, organic carbon compounds were extracted only from natural substances, leading to the hypothesis that they could only be formed within living systems. It was postulated that a mysterious 'vital force' was absolutely necessary to synthesize them. This theory was disproved in 1828 by Friedrich Wöhler, who chemically synthesized urea (an organic compound) inside a lab using the inorganic compound ammonium cyanate.",
+   "question_citation_ids": [
+    "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+   ],
+   "answer_citation_ids": [
+    "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "long_answer",
+   "marks": 5,
+   "cognitive_level": "An",
+   "raw_text": "What is the reason behind the versatile nature of carbon that enables it to form millions of compounds? Discuss the two major factors in detail.",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "What is the reason behind the versatile nature of carbon that enables it to form millions of compounds? Discuss the two major factors in detail."
+     }
+    ]
+   },
+   "topic_names": [
+    "4.2 VERSATILE NATURE OF CARBON"
+   ],
+   "answer": "The versatile nature of carbon and the large number of compounds it forms can be explained by two key physical and chemical factors:\n\n1. Catenation: Carbon has the unique ability to link up with other carbon atoms through strong, stable covalent bonds. This leads to the formation of incredibly long chains, branched skeletons, or closed rings. Furthermore, carbon-carbon linkages can be composed of single, double, or triple bonds, yielding highly varied saturated and unsaturated compounds. Other elements like silicon show poor catenation ability because their bonds are much more reactive and less stable.\n\n2. Tetravalency: Because carbon has four valence electrons, it is capable of bonding with up to four other atoms, such as hydrogen, oxygen, nitrogen, sulphur, chlorine, and other halogens. This gives rise to unique organic compounds with specific molecular properties depending on the heteroatoms attached.\n\nAdditionally, the small atomic size of carbon enables the nucleus to hold onto shared electron pairs firmly, making the resulting covalent bonds exceptionally sturdy and stable in comparison to compounds formed by larger elements.",
+   "question_citation_ids": [
+    "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+    "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+    "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+    "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+   ],
+   "answer_citation_ids": [
+    "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0",
+    "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+    "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+    "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  },
+  {
+   "chapter_slug": "carbon-and-its-compounds",
+   "qtype": "long_answer",
+   "marks": 5,
+   "cognitive_level": "U",
+   "raw_text": "What are functional groups? State how they attach to a hydrocarbon chain and explain how they determine the physical and chemical properties of organic families.",
+   "content": {
+    "stem": [
+     {
+      "type": "paragraph",
+      "text": "What are functional groups? State how they attach to a hydrocarbon chain and explain how they determine the physical and chemical properties of organic families."
+     }
+    ]
+   },
+   "topic_names": [
+    "4.2 VERSATILE NATURE OF CARBON"
+   ],
+   "answer": "1. Definition of Functional Groups and Heteroatoms: In a hydrocarbon chain, one or more hydrogen atoms can be substituted by other monovalent or polyvalent elements like oxygen, halogens (chlorine/bromine), nitrogen, or sulphur. The replacing single element is referred to as a heteroatom. These heteroatoms, either alone or with specific groups of atoms containing them, confer fixed properties to the compound and are called functional groups.\n\n2. Mode of Attachment: Functional groups attach to the carbon chain by replacing one or more hydrogen atoms. They link up through the free valencies of the group, which are represented by single lines in molecular formulae, ensuring the valency of the carbon skeleton remains fully satisfied.\n\n3. Determination of Properties: \n- Chemical Properties: The chemical reactivity of members in a family is determined solely by the functional group, regardless of the length and shape of the carbon chain (e.g., all alcohols like methanol, ethanol, and propanol perform identical chemical reactions).\n- Physical Properties: Gradation in physical characteristics like melting point, boiling point, and solubility is determined by the length and overall molecular mass of the carbon chain behind the functional group. As mass increases, physical forces like boiling points rise systematically.",
+   "question_citation_ids": [
+    "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+    "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908",
+    "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53",
+    "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+   ],
+   "answer_citation_ids": [
+    "6b4246f77b2be125a417ec8ff6e98e3788c9b515218e8a14c3fe15fba5efbbc9",
+    "d0ad5f449e1336d9fbc5c1dc251cf3da36ce1c73293517fa3044438d0ee83908",
+    "5767f993d367088c8653d196f4608b74aa721f66b6df50c8d1e35ead2247ee53",
+    "f4cabbc160d6b036b0ca56883c92927d47a42ec971f402c1de65edfe7719c4bd"
+   ],
+   "source": {
+    "type": "ai_generated",
+    "name": "question-generation"
+   }
+  }
+ ]
+}

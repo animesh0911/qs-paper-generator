@@ -1,0 +1,303 @@
+{
+ "golden_version": 1,
+ "scenario": "generation",
+ "rubric_name": "generation",
+ "rubric_version": "v1",
+ "run_id": "f0142df4a5a2",
+ "model_eval_id": "google/gemini-3.5-flash",
+ "verified_by": "animesh (confirmed agent-evidence review)",
+ "verified_at": "2026-07-10",
+ "items": [
+  {
+   "key": "i:0",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "mcq",
+    "marks": 1,
+    "cognitive_level": "R",
+    "raw_text": "Which of the following organic compounds has a melting point of 290 K and a boiling point of 391 K?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Which of the following organic compounds has a melting point of 290 K and a boiling point of 391 K?"
+      }
+     ],
+     "options": [
+      {
+       "label": "A",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Chloroform"
+        }
+       ]
+      },
+      {
+       "label": "B",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Methane"
+        }
+       ]
+      },
+      {
+       "label": "C",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Acetic acid"
+        }
+       ]
+      },
+      {
+       "label": "D",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Ethanol"
+        }
+       ]
+      }
+     ]
+    },
+    "topic_names": [
+     "Melting points and boiling points of some compounds of carbon"
+    ],
+    "answer": "C",
+    "question_citation_ids": [
+     "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7"
+    ],
+    "answer_citation_ids": [
+     "4469ad0d3298de8e47071d2a9b3b7f92c81bceb8d8ada7d5f33425a896740ce7"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nCompound\nMelting point (K)\nBoiling point (K)\nAcetic acid (CH 3 COOH)\n290\n391\nChloroform (CHCl 3 )\n209\n334\nEthanol (CH 3 CH 2 OH)\n156\n351\nMethane (CH 4 )\n90\n111\nTable 4.1 Melting points and boiling points of some compounds of carbon",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 2,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 2
+   },
+   "human_flags": [
+    "duplicate_of_excerpt_sentence"
+   ],
+   "note": "self 2 / diff 2: answering requires memorized Table 4.1 constants (acetic acid 290 K / 391 K) — data-dependence the stem does not reproduce; not a plausible board item. Judge missed the self-containedness failure (scored it high)."
+  },
+  {
+   "key": "i:3",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "mcq",
+    "marks": 1,
+    "cognitive_level": "R",
+    "raw_text": "How many shared pairs of electrons constitute a triple bond in a nitrogen molecule (N2)?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "How many shared pairs of electrons constitute a triple bond in a nitrogen molecule (N2)?"
+      }
+     ],
+     "options": [
+      {
+       "label": "A",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "One"
+        }
+       ]
+      },
+      {
+       "label": "B",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Two"
+        }
+       ]
+      },
+      {
+       "label": "C",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Three"
+        }
+       ]
+      },
+      {
+       "label": "D",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Four"
+        }
+       ]
+      }
+     ]
+    },
+    "topic_names": [
+     "4.1 BONDING IN CARBON - THE COVALENT BOND"
+    ],
+    "answer": "C",
+    "question_citation_ids": [
+     "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+    ],
+    "answer_citation_ids": [
+     "e58b0bf7ad946fe2bd9606339a11ff76b642ec9a8b65ddc23e3b041e66974165"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nWhat would happen in the case of a diatomic molecule of nitrogen? Nitrogen has the atomic number 7. What would be its electronic configuration and its combining capacity? In order to attain an octet, each nitrogen atom in a molecule of nitrogen contributes three electrons giving rise to three shared pairs of electrons. This is said to constitute a triple bond between the two atoms. The electron dot structure of N 2 and its triple bond can be depicted as in Fig. 4.4.\nA molecule of ammonia has the formula NH 3 . Can you draw the electron dot structure for this molecule showing how all four atoms achieve noble gas configuration? Will the molecule have single, double or triple bonds?\nLet us now take a look at methane, which is a compound of carbon. Methane is widely used as a fuel and is a major component of bio-gas and Compressed Natural Gas (CNG). It is also one of the simplest compounds formed by carbon. Methane has a formula CH 4 . Hydrogen, as you know, has a valency of 1. Carbon is tetravalent because it has four valence electrons. In order to achieve noble gas configuration, carbon shares these electrons with four atoms of hydrogen as shown in Fig. 4.5.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.1: 'three shared pairs of electrons... said to constitute a triple bond' (N2, Fig 4.4) — C correct; all 5s."
+  },
+  {
+   "key": "i:6",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "very_short_answer",
+    "marks": 2,
+    "cognitive_level": "R",
+    "raw_text": "Why is it difficult for a carbon atom to form a C4- anion by gaining four electrons?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Why is it difficult for a carbon atom to form a C4- anion by gaining four electrons?"
+      }
+     ]
+    },
+    "topic_names": [
+     "4.1 BONDING IN CARBON - THE COVALENT BOND"
+    ],
+    "answer": "It is difficult because the carbon nucleus possesses only six protons, making it extremely hard to hold on to ten electrons (meaning four extra electrons).",
+    "question_citation_ids": [
+     "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+    ],
+    "answer_citation_ids": [
+     "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\n(i) It could gain four electrons forming C 4- anion. But it would be difficult for the nucleus with six protons to hold on to ten electrons, that is, four extra electrons.\n(ii) It could lose four electrons forming C 4+ cation. But it would require a large amount of energy to remove four electrons leaving behind a carbon cation with six protons in its nucleus holding on to just two electrons.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 4
+   },
+   "human_flags": [
+    "duplicate_of_excerpt_sentence"
+   ],
+   "note": "Verified vs 4.1 point (i): 'difficult for the nucleus with six protons to hold on to ten electrons' — correct; difficulty -1: verbatim restatement (overlaps batch-30 item i:24)."
+  },
+  {
+   "key": "i:9",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "very_short_answer",
+    "marks": 2,
+    "cognitive_level": "U",
+    "raw_text": "Why does silicon not exhibit the property of catenation to the same extent as carbon, even though it lies in the same group?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Why does silicon not exhibit the property of catenation to the same extent as carbon, even though it lies in the same group?"
+      }
+     ]
+    },
+    "topic_names": [
+     "4.2 VERSATILE NATURE OF CARBON"
+    ],
+    "answer": "Silicon forms compounds with hydrogen that have chains of only up to seven or eight atoms, but these compounds are very reactive. In contrast, the carbon-carbon bond is exceedingly strong and stable, allowing exceptionally large networks to form.",
+    "question_citation_ids": [
+     "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+    ],
+    "answer_citation_ids": [
+     "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.2 VERSATILE NATURE OF CARBON\nNo other element exhibits the property of catenation to the extent seen in carbon compounds. Silicon forms compounds with hydrogen which have chains of upto seven or eight atoms, but these compounds are very reactive. The carbon-carbon bond is very strong and hence stable. This gives us the large number of compounds with many carbon atoms linked to each other.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.2: Si-H chains up to 7-8 atoms + very reactive, C-C bond strong and stable; 'exceptionally large networks' is a mild consistent paraphrase; all 5s."
+  },
+  {
+   "key": "i:12",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "short_answer",
+    "marks": 3,
+    "cognitive_level": "An",
+    "raw_text": "Historically, what was the 'vital force' theory regarding organic compounds, and how was it disproved?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Historically, what was the 'vital force' theory regarding organic compounds, and how was it disproved?"
+      }
+     ]
+    },
+    "topic_names": [
+     "4.2 VERSATILE NATURE OF CARBON"
+    ],
+    "answer": "Originally, organic carbon compounds were extracted only from natural substances, leading to the hypothesis that they could only be formed within living systems. It was postulated that a mysterious 'vital force' was absolutely necessary to synthesize them. This theory was disproved in 1828 by Friedrich Wöhler, who chemically synthesized urea (an organic compound) inside a lab using the inorganic compound ammonium cyanate.",
+    "question_citation_ids": [
+     "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+    ],
+    "answer_citation_ids": [
+     "f072c24838ad66f4c219eebfc736c7dd9f26e0479a3644ad8f37045b507a53b5"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.2 VERSATILE NATURE OF CARBON\nThe two characteristic features seen in carbon, that is, tetravalency and catenation, put together give rise to a large number of compounds. Many have the same non-carbon atom or group of atoms attached to different carbon chains. These compounds were initially extracted from natural substances and it was thought that these carbon compounds or organic compounds could only be formed within a living system. That is, it was postulated that a 'vital force' was necessary for their synthesis. Friedrich Wöhler disproved this in 1828 by preparing urea from ammonium cyanate. But carbon compounds, except for carbides, oxides of carbon, carbonate and hydrogencarbonate salts continue to be studied under organic chemistry.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 4
+   },
+   "human_flags": [],
+   "note": "Verified vs the 4.2 'Organic compounds' box: vital-force postulate, Wöhler 1828 urea from ammonium cyanate — exact; difficulty -1: history from a side box is an unusual board ask."
+  }
+ ],
+ "provenance": "Graded 2026-07-10 in-session: claude-fable-5 verified each item against the committed chapter source (content/ncert/jesc104, sections 4.1-4.2) and proposed scores with quoted evidence; Animesh confirmed/overrode each item via option cards. Human-confirmed from agent evidence, not blind human grading."
+}

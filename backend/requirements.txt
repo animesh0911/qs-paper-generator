@@ -21,3 +21,10 @@ langchain-anthropic>=0.3,<0.4
 langchain-openai>=0.3,<0.4
 langchain-ollama>=0.3,<0.4
 langgraph-checkpoint-postgres>=2.0,<3.0
+
+# Eval measurement layer (evals/deepeval_suite). Exact pin: 4.0.8 was yanked
+# on PyPI, and the judge/metric API surface moves between minors. Its pytest
+# plugin imports deepeval settings at collection time, which is why compose
+# defaults OPENROUTER_BASE_URL to the canonical URL (empty string fails
+# validation); telemetry is opted out in evals/deepeval_suite/__init__.py.
+deepeval==4.0.9

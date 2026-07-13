@@ -25,7 +25,7 @@ from dataclasses import dataclass
 
 # Stamp of when the verified prices below were last checked against provider
 # price pages. Bump whenever any rate is edited.
-PRICING_AS_OF = "2026-06-13"  # docs/common/question_generation_model_cost_report.md
+PRICING_AS_OF = "2026-07-10"  # openrouter.ai/api/v1/models live listing
 
 # FX planning rate from docs/pricing_model.md ("FX assumption: ₹88 / USD").
 INR_PER_USD = 88.0
@@ -61,52 +61,65 @@ class OcrEngineSpec:
 
 
 # ---------------------------------------------------------------------------
-# The candidate matrix (from the eval brief). Verified rates come from the
-# June 2026 model cost report; everything else is deliberately None until a
-# human checks the provider price page (tracked as an implementation issue).
+# The candidate matrix (from the eval brief). All chat candidates route via
+# OpenRouter (the deploy convention — one OPENROUTER_API_KEY, no per-provider
+# keys); model ids and rates were read from the live openrouter.ai/api/v1/models
+# listing on PRICING_AS_OF. The one exception (gemini-2.5-flash-lite) is not
+# listed on OpenRouter and stays unverified until priced natively or dropped.
 # ---------------------------------------------------------------------------
+
+_OPENROUTER_LISTING = "openrouter.ai/api/v1/models listing, checked 2026-07-10"
 
 MODELS: dict[str, ModelSpec] = {
     spec.eval_id: spec
     for spec in (
         ModelSpec(
             eval_id="google/gemini-3.5-flash",
-            provider="gemini",
-            model="gemini-3.5-flash",
+            provider="openrouter",
+            model="google/gemini-3.5-flash",
             usd_per_1m_input=1.50,
             usd_per_1m_output=9.00,
             usd_per_1m_cache_read=0.15,
             pricing_verified=True,
-            notes="Production default (ADR-0004/0005). Rates: June 2026 cost report.",
+            notes=(
+                "Production default (ADR-0004/0005). Rates: "
+                f"{_OPENROUTER_LISTING}; identical to the native-API rates in "
+                "the June 2026 cost report."
+            ),
         ),
         ModelSpec(
             eval_id="deepseek-v4-flash",
-            provider="deepseek",
-            model="deepseek-v4-flash",
-            usd_per_1m_input=0.14,
-            usd_per_1m_output=0.28,
-            usd_per_1m_cache_read=0.0028,
+            provider="openrouter",
+            model="deepseek/deepseek-v4-flash",
+            usd_per_1m_input=0.09,
+            usd_per_1m_output=0.18,
+            usd_per_1m_cache_read=0.018,
             pricing_verified=True,
             notes=(
-                "Rates: June 2026 cost report (official API, cache-miss input). "
-                "VERIFY exact API model id against DeepSeek docs before first run."
+                f"Rates: {_OPENROUTER_LISTING}. Cheaper than DeepSeek's "
+                "native API (June 2026 report: 0.14/0.28) — reprice if "
+                "routing ever moves off OpenRouter."
             ),
         ),
         ModelSpec(
             eval_id="deepseek-v4-pro",
-            provider="deepseek",
-            model="deepseek-v4-pro",
-            usd_per_1m_input=None,
-            usd_per_1m_output=None,
-            notes="VERIFY model id + rates on DeepSeek price page.",
+            provider="openrouter",
+            model="deepseek/deepseek-v4-pro",
+            usd_per_1m_input=0.435,
+            usd_per_1m_output=0.87,
+            usd_per_1m_cache_read=0.003625,
+            pricing_verified=True,
+            notes=f"Rates: {_OPENROUTER_LISTING}.",
         ),
         ModelSpec(
             eval_id="google/gemini-3.1-flash-lite",
-            provider="gemini",
-            model="gemini-3.1-flash-lite",
-            usd_per_1m_input=None,
-            usd_per_1m_output=None,
-            notes="VERIFY rates on Google AI Studio price page.",
+            provider="openrouter",
+            model="google/gemini-3.1-flash-lite",
+            usd_per_1m_input=0.25,
+            usd_per_1m_output=1.50,
+            usd_per_1m_cache_read=0.025,
+            pricing_verified=True,
+            notes=f"Rates: {_OPENROUTER_LISTING}.",
         ),
         ModelSpec(
             eval_id="google/gemini-2.5-flash-lite",
@@ -114,42 +127,60 @@ MODELS: dict[str, ModelSpec] = {
             model="gemini-2.5-flash-lite",
             usd_per_1m_input=None,
             usd_per_1m_output=None,
-            notes="VERIFY rates on Google AI Studio price page.",
+            notes=(
+                "Not listed on OpenRouter (checked 2026-07-10), so this stays "
+                "on the native gemini provider (needs GEMINI_API_KEY) with "
+                "rates unverified — price from the Google AI Studio page or "
+                "drop it from the matrix."
+            ),
         ),
         ModelSpec(
             eval_id="gpt-oss-120b",
             provider="openrouter",
             model="openai/gpt-oss-120b",
-            usd_per_1m_input=None,
-            usd_per_1m_output=None,
+            usd_per_1m_input=0.036,
+            usd_per_1m_output=0.18,
+            pricing_verified=True,
             notes=(
-                "Open-weights via OpenRouter (no native seam provider). "
-                "VERIFY routed price on openrouter.ai/models; varies by host."
+                f"Rates: {_OPENROUTER_LISTING} (default routing; open-weights "
+                "prices vary by host, so re-check before large runs)."
             ),
         ),
         ModelSpec(
             eval_id="gpt-oss-20b",
             provider="openrouter",
             model="openai/gpt-oss-20b",
-            usd_per_1m_input=None,
-            usd_per_1m_output=None,
-            notes="Open-weights via OpenRouter. VERIFY routed price.",
+            usd_per_1m_input=0.029,
+            usd_per_1m_output=0.14,
+            pricing_verified=True,
+            notes=(
+                f"Rates: {_OPENROUTER_LISTING} (default routing; open-weights "
+                "prices vary by host, so re-check before large runs)."
+            ),
         ),
         ModelSpec(
             eval_id="qwen-3.7-plus",
             provider="openrouter",
-            model="qwen/qwen-3.7-plus",
-            usd_per_1m_input=None,
-            usd_per_1m_output=None,
-            notes="VERIFY OpenRouter model id + routed price.",
+            model="qwen/qwen3.7-plus",
+            usd_per_1m_input=0.32,
+            usd_per_1m_output=1.28,
+            usd_per_1m_cache_read=0.064,
+            pricing_verified=True,
+            notes=(
+                f"Rates: {_OPENROUTER_LISTING}. NB the listed id is "
+                "qwen/qwen3.7-plus — the previously guessed qwen/qwen-3.7-plus "
+                "does not exist."
+            ),
         ),
         ModelSpec(
             eval_id="qwen-3.7-max",
             provider="openrouter",
-            model="qwen/qwen-3.7-max",
-            usd_per_1m_input=None,
-            usd_per_1m_output=None,
-            notes="VERIFY OpenRouter model id + routed price.",
+            model="qwen/qwen3.7-max",
+            usd_per_1m_input=1.25,
+            usd_per_1m_output=3.75,
+            usd_per_1m_cache_read=0.25,
+            pricing_verified=True,
+            notes=f"Rates: {_OPENROUTER_LISTING}. Listed id is qwen/qwen3.7-max.",
         ),
     )
 }

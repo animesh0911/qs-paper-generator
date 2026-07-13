@@ -1,19 +1,26 @@
 [
   {
-    "_comment": "Grounded generation fixtures. chapter_map_node_ids are stable_node_ids from the seeded chapter map; leave empty to use node_selector at runtime (resolved against the live ChapterMapNode table so the fixture survives re-imports). TODO(implementation issue: generation eval): pin explicit node ids once the corpus seed is final.",
+    "_comment": "Grounded generation fixtures. chapter_map_node_ids are pinned stable_node_ids (SECTION nodes) from the seeded chapter map, frozen so a run resolves identically regardless of re-imports; node_selector documents how they were chosen and stays as the runtime fallback for fixtures that leave chapter_map_node_ids empty.",
     "fixture_id": "carbon-compounds-grounded",
     "chapter_slug": "carbon-and-its-compounds",
     "source_document": "jesc104",
-    "chapter_map_node_ids": [],
+    "chapter_map_node_ids": [
+      "084b2321cf4014a97cacd8bef28ecdad7179a5b9bf2780c4700269d3ead8d6df",
+      "ef1e9dcd30dfc5300e40290da35a891db5f90a654a4df2b1d9e4e3a7d0c23f43"
+    ],
     "node_selector": {"strategy": "first_major_topics", "count": 2},
     "topic_names": [],
     "difficulty_preset": "balanced"
   },
   {
-    "fixture_id": "light-reflection-grounded",
-    "chapter_slug": "light-reflection-and-refraction",
+    "_comment": "jesc110 is 'The Human Eye and the Colourful World' (chapter 10), not light-reflection-and-refraction (chapter 9, jesc109) — no jesc109 canonical artifact is committed yet, so light-reflection-and-refraction cannot be seeded/pinned until that source is sourced and extracted separately.",
+    "fixture_id": "human-eye-grounded",
+    "chapter_slug": "human-eye-and-the-colourful-world",
     "source_document": "jesc110",
-    "chapter_map_node_ids": [],
+    "chapter_map_node_ids": [
+      "04e58fdb903bb2cd0f3c47e3103e31a4c467b5f9662aca2f69b416a55c536feb",
+      "da916292bcf3abcd254428bb3cf00afd718f9a3b1fb760227618441a9ad27146"
+    ],
     "node_selector": {"strategy": "first_major_topics", "count": 2},
     "topic_names": [],
     "difficulty_preset": "balanced"

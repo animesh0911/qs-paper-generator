@@ -43,4 +43,4 @@ def test_estimate_scales_with_units_and_none_propagates():
         )
     ]
     assert estimate_units_usd(spec, units) == pytest.approx(2 * 0.06075)
-    assert estimate_units_usd(get_model("qwen-3.7-max"), units) is None
+    assert estimate_units_usd(get_model("google/gemini-2.5-flash-lite"), units) is None

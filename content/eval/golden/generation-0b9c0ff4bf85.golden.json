@@ -1,0 +1,305 @@
+{
+ "golden_version": 1,
+ "scenario": "generation",
+ "rubric_name": "generation",
+ "rubric_version": "v1",
+ "run_id": "0b9c0ff4bf85",
+ "model_eval_id": "google/gemini-3.5-flash",
+ "verified_by": "animesh (confirmed agent-evidence review)",
+ "verified_at": "2026-07-10",
+ "items": [
+  {
+   "key": "i:0",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "mcq",
+    "marks": 1,
+    "cognitive_level": "U",
+    "raw_text": "Most carbon compounds have low melting and boiling points compared to ionic compounds. What can we conclude from this observation?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Most carbon compounds have low melting and boiling points compared to ionic compounds. What can we conclude from this observation?"
+      }
+     ],
+     "options": [
+      {
+       "label": "A",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "The forces of attraction between the molecules are not very strong."
+        }
+       ]
+      },
+      {
+       "label": "B",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "The carbon compounds contain highly stable and strong ionic bonds."
+        }
+       ]
+      },
+      {
+       "label": "C",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Carbon compounds readily break up into ions when heated slightly."
+        }
+       ]
+      },
+      {
+       "label": "D",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "The molecules are bound together by strong electrostatic forces."
+        }
+       ]
+      }
+     ]
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ],
+    "answer": "A",
+    "question_citation_ids": [
+     "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+    ],
+    "answer_citation_ids": [
+     "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nIn the previous Chapter, we have studied the properties of ionic compounds. We saw that ionic compounds have high melting and boiling points and conduct electricity in solution or in the molten state. We also\nScience saw how the nature of bonding in ionic compounds explains these properties. Let us now study the properties of some carbon compounds. Most carbon compounds are poor conductors of electricity as we have seen in Chapter 2. From the data given in Table 4.1 on the boiling and melting points of the carbon compounds, we find that these compounds have low melting and boiling points as compared to ionic compounds (Chapter 3). We can conclude that the forces of attraction between the molecules are not very strong. Since these compounds are largely non-conductors of electricity, we can conclude that the bonding in these compounds does not give rise to any ions.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 4
+   },
+   "human_flags": [
+    "duplicate_of_excerpt_sentence"
+   ],
+   "note": "Verified vs 4.1: 'We can conclude that the forces of attraction between the molecules are not very strong' — answer A correct; difficulty -1 because option A is a near-verbatim lift of that sentence."
+  },
+  {
+   "key": "i:6",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "mcq",
+    "marks": 1,
+    "cognitive_level": "U",
+    "raw_text": "How many double bonds are present in the structure of graphite?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "How many double bonds are present in the structure of graphite?"
+      }
+     ],
+     "options": [
+      {
+       "label": "A",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "All bonds in graphite are double bonds."
+        }
+       ]
+      },
+      {
+       "label": "B",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "There are no double bonds; only single bonds are present."
+        }
+       ]
+      },
+      {
+       "label": "C",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "One of the three bonds of each carbon is a double bond."
+        }
+       ]
+      },
+      {
+       "label": "D",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Two out of four bonds of each carbon are double bonds."
+        }
+       ]
+      }
+     ]
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ],
+    "answer": "C",
+    "question_citation_ids": [
+     "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+    ],
+    "answer_citation_ids": [
+     "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThe element carbon occurs in different forms in nature with widely varying physical properties. Both diamond and graphite are formed by carbon atoms, the difference lies in the manner in which the carbon atoms are bonded to one another. In diamond, each carbon atom is bonded to four other carbon atoms forming a rigid three-dimensional structure. In graphite, each carbon atom is bonded to three other carbon atoms in the same plane giving a hexagonal array. One of these bonds is a double-bond, and thus the valency of carbon is satisfied. Graphite structure is formed by the hexagonal arrays being placed in layers one above the other.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 4,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.1 allotropes: 'each carbon atom is bonded to three other carbon atoms... One of these bonds is a double-bond' — C correct; qtype -1 because the stem asks 'how many' while the options are statements (stem/option mismatch)."
+  },
+  {
+   "key": "i:12",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "very_short_answer",
+    "marks": 2,
+    "cognitive_level": "U",
+    "raw_text": "Why does a hydrogen molecule have a single covalent bond rather than a double bond?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Why does a hydrogen molecule have a single covalent bond rather than a double bond?"
+      }
+     ]
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ],
+    "answer": "Because hydrogen has only one valence electron in its K shell and needs only one more electron to achieve the stable configuration of helium (two electrons). Therefore, two hydrogen atoms share only one pair of electrons, forming a single bond.",
+    "question_citation_ids": [
+     "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd"
+    ],
+    "answer_citation_ids": [
+     "800f89c574c0c0b3b140410bd24870a34e8947738dc8f9cbb447873f41dd5efd"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nCarbon overcomes this problem by sharing its valence electrons with other atoms of carbon or with atoms of other elements. Not just carbon, but many other elements form molecules by sharing electrons in this manner. The shared electrons 'belong' to the outermost shells of both the atoms and lead to both atoms attaining the noble gas configuration. Before going on to compounds of carbon, let us look at some simple molecules formed by the sharing of valence electrons.\nThe simplest molecule formed in this manner is that of hydrogen. As you have learnt earlier, the atomic number of hydrogen is 1. Hence hydrogen has one electron in its K shell and it requires one more electron to fill the K shell. So two hydrogen atoms share their electrons to form a molecule of hydrogen, H 2 . This allows each hydrogen atom to attain the electronic configuration of the nearest noble gas, helium, which has two electrons in its K shell. We can depict this using dots or crosses to represent valence electrons (Fig. 4.1).",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.1: H has one K-shell electron, needs one more for helium config, one shared pair = single covalent bond. Fully supported why-question; all 5s."
+  },
+  {
+   "key": "i:18",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "very_short_answer",
+    "marks": 2,
+    "cognitive_level": "U",
+    "raw_text": "Why do silicon compounds with hydrogen have shorter chains and show high reactivity compared to carbon compounds?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Why do silicon compounds with hydrogen have shorter chains and show high reactivity compared to carbon compounds?"
+      }
+     ]
+    },
+    "topic_names": [
+     "Versatile Nature of Carbon"
+    ],
+    "answer": "Unlike the exceptionally strong and stable carbon-carbon bonds, silicon-silicon bonds are much weaker and highly reactive, which limits silicon chains to only seven or eight atoms.",
+    "question_citation_ids": [
+     "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+    ],
+    "answer_citation_ids": [
+     "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.2 VERSATILE NATURE OF CARBON\nNo other element exhibits the property of catenation to the extent seen in carbon compounds. Silicon forms compounds with hydrogen which have chains of upto seven or eight atoms, but these compounds are very reactive. The carbon-carbon bond is very strong and hence stable. This gives us the large number of compounds with many carbon atoms linked to each other.",
+   "human_scores": {
+    "ncert_fidelity": 4,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 4,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [
+    "ungrounded_claim"
+   ],
+   "note": "fid/ans -1: answer says Si-Si *bonds* are 'much weaker and highly reactive'; textbook 4.2 says the *compounds* are very reactive, and supports 'weaker' only indirectly via 'bonds formed by elements having bigger atoms are much weaker' — attribution drift."
+  },
+  {
+   "key": "i:24",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "short_answer",
+    "marks": 3,
+    "cognitive_level": "U",
+    "raw_text": "Explain why carbon cannot complete its octet by either gaining four electrons to form C4- or losing four electrons to form C4+.",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Explain why carbon cannot complete its octet by either gaining four electrons to form C4- or losing four electrons to form C4+."
+      }
+     ]
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ],
+    "answer": "1. C4- Anion formation: It is highly difficult for the carbon nucleus with only six protons to hold on to ten electrons (four extra electrons).\n2. C4+ Cation formation: Removing four electrons requires an exceptionally large amount of energy, leaving behind a heavily positive carbon cation with six protons holding just two interior electrons.",
+    "question_citation_ids": [
+     "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+    ],
+    "answer_citation_ids": [
+     "98b384d41bc098fb4bceaa98269f1f6862e16f44e46f494b1ae01a6f1da4b228"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\n(i) It could gain four electrons forming C 4- anion. But it would be difficult for the nucleus with six protons to hold on to ten electrons, that is, four extra electrons.\n(ii) It could lose four electrons forming C 4+ cation. But it would require a large amount of energy to remove four electrons leaving behind a carbon cation with six protons in its nucleus holding on to just two electrons.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 4
+   },
+   "human_flags": [
+    "duplicate_of_excerpt_sentence"
+   ],
+   "note": "Verified vs 4.1 points (i)/(ii) on C4-/C4+ — exact match; difficulty -1 because the answer restates the excerpt's two points."
+  }
+ ],
+ "provenance": "Graded 2026-07-10 in-session: claude-fable-5 verified each item against the committed chapter source (content/ncert/jesc104, sections 4.1-4.2) and proposed scores with quoted evidence; Animesh confirmed/overrode each item via option cards. Human-confirmed from agent evidence, not blind human grading."
+}

@@ -1,0 +1,344 @@
+{
+ "golden_version": 1,
+ "scenario": "generation",
+ "rubric_name": "generation",
+ "rubric_version": "v1",
+ "run_id": "783c21416f02",
+ "model_eval_id": "deepseek-v4-flash",
+ "verified_by": "animesh (confirmed agent-evidence review)",
+ "verified_at": "2026-07-10",
+ "items": [
+  {
+   "key": "i:0",
+   "payload": {
+    "answer": "B",
+    "answer_citation_ids": [
+     "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+    ],
+    "chapter_slug": "carbon-and-its-compounds",
+    "cognitive_level": "R",
+    "content": {
+     "options": [
+      {
+       "content": [
+        {
+         "text": "a bond formed by the transfer of electrons from one atom to another",
+         "type": "paragraph"
+        }
+       ],
+       "label": "A"
+      },
+      {
+       "content": [
+        {
+         "text": "a bond formed by the sharing of an electron pair between two atoms",
+         "type": "paragraph"
+        }
+       ],
+       "label": "B"
+      },
+      {
+       "content": [
+        {
+         "text": "a bond formed by the attraction of opposite charges between ions",
+         "type": "paragraph"
+        }
+       ],
+       "label": "C"
+      },
+      {
+       "content": [
+        {
+         "text": "a bond formed by the free movement of electrons in a metallic lattice",
+         "type": "paragraph"
+        }
+       ],
+       "label": "D"
+      }
+     ],
+     "stem": [
+      {
+       "text": "What is a covalent bond?",
+       "type": "paragraph"
+      }
+     ]
+    },
+    "marks": 1,
+    "qtype": "mcq",
+    "question_citation_ids": [
+     "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+    ],
+    "raw_text": "What is a covalent bond?",
+    "source": {
+     "name": "question-generation",
+     "type": "ai_generated"
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ]
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nSuch bonds which are formed by the sharing of an electron pair between two atoms are known as covalent bonds. Covalently bonded molecules are seen to have strong bonds within the molecule, but inter molecular forces are weak. This gives rise to the low melting and boiling points of these compounds. Since the electrons are shared between atoms and no charged particles are formed, such covalent compounds are generally poor conductors of electricity.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 4
+   },
+   "human_flags": [
+    "duplicate_of_excerpt_sentence"
+   ],
+   "note": "Verified vs 4.1: 'bonds which are formed by the sharing of an electron pair between two atoms are known as covalent bonds' — B correct; difficulty -1 for the verbatim definition as option text."
+  },
+  {
+   "key": "i:3",
+   "payload": {
+    "answer": "B",
+    "answer_citation_ids": [
+     "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+    ],
+    "chapter_slug": "carbon-and-its-compounds",
+    "cognitive_level": "U",
+    "content": {
+     "options": [
+      {
+       "content": [
+        {
+         "text": "Diamond",
+         "type": "paragraph"
+        }
+       ],
+       "label": "A"
+      },
+      {
+       "content": [
+        {
+         "text": "Graphite",
+         "type": "paragraph"
+        }
+       ],
+       "label": "B"
+      },
+      {
+       "content": [
+        {
+         "text": "Fullerene",
+         "type": "paragraph"
+        }
+       ],
+       "label": "C"
+      },
+      {
+       "content": [
+        {
+         "text": "All of these",
+         "type": "paragraph"
+        }
+       ],
+       "label": "D"
+      }
+     ],
+     "stem": [
+      {
+       "text": "Which allotrope of carbon is a very good conductor of electricity?",
+       "type": "paragraph"
+      }
+     ]
+    },
+    "marks": 1,
+    "qtype": "mcq",
+    "question_citation_ids": [
+     "d2a54206e88cb33f4d34e250bb715bfff876629c673585db8bf9b2d7b99218f6"
+    ],
+    "raw_text": "Which allotrope of carbon is a very good conductor of electricity?",
+    "source": {
+     "name": "question-generation",
+     "type": "ai_generated"
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ]
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThese two different structures result in diamond and graphite having very different physical properties even though their chemical properties are the same. Diamond is the hardest substance known while graphite is smooth and slippery. Graphite is also a very good conductor of electricity unlike other non-metals that you studied in the previous Chapter.\nDiamonds can be synthesised by subjecting pure carbon to very high pressure and temperature. These synthetic diamonds are small but are otherwise indistinguishable from natural diamonds.\nFullerenes form another class of carbon allotropes. The first one to be identified was C-60 which has carbon atoms arranged in the shape of a football. Since this looked like the geodesic dome designed by the US architect Buckminster Fuller, the molecule was named fullerene.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.1 allotropes: 'Graphite is also a very good conductor of electricity' — B correct, good distractors; all 5s."
+  },
+  {
+   "key": "i:6",
+   "payload": {
+    "answer": "Covalent compounds are poor conductors of electricity because they do not have ions or free electrons. The electrons are shared between atoms and are not free to move, so no charged particles are available to carry electric current.",
+    "answer_citation_ids": [
+     "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+    ],
+    "chapter_slug": "carbon-and-its-compounds",
+    "cognitive_level": "U",
+    "content": {
+     "stem": [
+      {
+       "text": "Why are covalent compounds generally poor conductors of electricity?",
+       "type": "paragraph"
+      }
+     ]
+    },
+    "marks": 2,
+    "qtype": "very_short_answer",
+    "question_citation_ids": [
+     "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+    ],
+    "raw_text": "Why are covalent compounds generally poor conductors of electricity?",
+    "source": {
+     "name": "question-generation",
+     "type": "ai_generated"
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ]
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nSuch bonds which are formed by the sharing of an electron pair between two atoms are known as covalent bonds. Covalently bonded molecules are seen to have strong bonds within the molecule, but inter molecular forces are weak. This gives rise to the low melting and boiling points of these compounds. Since the electrons are shared between atoms and no charged particles are formed, such covalent compounds are generally poor conductors of electricity.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.1: 'electrons are shared... no charged particles are formed... generally poor conductors' — 'no free electrons' elaboration consistent; all 5s."
+  },
+  {
+   "key": "i:9",
+   "payload": {
+    "answer": "B",
+    "answer_citation_ids": [
+     "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+    ],
+    "chapter_slug": "carbon-and-its-compounds",
+    "cognitive_level": "R",
+    "content": {
+     "options": [
+      {
+       "content": [
+        {
+         "text": "2",
+         "type": "paragraph"
+        }
+       ],
+       "label": "A"
+      },
+      {
+       "content": [
+        {
+         "text": "4",
+         "type": "paragraph"
+        }
+       ],
+       "label": "B"
+      },
+      {
+       "content": [
+        {
+         "text": "6",
+         "type": "paragraph"
+        }
+       ],
+       "label": "C"
+      },
+      {
+       "content": [
+        {
+         "text": "8",
+         "type": "paragraph"
+        }
+       ],
+       "label": "D"
+      }
+     ],
+     "stem": [
+      {
+       "text": "How many valence electrons does carbon have?",
+       "type": "paragraph"
+      }
+     ]
+    },
+    "marks": 1,
+    "qtype": "mcq",
+    "question_citation_ids": [
+     "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+    ],
+    "raw_text": "How many valence electrons does carbon have?",
+    "source": {
+     "name": "question-generation",
+     "type": "ai_generated"
+    },
+    "topic_names": [
+     "Versatile Nature of Carbon"
+    ]
+   },
+   "context": "4.2 VERSATILE NATURE OF CARBON\nAgain the bonds that carbon forms with most other elements are very strong making these compounds exceptionally stable. One reason for the formation of strong bonds by carbon is its small size. This enables the nucleus to hold on to the shared pairs of electrons strongly. The bonds formed by elements having bigger atoms are much weaker.",
+   "human_scores": {
+    "ncert_fidelity": 4,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [
+    "ungrounded_claim"
+   ],
+   "note": "fid -1: '4 valence electrons' is chapter-true ('four electrons in its outermost shell', 4.1) but the item's cited excerpt is the 4.2 bond-strength/small-size passage, which never states the valence count — unsupportive citation. This is the judge-vs-lexical divergence case: judge graded chapter-truth 5."
+  },
+  {
+   "key": "i:12",
+   "payload": {
+    "answer": "Carbon attains a noble gas configuration by sharing its four valence electrons with other atoms (e.g., hydrogen) to form covalent bonds. Each carbon atom shares electrons with four other atoms, achieving an octet (or duplet for hydrogen). This allows carbon to become stable without forming ions.",
+    "answer_citation_ids": [
+     "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0",
+     "ac1ef4eb9c9feefade26202cd9696da4ba1517e3602caab22e84bc2da4c3653d"
+    ],
+    "chapter_slug": "carbon-and-its-compounds",
+    "cognitive_level": "U",
+    "content": {
+     "stem": [
+      {
+       "text": "How does carbon attain a noble gas configuration?",
+       "type": "paragraph"
+      }
+     ]
+    },
+    "marks": 3,
+    "qtype": "short_answer",
+    "question_citation_ids": [
+     "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+    ],
+    "raw_text": "How does carbon attain a noble gas configuration?",
+    "source": {
+     "name": "question-generation",
+     "type": "ai_generated"
+    },
+    "topic_names": [
+     "Versatile Nature of Carbon"
+    ]
+   },
+   "context": "4.2 VERSATILE NATURE OF CARBON\nAgain the bonds that carbon forms with most other elements are very strong making these compounds exceptionally stable. One reason for the formation of strong bonds by carbon is its small size. This enables the nucleus to hold on to the shared pairs of electrons strongly. The bonds formed by elements having bigger atoms are much weaker.\n\n4.2 VERSATILE NATURE OF CARBON\n(ii) Since carbon has a valency of four, it is capable of bonding with four other atoms of carbon or atoms of some other mono-valent element. Compounds of carbon are formed with oxygen, hydrogen, nitrogen, sulphur, chlorine and many other elements giving rise to compounds with specific properties which depend on the elements other than carbon present in the molecule.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 4
+   },
+   "human_flags": [
+    "duplicate_of_excerpt_sentence"
+   ],
+   "note": "Verified vs 4.1/4.2: sharing four valence electrons -> covalent bonds -> noble gas config; cited 4.2 excerpt covers valency-four bonding. difficulty -1: restatement-level."
+  }
+ ],
+ "provenance": "Graded 2026-07-10 in-session: claude-fable-5 verified each item against the committed chapter source (content/ncert/jesc104, sections 4.1-4.2) and proposed scores with quoted evidence; Animesh confirmed/overrode each item via option cards. Human-confirmed from agent evidence, not blind human grading."
+}

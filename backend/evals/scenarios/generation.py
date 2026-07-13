@@ -11,9 +11,9 @@ Brief mapping:
   .count``; it is the primary output-token driver.
 - outputs per run → cost (metered tokens × registry rates), latency (per-call
   + unit wall), batch_size requested vs delivered, accuracy (below).
-- accuracy → deterministic: delivered/requested yield, qtype-mix conformance,
-  near-duplicate rate; judge (NCERT-grounded, rubric ``generation``): fidelity,
-  self-containedness, qtype conformity, answer correctness.
+- accuracy → deterministic here: delivered/requested yield, qtype-mix
+  conformance, near-duplicate rate, lexical citation support; judged
+  accuracy lives in ``evals.deepeval_suite`` (the single judged path).
 
 Note on yield: ``LangChainQuestionGenerator.generate`` validates and trims
 internally, so raw-model candidate counts are not observable from the outside.
@@ -29,7 +29,6 @@ import re
 from typing import Any
 
 from evals.budget import UnitEstimate
-from evals.judges.base import Judge, JudgeRequest
 from evals.metering import Meter, metered_make_model, seam_env
 from evals.records import RunRecord
 from evals.registry import get_model
@@ -45,11 +44,13 @@ from evals.scenarios.base import (
 
 SCENARIO = "generation"
 
-# Rough per-call token priors for the budget gate, from the June 2026 cost
-# report's representative Q&A call (10.5k in / 5k out at batch 30). Output
-# scales ~linearly with batch size; input is dominated by grounding + schema.
-_EST_INPUT_TOKENS = 10_500
-_EST_OUTPUT_TOKENS_PER_QUESTION = 170  # ≈5k out / 30 questions
+# Per-call token priors for the budget gate, trued to the recorded smoke run
+# (generation-20260710-134623): grounded calls carried ~14-17k prompt tokens
+# (manifest + schema dominate) and ~700-900 output tokens per requested
+# question across gemini/deepseek. The June 2026 cost report's 10.5k/170
+# priors under-forecast that run ~3.5x.
+_EST_INPUT_TOKENS = 15_000
+_EST_OUTPUT_TOKENS_PER_QUESTION = 800
 
 
 def build_units(args: argparse.Namespace) -> list[EvalUnit]:
@@ -97,13 +98,11 @@ def estimate(unit: EvalUnit) -> UnitEstimate:
 def run_unit(unit: EvalUnit) -> RunRecord:
     """One production generation call, metered.
 
-    PLACEHOLDER (issue: "generation eval — fixtures & run"): the wiring below
-    is the real production path, but it can only execute once
-    - the corpus is seeded for the fixture chapters (``seed_textbook_corpus``
-      + chapter-map import for all fixture chapters), and
-    - fixtures resolve to real ``ChapterMapNode.stable_node_id`` values
-      (``_resolve_node_ids`` below implements the runtime selector; the issue
-      pins explicit ids once the seed is final).
+    Both fixtures (``datasets/fixtures/generation_requests.json``) carry
+    pinned ``chapter_map_node_ids`` against the seeded corpus (issue #219), so
+    ``_resolve_fixture`` below resolves them directly with no runtime-selector
+    fallback. A live call still needs ``--yes`` (Rule 13) and a verified
+    model in the registry.
     """
     from bank.generation import (
         DIFFICULTY_TARGETS_BY_PRESET,
@@ -166,8 +165,9 @@ def _resolve_fixture(fixture: dict):
     chapter = Chapter.objects.filter(slug=fixture["chapter_slug"]).first()
     if chapter is None:
         raise EvalNotImplemented(
-            f"Chapter {fixture['chapter_slug']!r} not seeded — run the corpus "
-            "seed commands first (issue: generation eval — fixtures & run)."
+            f"Chapter {fixture['chapter_slug']!r} not seeded — run "
+            "seed_textbook_corpus (see evals/README.md's inputs checklist) "
+            "or pin a different, already-seeded chapter_slug."
         )
     node_ids = tuple(fixture.get("chapter_map_node_ids") or ())
     if not node_ids:
@@ -181,7 +181,7 @@ def _resolve_fixture(fixture: dict):
     if not node_ids:
         raise EvalNotImplemented(
             f"No ChapterMapNodes for {fixture['chapter_slug']!r}; import the "
-            "chapter map before running (issue: generation eval)."
+            "chapter map before running (see evals/README.md)."
         )
     return chapter, node_ids
 
@@ -191,25 +191,44 @@ def _resolve_fixture(fixture: dict):
 # ---------------------------------------------------------------------------
 
 
-def score_unit(
-    record: dict, judge: Judge | None, *, judge_sample: int = 10
-) -> dict[str, Any]:
-    """Deterministic quality metrics + judged accuracy for one stored run."""
+def score_unit(record: dict) -> dict[str, Any]:
+    """Deterministic quality metrics for one stored run.
+
+    Judged accuracy and golden agreement live in the deepeval suite
+    (``python -m evals.run deepeval-score``) — the single judged path.
+    """
     artifact = load_artifact(record)
     questions: list[dict] = artifact.get("questions", [])
+    manifest: dict = artifact.get("grounding_manifest") or {}
     requested = int(record.get("batch_size") or 0)
 
-    accuracy: dict[str, Any] = {
+    return {
         "yield": len(questions) / requested if requested else 0.0,
         "qtype_mix": _qtype_mix(questions),
         "near_duplicate_rate": _near_duplicate_rate(questions),
+        "citation_support": _citation_support(questions, manifest),
     }
 
-    if judge is not None:
-        accuracy["judge"] = _judge_sample(
-            questions[:judge_sample], artifact.get("grounding_manifest") or {}, judge
+
+def golden_items(record: dict, sample: int) -> list[tuple[str, dict, str]]:
+    """Frozen (key, payload, context) triples a human grades into goldens.
+
+    Context is the same citation-scoped excerpt text ``_judge_sample`` hands
+    the judge, so judge–human agreement compares grades of the same thing.
+    """
+    from evals.golden import spread_indices
+
+    artifact = load_artifact(record)
+    questions: list[dict] = artifact.get("questions", [])
+    excerpt_text_by_id = _excerpt_text_by_id(artifact.get("grounding_manifest") or {})
+    return [
+        (
+            f"i:{idx}",
+            questions[idx],
+            _cited_context(questions[idx], excerpt_text_by_id),
         )
-    return accuracy
+        for idx in spread_indices(len(questions), sample)
+    ]
 
 
 def _qtype_mix(questions: list[dict]) -> dict[str, int]:
@@ -235,49 +254,63 @@ def _near_duplicate_rate(questions: list[dict]) -> float:
     return dupes / len(questions)
 
 
-def _judge_sample(
-    questions: list[dict], manifest: dict, judge: Judge
-) -> dict[str, Any]:
-    """Judge each sampled question against the excerpts it was grounded on.
+def _citation_support(questions: list[dict], manifest: dict) -> dict[str, Any]:
+    """Production's lexical citation screen, run over every stored candidate.
 
-    PLACEHOLDER (issue: "generation eval — judge scoring"): context below is
-    the full manifest excerpt text; the issue should narrow it to the excerpts
-    the question actually cites (question_citation_ids) and calibrate the
-    rubric on a hand-reviewed sample.
+    ``bank.citation_support`` is the deterministic pre-review production
+    applies before a human accepts a candidate; running it at score time gives
+    a judge-independent grounding floor at zero API cost (it covers all
+    candidates, not just the judged sample). Where it and the judge disagree —
+    lexically unsupported but judged faithful, or the reverse — is exactly the
+    sample worth human review when calibrating the judge.
     """
-    context = "\n\n".join(
-        str(excerpt.get("text", "")) for excerpt in manifest.get("excerpts", [])
-    )
-    verdicts = [
-        judge.judge(
-            JudgeRequest(
-                rubric_name="generation",
-                payload=question,
-                context=context,
-                context_kind="ncert_excerpts",
-            )
-        )
-        for question in questions
-    ]
-    return summarise_verdicts(verdicts)
+    from bank.citation_support import review_candidate_citation_support
 
-
-def summarise_verdicts(verdicts) -> dict[str, Any]:
-    """Aggregate judge verdicts: mean per dimension + flag counts + failures."""
-    ok = [v for v in verdicts if v.ok]
-    dims: dict[str, list[float]] = {}
+    if not questions:
+        return {"n_reviewed": 0}
+    question_supported = answer_supported = fully_supported = 0
     flags: dict[str, int] = {}
-    for verdict in ok:
-        for dim, value in verdict.scores.items():
-            if value >= 0:  # -1 = rubric's "not applicable" sentinel
-                dims.setdefault(dim, []).append(value)
-        for flag in verdict.flags:
-            flags[flag] = flags.get(flag, 0) + 1
+    for question in questions:
+        review = review_candidate_citation_support(question, manifest)
+        question_supported += review.question_supported
+        answer_supported += review.answer_supported
+        fully_supported += review.supported
+        for issue in review.issues:
+            flags[issue.code] = flags.get(issue.code, 0) + 1
     return {
-        "n_judged": len(ok),
-        "n_failed": len(verdicts) - len(ok),
-        "mean_scores": {d: sum(v) / len(v) for d, v in dims.items() if v},
+        "n_reviewed": len(questions),
+        "question_supported_rate": question_supported / len(questions),
+        "answer_supported_rate": answer_supported / len(questions),
+        "supported_rate": fully_supported / len(questions),
         "flags": flags,
-        "rubric_version": ok[0].rubric_version if ok else "",
-        "judge_id": ok[0].judge_id if ok else "",
     }
+
+
+def _excerpt_text_by_id(manifest: dict) -> dict[str, str]:
+    return {
+        excerpt["citation_id"]: str(excerpt.get("text", ""))
+        for excerpt in manifest.get("excerpts", [])
+        if isinstance(excerpt, dict) and isinstance(excerpt.get("citation_id"), str)
+    }
+
+
+def _cited_context(question: dict, excerpt_text_by_id: dict[str, str]) -> str:
+    """The subset of manifest excerpts this candidate's citations point to."""
+    citation_ids = dict.fromkeys(
+        [
+            *_citation_ids(question.get("question_citation_ids")),
+            *_citation_ids(question.get("answer_citation_ids")),
+        ]
+    )
+    texts = (
+        excerpt_text_by_id[citation_id]
+        for citation_id in citation_ids
+        if citation_id in excerpt_text_by_id
+    )
+    return "\n\n".join(text for text in texts if text)
+
+
+def _citation_ids(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str)]

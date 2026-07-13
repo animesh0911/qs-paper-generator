@@ -231,9 +231,15 @@ def _accuracy_highlights(accuracy: dict[str, Any]) -> str:
     for key in ("recall", "precision"):
         if key in deterministic:
             parts.append(f"{key}={deterministic[key]:.2f}")
+    support = accuracy.get("citation_support") or {}
+    if isinstance(support.get("supported_rate"), (int, float)):
+        parts.append(f"cite_support={support['supported_rate']:.2f}")
     judge = accuracy.get("judge") or {}
     for dim, value in (judge.get("mean_scores") or {}).items():
         parts.append(f"{dim}={value:.1f}")
+    agreement = accuracy.get("judge_agreement") or {}
+    for dim, stats in (agreement.get("dimensions") or {}).items():
+        parts.append(f"Δhuman[{dim}]={stats['mean_abs_diff']:.2f}")
     return " ".join(parts) or "unscored"
 
 

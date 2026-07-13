@@ -17,8 +17,9 @@ Brief mapping:
   tokens × rates) so the brief's "OCR cost per run vs LLM cost per run on OCR
   output" is answered directly from one RunRecord.
 - accuracy — deterministic: the existing ``score_extraction.score`` (recall/
-  precision/section/qtype/structure) against truth manifests; judge (rubric
-  ``extraction_fidelity``): text/equation/diagram fidelity vs the source page.
+  precision/section/qtype/structure) against truth manifests plus verbatim
+  equation fidelity; judged page fidelity belongs to a deepeval extraction
+  lane when #220 lands.
 """
 
 from __future__ import annotations
@@ -29,7 +30,6 @@ from pathlib import Path
 from typing import Any
 
 from evals.budget import UnitEstimate
-from evals.judges.base import Judge, JudgeRequest
 from evals.metering import Meter, metered_make_model, seam_env
 from evals.records import RunRecord
 from evals.registry import get_model
@@ -229,10 +229,8 @@ class _MeteredOcrClient:
 # ---------------------------------------------------------------------------
 
 
-def score_unit(
-    record: dict, judge: Judge | None, *, judge_sample: int = 8
-) -> dict[str, Any]:
-    """Deterministic truth-manifest scoring + judged page fidelity."""
+def score_unit(record: dict) -> dict[str, Any]:
+    """Deterministic truth-manifest scoring for one stored run."""
     artifact = load_artifact(record)
     accuracy: dict[str, Any] = {}
 
@@ -275,8 +273,6 @@ def score_unit(
             "runs currently report cost/latency only."
         )
 
-    if judge is not None:
-        accuracy["judge"] = _judge_fidelity(record, artifact, judge, judge_sample)
     return accuracy
 
 
@@ -299,41 +295,6 @@ def _equation_fidelity(truth: dict, questions: list[dict]) -> float | None:
         for question in questions
     )
     return sum(1 for equation in expected if equation in haystack) / len(expected)
-
-
-def _judge_fidelity(
-    record: dict, artifact: dict, judge: Judge, sample: int
-) -> dict[str, Any]:
-    """Judge extracted questions against source-page text.
-
-    PLACEHOLDER (issue: "extraction eval — judge fidelity"): v1 gives the
-    judge the PDF's native text layer as coarse whole-document context. The
-    issue upgrades this to per-page attribution (provenance from per-page
-    payload order) and page-image rendering for scanned papers, where the
-    text layer is empty and OCR text must stand in as the reference.
-    """
-    import fitz
-
-    from evals.scenarios.generation import summarise_verdicts
-
-    pdf_path = Path(artifact.get("pdf", ""))
-    if not pdf_path.is_file():
-        raise FileNotFoundError(f"Source PDF for fidelity judging: {pdf_path}")
-    with fitz.open(pdf_path) as doc:
-        page_text = "\n".join(page.get_text() for page in doc)
-
-    verdicts = [
-        judge.judge(
-            JudgeRequest(
-                rubric_name="extraction_fidelity",
-                payload=question,
-                context=page_text[:20_000],
-                context_kind="page_text",
-            )
-        )
-        for question in artifact.get("questions", [])[:sample]
-    ]
-    return summarise_verdicts(verdicts)
 
 
 # ---------------------------------------------------------------------------
