@@ -217,9 +217,16 @@ def _bare_metric_name(metric: Any) -> str:
 
 
 def _generation_rows(records_path: Path) -> list[dict[str, Any]]:
-    rows = [r for r in read_records(records_path) if r.get("scenario") == "generation"]
+    # Failure records (success=False) have no artifact to build cases from;
+    # they stay in the JSONL for the report's failure counts but are not
+    # scoreable.
+    rows = [
+        r
+        for r in read_records(records_path)
+        if r.get("scenario") == "generation" and r.get("success")
+    ]
     if not rows:
-        raise ValueError(f"No generation records in {records_path}.")
+        raise ValueError(f"No successful generation records in {records_path}.")
     return rows
 
 

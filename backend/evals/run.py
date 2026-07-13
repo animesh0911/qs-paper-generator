@@ -208,18 +208,50 @@ def _cmd_run(args: argparse.Namespace) -> int:
         RESULTS_DIR
         / f"{args.scenario}-{datetime.now(UTC).strftime('%Y%m%d-%H%M%S')}.jsonl"
     )
-    completed = 0
+    completed = failed = 0
     for unit in units:
-        record = module.run_unit(unit)
+        # A failed cell is a result, not a run-abort: matrix runs cover
+        # models that flake on structured output (2026-07-13: gpt-oss-120b
+        # emitted unparseable JSON and killed the remaining 8 cells), and
+        # the record schema + report already carry success/error per row.
+        # Budget-gate refusals must still abort, so they re-raise.
+        try:
+            record = module.run_unit(unit)
+        except Exception as exc:  # noqa: BLE001 — recorded, not swallowed
+            if "budget" in type(exc).__name__.lower():
+                raise
+            record = _failure_record(unit, exc)
+            failed += 1
+            print(f"FAILED {unit.label}: {record.error}")
+        else:
+            completed += 1
+            cost = "n/a" if record.cost_usd is None else f"${record.cost_usd:.4f}"
+            print(f"done {unit.label}: cost={cost} wall={record.wall_ms}ms")
         append_records(out, [record])
-        completed += 1
-        cost = "n/a" if record.cost_usd is None else f"${record.cost_usd:.4f}"
-        print(f"done {unit.label}: cost={cost} wall={record.wall_ms}ms")
         gate.charge(record.cost_usd)
 
-    print(f"\nwrote {completed} records -> {out}")
+    print(f"\nwrote {completed + failed} records ({failed} failed) -> {out}")
     print(f"next: python -m evals.run score --records {out}")
     return 0
+
+
+def _failure_record(unit, exc: Exception):
+    """A success=False RunRecord for a unit whose production call raised."""
+    from evals.records import RunRecord
+    from evals.registry import MODELS
+
+    spec = MODELS.get(unit.model_eval_id)
+    return RunRecord(
+        scenario=unit.scenario,
+        arm=unit.arm,
+        model_eval_id=unit.model_eval_id,
+        provider=spec.provider if spec else "",
+        model=spec.model if spec else unit.model_eval_id,
+        config={**unit.config, "trial": unit.trial},
+        pricing_verified=spec.pricing_verified if spec else False,
+        success=False,
+        error=f"{type(exc).__name__}: {exc}",
+    )
 
 
 def _cmd_score(args: argparse.Namespace) -> int:
@@ -234,10 +266,13 @@ def _cmd_score(args: argparse.Namespace) -> int:
     scored = 0
     with out.open("w", encoding="utf-8") as fh:
         for row in rows:
-            module = _scenario_module(row["scenario"])
-            row["accuracy"] = module.score_unit(row, None)
+            # Failure records have no artifact to score; they pass through so
+            # the report still counts them against the model.
+            if row.get("success"):
+                module = _scenario_module(row["scenario"])
+                row["accuracy"] = module.score_unit(row, None)
+                scored += 1
             fh.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
-            scored += 1
     print(f"scored {scored} records -> {out}")
     print(
         "judged metrics + golden agreement: python -m evals.run deepeval-score "
