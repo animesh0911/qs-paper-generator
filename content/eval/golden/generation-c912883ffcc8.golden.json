@@ -1,0 +1,305 @@
+{
+ "golden_version": 1,
+ "scenario": "generation",
+ "rubric_name": "generation",
+ "rubric_version": "v1",
+ "run_id": "c912883ffcc8",
+ "model_eval_id": "deepseek-v4-flash",
+ "verified_by": "animesh (confirmed agent-evidence review)",
+ "verified_at": "2026-07-10",
+ "items": [
+  {
+   "key": "i:0",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "mcq",
+    "marks": 1,
+    "cognitive_level": "R",
+    "raw_text": "Which of the following is a property of most carbon compounds?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Which of the following is a property of most carbon compounds?"
+      }
+     ],
+     "options": [
+      {
+       "label": "A",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "They are good conductors of electricity."
+        }
+       ]
+      },
+      {
+       "label": "B",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "They have high melting points."
+        }
+       ]
+      },
+      {
+       "label": "C",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "They are poor conductors of electricity."
+        }
+       ]
+      },
+      {
+       "label": "D",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "They form ionic bonds."
+        }
+       ]
+      }
+     ]
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ],
+    "answer": "C",
+    "question_citation_ids": [
+     "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+    ],
+    "answer_citation_ids": [
+     "99175fc7400a8e63e9073523fb70ec2de08b59925fa2a3124f384c8db260696b"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nIn the previous Chapter, we have studied the properties of ionic compounds. We saw that ionic compounds have high melting and boiling points and conduct electricity in solution or in the molten state. We also\nScience saw how the nature of bonding in ionic compounds explains these properties. Let us now study the properties of some carbon compounds. Most carbon compounds are poor conductors of electricity as we have seen in Chapter 2. From the data given in Table 4.1 on the boiling and melting points of the carbon compounds, we find that these compounds have low melting and boiling points as compared to ionic compounds (Chapter 3). We can conclude that the forces of attraction between the molecules are not very strong. Since these compounds are largely non-conductors of electricity, we can conclude that the bonding in these compounds does not give rise to any ions.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.1: 'Most carbon compounds are poor conductors of electricity' — C correct; distractors contradict the chapter; all 5s."
+  },
+  {
+   "key": "i:6",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "mcq",
+    "marks": 1,
+    "cognitive_level": "U",
+    "raw_text": "Covalent compounds generally have low melting and boiling points because:",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Covalent compounds generally have low melting and boiling points because:"
+      }
+     ],
+     "options": [
+      {
+       "label": "A",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "They have strong bonds within the molecule."
+        }
+       ]
+      },
+      {
+       "label": "B",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "Intermolecular forces are weak."
+        }
+       ]
+      },
+      {
+       "label": "C",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "They are poor conductors of electricity."
+        }
+       ]
+      },
+      {
+       "label": "D",
+       "content": [
+        {
+         "type": "paragraph",
+         "text": "They are formed by ionic bonds."
+        }
+       ]
+      }
+     ]
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ],
+    "answer": "B",
+    "question_citation_ids": [
+     "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+    ],
+    "answer_citation_ids": [
+     "553a45da1bab38f2c1a503a3415fe8816d8d28fb5e660529ddcada7216d929e4"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nSuch bonds which are formed by the sharing of an electron pair between two atoms are known as covalent bonds. Covalently bonded molecules are seen to have strong bonds within the molecule, but inter molecular forces are weak. This gives rise to the low melting and boiling points of these compounds. Since the electrons are shared between atoms and no charged particles are formed, such covalent compounds are generally poor conductors of electricity.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs 4.1: 'strong bonds within the molecule, but inter molecular forces are weak. This gives rise to the low melting and boiling points' — B correct; option C is true-but-not-the-reason, a good causal distractor; all 5s."
+  },
+  {
+   "key": "i:12",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "very_short_answer",
+    "marks": 2,
+    "cognitive_level": "U",
+    "raw_text": "Why is graphite used as a lubricant?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Why is graphite used as a lubricant?"
+      }
+     ]
+    },
+    "topic_names": [
+     "Bonding in Carbon - The Covalent Bond"
+    ],
+    "answer": "It is smooth and slippery due to its layered structure.",
+    "question_citation_ids": [
+     "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+    ],
+    "answer_citation_ids": [
+     "45ef9050f0f931861ab63e1b47eb346296c7012dc637afb9c088a3947211e403"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.1 BONDING IN CARBON - THE COVALENT BOND\nThe element carbon occurs in different forms in nature with widely varying physical properties. Both diamond and graphite are formed by carbon atoms, the difference lies in the manner in which the carbon atoms are bonded to one another. In diamond, each carbon atom is bonded to four other carbon atoms forming a rigid three-dimensional structure. In graphite, each carbon atom is bonded to three other carbon atoms in the same plane giving a hexagonal array. One of these bonds is a double-bond, and thus the valency of carbon is satisfied. Graphite structure is formed by the hexagonal arrays being placed in layers one above the other.",
+   "human_scores": {
+    "ncert_fidelity": 4,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [
+    "ungrounded_claim"
+   ],
+   "note": "fid -1: the lubricant-use premise is not in the chapter (4.1 only says graphite is 'smooth and slippery', layered hexagonal arrays); the answer itself is grounded in that passage."
+  },
+  {
+   "key": "i:18",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "very_short_answer",
+    "marks": 2,
+    "cognitive_level": "R",
+    "raw_text": "Define catenation.",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Define catenation."
+      }
+     ]
+    },
+    "topic_names": [
+     "Versatile Nature of Carbon"
+    ],
+    "answer": "Catenation is the property of carbon to form bonds with other atoms of carbon, giving rise to large molecules.",
+    "question_citation_ids": [
+     "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+    ],
+    "answer_citation_ids": [
+     "c30da580789b333fe954d0b76abc5c3e78a2c55665ce845b114f2a6dca81ffd0"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.2 VERSATILE NATURE OF CARBON\n(i) Carbon has the unique ability to form bonds with other atoms of carbon, giving rise to large molecules. This property is called catenation. These compounds may have long chains of carbon, branched chains of carbon or even carbon atoms arranged in rings. In addition, carbon atoms may be linked by single, double or triple bonds. Compounds of carbon, which are linked by only single bonds between the carbon atoms are called saturated compounds. Compounds of carbon having double or triple bonds between their carbon atoms are called unsaturated compounds.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 4
+   },
+   "human_flags": [
+    "duplicate_of_excerpt_sentence"
+   ],
+   "note": "Verified vs 4.2(i): definition matches 'unique ability to form bonds with other atoms of carbon, giving rise to large molecules... called catenation'; difficulty -1 for verbatim definition recall."
+  },
+  {
+   "key": "i:24",
+   "payload": {
+    "chapter_slug": "carbon-and-its-compounds",
+    "qtype": "long_answer",
+    "marks": 5,
+    "cognitive_level": "An",
+    "raw_text": "Compare the catenation property of carbon with that of silicon. Why are carbon compounds more stable?",
+    "content": {
+     "stem": [
+      {
+       "type": "paragraph",
+       "text": "Compare the catenation property of carbon with that of silicon. Why are carbon compounds more stable?"
+      }
+     ]
+    },
+    "topic_names": [
+     "Versatile Nature of Carbon"
+    ],
+    "answer": "Carbon exhibits catenation to a very large extent, forming compounds with long chains, branched chains, and rings. Silicon also forms chains with hydrogen, but only up to seven or eight atoms, and these compounds are very reactive. In contrast, the carbon-carbon bond is very strong and stable. Additionally, carbon bonds with most other elements are strong because of its small size, which allows the nucleus to hold on to shared pairs strongly. Silicon atoms are larger, so the bonds are weaker. Therefore, carbon compounds are much more numerous and stable than silicon compounds.",
+    "question_citation_ids": [
+     "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+     "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+    ],
+    "answer_citation_ids": [
+     "4382f8c37c0367c12df3a8e3ebec3d3393b4487cc18e3b62d4e40ecba9989049",
+     "3abcdf8a9914cbc0d1fe28db5e1b164b2c4e13b7b1fe1d96a2b83d673f85e5e0"
+    ],
+    "source": {
+     "type": "ai_generated",
+     "name": "question-generation"
+    }
+   },
+   "context": "4.2 VERSATILE NATURE OF CARBON\nNo other element exhibits the property of catenation to the extent seen in carbon compounds. Silicon forms compounds with hydrogen which have chains of upto seven or eight atoms, but these compounds are very reactive. The carbon-carbon bond is very strong and hence stable. This gives us the large number of compounds with many carbon atoms linked to each other.\n\n4.2 VERSATILE NATURE OF CARBON\nAgain the bonds that carbon forms with most other elements are very strong making these compounds exceptionally stable. One reason for the formation of strong bonds by carbon is its small size. This enables the nucleus to hold on to the shared pairs of electrons strongly. The bonds formed by elements having bigger atoms are much weaker.",
+   "human_scores": {
+    "ncert_fidelity": 5,
+    "self_containedness": 5,
+    "qtype_conformity": 5,
+    "answer_correctness": 5,
+    "difficulty_plausibility": 5
+   },
+   "human_flags": [],
+   "note": "Verified vs both cited 4.2 excerpts: carbon catenation extent, Si-H chains up to 7-8 atoms + reactive, strong C-C bond, small-size reason. Proper 5-mark comparison; all 5s."
+  }
+ ],
+ "provenance": "Graded 2026-07-10 in-session: claude-fable-5 verified each item against the committed chapter source (content/ncert/jesc104, sections 4.1-4.2) and proposed scores with quoted evidence; Animesh confirmed/overrode each item via option cards. Human-confirmed from agent evidence, not blind human grading."
+}
