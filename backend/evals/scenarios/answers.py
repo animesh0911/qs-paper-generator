@@ -12,10 +12,10 @@ Brief mapping:
   one production call per chunk — ``chunk_size`` is part of the matrix, since
   it is the real cost/latency/quality trade-off a premium tier would tune.
 - outputs per run → model, cost, batch_size, latency, accuracy.
-- accuracy → textbook-grounded judging (the user-chosen ground truth): NCERT
-  excerpts retrieved per question through the production corpus retriever;
-  the ``answers`` rubric scores correctness/groundedness/marks-depth, and
-  runs record corpus *coverage* so ungrounded verdicts are reported apart.
+- accuracy → deterministic here: answered rate + corpus coverage (so
+  ungrounded judging is never silently mixed in); textbook-grounded judged
+  accuracy belongs to the deepeval suite's answers lane (#226), grading the
+  same ``_judge_payload`` shape golden graders see.
 """
 
 from __future__ import annotations
@@ -25,14 +25,12 @@ from math import ceil
 from typing import Any
 
 from evals.budget import UnitEstimate
-from evals.judges.base import Judge, JudgeRequest
 from evals.metering import Meter, metered_make_model, seam_env
 from evals.records import RunRecord
 from evals.registry import get_model
 from evals.scenarios.base import (
     EvalNotImplemented,
     EvalUnit,
-    golden_agreement,
     load_artifact,
     new_record,
     save_artifact,
@@ -156,13 +154,13 @@ def run_unit(unit: EvalUnit) -> RunRecord:
 # ---------------------------------------------------------------------------
 
 
-def score_unit(
-    record: dict, judge: Judge | None, *, judge_sample: int = 12
-) -> dict[str, Any]:
-    """Coverage + textbook-grounded judged accuracy for one stored run."""
+def score_unit(record: dict) -> dict[str, Any]:
+    """Deterministic coverage metrics for one stored run.
+
+    Judged accuracy belongs to the deepeval suite's answers lane (#226).
+    """
     from bank.models import Question
-    from evals.datasets.loaders import corpus_coverage, textbook_context_for_question
-    from evals.scenarios.generation import summarise_verdicts
+    from evals.datasets.loaders import corpus_coverage
 
     artifact = load_artifact(record)
     answers: list[dict] = artifact.get("answers", [])
@@ -172,7 +170,7 @@ def score_unit(
         for q in Question.objects.filter(pk__in=question_ids).select_related("chapter")
     }
 
-    accuracy: dict[str, Any] = {
+    return {
         "answered_rate": (
             len(answers) / record.get("batch_size", 1)
             if record.get("batch_size")
@@ -183,34 +181,14 @@ def score_unit(
         ).fraction,
     }
 
-    if judge is not None:
-        verdicts = []
-        for item in answers[:judge_sample]:
-            question = questions.get(int(item.get("id", 0)))
-            if question is None:
-                continue
-            context = textbook_context_for_question(question)
-            verdicts.append(
-                judge.judge(
-                    JudgeRequest(
-                        rubric_name="answers",
-                        payload=_judge_payload(question, item),
-                        context=context,
-                        context_kind="ncert_excerpts" if context else "",
-                    )
-                )
-            )
-        accuracy["judge"] = summarise_verdicts(verdicts)
-        accuracy.update(golden_agreement(record, judge))
-    return accuracy
-
 
 def golden_items(record: dict, sample: int) -> list[tuple[str, dict, str]]:
     """Frozen (key, payload, context) triples a human grades into goldens.
 
-    Payload and context are exactly what ``score_unit`` hands the judge, so
-    judge–human agreement compares grades of the same thing. Contexts are
-    frozen at draft time: agreement stays comparable even as the corpus grows.
+    Payload and context are exactly what the future answers deepeval lane
+    (#226) will hand its judge, so judge–human agreement compares grades of
+    the same thing. Contexts are frozen at draft time: agreement stays
+    comparable even as the corpus grows.
     """
     from bank.models import Question
     from evals.datasets.loaders import textbook_context_for_question

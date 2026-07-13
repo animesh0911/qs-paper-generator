@@ -1,36 +1,13 @@
-"""Golden sets: draft/verify lifecycle, validation, judge–human agreement."""
+"""Golden sets: draft/verify lifecycle and validation."""
 
 import json
-from dataclasses import dataclass
 
 import pytest
 
 from evals.datasets.loaders import DatasetError
-from evals.golden import (
-    draft_golden_set,
-    judge_human_agreement,
-    load_golden_sets,
-    spread_indices,
-)
-from evals.judges.base import JudgeRequest, JudgeVerdict
+from evals.golden import draft_golden_set, load_golden_sets, spread_indices
 
 RECORD = {"scenario": "generation", "run_id": "run1", "model_eval_id": "m"}
-
-
-@dataclass
-class StaticJudge:
-    """Returns the same scores for every payload — agreement math is exact."""
-
-    scores: dict
-    judge_id: str = "static"
-    rubric_version: str = "v1"
-
-    def judge(self, request: JudgeRequest) -> JudgeVerdict:
-        return JudgeVerdict(
-            scores=dict(self.scores),
-            judge_id=self.judge_id,
-            rubric_version=self.rubric_version,
-        )
 
 
 def _draft(tmp_path, items=None):
@@ -110,41 +87,6 @@ def test_unknown_score_dimension_is_loud(tmp_path):
 
     with pytest.raises(DatasetError, match="unknown dimensions"):
         load_golden_sets("generation", "run1", golden_dir=tmp_path)
-
-
-def test_agreement_reports_per_dimension_gap_and_skips_na(tmp_path):
-    path = _draft(
-        tmp_path,
-        items=[("i:0", {"raw_text": "Q0"}, "ctx"), ("i:1", {"raw_text": "Q1"}, "")],
-    )
-    _verify(
-        path,
-        {
-            "i:0": {"ncert_fidelity": 5, "answer_correctness": 3},
-            "i:1": {"ncert_fidelity": 4, "answer_correctness": -1},
-        },
-    )
-    judge = StaticJudge(scores={"ncert_fidelity": 4.0, "answer_correctness": 5.0})
-    [golden_set], _ = load_golden_sets("generation", "run1", golden_dir=tmp_path)
-
-    agreement = judge_human_agreement(judge, [golden_set])
-
-    assert agreement["n_judged"] == 2
-    fidelity = agreement["dimensions"]["ncert_fidelity"]
-    assert fidelity == {"n": 2, "mean_abs_diff": 0.5, "within_1": 1.0}
-    correctness = agreement["dimensions"]["answer_correctness"]
-    assert correctness == {"n": 1, "mean_abs_diff": 2.0, "within_1": 0.0}
-    assert agreement["judge_id"] == "static"
-
-
-def test_agreement_refuses_rubric_version_mismatch(tmp_path):
-    path = _draft(tmp_path)
-    _verify(path, {"i:0": {"ncert_fidelity": 5}})
-    [golden_set], _ = load_golden_sets("generation", "run1", golden_dir=tmp_path)
-    judge = StaticJudge(scores={"ncert_fidelity": 5.0}, rubric_version="v2")
-
-    with pytest.raises(DatasetError, match="re-verify the golden set"):
-        judge_human_agreement(judge, [golden_set])
 
 
 def test_spread_indices_samples_across_the_whole_list():

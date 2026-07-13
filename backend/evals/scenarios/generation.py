@@ -11,9 +11,9 @@ Brief mapping:
   .count``; it is the primary output-token driver.
 - outputs per run → cost (metered tokens × registry rates), latency (per-call
   + unit wall), batch_size requested vs delivered, accuracy (below).
-- accuracy → deterministic: delivered/requested yield, qtype-mix conformance,
-  near-duplicate rate; judge (NCERT-grounded, rubric ``generation``): fidelity,
-  self-containedness, qtype conformity, answer correctness.
+- accuracy → deterministic here: delivered/requested yield, qtype-mix
+  conformance, near-duplicate rate, lexical citation support; judged
+  accuracy lives in ``evals.deepeval_suite`` (the single judged path).
 
 Note on yield: ``LangChainQuestionGenerator.generate`` validates and trims
 internally, so raw-model candidate counts are not observable from the outside.
@@ -29,14 +29,12 @@ import re
 from typing import Any
 
 from evals.budget import UnitEstimate
-from evals.judges.base import Judge, JudgeRequest
 from evals.metering import Meter, metered_make_model, seam_env
 from evals.records import RunRecord
 from evals.registry import get_model
 from evals.scenarios.base import (
     EvalNotImplemented,
     EvalUnit,
-    golden_agreement,
     load_artifact,
     new_record,
     save_artifact,
@@ -193,26 +191,23 @@ def _resolve_fixture(fixture: dict):
 # ---------------------------------------------------------------------------
 
 
-def score_unit(
-    record: dict, judge: Judge | None, *, judge_sample: int = 10
-) -> dict[str, Any]:
-    """Deterministic quality metrics + judged accuracy for one stored run."""
+def score_unit(record: dict) -> dict[str, Any]:
+    """Deterministic quality metrics for one stored run.
+
+    Judged accuracy and golden agreement live in the deepeval suite
+    (``python -m evals.run deepeval-score``) — the single judged path.
+    """
     artifact = load_artifact(record)
     questions: list[dict] = artifact.get("questions", [])
     manifest: dict = artifact.get("grounding_manifest") or {}
     requested = int(record.get("batch_size") or 0)
 
-    accuracy: dict[str, Any] = {
+    return {
         "yield": len(questions) / requested if requested else 0.0,
         "qtype_mix": _qtype_mix(questions),
         "near_duplicate_rate": _near_duplicate_rate(questions),
         "citation_support": _citation_support(questions, manifest),
     }
-
-    if judge is not None:
-        accuracy["judge"] = _judge_sample(questions[:judge_sample], manifest, judge)
-        accuracy.update(golden_agreement(record, judge))
-    return accuracy
 
 
 def golden_items(record: dict, sample: int) -> list[tuple[str, dict, str]]:
@@ -291,35 +286,6 @@ def _citation_support(questions: list[dict], manifest: dict) -> dict[str, Any]:
     }
 
 
-def _judge_sample(
-    questions: list[dict], manifest: dict, judge: Judge
-) -> dict[str, Any]:
-    """Judge each sampled question against only the excerpts it cites.
-
-    ``question_citation_ids``/``answer_citation_ids`` are required output
-    fields (``bank.generation``'s schema); scoping context to the excerpts a
-    candidate actually names — instead of the whole grounding manifest — is
-    what makes ``ncert_fidelity``/``answer_correctness`` a check against what
-    the model claimed to use, not everything it could have used.
-    """
-    excerpt_text_by_id = _excerpt_text_by_id(manifest)
-    contexts = [_cited_context(question, excerpt_text_by_id) for question in questions]
-    verdicts = [
-        judge.judge(
-            JudgeRequest(
-                rubric_name="generation",
-                payload=question,
-                context=context,
-                context_kind="ncert_excerpts",
-            )
-        )
-        for question, context in zip(questions, contexts)
-    ]
-    summary = summarise_verdicts(verdicts)
-    summary["n_uncited"] = sum(1 for context in contexts if not context)
-    return summary
-
-
 def _excerpt_text_by_id(manifest: dict) -> dict[str, str]:
     return {
         excerpt["citation_id"]: str(excerpt.get("text", ""))
@@ -348,24 +314,3 @@ def _citation_ids(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
     return [item for item in value if isinstance(item, str)]
-
-
-def summarise_verdicts(verdicts) -> dict[str, Any]:
-    """Aggregate judge verdicts: mean per dimension + flag counts + failures."""
-    ok = [v for v in verdicts if v.ok]
-    dims: dict[str, list[float]] = {}
-    flags: dict[str, int] = {}
-    for verdict in ok:
-        for dim, value in verdict.scores.items():
-            if value >= 0:  # -1 = rubric's "not applicable" sentinel
-                dims.setdefault(dim, []).append(value)
-        for flag in verdict.flags:
-            flags[flag] = flags.get(flag, 0) + 1
-    return {
-        "n_judged": len(ok),
-        "n_failed": len(verdicts) - len(ok),
-        "mean_scores": {d: sum(v) / len(v) for d, v in dims.items() if v},
-        "flags": flags,
-        "rubric_version": ok[0].rubric_version if ok else "",
-        "judge_id": ok[0].judge_id if ok else "",
-    }

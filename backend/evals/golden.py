@@ -1,10 +1,11 @@
 """Golden sets: hand-verified verdicts that calibrate the LLM judge.
 
 A golden set freezes what one human graded — payload, reference context, and
-per-dimension scores — for a sample of one stored run's outputs. At score
-time the judge re-grades exactly those frozen (payload, context) pairs and
-the per-dimension gap is reported as judge–human agreement: the number that
-says how much a judged groundedness/correctness score can be trusted.
+per-dimension scores — for a sample of one stored run's outputs. The deepeval
+suite grades the same items and reports the per-dimension gap as judge–human
+agreement: the number that says how much a judged groundedness/correctness
+score can be trusted (see ``evals.deepeval_suite.runner`` and the golden
+regression gate).
 
 Workflow (HITL — an agent drafts, a human verifies):
 
@@ -15,9 +16,8 @@ Workflow (HITL — an agent drafts, a human verifies):
    cannot calibrate it).
 2. A human fills every ``human_scores`` dimension (0–5 per the rubric,
    ``-1`` for not-applicable), then sets ``verified_by``/``verified_at``.
-3. ``score`` picks verified sets up by ``run_id`` and adds
-   ``judge_agreement`` to the record's accuracy; drafts only surface as a
-   ``golden_drafts_pending`` count and are never compared.
+3. ``deepeval-score`` samples verified golden items by ``run_id`` and
+   reports per-dimension judge–human agreement; drafts are never compared.
 
 File format (``golden_version: 1``)::
 
@@ -46,7 +46,7 @@ from typing import Any
 
 from evals.datasets import GOLDEN_DIR
 from evals.datasets.loaders import DatasetError
-from evals.judges.base import Judge, JudgeRequest, load_rubric
+from evals.judges.base import load_rubric
 
 GOLDEN_VERSION = 1
 
@@ -162,59 +162,6 @@ def load_golden_sets(
         else:
             pending += 1
     return verified, pending
-
-
-def judge_human_agreement(judge: Judge, golden_sets: list[GoldenSet]) -> dict[str, Any]:
-    """Re-judge each golden's frozen payload+context; gap per dimension.
-
-    The judge grades exactly what the human graded, so agreement is immune to
-    corpus drift and judge-sample selection. ``-1`` (not-applicable) on either
-    side skips that dimension pair, matching ``summarise_verdicts``.
-    """
-    diffs_by_dim: dict[str, list[float]] = {}
-    judged = failed = 0
-    judge_id = ""
-    for golden_set in golden_sets:
-        for item in golden_set.items:
-            verdict = judge.judge(
-                JudgeRequest(
-                    rubric_name=golden_set.rubric_name,
-                    payload=item.payload,
-                    context=item.context,
-                    context_kind="ncert_excerpts" if item.context else "",
-                )
-            )
-            if not verdict.ok:
-                failed += 1
-                continue
-            if verdict.rubric_version != golden_set.rubric_version:
-                raise DatasetError(
-                    f"{golden_set.path} was graded under rubric "
-                    f"{golden_set.rubric_version!r} but the judge runs "
-                    f"{verdict.rubric_version!r}; re-verify the golden set "
-                    "against the current rubric."
-                )
-            judged += 1
-            judge_id = verdict.judge_id
-            for dim, human in item.human_scores.items():
-                model = verdict.scores.get(dim)
-                if model is None or model < 0 or human < 0:
-                    continue
-                diffs_by_dim.setdefault(dim, []).append(abs(model - human))
-    return {
-        "n_golden_items": sum(len(s.items) for s in golden_sets),
-        "n_judged": judged,
-        "n_failed": failed,
-        "dimensions": {
-            dim: {
-                "n": len(diffs),
-                "mean_abs_diff": sum(diffs) / len(diffs),
-                "within_1": sum(1 for d in diffs if d <= 1) / len(diffs),
-            }
-            for dim, diffs in sorted(diffs_by_dim.items())
-        },
-        "judge_id": judge_id,
-    }
 
 
 def _parse_golden(path: Path, raw: dict, scenario: str) -> GoldenSet:

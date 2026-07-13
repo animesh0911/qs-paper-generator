@@ -6,7 +6,7 @@ Each module implements the same four functions consumed by ``evals.run``:
 - ``estimate(unit)``      — rough token forecast for the budget gate.
 - ``run_unit(unit)``      — the paid phase: production call via the metered
                             seam; returns a RunRecord + writes raw artifacts.
-- ``score_unit(record, judge)`` — the scoring phase over stored artifacts;
+- ``score_unit(record)`` — deterministic scoring over stored artifacts;
                             deterministic metrics + judge verdicts.
 
 Wiring to production entry points is real; bodies that need datasets, judge

@@ -64,14 +64,14 @@ verifying a price later fixes past reports without re-running.
 
 There is exactly **one judged scoring path**: `deepeval-score` (below).
 `score` is deterministic-only, so "which number is the number" never has two
-answers. The Judge-protocol backends in `evals/judges/` (`claude -p`,
-`codex exec`, seam) are retained as a *library* for cross-family second
-opinions on golden sets — they are no longer a CLI scoring lane.
+answers. The pre-deepeval judge backends (`claude -p`, `codex exec`, seam)
+were deleted once superseded — `evals/judges/` now holds only the versioned
+rubric files plus `load_rubric`.
 
-Rubrics live in `evals/judges/rubrics/*.md`, are versioned
-(`rubric_version:`), and every verdict records its rubric version and judge id
-so scores from different rubric revisions are never silently mixed. The judge
-is never the model under test.
+Rubrics (`evals/judges/rubrics/*.md`, `rubric_version:` header) remain the
+source of truth for what each judged dimension means: the deepeval G-Eval
+steps mirror them, and golden sets stamp their version so a rubric edit
+invalidates comparability loudly. The judge is never the model under test.
 
 **deepeval suite** (`evals/deepeval_suite/`, Phase 1 — generation): the
 decomposed measurement layer on top of the same stored artifacts. One G-Eval

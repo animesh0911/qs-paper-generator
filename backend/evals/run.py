@@ -257,8 +257,6 @@ def _failure_record(unit, exc: Exception):
 def _cmd_score(args: argparse.Namespace) -> int:
     # Deterministic-only by design: there is exactly ONE judged scoring path
     # (deepeval-score), so "which number is the number" never has two answers.
-    # The Judge-protocol backends in evals/judges/ remain as a library for
-    # cross-family spot checks, not as a CLI lane.
     from evals.records import read_records
 
     rows = read_records(args.records)
@@ -270,7 +268,7 @@ def _cmd_score(args: argparse.Namespace) -> int:
             # the report still counts them against the model.
             if row.get("success"):
                 module = _scenario_module(row["scenario"])
-                row["accuracy"] = module.score_unit(row, None)
+                row["accuracy"] = module.score_unit(row)
                 scored += 1
             fh.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
     print(f"scored {scored} records -> {out}")
